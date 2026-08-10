@@ -133,6 +133,7 @@ function EditResume() {
   const [draft, setDraft] = useState<Resume | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("saved");
   const [step, setStep] = useState<(typeof stepDefs)[number]["key"]>("personal");
+  const [sideTab, setSideTab] = useState("preview");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const past = useRef<Resume[]>([]);
   const future = useRef<Resume[]>([]);
@@ -202,6 +203,11 @@ function EditResume() {
       return next;
     });
   }, [scheduleSave]);
+
+  // Deep link from the dashboard: /resumes/:id/edit#ats opens the ATS panel.
+  useEffect(() => {
+    if (window.location.hash === "#ats") setSideTab("ats");
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -916,7 +922,7 @@ function EditResume() {
 
         {/* Right column */}
         <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[calc(100vh-10rem)]">
-          <Tabs defaultValue="preview" className="flex h-full flex-col">
+          <Tabs value={sideTab} onValueChange={setSideTab} className="flex h-full flex-col">
             <TabsList className="w-full">
               <TabsTrigger value="preview" className="flex-1">{ar ? "معاينة" : "Preview"}</TabsTrigger>
               <TabsTrigger value="ai" className="flex-1">{ar ? "مساعد سيرتي" : "Assistant"}</TabsTrigger>
