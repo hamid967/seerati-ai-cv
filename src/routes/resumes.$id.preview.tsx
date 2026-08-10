@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
-import { atsScore, runAtsChecks, toPlainText } from "@/lib/ats";
+import { analyzeResume, toPlainText } from "@/lib/ats";
 
 export const Route = createFileRoute("/resumes/$id/preview")({
   head: () => ({
@@ -50,7 +50,7 @@ function PreviewResume() {
   }
 
   const tpl = getTemplate(resume.templateId);
-  const score = atsScore(runAtsChecks(resume.data, tpl.atsFriendly));
+  const score = analyzeResume(resume, tpl).score;
 
   const downloadTxt = () => {
     const blob = new Blob([toPlainText(resume)], { type: "text/plain;charset=utf-8" });
