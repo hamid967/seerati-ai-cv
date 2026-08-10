@@ -46,24 +46,61 @@ export async function fetchTemplates(includeInactive = false): Promise<TemplateD
   return ((data as TemplateRow[] | null) ?? []).map(rowToTemplate);
 }
 
+const templateColumns = (tpl: TemplateDef) => ({
+  name_ar: tpl.name.ar,
+  name_en: tpl.name.en,
+  description_ar: tpl.description.ar,
+  description_en: tpl.description.en,
+  category: tpl.category,
+  supports_rtl: tpl.supportsRTL,
+  ats_friendly: tpl.atsFriendly,
+  active: tpl.active,
+  display_order: tpl.order,
+  design: tpl.design as never,
+});
+
 export async function saveTemplate(tpl: TemplateDef) {
-  const { error } = await supabase
-    .from("templates")
-    .update({
-      name_ar: tpl.name.ar,
-      name_en: tpl.name.en,
-      description_ar: tpl.description.ar,
-      description_en: tpl.description.en,
-      category: tpl.category,
-      supports_rtl: tpl.supportsRTL,
-      ats_friendly: tpl.atsFriendly,
-      active: tpl.active,
-      display_order: tpl.order,
-      design: tpl.design as never,
-    })
-    .eq("id", tpl.id);
+  const { error } = await supabase.from("templates").update(templateColumns(tpl)).eq("id", tpl.id);
   return error ? { error: error.message } : {};
 }
+
+export async function createTemplate(tpl: TemplateDef) {
+  const { error } = await supabase.from("templates").insert({ id: tpl.id, ...templateColumns(tpl) });
+  return error ? { error: error.message } : {};
+}
+
+/** Deletes a template only when unused; otherwise deactivates it. */
+export async function deleteOrDeactivateTemplate(id: string): Promise<{ deleted: boolean; error?: string }> {
+  const { count } = await supabase
+    .from("resumes")
+    .select("id", { count: "exact", head: true })
+    .eq("template_id", id);
+  if ((count ?? 0) > 0) {
+    const { error } = await supabase.from("templates").update({ active: false }).eq("id", id);
+    return { deleted: false, ...(error ? { error: error.message } : {}) };
+  }
+  const { error } = await supabase.from("templates").delete().eq("id", id);
+  return { deleted: !error, ...(error ? { error: error.message } : {}) };
+}
+
+export async function templateUsage(): Promise<Record<string, number>> {
+  const { data } = await supabase.from("resumes").select("template_id");
+  const out: Record<string, number> = {};
+  for (const r of data ?? []) {
+    const key = r.template_id ?? "—";
+    out[key] = (out[key] ?? 0) + 1;
+  }
+  return out;
+}
+
+export async function setUserRole(userId: string, role: "admin" | "user") {
+  const { error } = await supabase.rpc("admin_set_user_role", {
+    target_user_id: userId,
+    new_role: role,
+  });
+  return error ? { error: error.message } : {};
+}
+
 
 export type AdminUser = {
   id: string;
