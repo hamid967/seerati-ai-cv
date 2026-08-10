@@ -11,6 +11,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowRight,
+  Check,
   ClipboardPaste,
   FileUp,
   Info,
@@ -55,6 +56,7 @@ import {
   type ListKind,
 } from "@/lib/import-map";
 import { ResumeCopilot, type CopilotGap } from "@/components/resume-copilot";
+import { describeProgress, RESUME_LANGUAGE_LABEL, type ResumeLanguage } from "@/lib/ai-actions";
 import { uid } from "@/lib/types";
 
 export const Route = createFileRoute("/import")({
@@ -106,6 +108,9 @@ function ImportCenterPage() {
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<ImportDraft | null>(null);
   const [twin, setTwin] = useState<CareerTwin | null>(null);
+  const [recap, setRecap] = useState<string[]>([]);
+  const [dragOver, setDragOver] = useState(false);
+  const [resumeLang, setResumeLang] = useState<ResumeLanguage>(ar ? "ar" : "en");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const health = useMemo(() => twinHealth(twin), [twin]);
@@ -235,6 +240,31 @@ function ImportCenterPage() {
                 {connector.note[ar ? "ar" : "en"]}
               </p>
             )}
+
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file) void onFile(file);
+              }}
+              className={`rounded-xl border-2 border-dashed p-6 text-center transition ${
+                dragOver ? "border-primary bg-primary/5" : "border-border"
+              }`}
+            >
+              <Upload className="mx-auto size-6 text-muted-foreground" />
+              <p className="mt-2 text-sm font-medium">
+                {ar ? "اسحب الملف وأفلته هنا" : "Drag and drop your file here"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {ar ? "أو استخدم الأزرار أدناه — الملف يُقرأ في متصفحك فقط." : "Or use the buttons below — the file is read in your browser only."}
+              </p>
+            </div>
 
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => fileRef.current?.click()} disabled={busy}>
