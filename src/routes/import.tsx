@@ -329,7 +329,14 @@ function ImportCenterPage() {
         toast.success(
           ar ? `تم حفظ ${count} عنصراً في ملفك المهني.` : `Saved ${count} item${count === 1 ? "" : "s"} to your profile.`,
         );
-        setStep("gaps");
+        setRecap(
+          sections.map((s) =>
+            ar ? `تم استيراد قسم: ${s}` : `Imported section: ${s}`,
+          ),
+        );
+        if (next === "gaps") setStep("gaps");
+        else navigate({ to: "/career-twin" });
+
       } finally {
         setBusy(false);
       }
