@@ -27,6 +27,14 @@ import {
   type QuickAction,
 } from "@/lib/ai-actions";
 import { parseCopilotAction, type CopilotProtocolAction } from "@/lib/copilot/actions";
+import { listProtectedTerms, type ProtectedTerm } from "@/lib/career-facts";
+import {
+  applyProtectedTerms,
+  normalizeArabicEnglishPunctuation,
+  preserveBrandEntities,
+  protectedTermsPrompt,
+} from "@/lib/bilingual-intelligence";
+import { supabase } from "@/integrations/supabase/client";
 
 export type CopilotGap = {
   /** Field the question targets, e.g. "summary" or "skills". */
@@ -82,6 +90,7 @@ export function ResumeCopilot({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastAnswer, setLastAnswer] = useState("");
+  const [terms, setTerms] = useState<ProtectedTerm[]>([]);
   const scroller = useRef<HTMLDivElement>(null);
   const composer = useRef<HTMLTextAreaElement>(null);
 
@@ -109,6 +118,25 @@ export function ResumeCopilot({
     composer.current?.focus();
   }, [busy]);
 
+  // Protected terms are the user's own glossary; they gate every translation.
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      const { data } = await supabase.auth.getSession();
+      const uid = data.session?.user.id;
+      if (!uid) return;
+      try {
+        const rows = await listProtectedTerms(uid);
+        if (alive) setTerms(rows);
+      } catch {
+        /* glossary is an enhancement — never block the copilot on it */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const remaining = useMemo(() => Math.max(0, gaps.length - index), [gaps.length, index]);
   const activeKey = gap?.key ?? "headline";
 
@@ -128,17 +156,45 @@ export function ResumeCopilot({
           section: activeKey,
           ...(targetRole ? { targetRole } : {}),
           ...(jobDescription ? { jobDescription } : {}),
+          ...(terms.length ? { protectedTerms: protectedTermsPrompt(terms, replyLang) } : {}),
         },
       });
       const raw = (res.items?.[0] ?? res.text).trim();
-      const text = flagUnverifiedFigures(raw, replyLang);
+      const isTranslate = quick?.task === "translate";
+      // Deterministic post-processing: punctuation hygiene for the target
+      // language, then the user's glossary spelling restored, then a report of
+      // brands/terms the model dropped. The model never has the last word here.
+      const hygienic = isTranslate ? normalizeArabicEnglishPunctuation(raw, replyLang) : raw;
+      const applied = isTranslate ? applyProtectedTerms(hygienic, terms, answer) : null;
+      const brands = isTranslate ? preserveBrandEntities(answer, applied?.text ?? hygienic) : null;
+      const text = flagUnverifiedFigures(applied?.text ?? hygienic, replyLang);
+      const droppedTerms = [
+        ...(applied?.missing ?? []),
+        ...(brands?.missing ?? []),
+      ].filter((v, i, a) => a.indexOf(v) === i);
+      const bilingualNote = isTranslate
+        ? [
+            applied?.restored.length
+              ? replyLang === "ar"
+                ? `أُعيد ضبط تهجئة: ${applied.restored.join("، ")}`
+                : `Spelling restored for: ${applied.restored.join(", ")}`
+              : "",
+            droppedTerms.length
+              ? replyLang === "ar"
+                ? `تحقّق من غياب: ${droppedTerms.join("، ")}`
+                : `Check missing: ${droppedTerms.join(", ")}`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : "";
       const action = makeAction({
         type: quick?.task === "translate" ? "translate" : activeKey ? "update_field" : "suggest_edit",
         target: activeKey,
         text,
         ...(res.items?.length ? { items: res.items } : {}),
         reason: quick
-          ? quick.reason[replyLang]
+          ? [quick.reason[replyLang], bilingualNote].filter(Boolean).join(" — ")
           : replyLang === "ar"
             ? "صياغة مهنية مبنية على ما ذكرته، بدون إضافة معلومات لم تقدّمها."
             : "Professional wording based only on what you told me — nothing invented.",
