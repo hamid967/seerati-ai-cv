@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import type { Resume, ResumeUserDesign, TemplateDef } from "@/lib/types";
 import { defaultTemplates } from "@/lib/templates";
 
@@ -376,30 +377,37 @@ export function ResumePreview({
 export function ResumeThumb({
   resume,
   template,
-  scale = 0.34,
 }: {
   resume: Resume;
   template?: TemplateDef;
   scale?: number;
 }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(0.3);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => setScale(el.clientWidth / 794);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   return (
     <div
+      ref={ref}
       className="pointer-events-none relative w-full overflow-hidden rounded-lg border bg-white"
       style={{ aspectRatio: "1 / 1.414" }}
       aria-hidden
     >
       <div
         className="absolute top-0"
-        style={{
-          left: 0,
-          width: 794,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-        }}
+        style={{ left: 0, width: 794, transform: `scale(${scale})`, transformOrigin: "top left" }}
       >
         <ResumePreview resume={resume} {...(template ? { template } : {})} className="shadow-none" />
       </div>
     </div>
   );
 }
-
