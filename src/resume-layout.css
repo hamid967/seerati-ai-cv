@@ -1,4 +1,4 @@
-/* Stage 5F — Professional document layout engine.
+/* Stage 5F/5G — Professional document layout and smart pagination engine.
  * These rules affect the actual resume page inside Studio/Preview/Export.
  * Gallery thumbnails and marketing surfaces remain unchanged.
  */
@@ -24,14 +24,29 @@
   overflow: visible !important;
 }
 
-.professional-resume-page > .paper [data-cv-section] {
-  break-inside: avoid;
-  page-break-inside: avoid;
+/* Keep section headings attached to at least the first content block. */
+.professional-resume-page > .paper [data-cv-section] > h3 {
+  break-after: avoid;
+  page-break-after: avoid;
 }
 
+/* Individual resume entries are protected from splitting whenever they fit on one page. */
 .professional-resume-page > .paper [data-cv-item] {
+  break-inside: avoid;
+  page-break-inside: avoid;
   font-size: calc(12px * var(--resume-font-scale)) !important;
   line-height: var(--resume-line-height) !important;
+}
+
+/* Explicit Page Composer rules are persisted in resume.data.design and applied by the renderer. */
+.professional-resume-page > .paper [data-keep-together="true"] {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+.professional-resume-page > .paper [data-manual-break="true"] {
+  break-before: page !important;
+  page-break-before: always !important;
 }
 
 .professional-resume-page > .paper [data-cv-item] li,
@@ -64,6 +79,21 @@
   border-top: 1px dashed color-mix(in oklab, var(--muted-foreground) 38%, transparent);
   pointer-events: none;
   z-index: 4;
+}
+
+.resume-page-boundary::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: -3px;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--muted-foreground) 6%, transparent),
+    transparent
+  );
 }
 
 @media print {
