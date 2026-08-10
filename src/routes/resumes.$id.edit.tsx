@@ -34,6 +34,13 @@ import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
 import { analyzeResume, checklist, completeness, keywordCoverage, resumeStatus } from "@/lib/ats";
 import { ACCENT_PALETTE, uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+import {
+  createVersionSnapshot,
+  ensureSessionSnapshot,
+  listResumeVersions,
+  type ResumeVersion,
+} from "@/lib/resume-versions";
+import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 
 
 export const Route = createFileRoute("/resumes/$id/edit")({
