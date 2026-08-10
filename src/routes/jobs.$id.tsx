@@ -46,6 +46,17 @@ import {
 } from "@/lib/career";
 import { parseJobDescription, matchTwinToJob, GAP_LABEL } from "@/lib/job-match";
 import { agentsForSurface } from "@/lib/team";
+import { ApplicationTimeline } from "@/components/application-timeline";
+import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
+import { NextBestActions } from "@/components/next-best-actions";
+import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
+import { InterviewEvidenceAnswer } from "@/components/interview-evidence-answer";
+import { addJobEvent, listJobEvents, upcomingInterviews, type TimelineEvent } from "@/lib/job-timeline";
+import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
+import { computeNextActions } from "@/lib/next-best-action";
+import { loadFactGraph, type FactGraph } from "@/lib/career-facts";
+import { createJobVariantSnapshot, listResumeVersions, type ResumeVersion } from "@/lib/resume-versions";
+import type { ResumeData } from "@/lib/types";
 
 export const Route = createFileRoute("/jobs/$id")({
   head: () => ({
