@@ -118,13 +118,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const loadResumes = useCallback(async () => {
     setLoadingResumes(true);
+    // Admins can read every resume via RLS, so scope the dashboard to the signed-in owner.
+    const { data: auth } = await supabase.auth.getUser();
+    const uid = auth.user?.id;
+    if (!uid) {
+      setResumes([]);
+      setLoadingResumes(false);
+      return;
+    }
     const { data } = await supabase
       .from("resumes")
       .select("*")
+      .eq("user_id", uid)
       .order("updated_at", { ascending: false });
     setResumes(((data as ResumeRow[] | null) ?? []).map(toResume));
     setLoadingResumes(false);
   }, []);
+
 
   useEffect(() => {
     let active = true;
