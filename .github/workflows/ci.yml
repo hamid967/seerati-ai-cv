@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -29,14 +29,10 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      # Temporarily non-blocking during Stage 4 so type/build/QA failures are
-      # visible in the same run. These become blocking again before merge.
       - name: Format check
-        continue-on-error: true
         run: bunx prettier --check .
 
       - name: Lint
-        continue-on-error: true
         run: bun run lint
 
       - name: Type check
@@ -64,7 +60,7 @@ jobs:
       SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
