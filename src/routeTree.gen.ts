@@ -18,6 +18,8 @@ import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
+import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
+import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +66,16 @@ const ResumesNewRoute = ResumesNewRouteImport.update({
   path: '/resumes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIdEditRoute = ResumesIdEditRouteImport.update({
+  id: '/resumes/$id/edit',
+  path: '/resumes/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResumesIdPreviewRoute = ResumesIdPreviewRouteImport.update({
+  id: '/resumes/$id/preview',
+  path: '/resumes/$id/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +87,8 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
   '/resumes/new': typeof ResumesNewRoute
+  '/resumes/$id/edit': typeof ResumesIdEditRoute
+  '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +100,8 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
   '/resumes/new': typeof ResumesNewRoute
+  '/resumes/$id/edit': typeof ResumesIdEditRoute
+  '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +114,8 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
   '/resumes/new': typeof ResumesNewRoute
+  '/resumes/$id/edit': typeof ResumesIdEditRoute
+  '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +129,8 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/templates'
     | '/resumes/new'
+    | '/resumes/$id/edit'
+    | '/resumes/$id/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +142,8 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/templates'
     | '/resumes/new'
+    | '/resumes/$id/edit'
+    | '/resumes/$id/preview'
   id:
     | '__root__'
     | '/'
@@ -133,6 +155,8 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/templates'
     | '/resumes/new'
+    | '/resumes/$id/edit'
+    | '/resumes/$id/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +169,8 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   TemplatesRoute: typeof TemplatesRoute
   ResumesNewRoute: typeof ResumesNewRoute
+  ResumesIdEditRoute: typeof ResumesIdEditRoute
+  ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +238,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/$id/edit': {
+      id: '/resumes/$id/edit'
+      path: '/resumes/$id/edit'
+      fullPath: '/resumes/$id/edit'
+      preLoaderRoute: typeof ResumesIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resumes/$id/preview': {
+      id: '/resumes/$id/preview'
+      path: '/resumes/$id/preview'
+      fullPath: '/resumes/$id/preview'
+      preLoaderRoute: typeof ResumesIdPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +265,8 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   TemplatesRoute: TemplatesRoute,
   ResumesNewRoute: ResumesNewRoute,
+  ResumesIdEditRoute: ResumesIdEditRoute,
+  ResumesIdPreviewRoute: ResumesIdPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
