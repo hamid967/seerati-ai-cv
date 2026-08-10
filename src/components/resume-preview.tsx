@@ -384,14 +384,15 @@ export function ResumeThumb({
 }) {
   return (
     <div
-      className="pointer-events-none relative overflow-hidden rounded-lg border bg-white"
+      className="pointer-events-none relative w-full overflow-hidden rounded-lg border bg-white"
       style={{ aspectRatio: "1 / 1.414" }}
       aria-hidden
     >
       <div
-        className="absolute start-0 top-0 origin-top-left"
+        className="absolute top-0"
         style={{
-          width: `${100 / scale}%`,
+          left: 0,
+          width: 794,
           transform: `scale(${scale})`,
           transformOrigin: "top left",
         }}
@@ -401,3 +402,4 @@ export function ResumeThumb({
     </div>
   );
 }
+
