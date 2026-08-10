@@ -161,7 +161,7 @@ export function matchTwinToJob(twin: CareerTwin | null, req: JobRequirements): M
     });
   }
 
-  // Wording gaps: the requirement keyword exists nowhere, but a близкая skill does.
+  // Wording gaps: the requirement keyword exists nowhere, but a closely related skill does.
   if (matchedKeywords.length < Math.min(6, req.keywords.length)) {
     gaps.push({
       id: uid(),
