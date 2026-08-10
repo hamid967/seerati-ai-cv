@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  AlertTriangle,
   ArrowDown,
   ArrowUp,
   Check,
@@ -21,12 +22,14 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
-import { atsScore, keywordGaps, runAtsChecks } from "@/lib/ats";
-import { uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+import { analyzeResume, checklist, completeness, keywordCoverage, resumeStatus } from "@/lib/ats";
+import { ACCENT_PALETTE, uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+
 
 export const Route = createFileRoute("/resumes/$id/edit")({
   head: () => ({
@@ -48,8 +51,10 @@ const stepDefs = [
   { key: "education", ar: "التعليم", en: "Education" },
   { key: "skills", ar: "المهارات واللغات", en: "Skills & languages" },
   { key: "extras", ar: "أقسام إضافية", en: "Extra sections" },
+  { key: "design", ar: "التصميم", en: "Design" },
   { key: "order", ar: "ترتيب الأقسام", en: "Section order" },
 ] as const;
+
 
 const sectionLabels: Record<SectionKey, { ar: string; en: string }> = {
   summary: { ar: "الملخص المهني", en: "Summary" },
@@ -75,7 +80,7 @@ function EditResume() {
 
   const stored = getResume(id);
   const [draft, setDraft] = useState<Resume | null>(null);
-  const [status, setStatus] = useState<"idle" | "saving" | "saved">("saved");
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("saved");
   const [step, setStep] = useState<(typeof stepDefs)[number]["key"]>("personal");
   const [jobDescription, setJobDescription] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -91,8 +96,18 @@ function EditResume() {
       setStatus("saving");
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => {
-        updateResume(next.id, { title: next.title, templateId: next.templateId, language: next.language, data: next.data });
-        setStatus("saved");
+        const tplNext = getTemplate(next.templateId);
+        void updateResume(next.id, {
+          title: next.title,
+          templateId: next.templateId,
+          language: next.language,
+          data: next.data,
+          status: resumeStatus(next),
+          completionScore: completeness(next),
+          atsScore: analyzeResume(next, tplNext).score,
+        })
+          .then(() => setStatus("saved"))
+          .catch(() => setStatus("error"));
       }, 700);
     },
     [updateResume],
@@ -116,12 +131,18 @@ function EditResume() {
   );
 
   const tpl = useMemo(() => (draft ? getTemplate(draft.templateId) : null), [draft]);
-  const checks = useMemo(() => (draft ? runAtsChecks(draft.data, tpl?.atsFriendly ?? true) : []), [draft, tpl]);
-  const score = checks.length ? atsScore(checks) : 0;
+  const report = useMemo(
+    () => (draft ? analyzeResume(draft, tpl ?? undefined, jobDescription) : null),
+    [draft, tpl, jobDescription],
+  );
+  const score = report?.score ?? 0;
+  const items = useMemo(() => (draft ? checklist(draft) : []), [draft]);
+  const completion = draft ? completeness(draft) : 0;
   const gaps = useMemo(
-    () => (draft && jobDescription.trim() ? keywordGaps(jobDescription, draft.data) : null),
+    () => (draft && jobDescription.trim() ? keywordCoverage(jobDescription, draft.data) : null),
     [jobDescription, draft],
   );
+
 
   if (!ready) return null;
   if (!draft) {
@@ -168,13 +189,51 @@ function EditResume() {
             </SelectContent>
           </Select>
 
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-live="polite">
-            {status === "saving" ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5 text-emerald-accent" />}
-            {status === "saving" ? (ar ? "جارٍ الحفظ…" : "Saving…") : ar ? "تم الحفظ" : "Saved"}
+          <span
+            className={`flex items-center gap-1.5 text-xs ${status === "error" ? "text-destructive" : "text-muted-foreground"}`}
+            aria-live="polite"
+          >
+            {status === "saving" ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : status === "error" ? (
+              <AlertTriangle className="size-3.5" />
+            ) : (
+              <Check className="size-3.5 text-emerald-accent" />
+            )}
+            {status === "saving"
+              ? ar
+                ? "جارٍ الحفظ…"
+                : "Saving…"
+              : status === "error"
+                ? ar
+                  ? "تعذّر الحفظ — سنحاول مع تعديلك القادم"
+                  : "Save failed — will retry on next change"
+                : ar
+                  ? "تم الحفظ"
+                  : "Saved"}
           </span>
 
           <div className="ms-auto flex items-center gap-2">
+            <Badge variant="secondary">
+              {ar ? "الاكتمال" : "Complete"} {completion}%
+            </Badge>
             <Badge variant="secondary">ATS {score}/100</Badge>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button size="sm" variant="outline" className="lg:hidden">
+                  <Eye className="size-4" />
+                  {ar ? "معاينة" : "Preview"}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[88vh] overflow-auto">
+                <SheetHeader>
+                  <SheetTitle>{ar ? "معاينة مباشرة" : "Live preview"}</SheetTitle>
+                </SheetHeader>
+                <div className="mt-3">
+                  <ResumePreview resume={draft} />
+                </div>
+              </SheetContent>
+            </Sheet>
             <Button size="sm" variant="outline" asChild>
               <Link to="/resumes/$id/preview" params={{ id: draft.id }}>
                 <Eye className="size-4" />
@@ -185,14 +244,15 @@ function EditResume() {
         </div>
       </div>
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        {/* Form column */}
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-1.5">
+      <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">
+        {/* Section navigation */}
+        <nav aria-label={ar ? "أقسام المحرر" : "Builder sections"} className="lg:sticky lg:top-36 lg:self-start">
+          <div className="flex gap-1.5 overflow-x-auto lg:flex-col">
             {stepDefs.map((s) => (
               <Button
                 key={s.key}
                 size="sm"
+                className="shrink-0 justify-start lg:w-full"
                 variant={step === s.key ? "default" : "outline"}
                 onClick={() => setStep(s.key)}
               >
@@ -200,8 +260,31 @@ function EditResume() {
               </Button>
             ))}
           </div>
+          <div className="mt-4 hidden rounded-xl border border-border bg-card p-3 lg:block">
+            <p className="mb-2 text-xs font-bold">{ar ? "قائمة الاكتمال" : "Completion checklist"}</p>
+            <Progress value={completion} className="mb-2" />
+            <ul className="space-y-1">
+              {items.map((i) => (
+                <li key={i.id}>
+                  <button
+                    onClick={() => setStep(i.step === "design" ? "design" : i.step)}
+                    className="flex w-full items-start gap-1.5 text-start text-[11.5px] hover:underline"
+                  >
+                    <span className={i.done ? "text-emerald-accent" : "text-muted-foreground"}>
+                      {i.done ? "✓" : "○"}
+                    </span>
+                    <span className={i.done ? "text-muted-foreground" : ""}>{i.label[lang]}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
 
+        {/* Form column */}
+        <div className="space-y-4">
           <div className="rounded-2xl border border-border bg-card p-5">
+
             {step === "personal" && (
               <div className="grid gap-4 sm:grid-cols-2">
                 {([
@@ -453,7 +536,87 @@ function EditResume() {
               </div>
             )}
 
+            {step === "design" && (
+              <div className="space-y-6">
+                <div>
+                  <Label className="mb-2 block">{ar ? "لون التمييز" : "Accent colour"}</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {ACCENT_PALETTE.map((c) => {
+                      const active = (d.design?.accent ?? tpl?.design.accent) === c;
+                      return (
+                        <button
+                          key={c}
+                          aria-label={c}
+                          aria-pressed={active}
+                          onClick={() => setData((data) => { data.design = { ...data.design, accent: c }; })}
+                          className={`size-8 rounded-full border-2 ${active ? "border-foreground" : "border-transparent"}`}
+                          style={{ background: c }}
+                        />
+                      );
+                    })}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setData((data) => { const { accent: _drop, ...rest } = data.design ?? {}; data.design = rest; })}
+                    >
+                      {ar ? "لون القالب الأصلي" : "Template default"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{ar ? "كثافة النص والمسافات" : "Text & spacing density"}</Label>
+                  <Select
+                    value={d.design?.density ?? tpl?.design.spacing ?? "normal"}
+                    onValueChange={(v) =>
+                      setData((data) => { data.design = { ...data.design, density: v as "compact" | "normal" | "airy" }; })
+                    }
+                  >
+                    <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="compact">{ar ? "مضغوط" : "Compact"}</SelectItem>
+                      <SelectItem value="normal">{ar ? "معتاد" : "Normal"}</SelectItem>
+                      <SelectItem value="airy">{ar ? "واسع" : "Airy"}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {tpl?.design.supportsPhoto ? (
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={d.design?.showPhoto ?? true}
+                        onCheckedChange={(v) => setData((data) => { data.design = { ...data.design, showPhoto: Boolean(v) }; })}
+                      />
+                      {ar ? "إظهار الصورة الشخصية" : "Show profile photo"}
+                    </label>
+                    <Input
+                      dir="ltr"
+                      placeholder="https://…"
+                      value={d.personal.photoUrl ?? ""}
+                      onChange={(e) => setData((data) => { data.personal.photoUrl = e.target.value; })}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {ar
+                      ? "القالب الحالي لا يعرض صورة شخصية — وهو الخيار الأنسب للتقديم عبر أنظمة ATS."
+                      : "The current template has no photo slot, which suits ATS submissions."}
+                  </p>
+                )}
+
+                {tpl && !tpl.atsFriendly && (
+                  <p className="rounded-lg bg-secondary p-3 text-xs text-muted-foreground">
+                    {ar
+                      ? "هذا القالب إبداعي وقد تقرأه بعض أنظمة ATS بشكل ناقص. استخدم «كلاسيكي ATS» أو «مبسّط» للتقديم الإلكتروني."
+                      : "This creative template may be parsed imperfectly by some ATS. Use Classic ATS or Minimal for online applications."}
+                  </p>
+                )}
+              </div>
+            )}
+
             {step === "order" && (
+
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   {ar ? "رتّب أقسام السيرة الذاتية. الأقسام الفارغة لا تظهر في المعاينة." : "Reorder sections. Empty sections are hidden in the preview."}
@@ -495,40 +658,73 @@ function EditResume() {
         </div>
 
         {/* Right column */}
-        <div className="lg:sticky lg:top-36 lg:h-[calc(100vh-10rem)]">
-          <Tabs defaultValue="preview" className="h-full">
+        <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[calc(100vh-10rem)]">
+          <Tabs defaultValue="preview" className="flex h-full flex-col">
             <TabsList className="w-full">
               <TabsTrigger value="preview" className="flex-1">{ar ? "معاينة" : "Preview"}</TabsTrigger>
               <TabsTrigger value="ai" className="flex-1">{ar ? "مساعد سيرتي" : "Assistant"}</TabsTrigger>
               <TabsTrigger value="ats" className="flex-1">ATS</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="preview" className="mt-3 h-[calc(100%-3rem)] overflow-auto rounded-2xl bg-secondary/40 p-3">
+            <TabsContent value="preview" className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl bg-secondary/40 p-3">
               <ResumePreview resume={draft} />
             </TabsContent>
 
-            <TabsContent value="ai" className="mt-3 h-[calc(100%-3rem)]">
+            <TabsContent value="ai" className="mt-3 min-h-0 flex-1">
               <AiAssistant
                 resume={draft}
+                section={step}
                 onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                onApplyBullets={(bullets) =>
+                  setData((data) => {
+                    if (!data.experience.length) {
+                      data.experience.push({ id: uid(), role: "", company: "", bullets });
+                    } else {
+                      data.experience[0]!.bullets = bullets;
+                    }
+                  })
+                }
+                onAddSkills={(skills) =>
+                  setData((data) => {
+                    skills.forEach((name) => {
+                      if (name && !data.skills.some((s) => s.name.toLowerCase() === name.toLowerCase()))
+                        data.skills.push({ id: uid(), name });
+                    });
+                  })
+                }
               />
             </TabsContent>
 
-            <TabsContent value="ats" className="mt-3 h-[calc(100%-3rem)] overflow-auto rounded-2xl border border-border bg-card p-4">
+            <TabsContent value="ats" className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <p className="font-bold">{ar ? "جاهزية ATS" : "ATS readiness"}</p>
                 <p className="text-xl font-extrabold text-emerald-accent">{score}/100</p>
               </div>
               <Progress value={score} className="mt-3" />
-              <ul className="mt-4 space-y-2.5">
-                {checks.map((c) => (
-                  <li key={c.id} className="text-sm">
-                    <span className={c.passed ? "text-emerald-accent" : "text-destructive"}>{c.passed ? "✓" : "✕"}</span>{" "}
-                    <span className="font-medium">{c.label[lang]}</span>
-                    {!c.passed && <p className="ms-4 text-xs text-muted-foreground">{c.hint[lang]}</p>}
-                  </li>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                {ar
+                  ? "النتيجة إرشادية مبنية على قواعد كتابة معروفة، وليست تقييماً من نظام توظيف فعلي."
+                  : "The score is advisory, based on known writing rules — not a verdict from a real ATS."}
+              </p>
+
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {(report?.categories ?? []).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setStep(c.step)}
+                    className="rounded-xl border border-border p-3 text-start transition hover:border-accent"
+                  >
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-[12px] font-semibold">{c.label[lang]}</span>
+                      <span className="text-[12px] font-bold text-muted-foreground">
+                        {c.earned}/{c.max}
+                      </span>
+                    </div>
+                    <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
+                    {c.tips[0] && <p className="mt-2 text-[11px] text-muted-foreground">{c.tips[0][lang]}</p>}
+                  </button>
                 ))}
-              </ul>
+              </div>
 
               <div className="mt-6 space-y-2">
                 <Label htmlFor="jd">{ar ? "الصق وصف الوظيفة لاستخراج الكلمات المفتاحية" : "Paste a job description for keywords"}</Label>
@@ -536,11 +732,11 @@ function EditResume() {
                 {gaps && (
                   <div className="text-xs">
                     <p className="font-semibold">
-                      {ar ? "مطابقة" : "Matched"}: {gaps.matched}/{gaps.total}
+                      {ar ? "التطابق" : "Match"}: {gaps.coverage}% ({gaps.matched.length}/{gaps.total})
                     </p>
                     {gaps.missing.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
-                        {gaps.missing.map((m) => (
+                        {gaps.missing.slice(0, 18).map((m) => (
                           <Badge key={m} variant="outline" className="text-[10.5px]">{m}</Badge>
                         ))}
                       </div>
@@ -566,6 +762,7 @@ function EditResume() {
             </TabsContent>
           </Tabs>
         </div>
+
       </main>
     </div>
   );

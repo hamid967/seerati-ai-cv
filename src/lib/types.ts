@@ -1,5 +1,16 @@
 export type TemplateCategory = "ats" | "modern" | "creative" | "executive" | "minimal";
 
+export type TemplateDesign = {
+  accent: string;
+  headingFont: "sans" | "serif";
+  spacing: "compact" | "normal" | "airy";
+  sectionStyle: "line" | "bar" | "plain" | "caps";
+  layout: "single" | "sidebar" | "sidebar-left";
+  header: "stack" | "banner" | "centered" | "split";
+  bullet: "disc" | "dash" | "square";
+  supportsPhoto: boolean;
+};
+
 export type TemplateDef = {
   id: string;
   name: { ar: string; en: string };
@@ -9,14 +20,27 @@ export type TemplateDef = {
   supportsRTL: boolean;
   active: boolean;
   order: number;
-  design: {
-    accent: string;
-    headingFont: "sans" | "serif";
-    spacing: "compact" | "normal" | "airy";
-    sectionStyle: "line" | "bar" | "plain";
-    layout: "single" | "sidebar";
-  };
+  design: TemplateDesign;
 };
+
+/** Limited, safe design controls exposed to the end user inside the builder. */
+export type ResumeUserDesign = {
+  accent?: string;
+  density?: "compact" | "normal" | "airy";
+  showPhoto?: boolean;
+};
+
+export const ACCENT_PALETTE = [
+  "#1e3a5f",
+  "#0f766e",
+  "#166534",
+  "#7c2d12",
+  "#4c1d95",
+  "#111827",
+  "#b45309",
+  "#0369a1",
+] as const;
+
 
 export type Experience = {
   id: string;
@@ -82,7 +106,11 @@ export type ResumeData = {
   references: SimpleItem[];
   custom: CustomSection[];
   sectionOrder: SectionKey[];
+  hiddenSections?: SectionKey[];
+  design?: ResumeUserDesign;
 };
+
+export type ResumeStatus = "draft" | "complete";
 
 export type Resume = {
   id: string;
@@ -91,9 +119,14 @@ export type Resume = {
   templateId: string;
   language: "ar" | "en";
   data: ResumeData;
+  status: ResumeStatus;
+  completionScore: number;
+  atsScore: number;
+  lastViewedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 };
+
 
 export type Profile = {
   id: string;

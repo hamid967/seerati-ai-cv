@@ -21,7 +21,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { useI18n, useT } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { RESUME_LIMIT } from "@/lib/types";
-import { atsScore, completeness, runAtsChecks } from "@/lib/ats";
+import { analyzeResume, completeness, resumeStatus } from "@/lib/ats";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -80,12 +80,19 @@ function Dashboard() {
               </p>
               <Progress value={(resumes.length / RESUME_LIMIT) * 100} className="mt-2" />
             </div>
-            <Button asChild disabled={atLimit}>
-              <Link to="/resumes/new">
+            {atLimit ? (
+              <Button disabled title={t("limit_reached")}>
                 <Plus className="size-4" />
                 {t("dash_new")}
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link to="/resumes/new">
+                  <Plus className="size-4" />
+                  {t("dash_new")}
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -131,7 +138,8 @@ function Dashboard() {
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {resumes.map((r) => {
               const tpl = getTemplate(r.templateId);
-              const score = atsScore(runAtsChecks(r.data, tpl.atsFriendly));
+              const score = analyzeResume(r, tpl).score;
+              const done = resumeStatus(r) === "complete";
               return (
                 <Card key={r.id} className="overflow-hidden">
                   <CardContent className="pt-6">
@@ -188,7 +196,10 @@ function Dashboard() {
                       <Progress value={completeness(r)} />
                     </div>
 
-                    <div className="mt-4 flex items-center gap-2">
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <Badge variant={done ? "default" : "outline"}>
+                        {done ? (ar ? "مكتملة" : "Complete") : ar ? "مسودة" : "Draft"}
+                      </Badge>
                       <Badge variant="secondary">ATS {score}/100</Badge>
                       <span className="text-xs text-muted-foreground">
                         {t("updated")}: {new Date(r.updatedAt).toLocaleDateString(ar ? "ar-SA" : "en-GB")}

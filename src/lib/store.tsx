@@ -55,6 +55,10 @@ type ResumeRow = {
   template_id: string | null;
   language: string;
   data: unknown;
+  status?: string | null;
+  completion_score?: number | null;
+  ats_score?: number | null;
+  last_viewed_at?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -66,6 +70,10 @@ const toResume = (row: ResumeRow): Resume => ({
   templateId: row.template_id ?? "classic-ats",
   language: row.language === "en" ? "en" : "ar",
   data: { ...emptyResumeData(), ...((row.data as ResumeData) ?? {}) },
+  status: (row.status === "complete" ? "complete" : "draft") as Resume["status"],
+  completionScore: row.completion_score ?? 0,
+  atsScore: row.ats_score ?? 0,
+  lastViewedAt: row.last_viewed_at ?? null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -252,16 +260,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           list.map((r) => (r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r)),
         );
         const current = resumes.find((r) => r.id === id);
-        await supabase
+        const { error } = await supabase
           .from("resumes")
           .update({
             title: patch.title ?? current?.title ?? "",
             template_id: patch.templateId ?? current?.templateId ?? "classic-ats",
             language: patch.language ?? current?.language ?? "ar",
             data: (patch.data ?? current?.data ?? emptyResumeData()) as never,
+            status: patch.status ?? current?.status ?? "draft",
+            completion_score: patch.completionScore ?? current?.completionScore ?? 0,
+            ats_score: patch.atsScore ?? current?.atsScore ?? 0,
           })
           .eq("id", id);
+        if (error) throw new Error(error.message);
       },
+
       duplicateResume: async (id) => {
         const src = resumes.find((r) => r.id === id);
         if (!src || !user || atLimit) return null;

@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import { baseDesign, defaultTemplates } from "./templates";
 import type { TemplateDef } from "./types";
 
-/** Cloud reads/writes for templates, admin users list and the audit log. */
+/** Cloud reads/writes for templates, admin users, settings and the audit log. */
 
 type TemplateRow = {
   id: string;
@@ -18,25 +19,25 @@ type TemplateRow = {
   design: unknown;
 };
 
-const defaultDesign: TemplateDef["design"] = {
-  accent: "#1e3a5f",
-  headingFont: "sans",
-  spacing: "normal",
-  sectionStyle: "line",
-  layout: "single",
+export const rowToTemplate = (row: TemplateRow): TemplateDef => {
+  const seed = defaultTemplates.find((t) => t.id === row.id);
+  return {
+    id: row.id,
+    name: { ar: row.name_ar, en: row.name_en },
+    description: { ar: row.description_ar ?? "", en: row.description_en ?? "" },
+    category: row.category as TemplateDef["category"],
+    supportsRTL: row.supports_rtl,
+    atsFriendly: row.ats_friendly,
+    active: row.active,
+    order: row.display_order,
+    design: {
+      ...baseDesign,
+      ...(seed?.design ?? {}),
+      ...((row.design as Partial<TemplateDef["design"]>) ?? {}),
+    },
+  };
 };
 
-export const rowToTemplate = (row: TemplateRow): TemplateDef => ({
-  id: row.id,
-  name: { ar: row.name_ar, en: row.name_en },
-  description: { ar: row.description_ar ?? "", en: row.description_en ?? "" },
-  category: row.category as TemplateDef["category"],
-  supportsRTL: row.supports_rtl,
-  atsFriendly: row.ats_friendly,
-  active: row.active,
-  order: row.display_order,
-  design: { ...defaultDesign, ...((row.design as TemplateDef["design"]) ?? {}) },
-});
 
 export async function fetchTemplates(includeInactive = false): Promise<TemplateDef[]> {
   let query = supabase.from("templates").select("*").order("display_order");
@@ -153,4 +154,43 @@ export async function logAiUsage(task: string) {
   const { data } = await supabase.auth.getUser();
   if (!data.user) return;
   await supabase.from("ai_usage").insert({ user_id: data.user.id, task });
+}
+
+export type AppSettings = {
+  id: string;
+  siteName: string;
+  defaultLanguage: "ar" | "en";
+  maxResumes: number;
+  maintenance: boolean;
+  aiMode: string;
+  aiProvider: string | null;
+};
+
+export async function fetchAppSettings(): Promise<AppSettings | null> {
+  const { data } = await supabase.from("app_settings").select("*").limit(1).maybeSingle();
+  if (!data) return null;
+  return {
+    id: data.id,
+    siteName: data.site_name,
+    defaultLanguage: data.default_language === "en" ? "en" : "ar",
+    maxResumes: data.max_resumes,
+    maintenance: data.maintenance,
+    aiMode: data.ai_mode,
+    aiProvider: data.ai_provider,
+  };
+}
+
+export async function saveAppSettings(patch: Partial<AppSettings> & { id: string }) {
+  const { error } = await supabase
+    .from("app_settings")
+    .update({
+      ...(patch.siteName !== undefined ? { site_name: patch.siteName } : {}),
+      ...(patch.defaultLanguage !== undefined ? { default_language: patch.defaultLanguage } : {}),
+      ...(patch.maxResumes !== undefined ? { max_resumes: patch.maxResumes } : {}),
+      ...(patch.maintenance !== undefined ? { maintenance: patch.maintenance } : {}),
+      ...(patch.aiMode !== undefined ? { ai_mode: patch.aiMode } : {}),
+      ...(patch.aiProvider !== undefined ? { ai_provider: patch.aiProvider } : {}),
+    })
+    .eq("id", patch.id);
+  return error ? { error: error.message } : {};
 }

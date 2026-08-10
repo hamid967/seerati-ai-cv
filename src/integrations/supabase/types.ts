@@ -65,6 +65,45 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          ai_mode: string
+          ai_provider: string | null
+          created_at: string
+          default_language: string
+          id: string
+          logo_url: string | null
+          maintenance: boolean
+          max_resumes: number
+          site_name: string
+          updated_at: string
+        }
+        Insert: {
+          ai_mode?: string
+          ai_provider?: string | null
+          created_at?: string
+          default_language?: string
+          id?: string
+          logo_url?: string | null
+          maintenance?: boolean
+          max_resumes?: number
+          site_name?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_mode?: string
+          ai_provider?: string | null
+          created_at?: string
+          default_language?: string
+          id?: string
+          logo_url?: string | null
+          maintenance?: boolean
+          max_resumes?: number
+          site_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -103,30 +142,42 @@ export type Database = {
       }
       resumes: {
         Row: {
+          ats_score: number
+          completion_score: number
           created_at: string
           data: Json
           id: string
           language: string
+          last_viewed_at: string | null
+          status: string
           template_id: string | null
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          ats_score?: number
+          completion_score?: number
           created_at?: string
           data?: Json
           id?: string
           language?: string
+          last_viewed_at?: string | null
+          status?: string
           template_id?: string | null
           title?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          ats_score?: number
+          completion_score?: number
           created_at?: string
           data?: Json
           id?: string
           language?: string
+          last_viewed_at?: string | null
+          status?: string
           template_id?: string | null
           title?: string
           updated_at?: string
