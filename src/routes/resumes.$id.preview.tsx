@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ClipboardCopy, Download, FileText, Loader2, Printer } from "lucide-react";
 import { toast } from "sonner";
-import { SiteHeader } from "@/components/site-header";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +48,6 @@ function PreviewResume() {
   if (!resume) {
     return (
       <div className="min-h-screen">
-        <SiteHeader />
         <div className="mx-auto max-w-2xl px-4 py-20 text-center">
           <p className="text-lg font-bold">{ar ? "لم نجد هذه السيرة الذاتية" : "Resume not found"}</p>
           <Button className="mt-6" asChild>
@@ -115,7 +113,6 @@ function PreviewResume() {
 
   return (
     <div className="min-h-screen bg-secondary/40">
-      <SiteHeader />
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-5">
         <div>
           <h1 className="text-xl font-extrabold">{resume.title}</h1>

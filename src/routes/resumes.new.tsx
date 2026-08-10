@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { z } from "zod";
-import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +41,6 @@ function NewResume() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <main className="mx-auto max-w-4xl px-4 py-10">
         <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "سيرة ذاتية جديدة" : "New resume"}</h1>
 

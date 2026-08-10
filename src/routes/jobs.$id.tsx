@@ -11,8 +11,6 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -268,7 +266,6 @@ function JobWorkspacePage() {
   if (!ready || !user || job === undefined) {
     return (
       <div className="min-h-screen">
-        <SiteHeader />
         <div className="mx-auto max-w-6xl space-y-4 px-4 py-12">
           <Skeleton className="h-10 w-52" />
           <Skeleton className="h-64 rounded-2xl" />
@@ -280,7 +277,6 @@ function JobWorkspacePage() {
   if (job === null) {
     return (
       <div className="flex min-h-screen flex-col">
-        <SiteHeader />
         <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
           <p className="text-xl font-bold">{ar ? "لم نجد هذه الوظيفة" : "We couldn't find this job"}</p>
           <p className="text-sm text-muted-foreground">
@@ -290,7 +286,6 @@ function JobWorkspacePage() {
             <Link to="/jobs">{ar ? "العودة إلى مساحات الوظائف" : "Back to job workspaces"}</Link>
           </Button>
         </main>
-        <SiteFooter />
       </div>
     );
   }
@@ -304,7 +299,6 @@ function JobWorkspacePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
         <Button variant="ghost" size="sm" asChild className="mb-2">
           <Link to="/jobs">
@@ -556,7 +550,6 @@ function JobWorkspacePage() {
           </div>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }

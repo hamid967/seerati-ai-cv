@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, Palette, ScrollText, Settings, ShieldAlert, Users } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
@@ -32,7 +31,6 @@ function AdminLayout() {
   if (user && user.role !== "admin") {
     return (
       <div className="min-h-screen">
-        <SiteHeader />
         <div className="mx-auto max-w-lg px-4 py-24 text-center">
           <ShieldAlert className="mx-auto size-10 text-destructive" />
           <h1 className="mt-4 text-xl font-bold">{ar ? "هذه الصفحة للمسؤولين فقط" : "Admins only"}</h1>
@@ -57,7 +55,6 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 md:flex-row">
         <aside className="md:w-56 md:shrink-0">
           <p className="mb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, FileText, MoreVertical, Pencil, Plus, Trash2, Eye, Sparkles, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -90,7 +88,6 @@ function Dashboard() {
   if (!ready || !user) {
     return (
       <div className="min-h-screen">
-        <SiteHeader />
         <div className="mx-auto max-w-6xl space-y-4 px-4 py-12">
           <Skeleton className="h-10 w-52" />
           <div className="grid gap-4 md:grid-cols-3">
@@ -143,7 +140,6 @@ function Dashboard() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-10 px-4 py-10">
         {/* Greeting + profile completeness */}
         <div className="flex flex-wrap items-end justify-between gap-6">
@@ -497,7 +493,6 @@ function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      <SiteFooter />
     </div>
   );
 }
