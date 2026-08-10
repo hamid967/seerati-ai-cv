@@ -202,7 +202,7 @@ export function RecruiterSnapshotCard({ snapshot }: { snapshot: RecruiterSnapsho
             </h4>
             <ul className="mt-1.5 space-y-1">
               {snapshot.scanFlags.slice(0, 5).map((f) => (
-                <li key={f.id} className="text-xs text-muted-foreground">
+                <li key={f.rule} className="text-xs text-muted-foreground">
                   · {ar ? f.message.ar : f.message.en}
                 </li>
               ))}
