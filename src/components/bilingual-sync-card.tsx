@@ -9,7 +9,8 @@ import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { SECTION_LABEL, SYNC_LABEL, detectUnsyncedSections } from "@/lib/bilingual-intelligence";
+import { SYNC_LABEL, detectUnsyncedSections } from "@/lib/bilingual-intelligence";
+import { sectionLabel } from "@/lib/resume-diff";
 import { useI18n } from "@/lib/i18n";
 import type { Resume } from "@/lib/types";
 
@@ -67,7 +68,7 @@ export function BilingualSyncCard({ current, all }: { current: Resume; all: Resu
       <ul className="mt-2 space-y-1">
         {rows.map((r) => (
           <li key={r.key} className="flex items-center justify-between gap-2 text-[11px]">
-            <span>{SECTION_LABEL[r.key][ar ? "ar" : "en"]}</span>
+            <span>{sectionLabel(r.key)[ar ? "ar" : "en"]}</span>
             <span
               className={
                 r.status === "in_sync" ? "text-muted-foreground" : "font-semibold text-foreground"
