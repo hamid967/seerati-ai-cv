@@ -16,14 +16,13 @@ export type BuilderStep =
   | "design";
 
 export type AtsCategoryId =
-  | "completeness"
   | "contact"
   | "summary"
   | "experience"
-  | "achievements"
   | "skills"
-  | "formatting"
+  | "education"
   | "keywords";
+
 
 export type AtsTip = { ar: string; en: string; step: BuilderStep };
 
