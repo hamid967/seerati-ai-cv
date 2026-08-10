@@ -1,4 +1,6 @@
 import type { Resume, ResumeData, TemplateDef } from "./types";
+import { foldText, keywordAliases } from "./saudi-career-taxonomy";
+
 
 /**
  * ATS Engine V2 — a transparent, rule based readiness estimate.
