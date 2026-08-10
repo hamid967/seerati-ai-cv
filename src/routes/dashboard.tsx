@@ -148,7 +148,66 @@ function Dashboard() {
           </a>
         </div>
 
-        {/* Next best actions */}
+        {/* Career OS cohesion strip: readiness + one-tap entry points.
+            Every number below is counted from the user's own rows — no demo data. */}
+        <section className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold">{vault.headline}</p>
+              <Badge variant="outline" className="text-[10px]">
+                {loadingCenter ? "…" : `${graph.facts.length} / ${graph.evidence.length}`}
+              </Badge>
+            </div>
+            <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+              {vault.items.map((line) => (
+                <li key={line}>• {line}</li>
+              ))}
+            </ul>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/career-evidence">{ar ? "خزانة الأدلة" : "Evidence vault"}</Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <Link to="/privacy-center">{ar ? "مركز الخصوصية" : "Privacy center"}</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <p className="text-sm font-bold">{ar ? "إجراءات سريعة" : "Quick actions"}</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <Button asChild variant="outline" className="justify-start">
+                <Link to="/import">{ar ? "استيراد سيرة أو ملف مهني" : "Import a resume or profile"}</Link>
+              </Button>
+              <Button asChild variant="outline" className="justify-start">
+                <Link to="/career-evidence">{ar ? "إضافة دليل جديد" : "Add new evidence"}</Link>
+              </Button>
+              <Button asChild variant="outline" className="justify-start">
+                <Link to="/jobs">{ar ? "تحديد وظيفة مستهدفة" : "Target a job"}</Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="justify-start"
+                disabled={!resumes.length}
+                onClick={() => {
+                  const first = resumes[0];
+                  if (first) void navigate({ to: "/resumes/$id/edit", params: { id: first.id } });
+                }}
+              >
+                {ar ? "إنشاء نسخة من سيرة" : "Create a resume variant"}
+              </Button>
+            </div>
+            {!resumes.length && (
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                {ar
+                  ? "أنشئ سيرتك الأولى أولاً لتتمكن من إنشاء نسخ مخصصة لكل وظيفة."
+                  : "Create your first resume to start branching per-job variants."}
+              </p>
+            )}
+          </div>
+        </section>
+
+
         <section>
           {loadingCenter ? (
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
