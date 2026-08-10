@@ -34,12 +34,13 @@ function AuthPage() {
   const ar = lang === "ar";
   const { mode } = Route.useSearch();
   const navigate = useNavigate();
-  const { signIn, signUp } = useStore();
+  const { signIn, signUp, resetPassword } = useStore();
 
   const [tab, setTab] = useState<"signin" | "signup" | "reset">(mode ?? "signin");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -51,25 +52,51 @@ function AuthPage() {
     return Object.keys(e).length === 0;
   };
 
-  const submit = (ev: React.FormEvent) => {
+  const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!validate()) return;
-
-    if (tab === "reset") {
-      toast.success(ar ? "أرسلنا رابط إعادة التعيين إلى بريدك (تجريبي)." : "Reset link sent to your email (demo).");
-      setTab("signin");
-      return;
+    if (!validate() || busy) return;
+    setBusy(true);
+    try {
+      if (tab === "reset") {
+        const res = await resetPassword(email);
+        if (res.error) toast.error(res.error);
+        else {
+          toast.success(ar ? "أرسلنا رابط إعادة التعيين إلى بريدك." : "Reset link sent to your email.");
+          setTab("signin");
+        }
+        return;
+      }
+      if (tab === "signup") {
+        const res = await signUp(email, password, name.trim());
+        if ("error" in res) {
+          toast.error(res.error);
+          return;
+        }
+        if (res.needsConfirmation) {
+          toast.success(
+            ar
+              ? "تم إنشاء الحساب. افتح بريدك وأكّد الرابط ثم سجّل الدخول."
+              : "Account created. Confirm the link in your email, then sign in.",
+          );
+          setTab("signin");
+          return;
+        }
+        toast.success(ar ? "تم إنشاء الحساب" : "Account created");
+        navigate({ to: "/onboarding" });
+        return;
+      }
+      const res = await signIn(email, password);
+      if ("error" in res) {
+        toast.error(ar ? "بيانات الدخول غير صحيحة" : "Invalid credentials");
+        return;
+      }
+      toast.success(ar ? "مرحباً بك" : "Welcome back");
+      navigate({ to: res.role === "admin" ? "/admin" : res.onboarded ? "/dashboard" : "/onboarding" });
+    } finally {
+      setBusy(false);
     }
-    if (tab === "signup") {
-      signUp(email, name.trim());
-      toast.success(ar ? "تم إنشاء الحساب" : "Account created");
-      navigate({ to: "/onboarding" });
-      return;
-    }
-    const profile = signIn(email);
-    toast.success(ar ? "مرحباً بك" : "Welcome back");
-    navigate({ to: profile.role === "admin" ? "/admin" : "/dashboard" });
   };
+
 
   return (
     <div className="flex min-h-screen flex-col">
