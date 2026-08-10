@@ -238,6 +238,19 @@ function Onboarding() {
                   {ar ? "ننشئ مسودة فارغة وتفتح المحرّر مباشرة." : "We create an empty draft and open the builder."}
                 </p>
               </button>
+              <button
+                onClick={() => navigate({ to: "/import" })}
+                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+              >
+                <p className="font-semibold">
+                  {ar ? "لدي LinkedIn/منصة — استخدم ملف التصدير" : "I use LinkedIn/a platform — use my export file"}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {ar
+                    ? "نستخدم ملف التصدير أو نص الملف الشخصي — بدون كلمات مرور ولا سحب من الروابط."
+                    : "We use your export file or profile text — no passwords, no link scraping."}
+                </p>
+              </button>
               {hasCv === "yes" && (
                 <button
                   onClick={() => navigate({ to: "/import" })}

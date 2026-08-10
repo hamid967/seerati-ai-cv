@@ -11,6 +11,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowRight,
+  Check,
   ClipboardPaste,
   FileUp,
   Info,
@@ -55,6 +56,7 @@ import {
   type ListKind,
 } from "@/lib/import-map";
 import { ResumeCopilot, type CopilotGap } from "@/components/resume-copilot";
+import { describeProgress, RESUME_LANGUAGE_LABEL, type ResumeLanguage } from "@/lib/ai-actions";
 import { uid } from "@/lib/types";
 
 export const Route = createFileRoute("/import")({
@@ -106,6 +108,9 @@ function ImportCenterPage() {
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<ImportDraft | null>(null);
   const [twin, setTwin] = useState<CareerTwin | null>(null);
+  const [recap, setRecap] = useState<string[]>([]);
+  const [dragOver, setDragOver] = useState(false);
+  const [resumeLang, setResumeLang] = useState<ResumeLanguage>(ar ? "ar" : "en");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const health = useMemo(() => twinHealth(twin), [twin]);
@@ -236,6 +241,31 @@ function ImportCenterPage() {
               </p>
             )}
 
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file) void onFile(file);
+              }}
+              className={`rounded-xl border-2 border-dashed p-6 text-center transition ${
+                dragOver ? "border-primary bg-primary/5" : "border-border"
+              }`}
+            >
+              <Upload className="mx-auto size-6 text-muted-foreground" />
+              <p className="mt-2 text-sm font-medium">
+                {ar ? "اسحب الملف وأفلته هنا" : "Drag and drop your file here"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {ar ? "أو استخدم الأزرار أدناه — الملف يُقرأ في متصفحك فقط." : "Or use the buttons below — the file is read in your browser only."}
+              </p>
+            </div>
+
             <div className="flex flex-wrap gap-2">
               <Button onClick={() => fileRef.current?.click()} disabled={busy}>
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}
@@ -303,7 +333,7 @@ function ImportCenterPage() {
 
     const lists: ListKind[] = ["experience", "education", "skills", "languages", "certificates", "projects"];
 
-    async function save() {
+    async function save(next: "gaps" | "only") {
       if (!user || !draft) return;
       setBusy(true);
       try {
@@ -329,7 +359,14 @@ function ImportCenterPage() {
         toast.success(
           ar ? `تم حفظ ${count} عنصراً في ملفك المهني.` : `Saved ${count} item${count === 1 ? "" : "s"} to your profile.`,
         );
-        setStep("gaps");
+        setRecap(
+          sections.map((s) =>
+            ar ? `تم استيراد قسم: ${s}` : `Imported section: ${s}`,
+          ),
+        );
+        if (next === "gaps") setStep("gaps");
+        else navigate({ to: "/career-twin" });
+
       } finally {
         setBusy(false);
       }
@@ -353,6 +390,39 @@ function ImportCenterPage() {
             </span>
           </div>
         </header>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{ar ? "الأقسام المكتشفة" : "Detected sections"}</CardTitle>
+            <CardDescription>
+              {ar
+                ? "ثقة نوعية فقط — لا نسب مئوية مضللة."
+                : "Qualitative confidence only — no misleading percentages."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {(["experience", "education", "skills", "languages", "certificates", "projects"] as ListKind[]).map(
+              (kind) => {
+                const items = draft[kind] as ListCandidate<Record<string, unknown>>[];
+                if (!items.length) return null;
+                const worst: Confidence = items.some((i) => i.confidence === "low")
+                  ? "low"
+                  : items.some((i) => i.confidence === "medium")
+                    ? "medium"
+                    : "high";
+                return (
+                  <span
+                    key={kind}
+                    className={`rounded-full px-3 py-1 text-xs ${CONFIDENCE_STYLE[worst]}`}
+                  >
+                    {LIST_LABEL[kind][ar ? "ar" : "en"]} · {items.length} ·{" "}
+                    {CONFIDENCE_LABEL[worst][ar ? "ar" : "en"]}
+                  </span>
+                );
+              },
+            )}
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
@@ -408,10 +478,69 @@ function ImportCenterPage() {
                   }
                 />
                 {field.existing && (
-                  <p className="mt-2 text-xs text-amber-700 dark:text-amber-500">
-                    {ar ? "القيمة الحالية في ملفك:" : "Current value on your profile:"} {field.existing} —{" "}
-                    {ar ? "اختر الحقل لاستبدالها." : "tick the field to replace it."}
-                  </p>
+                  <div className="mt-2 space-y-2 rounded-lg border border-amber-500/40 bg-amber-500/5 p-2">
+                    <p className="text-xs text-amber-700 dark:text-amber-500">
+                      {ar ? "تعارض مع ملفك الحالي:" : "Conflict with your current profile:"} {field.existing}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant={field.include ? "outline" : "secondary"}
+                        onClick={() =>
+                          setDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  fields: d.fields.map((x) =>
+                                    x.key === field.key ? { ...x, include: false } : x,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
+                      >
+                        {ar ? "أبقِ الحالي" : "Keep existing"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={field.include ? "secondary" : "outline"}
+                        onClick={() =>
+                          setDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  fields: d.fields.map((x) =>
+                                    x.key === field.key ? { ...x, include: true } : x,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
+                      >
+                        {ar ? "استخدم المستورد" : "Use imported"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          setDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  fields: d.fields.map((x) =>
+                                    x.key === field.key
+                                      ? { ...x, include: true, value: `${field.existing} — ${x.value}` }
+                                      : x,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
+                      >
+                        {ar ? "دمج يدوي" : "Merge manually"}
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
@@ -487,14 +616,19 @@ function ImportCenterPage() {
         )}
 
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => void save()} disabled={busy}>
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-            {ar ? "حفظ في ملفي المهني" : "Save to my profile"}
+          <Button onClick={() => void save("gaps")} disabled={busy}>
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+            {ar ? "اعتماد واستكمال مع المساعد" : "Approve and continue with the copilot"}
+          </Button>
+          <Button variant="outline" onClick={() => void save("only")} disabled={busy}>
+            <Upload className="size-4" />
+            {ar ? "استيراد فقط" : "Import only"}
           </Button>
           <Button variant="ghost" onClick={() => setStep("source")} disabled={busy}>
             {ar ? "رجوع" : "Back"}
           </Button>
         </div>
+
       </div>
     );
   }
@@ -544,6 +678,15 @@ function ImportCenterPage() {
       {gaps.length > 0 ? (
         <ResumeCopilot
           gaps={gaps}
+          recap={recap}
+          progress={describeProgress(
+            {
+              hasBasics: Boolean(twin?.identity.fullName && twin?.identity.email),
+              achievementsNeeded: Math.max(0, 2 - (twin?.achievements.length ?? 0)),
+              missing: gaps.map((g) => g.label[ar ? "ar" : "en"]),
+            },
+            ar ? "ar" : "en",
+          )}
           targetRole={twin?.identity.headline ?? ""}
           currentValue={(key) =>
             key === "summary" ? (twin?.identity.summary ?? "") : key === "headline" ? (twin?.identity.headline ?? "") : ""
@@ -572,13 +715,36 @@ function ImportCenterPage() {
         </Card>
       )}
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{ar ? "لغة السيرة الذاتية" : "Resume language"}</CardTitle>
+          <CardDescription>
+            {ar
+              ? "لغة المحادثة مستقلة عن لغة السيرة. لن نترجم أسماء الشركات أو الشهادات."
+              : "Chat language is separate from resume language. Company and certificate names stay as written."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          {(["ar", "en", "bilingual"] as ResumeLanguage[]).map((rl) => (
+            <Button
+              key={rl}
+              size="sm"
+              variant={resumeLang === rl ? "default" : "outline"}
+              onClick={() => setResumeLang(rl)}
+            >
+              {RESUME_LANGUAGE_LABEL[rl][ar ? "ar" : "en"]}
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
+
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => navigate({ to: "/career-twin" })}>
           {ar ? "افتح ملفي المهني" : "Open my career profile"}
           <ArrowRight className="size-4" />
         </Button>
         <Button variant="outline" onClick={() => navigate({ to: "/resumes/new" })}>
-          {ar ? "أنشئ سيرة ذاتية" : "Create a resume"}
+          {ar ? "إنشاء سيرتي الآن" : "Create my resume now"}
         </Button>
         <Button
           variant="ghost"

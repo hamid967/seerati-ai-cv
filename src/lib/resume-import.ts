@@ -145,6 +145,29 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
 
   const result: ParsedResume = { contact: { emails, phones, links } };
 
+  // Header block: the lines before the first recognised heading. The first
+  // usable line is the name, the next one the headline. Nothing is invented —
+  // if the block is empty we simply leave these fields out.
+  const headerLines: string[] = [];
+  for (const line of lines) {
+    if (isHeadingLine(line)) break;
+    const clean = line.replace(/^\s*[-•*\u2022▪◦·]\s*/, "").trim();
+    if (!clean) continue;
+    if (EMAIL_RE.test(clean) || /\d{5,}/.test(clean) || clean.includes("@")) continue;
+    headerLines.push(clean.replace(/\s*[|·]\s*/g, " · "));
+  }
+  if (headerLines.length) {
+    const personal: NonNullable<ParsedResume["personal"]> = {
+      fullName: headerLines[0] ?? "",
+      jobTitle: headerLines[1] ?? "",
+      email: emails[0] ?? "",
+      phone: phones[0] ?? "",
+      city: "",
+      country: "",
+    };
+    result.personal = personal;
+  }
+
   if (sections.summary?.length) {
     result.summary = toBullets(sections.summary.join("\n")).join(" ").trim();
   }
