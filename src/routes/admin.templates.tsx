@@ -175,7 +175,7 @@ function AdminTemplates() {
             <CardTitle className="text-base">{ar ? "معاينة حية" : "Live preview"}</CardTitle>
           </CardHeader>
           <CardContent className="max-h-[70vh] overflow-auto bg-secondary/40 p-3">
-            <ResumePreview resume={previewResume} key={JSON.stringify(selected.design) + selectedId} />
+            <ResumePreview resume={previewResume} template={selected} />
           </CardContent>
         </Card>
       </div>
