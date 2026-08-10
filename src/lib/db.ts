@@ -239,22 +239,33 @@ export type AuditEntry = {
   id: string;
   action: string;
   target: string | null;
+  actorId: string | null;
+  actorEmail: string | null;
+  metadata: Record<string, unknown> | null;
   createdAt: string;
 };
 
-export async function fetchAuditLog(): Promise<AuditEntry[]> {
-  const { data } = await supabase
-    .from("admin_audit_logs")
-    .select("id, action, target, created_at")
-    .order("created_at", { ascending: false })
-    .limit(30);
+export async function fetchAuditLog(limit = 200): Promise<AuditEntry[]> {
+  const [{ data }, { data: profiles }] = await Promise.all([
+    supabase
+      .from("admin_audit_logs")
+      .select("id, action, target, actor_id, metadata, created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    supabase.from("profiles").select("id, email"),
+  ]);
+  const emails = new Map((profiles ?? []).map((p) => [p.id, p.email]));
   return (data ?? []).map((a) => ({
     id: a.id,
     action: a.action,
     target: a.target,
+    actorId: a.actor_id,
+    actorEmail: a.actor_id ? emails.get(a.actor_id) ?? null : null,
+    metadata: (a.metadata as Record<string, unknown> | null) ?? null,
     createdAt: a.created_at,
   }));
 }
+
 
 export async function logAudit(action: string, target?: string, metadata?: Record<string, unknown>) {
   const { data } = await supabase.auth.getUser();
