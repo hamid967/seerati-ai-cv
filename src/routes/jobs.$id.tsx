@@ -423,6 +423,29 @@ function JobWorkspacePage() {
     return acc;
   }, {});
 
+  const snapshot = baseResume
+    ? buildRecruiterSnapshot(baseResume, { graph, jobDescription: form.jobDescription })
+    : null;
+
+  const nextActions = computeNextActions({
+    twin,
+    graph,
+    resumes,
+    jobs: [job],
+    upcomingInterviews: upcomingInterviews(events, () => job.jobTitle),
+    jobsWithCoverLetter: assets.some((a) => a.assetType === "cover_letter") ? [job.id] : [],
+    jobsWithVariant: versions.some((v) => v.changeSummary === `variant:${job.id}`) ? [job.id] : [],
+  });
+
+  const interviewQuestions = [
+    ar
+      ? `لماذا تناسب وظيفة ${job.jobTitle} في ${job.company}؟`
+      : `Why are you a fit for ${job.jobTitle} at ${job.company}?`,
+    ...(job.requirements?.hardSkills ?? []).slice(0, 2).map((s) =>
+      ar ? `حدّثني عن تجربتك مع ${s}.` : `Tell me about your experience with ${s}.`,
+    ),
+  ];
+
   const BackIcon = ar ? ArrowRight : ArrowLeft;
 
   return (
