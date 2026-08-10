@@ -447,10 +447,19 @@ function EditResume() {
                       <Input placeholder={ar ? "إلى" : "To"} value={e.end ?? ""} onChange={(ev) => setData((data) => { data.education[idx]!.end = ev.target.value; })} />
                     </div>
                     <Input placeholder={ar ? "ملاحظة (التقدير مثلاً)" : "Note (e.g. GPA)"} value={e.note ?? ""} onChange={(ev) => setData((data) => { data.education[idx]!.note = ev.target.value; })} />
-                    <Button size="sm" variant="ghost" className="text-destructive sm:col-span-2" onClick={() => setData((data) => { data.education.splice(idx, 1); })}>
-                      <Trash2 className="size-4" />
-                      {ar ? "حذف" : "Remove"}
-                    </Button>
+                    <div className="flex items-center gap-1 sm:col-span-2">
+                      <MoveButtons
+                        ar={ar}
+                        upDisabled={idx === 0}
+                        downDisabled={idx === d.education.length - 1}
+                        onMove={(dir) => setData((data) => { swap(data.education, idx, idx + dir); })}
+                      />
+                      <Button size="sm" variant="ghost" className="ms-auto text-destructive" onClick={() => setData((data) => { data.education.splice(idx, 1); })}>
+                        <Trash2 className="size-4" />
+                        {ar ? "حذف" : "Remove"}
+                      </Button>
+                    </div>
+
                   </div>
                 ))}
                 <Button onClick={() => setData((data) => { data.education.push({ id: uid(), degree: "", school: "" }); })}>
