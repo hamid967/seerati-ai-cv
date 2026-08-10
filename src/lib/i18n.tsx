@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type Lang = "ar" | "en";
 
@@ -38,20 +31,38 @@ export const dict: Dict = {
   },
   hero_cta: { ar: "أنشئ سيرتي مجاناً", en: "Create my resume" },
   hero_cta2: { ar: "استعرض القوالب", en: "Browse templates" },
-  hero_note: { ar: "تدعم العربية والإنجليزية · حتى ٣ سير ذاتية لكل حساب", en: "Arabic & English · up to 3 resumes per account" },
+  hero_note: {
+    ar: "تدعم العربية والإنجليزية · حتى ٣ سير ذاتية لكل حساب",
+    en: "Arabic & English · up to 3 resumes per account",
+  },
 
   steps_title: { ar: "ثلاث خطوات فقط", en: "Just three steps" },
   step1_t: { ar: "اختر القالب", en: "Choose a template" },
-  step1_d: { ar: "قوالب متوافقة مع أنظمة ATS وأخرى عصرية وإبداعية.", en: "ATS-friendly, modern and creative layouts." },
+  step1_d: {
+    ar: "قوالب متوافقة مع أنظمة ATS وأخرى عصرية وإبداعية.",
+    en: "ATS-friendly, modern and creative layouts.",
+  },
   step2_t: { ar: "أدخل بياناتك", en: "Add your details" },
-  step2_d: { ar: "نموذج متعدد الخطوات مع حفظ تلقائي ومعاينة مباشرة.", en: "Multi-step form with autosave and live preview." },
+  step2_d: {
+    ar: "نموذج متعدد الخطوات مع حفظ تلقائي ومعاينة مباشرة.",
+    en: "Multi-step form with autosave and live preview.",
+  },
   step3_t: { ar: "حسّن ونزّل", en: "Refine & download" },
-  step3_d: { ar: "تحسين بالذكاء الاصطناعي، فحص ATS، ثم تنزيل PDF.", en: "AI refinement, ATS check, then PDF export." },
+  step3_d: {
+    ar: "تحسين بالذكاء الاصطناعي، فحص ATS، ثم تنزيل PDF.",
+    en: "AI refinement, ATS check, then PDF export.",
+  },
 
   templates_title: { ar: "قوالب مصممة بعناية", en: "Carefully crafted templates" },
-  templates_sub: { ar: "كل قالب يدعم العربية والإنجليزية ويمكن تبديله في أي وقت.", en: "Every template supports Arabic and English and can be switched anytime." },
+  templates_sub: {
+    ar: "كل قالب يدعم العربية والإنجليزية ويمكن تبديله في أي وقت.",
+    en: "Every template supports Arabic and English and can be switched anytime.",
+  },
   ai_title: { ar: "مساعد سيرتي", en: "Seerati Assistant" },
-  ai_sub: { ar: "مساعد كتابة داخل المحرر يساعدك على الصياغة المهنية.", en: "An in-editor writing assistant for professional phrasing." },
+  ai_sub: {
+    ar: "مساعد كتابة داخل المحرر يساعدك على الصياغة المهنية.",
+    en: "An in-editor writing assistant for professional phrasing.",
+  },
   ats_title: { ar: "جاهزية أنظمة التوظيف (ATS)", en: "ATS readiness" },
   ats_sub: {
     ar: "فحص أولي يعتمد على قواعد واضحة: اكتمال الحقول، طول الملخص، عناوين الأقسام، ومعلومات الاتصال.",
@@ -59,7 +70,10 @@ export const dict: Dict = {
   },
   faq_title: { ar: "الأسئلة الشائعة", en: "FAQ" },
   cta_title: { ar: "ابدأ سيرتك الذاتية اليوم", en: "Start your resume today" },
-  cta_sub: { ar: "أنشئ حساباً وجرّب المحرر كاملاً.", en: "Create an account and try the full editor." },
+  cta_sub: {
+    ar: "أنشئ حساباً وجرّب المحرر كاملاً.",
+    en: "Create an account and try the full editor.",
+  },
 
   footer_rights: { ar: "جميع الحقوق محفوظة", en: "All rights reserved" },
   footer_product: { ar: "المنتج", en: "Product" },
@@ -75,14 +89,29 @@ export const dict: Dict = {
     en: "A digital career studio that helps you build your profile, match jobs, and export a submission-ready Arabic PDF.",
   },
   auth_benefit_1: { ar: "حتى ٣ سير ذاتية لكل حساب", en: "Up to 3 resumes per account" },
-  auth_benefit_2: { ar: "قوالب عربية وإنجليزية متوافقة مع ATS", en: "Arabic & English ATS-ready templates" },
-  auth_benefit_3: { ar: "مساعد كتابة وفحص جاهزية التقديم", en: "Writing assistant and application readiness checks" },
+  auth_benefit_2: {
+    ar: "قوالب عربية وإنجليزية متوافقة مع ATS",
+    en: "Arabic & English ATS-ready templates",
+  },
+  auth_benefit_3: {
+    ar: "مساعد كتابة وفحص جاهزية التقديم",
+    en: "Writing assistant and application readiness checks",
+  },
   auth_signin_title: { ar: "مرحباً بعودتك", en: "Welcome back" },
-  auth_signin_sub: { ar: "سجّل الدخول لمتابعة سيرتك ومساحات وظائفك.", en: "Sign in to continue your resumes and job spaces." },
+  auth_signin_sub: {
+    ar: "سجّل الدخول لمتابعة سيرتك ومساحات وظائفك.",
+    en: "Sign in to continue your resumes and job spaces.",
+  },
   auth_signup_title: { ar: "أنشئ حسابك في سيرتي", en: "Create your Seerati account" },
-  auth_signup_sub: { ar: "ابدأ مجاناً وابنِ سيرتك الذاتية خلال دقائق.", en: "Start free and build your resume in minutes." },
+  auth_signup_sub: {
+    ar: "ابدأ مجاناً وابنِ سيرتك الذاتية خلال دقائق.",
+    en: "Start free and build your resume in minutes.",
+  },
   auth_reset_title: { ar: "استعادة كلمة المرور", en: "Reset your password" },
-  auth_reset_sub: { ar: "أدخل بريدك وسنرسل رابط إعادة التعيين.", en: "Enter your email and we’ll send a reset link." },
+  auth_reset_sub: {
+    ar: "أدخل بريدك وسنرسل رابط إعادة التعيين.",
+    en: "Enter your email and we’ll send a reset link.",
+  },
   auth_password_confirm: { ar: "تأكيد كلمة المرور", en: "Confirm password" },
   auth_show_password: { ar: "إظهار كلمة المرور", en: "Show password" },
   auth_hide_password: { ar: "إخفاء كلمة المرور", en: "Hide password" },
@@ -103,7 +132,10 @@ export const dict: Dict = {
     en: "Your account is stored securely in the cloud. Up to 3 resumes per account.",
   },
   auth_err_email: { ar: "بريد إلكتروني غير صحيح", en: "Invalid email" },
-  auth_err_password: { ar: "٨ أحرف على الأقل مع مزيج أقوى", en: "At least 8 characters with a stronger mix" },
+  auth_err_password: {
+    ar: "٨ أحرف على الأقل مع مزيج أقوى",
+    en: "At least 8 characters with a stronger mix",
+  },
   auth_err_password_short: { ar: "٦ أحرف على الأقل", en: "At least 6 characters" },
   auth_err_name: { ar: "اكتب اسمك الكامل", en: "Enter your full name" },
   auth_err_confirm: { ar: "كلمتا المرور غير متطابقتين", en: "Passwords do not match" },
@@ -115,7 +147,10 @@ export const dict: Dict = {
     en: "Account created. Confirm the link in your email, then sign in.",
   },
   auth_ok_welcome: { ar: "مرحباً بك", en: "Welcome back" },
-  auth_ok_reset: { ar: "أرسلنا رابط إعادة التعيين إلى بريدك.", en: "Reset link sent to your email." },
+  auth_ok_reset: {
+    ar: "أرسلنا رابط إعادة التعيين إلى بريدك.",
+    en: "Reset link sent to your email.",
+  },
   email: { ar: "البريد الإلكتروني", en: "Email" },
   password: { ar: "كلمة المرور", en: "Password" },
   full_name: { ar: "الاسم الكامل", en: "Full name" },
@@ -133,7 +168,10 @@ export const dict: Dict = {
   completeness: { ar: "الاكتمال", en: "Completeness" },
   template: { ar: "القالب", en: "Template" },
   empty_resumes: { ar: "لا توجد سير ذاتية بعد", en: "No resumes yet" },
-  empty_resumes_d: { ar: "أنشئ أول سيرة ذاتية خلال دقائق.", en: "Create your first resume in minutes." },
+  empty_resumes_d: {
+    ar: "أنشئ أول سيرة ذاتية خلال دقائق.",
+    en: "Create your first resume in minutes.",
+  },
   limit_reached: { ar: "وصلت الحد الأقصى (٣ سير ذاتية)", en: "You reached the limit of 3 resumes" },
 
   saved: { ar: "تم الحفظ", en: "Saved" },

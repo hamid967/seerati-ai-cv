@@ -142,16 +142,26 @@ function AuthPage() {
         return;
       }
       toast.success(t("auth_ok_welcome"));
-      navigate({ to: res.role === "admin" ? "/admin" : res.onboarded ? "/dashboard" : "/onboarding" });
+      navigate({
+        to: res.role === "admin" ? "/admin" : res.onboarded ? "/dashboard" : "/onboarding",
+      });
     } finally {
       setBusy(false);
     }
   };
 
   const title =
-    tab === "signup" ? t("auth_signup_title") : tab === "reset" ? t("auth_reset_title") : t("auth_signin_title");
+    tab === "signup"
+      ? t("auth_signup_title")
+      : tab === "reset"
+        ? t("auth_reset_title")
+        : t("auth_signin_title");
   const subtitle =
-    tab === "signup" ? t("auth_signup_sub") : tab === "reset" ? t("auth_reset_sub") : t("auth_signin_sub");
+    tab === "signup"
+      ? t("auth_signup_sub")
+      : tab === "reset"
+        ? t("auth_reset_sub")
+        : t("auth_signin_sub");
 
   const benefits = [t("auth_benefit_1"), t("auth_benefit_2"), t("auth_benefit_3")];
 
@@ -185,7 +195,9 @@ function AuthPage() {
               <h1 className="text-balance-ar text-4xl font-extrabold leading-[1.25] tracking-tight xl:text-5xl">
                 {t("auth_panel_title")}
               </h1>
-              <p className="mt-4 text-[15px] leading-[1.9] text-ink-foreground/75">{t("auth_panel_sub")}</p>
+              <p className="mt-4 text-[15px] leading-[1.9] text-ink-foreground/75">
+                {t("auth_panel_sub")}
+              </p>
             </div>
             <ul className="space-y-3">
               {benefits.map((item) => (
@@ -208,8 +220,8 @@ function AuthPage() {
 
       <section className="relative flex min-h-screen flex-col bg-background">
         <div className="hero-grid absolute inset-0 opacity-60" aria-hidden />
-        <header className="relative z-10 flex items-center justify-between px-5 py-5 sm:px-8">
-          <Link to="/" className="inline-flex items-center gap-2 lg:invisible">
+        <header className="relative z-10 flex items-center justify-between gap-3 px-5 py-5 sm:px-8">
+          <Link to="/" className="inline-flex items-center gap-2 lg:hidden">
             <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
               <FileText className="size-5" />
             </span>
@@ -218,7 +230,7 @@ function AuthPage() {
               <span className="ms-1 text-xs font-medium text-muted-foreground">Seerati</span>
             </span>
           </Link>
-          <div className="ms-auto flex items-center gap-2">
+          <div className="flex items-center gap-2 lg:ms-auto">
             <Button variant="ghost" size="sm" onClick={toggle} aria-label={t("language")}>
               <Globe className="size-4" />
               {lang === "ar" ? "EN" : "ع"}
@@ -327,12 +339,16 @@ function AuthPage() {
                         type="button"
                         className="absolute inset-y-0 end-0 grid w-11 place-items-center text-muted-foreground hover:text-foreground"
                         onClick={() => setShowPassword((v) => !v)}
-                        aria-label={showPassword ? t("auth_hide_password") : t("auth_show_password")}
+                        aria-label={
+                          showPassword ? t("auth_hide_password") : t("auth_show_password")
+                        }
                       >
                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
                     </div>
-                    {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                    {errors.password && (
+                      <p className="text-xs text-destructive">{errors.password}</p>
+                    )}
                     {tab === "signup" && password.length > 0 && (
                       <div className="space-y-1.5 pt-1">
                         <div className="flex items-center justify-between text-[11px] text-muted-foreground">
@@ -420,7 +436,12 @@ function AuthPage() {
                 </Button>
 
                 {tab === "reset" && (
-                  <Button type="button" variant="ghost" className="w-full" onClick={() => setMode("signin")}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setMode("signin")}
+                  >
                     {t("auth_back_signin")}
                   </Button>
                 )}
