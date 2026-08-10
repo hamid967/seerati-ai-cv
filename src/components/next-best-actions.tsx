@@ -35,7 +35,9 @@ export function NextBestActions({
     return (
       <Card dir={dir}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">{title ?? (ar ? "خطوتك التالية" : "Your next step")}</CardTitle>
+          <CardTitle className="text-base">
+            {title ?? (ar ? "خطوتك التالية" : "Your next step")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="rounded-xl bg-muted/50 p-4 text-xs text-muted-foreground">
@@ -77,7 +79,9 @@ export function NextBestActions({
                 </Badge>
                 <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
               </div>
-              <p className="mt-1.5 text-sm font-bold leading-[1.7]">{ar ? a.title.ar : a.title.en}</p>
+              <p className="mt-1.5 text-sm font-bold leading-[1.7]">
+                {ar ? a.title.ar : a.title.en}
+              </p>
               <p className="mt-1 text-xs leading-[1.9] text-muted-foreground">
                 {ar ? a.why.ar : a.why.en}
               </p>

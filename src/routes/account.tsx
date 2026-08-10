@@ -13,7 +13,10 @@ export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
       { title: "حسابي | سيرتي — Seerati Account" },
-      { name: "description", content: "إدارة بيانات حسابك في سيرتي ومتابعة استخدامك من أصل ٣ سير ذاتية." },
+      {
+        name: "description",
+        content: "إدارة بيانات حسابك في سيرتي ومتابعة استخدامك من أصل ٣ سير ذاتية.",
+      },
       { property: "og:title", content: "حسابي في سيرتي" },
       { property: "og:description", content: "بياناتك الشخصية وحد الاستخدام." },
       { name: "robots", content: "noindex" },

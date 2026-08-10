@@ -172,5 +172,9 @@ export function upcomingInterviews(
   const cutoff = Date.now() - 24 * 60 * 60 * 1000;
   return events
     .filter((e) => e.eventType === "interview" && new Date(e.occurredAt).getTime() >= cutoff)
-    .map((e) => ({ jobId: e.jobId, jobTitle: jobTitleOf(e.jobId) || e.title, occurredAt: e.occurredAt }));
+    .map((e) => ({
+      jobId: e.jobId,
+      jobTitle: jobTitleOf(e.jobId) || e.title,
+      occurredAt: e.occurredAt,
+    }));
 }

@@ -27,5 +27,4 @@ export function parseAiRequest(input: unknown): AiRequest {
       : undefined;
 
   return { task: task as AiTask, lang, input: text, ...(context ? { context } : {}) };
-
 }

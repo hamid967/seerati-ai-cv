@@ -73,8 +73,26 @@ const ORDER: StepId[] = [
 
 const YEARS_CHIPS = ["٠-١", "١-٣", "٤-٧", "٨+"];
 const YEARS_CHIPS_EN = ["0-1", "1-3", "4-7", "8+"];
-const INDUSTRY_CHIPS_AR = ["تقنية المعلومات", "المالية", "الصحة", "التعليم", "التجزئة", "الطاقة", "الحكومي", "أخرى"];
-const INDUSTRY_CHIPS_EN = ["IT", "Finance", "Healthcare", "Education", "Retail", "Energy", "Government", "Other"];
+const INDUSTRY_CHIPS_AR = [
+  "تقنية المعلومات",
+  "المالية",
+  "الصحة",
+  "التعليم",
+  "التجزئة",
+  "الطاقة",
+  "الحكومي",
+  "أخرى",
+];
+const INDUSTRY_CHIPS_EN = [
+  "IT",
+  "Finance",
+  "Healthcare",
+  "Education",
+  "Retail",
+  "Energy",
+  "Government",
+  "Other",
+];
 const LANG_CHIPS_AR = ["العربية", "الإنجليزية", "الفرنسية", "لا يوجد"];
 const LANG_CHIPS_EN = ["Arabic", "English", "French", "None"];
 
@@ -107,15 +125,21 @@ function AiReviewPanel({
     <div className="space-y-2 rounded-xl border border-accent/40 bg-accent/5 p-3">
       <p className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
         <Sparkles className="size-3.5" />
-        {ar ? "مقارنة قبل / بعد — لن يُطبَّق شيء تلقائياً" : "Before / after — nothing applies automatically"}
+        {ar
+          ? "مقارنة قبل / بعد — لن يُطبَّق شيء تلقائياً"
+          : "Before / after — nothing applies automatically"}
       </p>
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="rounded-lg border border-border bg-background p-2">
-          <p className="mb-1 text-[10px] font-semibold text-muted-foreground">{ar ? "قبل" : "Before"}</p>
+          <p className="mb-1 text-[10px] font-semibold text-muted-foreground">
+            {ar ? "قبل" : "Before"}
+          </p>
           <p className="whitespace-pre-wrap text-[12.5px] leading-relaxed">{before || "—"}</p>
         </div>
         <div className="rounded-lg border border-primary/40 bg-background p-2">
-          <p className="mb-1 text-[10px] font-semibold text-muted-foreground">{ar ? "بعد (مقترح)" : "After (suggested)"}</p>
+          <p className="mb-1 text-[10px] font-semibold text-muted-foreground">
+            {ar ? "بعد (مقترح)" : "After (suggested)"}
+          </p>
           <p className="whitespace-pre-wrap text-[12.5px] leading-relaxed">{after}</p>
         </div>
       </div>
@@ -130,11 +154,23 @@ function AiReviewPanel({
         <Button size="sm" className="h-7 text-[11.5px]" onClick={onApply} disabled={busy}>
           {ar ? "تطبيق" : "Apply"}
         </Button>
-        <Button size="sm" variant="outline" className="h-7 text-[11.5px]" onClick={onRegenerate} disabled={busy}>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-[11.5px]"
+          onClick={onRegenerate}
+          disabled={busy}
+        >
           {busy ? <Loader2 className="size-3 animate-spin" /> : null}
           {ar ? "إعادة توليد" : "Regenerate"}
         </Button>
-        <Button size="sm" variant="ghost" className="h-7 text-[11.5px]" onClick={onKeep} disabled={busy}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 text-[11.5px]"
+          onClick={onKeep}
+          disabled={busy}
+        >
           {ar ? "الاحتفاظ بالأصل" : "Keep original"}
         </Button>
       </div>
@@ -150,7 +186,13 @@ export function ResumeInterview({
 }: {
   lang: "ar" | "en";
   templateId: string;
-  initial?: { fullName?: string; currentTitle?: string; targetJob?: string; years?: string; industry?: string };
+  initial?: {
+    fullName?: string;
+    currentTitle?: string;
+    targetJob?: string;
+    years?: string;
+    industry?: string;
+  };
   onCancel: () => void;
 }) {
   const ar = lang === "ar";
@@ -160,7 +202,12 @@ export function ResumeInterview({
   const [stepIdx, setStepIdx] = useState(0);
   const [extraExp2, setExtraExp2] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
-    { from: "bot", text: ar ? "لنبنِ سيرتك الذاتية معاً خطوة بخطوة. ما اسمك الكامل؟" : "Let’s build your resume together, step by step. What’s your full name?" },
+    {
+      from: "bot",
+      text: ar
+        ? "لنبنِ سيرتك الذاتية معاً خطوة بخطوة. ما اسمك الكامل؟"
+        : "Let’s build your resume together, step by step. What’s your full name?",
+    },
   ]);
   const [input, setInput] = useState(initial?.fullName ?? "");
   const [langsSelected, setLangsSelected] = useState<string[]>([]);
@@ -168,7 +215,11 @@ export function ResumeInterview({
 
   const [draft, setDraft] = useState<ResumeData>(() => ({
     ...emptyResumeData(),
-    personal: { ...emptyResumeData().personal, fullName: initial?.fullName ?? "", jobTitle: initial?.currentTitle ?? "" },
+    personal: {
+      ...emptyResumeData().personal,
+      fullName: initial?.fullName ?? "",
+      jobTitle: initial?.currentTitle ?? "",
+    },
     targetJob: initial?.targetJob ?? "",
   }));
 
@@ -215,25 +266,47 @@ export function ResumeInterview({
     targetJob: ar ? "ما المسمى الوظيفي الذي تستهدفه؟" : "Which job title are you targeting?",
     years: ar ? "كم سنة خبرة لديك؟" : "How many years of experience do you have?",
     industry: ar ? "في أي قطاع تعمل؟" : "Which industry do you work in?",
-    exp1_company: ar ? "لنبدأ بأحدث وظيفة. ما اسم الشركة؟" : "Let’s start with your most recent job. What’s the company name?",
+    exp1_company: ar
+      ? "لنبدأ بأحدث وظيفة. ما اسم الشركة؟"
+      : "Let’s start with your most recent job. What’s the company name?",
     exp1_role: ar ? "وما كان مسمّاك فيها؟" : "What was your title there?",
-    exp1_dates: ar ? "متى بدأت وانتهيت (أو تكتب حتى الآن)؟" : "Start and end dates (or say ‘current’)?",
-    exp1_resp: ar ? "صف مسؤولياتك الرئيسية هناك، سطر لكل مهمة." : "Describe your main responsibilities there, one line each.",
-    exp1_achv: ar ? "ما أبرز إنجاز حققته في هذه الوظيفة؟" : "What is your top achievement in this role?",
-    hasSecondExp: ar ? "هل لديك وظيفة سابقة أخرى تريد إضافتها؟" : "Do you have another previous job to add?",
-    exp2_company: ar ? "ما اسم الشركة في الوظيفة السابقة؟" : "What’s the company name for that previous job?",
+    exp1_dates: ar
+      ? "متى بدأت وانتهيت (أو تكتب حتى الآن)؟"
+      : "Start and end dates (or say ‘current’)?",
+    exp1_resp: ar
+      ? "صف مسؤولياتك الرئيسية هناك، سطر لكل مهمة."
+      : "Describe your main responsibilities there, one line each.",
+    exp1_achv: ar
+      ? "ما أبرز إنجاز حققته في هذه الوظيفة؟"
+      : "What is your top achievement in this role?",
+    hasSecondExp: ar
+      ? "هل لديك وظيفة سابقة أخرى تريد إضافتها؟"
+      : "Do you have another previous job to add?",
+    exp2_company: ar
+      ? "ما اسم الشركة في الوظيفة السابقة؟"
+      : "What’s the company name for that previous job?",
     exp2_role: ar ? "وما كان مسمّاك فيها؟" : "What was your title there?",
     exp2_dates: ar ? "متى بدأت وانتهيت؟" : "Start and end dates?",
-    exp2_resp: ar ? "صف مسؤولياتك الرئيسية هناك، سطر لكل مهمة." : "Describe your main responsibilities there, one line each.",
-    exp2_achv: ar ? "ما أبرز إنجاز حققته في هذه الوظيفة؟" : "What is your top achievement in this role?",
+    exp2_resp: ar
+      ? "صف مسؤولياتك الرئيسية هناك، سطر لكل مهمة."
+      : "Describe your main responsibilities there, one line each.",
+    exp2_achv: ar
+      ? "ما أبرز إنجاز حققته في هذه الوظيفة؟"
+      : "What is your top achievement in this role?",
     eduDegree: ar ? "ما آخر مؤهل علمي حصلت عليه؟" : "What is your highest qualification?",
     eduSchool: ar ? "من أي جهة أو جامعة؟" : "From which institution?",
     eduDates: ar ? "سنة التخرج (اختياري)؟" : "Graduation year (optional)?",
-    courses: ar ? "هل لديك دورات أو شهادات تريد إضافتها؟ اذكرها مفصولة بفواصل، أو اكتب «لا يوجد»." : "Any courses or certificates to add? Comma-separated, or say ‘None’.",
+    courses: ar
+      ? "هل لديك دورات أو شهادات تريد إضافتها؟ اذكرها مفصولة بفواصل، أو اكتب «لا يوجد»."
+      : "Any courses or certificates to add? Comma-separated, or say ‘None’.",
     skills: ar ? "اذكر أهم مهاراتك مفصولة بفواصل." : "List your top skills, comma-separated.",
     languages: ar ? "ما اللغات التي تتقنها؟" : "Which languages do you speak?",
-    projects: ar ? "هل لديك مشاريع أو روابط (بورتفوليو، لينكدإن) تريد إضافتها؟ أو اكتب «لا يوجد»." : "Any projects or links (portfolio, LinkedIn) to add? Or say ‘None’.",
-    summary: ar ? "سأقترح لك ملخصاً مهنياً بناءً على إجاباتك." : "I’ll suggest a professional summary based on your answers.",
+    projects: ar
+      ? "هل لديك مشاريع أو روابط (بورتفوليو، لينكدإن) تريد إضافتها؟ أو اكتب «لا يوجد»."
+      : "Any projects or links (portfolio, LinkedIn) to add? Or say ‘None’.",
+    summary: ar
+      ? "سأقترح لك ملخصاً مهنياً بناءً على إجاباتك."
+      : "I’ll suggest a professional summary based on your answers.",
     done: "",
   };
 
@@ -254,12 +327,7 @@ export function ResumeInterview({
   };
 
   const isSkippable = (): boolean =>
-    ![
-      "fullName",
-      "targetJob",
-      "years",
-      "hasSecondExp",
-    ].includes(step);
+    !["fullName", "targetJob", "years", "hasSecondExp"].includes(step);
 
   const finalizeSummary = async (raw: string) => {
     setAiPanel({ before: "", after: "", busy: true, apply: () => {}, regenerate: () => {} });
@@ -268,7 +336,11 @@ export function ResumeInterview({
         task: "summary",
         lang,
         input: raw,
-        context: { ...draft, targetRole: draft.targetJob ?? "", answers: { years: draft.personal.jobTitle } },
+        context: {
+          ...draft,
+          targetRole: draft.targetJob ?? "",
+          answers: { years: draft.personal.jobTitle },
+        },
       });
       setAiPanel({
         before: draft.summary || (ar ? "لا يوجد ملخص بعد" : "No summary yet"),
@@ -278,7 +350,11 @@ export function ResumeInterview({
           setDraft((d) => ({ ...d, summary: t }));
           setAiPanel(null);
           advance();
-          say(ar ? "تم اعتماد الملخص. أعددت لك ملخص إنجازاتك — راجع البطاقة أدناه." : "Summary applied. Review your progress card below.");
+          say(
+            ar
+              ? "تم اعتماد الملخص. أعددت لك ملخص إنجازاتك — راجع البطاقة أدناه."
+              : "Summary applied. Review your progress card below.",
+          );
         },
         regenerate: () => void finalizeSummary(raw),
       });
@@ -291,7 +367,12 @@ export function ResumeInterview({
   const runQuantify = async (raw: string, applyTo: (text: string) => void) => {
     setAiPanel({ before: raw, after: "", busy: true, apply: () => {}, regenerate: () => {} });
     try {
-      const res = await aiService.run({ task: "quantify", lang, input: raw, context: { ...draft } });
+      const res = await aiService.run({
+        task: "quantify",
+        lang,
+        input: raw,
+        context: { ...draft },
+      });
       const after = sanitizeQuantified(res.text, ar);
       setAiPanel({
         before: raw,
@@ -323,10 +404,17 @@ export function ResumeInterview({
         setDraft((d) => ({ ...d, personal: { ...d.personal, fullName: value } }));
         break;
       case "currentTitle":
-        setDraft((d) => ({ ...d, personal: { ...d.personal, jobTitle: d.personal.jobTitle || value } }));
+        setDraft((d) => ({
+          ...d,
+          personal: { ...d.personal, jobTitle: d.personal.jobTitle || value },
+        }));
         break;
       case "targetJob":
-        setDraft((d) => ({ ...d, targetJob: value, personal: { ...d.personal, jobTitle: d.personal.jobTitle || value } }));
+        setDraft((d) => ({
+          ...d,
+          targetJob: value,
+          personal: { ...d.personal, jobTitle: d.personal.jobTitle || value },
+        }));
         break;
       case "years":
       case "industry":
@@ -345,7 +433,10 @@ export function ResumeInterview({
         break;
       }
       case "exp1_resp": {
-        const bullets = value.split(/\n|،\s*(?=\S{6,})/).map((s) => s.trim()).filter(Boolean);
+        const bullets = value
+          .split(/\n|،\s*(?=\S{6,})/)
+          .map((s) => s.trim())
+          .filter(Boolean);
         exp1Ref.current.bullets = bullets.length ? bullets : [value];
         break;
       }
@@ -360,7 +451,10 @@ export function ResumeInterview({
           end: exp1Ref.current.end ?? "",
           bullets,
         };
-        setDraft((d) => ({ ...d, experience: [...d.experience.filter((e) => e.id !== exp.id), exp] }));
+        setDraft((d) => ({
+          ...d,
+          experience: [...d.experience.filter((e) => e.id !== exp.id), exp],
+        }));
         setAiPanel(null);
         setMessages((m) => [...m]);
         // Offer an AI quantify pass on the achievement line before moving on.
@@ -392,7 +486,10 @@ export function ResumeInterview({
         break;
       }
       case "exp2_resp": {
-        const bullets = value.split(/\n|،\s*(?=\S{6,})/).map((s) => s.trim()).filter(Boolean);
+        const bullets = value
+          .split(/\n|،\s*(?=\S{6,})/)
+          .map((s) => s.trim())
+          .filter(Boolean);
         exp2Ref.current.bullets = bullets.length ? bullets : [value];
         break;
       }
@@ -437,29 +534,50 @@ export function ResumeInterview({
         break;
       case "courses": {
         if (!/^(لا يوجد|none)$/i.test(value)) {
-          const items = value.split(/[,،]/).map((s) => s.trim()).filter(Boolean).map((title) => ({ id: uid(), title }));
+          const items = value
+            .split(/[,،]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .map((title) => ({ id: uid(), title }));
           setDraft((d) => ({ ...d, certificates: items }));
         }
         break;
       }
       case "skills": {
-        const items = value.split(/[,،]/).map((s) => s.trim()).filter(Boolean).map((name) => ({ id: uid(), name }));
+        const items = value
+          .split(/[,،]/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .map((name) => ({ id: uid(), name }));
         setDraft((d) => ({ ...d, skills: items }));
         break;
       }
       case "languages": {
-        const chosen = langsSelected.length ? langsSelected : value.split(/[,،]/).map((s) => s.trim()).filter(Boolean);
+        const chosen = langsSelected.length
+          ? langsSelected
+          : value
+              .split(/[,،]/)
+              .map((s) => s.trim())
+              .filter(Boolean);
         if (!chosen.some((c) => /^(لا يوجد|none)$/i.test(c))) {
           setDraft((d) => ({
             ...d,
-            languages: chosen.map((name) => ({ id: uid(), name, level: ar ? "جيد" : "Proficient" })),
+            languages: chosen.map((name) => ({
+              id: uid(),
+              name,
+              level: ar ? "جيد" : "Proficient",
+            })),
           }));
         }
         break;
       }
       case "projects": {
         if (!/^(لا يوجد|none)$/i.test(value)) {
-          const items = value.split(/[,،]/).map((s) => s.trim()).filter(Boolean).map((title) => ({ id: uid(), title }));
+          const items = value
+            .split(/[,،]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .map((title) => ({ id: uid(), title }));
           setDraft((d) => ({ ...d, projects: items }));
         }
         break;
@@ -495,7 +613,9 @@ export function ResumeInterview({
     const nextStepId: StepId = steps[nextIdx] ?? "done";
     if (nextStepId === "summary") {
       advance();
-      void finalizeSummary(`${draft.personal.fullName} — ${draft.targetJob || draft.personal.jobTitle}`);
+      void finalizeSummary(
+        `${draft.personal.fullName} — ${draft.targetJob || draft.personal.jobTitle}`,
+      );
       return;
     }
     advance(promptFor[nextStepId]);
@@ -520,7 +640,13 @@ export function ResumeInterview({
   const finish = async () => {
     setBusySave(true);
     const created = await createResume({
-      title: draft.targetJob ? (ar ? `سيرة ${draft.targetJob}` : `${draft.targetJob} resume`) : ar ? "سيرتي الذاتية" : "My resume",
+      title: draft.targetJob
+        ? ar
+          ? `سيرة ${draft.targetJob}`
+          : `${draft.targetJob} resume`
+        : ar
+          ? "سيرتي الذاتية"
+          : "My resume",
       templateId,
       language: lang,
       jobTitle: draft.targetJob || draft.personal.jobTitle,
@@ -545,15 +671,25 @@ export function ResumeInterview({
     return (
       <div className="space-y-5">
         <div className="rounded-xl border border-primary/40 bg-primary/5 p-4">
-          <p className="text-lg font-extrabold">{ar ? "سيرتك جاهزة للتحرير" : "Your resume is ready to edit"}</p>
+          <p className="text-lg font-extrabold">
+            {ar ? "سيرتك جاهزة للتحرير" : "Your resume is ready to edit"}
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            {ar ? "الأقسام التي جمعناها من محادثتنا:" : "Sections we gathered from our conversation:"}
+            {ar
+              ? "الأقسام التي جمعناها من محادثتنا:"
+              : "Sections we gathered from our conversation:"}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {filledSections.length ? (
-              filledSections.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)
+              filledSections.map((s) => (
+                <Badge key={s} variant="secondary">
+                  {s}
+                </Badge>
+              ))
             ) : (
-              <span className="text-sm text-muted-foreground">{ar ? "لا توجد أقسام بعد" : "No sections yet"}</span>
+              <span className="text-sm text-muted-foreground">
+                {ar ? "لا توجد أقسام بعد" : "No sections yet"}
+              </span>
             )}
           </div>
         </div>
@@ -578,7 +714,9 @@ export function ResumeInterview({
           <div key={i} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[85%] rounded-lg px-3 py-1.5 text-[13px] ${
-                m.from === "user" ? "bg-primary text-primary-foreground" : "bg-background border border-border"
+                m.from === "user"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-background border border-border"
               }`}
             >
               {m.text}
@@ -602,7 +740,9 @@ export function ResumeInterview({
               const nextStepId: StepId = steps[nextIdx] ?? "done";
               if (nextStepId === "summary") {
                 advance();
-                void finalizeSummary(`${draft.personal.fullName} — ${draft.targetJob || draft.personal.jobTitle}`);
+                void finalizeSummary(
+                  `${draft.personal.fullName} — ${draft.targetJob || draft.personal.jobTitle}`,
+                );
               } else {
                 advance(promptFor[nextStepId]);
               }
@@ -684,7 +824,9 @@ export function ResumeInterview({
           </p>
           <div className="flex flex-wrap gap-1.5">
             {filledSections.map((s) => (
-              <Badge key={s} variant="secondary">{s}</Badge>
+              <Badge key={s} variant="secondary">
+                {s}
+              </Badge>
             ))}
           </div>
         </div>

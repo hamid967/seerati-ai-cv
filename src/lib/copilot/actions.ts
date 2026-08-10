@@ -115,8 +115,7 @@ export const ACTION_LABEL: Record<CopilotProtocolActionType, { ar: string; en: s
 export const requiresConfirmation = (_action: CopilotProtocolAction): boolean => true;
 
 export type ParseResult =
-  | { ok: true; action: CopilotProtocolAction }
-  | { ok: false; error: string };
+  { ok: true; action: CopilotProtocolAction } | { ok: false; error: string };
 
 /** Validate untrusted model output. Unknown types and partial JSON are rejected. */
 export function parseCopilotAction(input: unknown): ParseResult {
@@ -133,7 +132,10 @@ export function parseCopilotAction(input: unknown): ParseResult {
   const declared = (candidate as { requiresConfirmation?: unknown }).requiresConfirmation;
   if (declared === false) return { ok: false, error: "confirmation_required" };
   const type = (candidate as { type?: unknown }).type;
-  if (typeof type !== "string" || !COPILOT_ACTION_TYPES.includes(type as CopilotProtocolActionType)) {
+  if (
+    typeof type !== "string" ||
+    !COPILOT_ACTION_TYPES.includes(type as CopilotProtocolActionType)
+  ) {
     return { ok: false, error: "unknown_action" };
   }
   const parsed = copilotActionSchema.safeParse(candidate);

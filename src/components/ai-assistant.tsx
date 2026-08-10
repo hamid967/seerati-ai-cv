@@ -48,7 +48,11 @@ export function AiAssistant({
   const [busy, setBusy] = useState(false);
   const [input, setInput] = useState("");
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
-  const [lastRun, setLastRun] = useState<{ task: AiTask; target: AssistantTarget; input: string } | null>(null);
+  const [lastRun, setLastRun] = useState<{
+    task: AiTask;
+    target: AssistantTarget;
+    input: string;
+  } | null>(null);
   const [messages, setMessages] = useState<Msg[]>([
     {
       id: 0,
@@ -66,7 +70,10 @@ export function AiAssistant({
 
   // job description analyzer
   const [jd, setJd] = useState("");
-  const coverage = useMemo(() => (jd.trim() ? keywordCoverage(jd, resume.data) : null), [jd, resume.data]);
+  const coverage = useMemo(
+    () => (jd.trim() ? keywordCoverage(jd, resume.data) : null),
+    [jd, resume.data],
+  );
 
   const push = (role: Msg["role"], text: string) =>
     setMessages((m) => [...m, { id: idRef.current++, role, text }]);
@@ -87,7 +94,12 @@ export function AiAssistant({
   ) => {
     setBusy(true);
     try {
-      const res = await aiService.run({ task, lang, input: text, context: contextFor(extraAnswers) });
+      const res = await aiService.run({
+        task,
+        lang,
+        input: text,
+        context: contextFor(extraAnswers),
+      });
       push("assistant", res.text);
       setSuggestion({ task, target, text: res.text, ...(res.items ? { items: res.items } : {}) });
       setLastRun({ task, target, input: text });
@@ -112,7 +124,13 @@ export function AiAssistant({
     } else if (suggestion.target === "bullets") {
       onApplyBullets?.(suggestion.items ?? suggestion.text.split("\n").filter(Boolean));
     } else {
-      onAddSkills?.(suggestion.items ?? suggestion.text.split(",").map((s) => s.trim()).filter(Boolean));
+      onAddSkills?.(
+        suggestion.items ??
+          suggestion.text
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+      );
     }
     toast.success(ar ? "تم تطبيق الاقتراح على سيرتك" : "Suggestion applied to your resume");
     setSuggestion(null);
@@ -138,9 +156,15 @@ export function AiAssistant({
 
       <Tabs defaultValue="actions" className="flex min-h-0 flex-1 flex-col">
         <TabsList className="mx-3 mt-3">
-          <TabsTrigger value="actions" className="flex-1 text-xs">{ar ? "إجراءات" : "Actions"}</TabsTrigger>
-          <TabsTrigger value="interview" className="flex-1 text-xs">{ar ? "مقابلة" : "Interview"}</TabsTrigger>
-          <TabsTrigger value="jd" className="flex-1 text-xs">{ar ? "وصف الوظيفة" : "Job desc."}</TabsTrigger>
+          <TabsTrigger value="actions" className="flex-1 text-xs">
+            {ar ? "إجراءات" : "Actions"}
+          </TabsTrigger>
+          <TabsTrigger value="interview" className="flex-1 text-xs">
+            {ar ? "مقابلة" : "Interview"}
+          </TabsTrigger>
+          <TabsTrigger value="jd" className="flex-1 text-xs">
+            {ar ? "وصف الوظيفة" : "Job desc."}
+          </TabsTrigger>
         </TabsList>
 
         {/* Quick actions + chat */}
@@ -280,7 +304,9 @@ export function AiAssistant({
               <Textarea
                 rows={7}
                 value={suggestion?.text ?? ""}
-                onChange={(e) => setSuggestion({ task: "summary", target: "summary", text: e.target.value })}
+                onChange={(e) =>
+                  setSuggestion({ task: "summary", target: "summary", text: e.target.value })
+                }
               />
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" onClick={apply} disabled={!suggestion?.text}>
@@ -296,7 +322,14 @@ export function AiAssistant({
                   <RefreshCw className="size-3.5" />
                   {ar ? "توليد بديل" : "Regenerate"}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => { setWizardStep(0); setAnswers({}); }}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setWizardStep(0);
+                    setAnswers({});
+                  }}
+                >
                   {ar ? "إعادة المقابلة" : "Restart"}
                 </Button>
               </div>
@@ -320,11 +353,14 @@ export function AiAssistant({
           {coverage && (
             <div className="space-y-2">
               <p className="text-sm font-semibold">
-                {ar ? "نسبة التطابق" : "Match"}: {coverage.coverage}% ({coverage.matched.length}/{coverage.total})
+                {ar ? "نسبة التطابق" : "Match"}: {coverage.coverage}% ({coverage.matched.length}/
+                {coverage.total})
               </p>
               {coverage.missing.length > 0 && (
                 <>
-                  <p className="text-[11px] text-muted-foreground">{ar ? "كلمات ناقصة" : "Missing terms"}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {ar ? "كلمات ناقصة" : "Missing terms"}
+                  </p>
                   <div className="flex flex-wrap gap-1.5">
                     {coverage.missing.slice(0, 18).map((m) => (
                       <Badge key={m} variant="outline" className="text-[10.5px]">

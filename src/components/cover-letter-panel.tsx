@@ -96,7 +96,9 @@ export function CoverLetterPanel({
         }),
       );
       toast.success(
-        ar ? "أُنشئت مسودة — راجع الادعاءات قبل الحفظ." : "Draft ready — review the claims before saving.",
+        ar
+          ? "أُنشئت مسودة — راجع الادعاءات قبل الحفظ."
+          : "Draft ready — review the claims before saving.",
       );
     } catch {
       toast.error(ar ? "تعذّر إنشاء المسودة." : "Could not create the draft.");
@@ -159,7 +161,12 @@ export function CoverLetterPanel({
 
         <div className="space-y-1.5">
           <Label htmlFor="cl-opening">{ar ? "الافتتاحية" : "Opening"}</Label>
-          <Textarea id="cl-opening" rows={2} value={opening} onChange={(e) => setOpening(e.target.value)} />
+          <Textarea
+            id="cl-opening"
+            rows={2}
+            value={opening}
+            onChange={(e) => setOpening(e.target.value)}
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cl-body">{ar ? "المتن" : "Body"}</Label>
@@ -167,7 +174,12 @@ export function CoverLetterPanel({
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cl-closing">{ar ? "الخاتمة" : "Closing"}</Label>
-          <Textarea id="cl-closing" rows={2} value={closing} onChange={(e) => setClosing(e.target.value)} />
+          <Textarea
+            id="cl-closing"
+            rows={2}
+            value={closing}
+            onChange={(e) => setClosing(e.target.value)}
+          />
         </div>
 
         {issues !== null && (
@@ -175,7 +187,9 @@ export function CoverLetterPanel({
             {issues.length === 0 ? (
               <p className="flex items-center gap-2 text-xs font-semibold text-emerald-accent">
                 <ShieldCheck className="size-4" />
-                {ar ? "كل الادعاءات مدعومة بما لديك." : "Every claim is supported by your own data."}
+                {ar
+                  ? "كل الادعاءات مدعومة بما لديك."
+                  : "Every claim is supported by your own data."}
               </p>
             ) : (
               <>

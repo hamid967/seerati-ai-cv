@@ -106,10 +106,7 @@ export async function createJobVariantSnapshot(args: {
   });
 }
 
-export async function renameResumeVersion(
-  versionId: string,
-  label: string,
-): Promise<void> {
+export async function renameResumeVersion(versionId: string, label: string): Promise<void> {
   const clean = label.trim();
   if (!clean) return;
   const { error } = await supabase
@@ -134,7 +131,8 @@ export async function restoreResumeVersion(args: {
   current: ResumeData;
   lang: "ar" | "en";
 }): Promise<RestoreResult> {
-  if (!(await assertOwnsResume(args.resumeId, args.userId))) return { ok: false, error: "not_owner" };
+  if (!(await assertOwnsResume(args.resumeId, args.userId)))
+    return { ok: false, error: "not_owner" };
   const { data, error } = await supabase
     .from("resume_versions")
     .select("*")
@@ -162,8 +160,8 @@ export async function restoreResumeVersion(args: {
 export function asResumeData(snapshot: unknown): ResumeData | null {
   if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
   const s = snapshot as Record<string, unknown>;
-  if (!s['personal'] || typeof s['personal'] !== "object") return null;
-  if (!Array.isArray(s['experience'])) return null;
+  if (!s["personal"] || typeof s["personal"] !== "object") return null;
+  if (!Array.isArray(s["experience"])) return null;
   const { __jobId: _ignored, ...rest } = s;
   return rest as unknown as ResumeData;
 }
@@ -172,7 +170,7 @@ export function asResumeData(snapshot: unknown): ResumeData | null {
 export function versionJobId(v: ResumeVersion): string | null {
   const s = v.snapshot;
   if (s && typeof s === "object" && !Array.isArray(s)) {
-    const id = (s as Record<string, unknown>)['__jobId'];
+    const id = (s as Record<string, unknown>)["__jobId"];
     if (typeof id === "string" && id) return id;
   }
   const m = /^variant:(.+)$/.exec(v.changeSummary || "");

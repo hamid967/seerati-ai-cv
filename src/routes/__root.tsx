@@ -133,7 +133,17 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 /** Signed-in product surfaces that get the App Shell instead of site chrome. */
-const APP_PREFIXES = ["/dashboard", "/account", "/career-twin", "/career-evidence", "/jobs", "/resumes", "/admin", "/import", "/privacy-center"];
+const APP_PREFIXES = [
+  "/dashboard",
+  "/account",
+  "/career-twin",
+  "/career-evidence",
+  "/jobs",
+  "/resumes",
+  "/admin",
+  "/import",
+  "/privacy-center",
+];
 /** Editor-style routes: chrome shrinks into focus mode. */
 const FOCUS_PATTERN = /^\/resumes\/[^/]+\/(edit|preview)$/;
 

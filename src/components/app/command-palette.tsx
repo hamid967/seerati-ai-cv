@@ -33,11 +33,10 @@ export function CommandPalette() {
   const items = APP_NAV.filter((i) => i.enabled && (!i.adminOnly || user?.role === "admin"));
 
   return (
-    <CommandDialog
-      open={paletteOpen}
-      onOpenChange={setPaletteOpen}
-    >
-      <CommandInput placeholder={ar ? "ابحث عن صفحة أو سيرة أو أمر…" : "Search pages, resumes, actions…"} />
+    <CommandDialog open={paletteOpen} onOpenChange={setPaletteOpen}>
+      <CommandInput
+        placeholder={ar ? "ابحث عن صفحة أو سيرة أو أمر…" : "Search pages, resumes, actions…"}
+      />
       <CommandList>
         <CommandEmpty>{ar ? "لا نتائج" : "No results"}</CommandEmpty>
 
@@ -54,7 +53,9 @@ export function CommandPalette() {
                 <Icon className="size-4" />
                 <span>{label}</span>
                 {pathname === item.to && (
-                  <span className="ms-auto text-xs text-muted-foreground">{ar ? "هنا" : "current"}</span>
+                  <span className="ms-auto text-xs text-muted-foreground">
+                    {ar ? "هنا" : "current"}
+                  </span>
                 )}
               </CommandItem>
             );
@@ -72,7 +73,9 @@ export function CommandPalette() {
                   onSelect={() => go(`/resumes/${r.id}/edit`)}
                 >
                   <FileText className="size-4" />
-                  <span className="truncate">{r.title || (ar ? "سيرة بدون عنوان" : "Untitled resume")}</span>
+                  <span className="truncate">
+                    {r.title || (ar ? "سيرة بدون عنوان" : "Untitled resume")}
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>

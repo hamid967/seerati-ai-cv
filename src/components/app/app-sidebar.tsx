@@ -50,7 +50,9 @@ function NavRow({
     return collapsed ? (
       <Tooltip>
         <TooltipTrigger asChild>{row}</TooltipTrigger>
-        <TooltipContent side={ar ? "left" : "right"}>{`${label} — ${ar ? "قريباً" : "Soon"}`}</TooltipContent>
+        <TooltipContent
+          side={ar ? "left" : "right"}
+        >{`${label} — ${ar ? "قريباً" : "Soon"}`}</TooltipContent>
       </Tooltip>
     ) : (
       row
@@ -137,7 +139,10 @@ export function AppSidebarNav({
           </div>
         )}
 
-        <nav className="min-h-0 flex-1 overflow-y-auto pe-0.5" aria-label={ar ? "التنقل" : "Navigation"}>
+        <nav
+          className="min-h-0 flex-1 overflow-y-auto pe-0.5"
+          aria-label={ar ? "التنقل" : "Navigation"}
+        >
           {groups.map((g) => {
             const items = navByGroup(g.key, isAdmin);
             if (!items.length) return null;
@@ -227,7 +232,11 @@ export function AppSidebar() {
         aria-label={ar ? "طيّ القائمة" : "Toggle sidebar"}
         className="absolute end-2 top-4 h-9 w-9 text-sidebar-foreground/60 hover:text-sidebar-foreground"
       >
-        {collapsed ? <PanelsTopLeft className="size-4" /> : <ChevronsLeftRight className="size-4" />}
+        {collapsed ? (
+          <PanelsTopLeft className="size-4" />
+        ) : (
+          <ChevronsLeftRight className="size-4" />
+        )}
       </Button>
     </aside>
   );

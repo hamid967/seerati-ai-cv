@@ -157,7 +157,9 @@ export function computeNextActions(input: NextActionInput, limit = 5): NextActio
 
   // 6. Cover letter missing for an active application.
   const withLetter = new Set(input.jobsWithCoverLetter ?? []);
-  const activeNoLetter = jobs.find((j) => ACTIVE_STATUSES.includes(j.status) && !withLetter.has(j.id));
+  const activeNoLetter = jobs.find(
+    (j) => ACTIVE_STATUSES.includes(j.status) && !withLetter.has(j.id),
+  );
   if (activeNoLetter) {
     actions.push({
       id: `letter_${activeNoLetter.id}`,

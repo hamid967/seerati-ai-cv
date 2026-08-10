@@ -114,7 +114,9 @@ export function ProtectedTermsManager({
             id="pt-term"
             value={draft.term}
             onChange={(e) => setDraft({ ...draft, term: e.target.value })}
-            placeholder={ar ? "مثال: أرامكو السعودية، SAP S/4HANA" : "e.g. Saudi Aramco, SAP S/4HANA"}
+            placeholder={
+              ar ? "مثال: أرامكو السعودية، SAP S/4HANA" : "e.g. Saudi Aramco, SAP S/4HANA"
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter") void add();
             }}

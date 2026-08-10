@@ -29,7 +29,12 @@ const same = (a: string, b: string) =>
 
 /** Compare a set of scalar fields and return only the real disagreements. */
 export function detectConflicts(
-  fields: Array<{ key: string; label: { ar: string; en: string }; existing: string; imported: string }>,
+  fields: Array<{
+    key: string;
+    label: { ar: string; en: string };
+    existing: string;
+    imported: string;
+  }>,
 ): FieldConflict[] {
   return fields
     .filter((f) => f.existing.trim() && f.imported.trim() && !same(f.existing, f.imported))

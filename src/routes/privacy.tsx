@@ -9,7 +9,8 @@ export const Route = createFileRoute("/privacy")({
       { title: "سياسة الخصوصية | سيرتي Seerati" },
       {
         name: "description",
-        content: "كيف تتعامل منصة سيرتي مع بياناتك: ما نخزّنه، استخدام الذكاء الاصطناعي، ملفات السير الذاتية، وحذف الحساب.",
+        content:
+          "كيف تتعامل منصة سيرتي مع بياناتك: ما نخزّنه، استخدام الذكاء الاصطناعي، ملفات السير الذاتية، وحذف الحساب.",
       },
       { property: "og:title", content: "سياسة الخصوصية | سيرتي Seerati" },
       { property: "og:description", content: "بيان مبدئي لسياسة الخصوصية في منصة سيرتي." },
@@ -96,14 +97,19 @@ function PrivacyPage() {
             "For full account deletion, contact us at the address below and we will process the request.",
           ],
         },
-        { h: "Contact", p: ["Placeholder contact address: hello@seerati.sa (demo address in this release)."] },
+        {
+          h: "Contact",
+          p: ["Placeholder contact address: hello@seerati.sa (demo address in this release)."],
+        },
       ];
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-14">
-        <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "سياسة الخصوصية" : "Privacy policy"}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {ar ? "سياسة الخصوصية" : "Privacy policy"}
+        </h1>
         <p className="mt-3 rounded-xl border border-border bg-secondary px-4 py-3 text-sm leading-relaxed">
           {ar
             ? "هذه صفحة توضيحية مبدئية وليست صياغة قانونية نهائية. ستُستبدل بنص مُراجَع قانونياً قبل التشغيل التجاري."

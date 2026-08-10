@@ -184,7 +184,9 @@ export function RecruiterSnapshotCard({ snapshot }: { snapshot: RecruiterSnapsho
 
         {snapshot.vaguest ? (
           <section className="rounded-xl border border-dashed border-border p-3">
-            <h4 className="text-sm font-bold">{ar ? "أكثر عبارة تحتاج تحديداً" : "Vaguest item"}</h4>
+            <h4 className="text-sm font-bold">
+              {ar ? "أكثر عبارة تحتاج تحديداً" : "Vaguest item"}
+            </h4>
             <p className="mt-1 text-xs leading-[1.9] text-muted-foreground">
               “{snapshot.vaguest.text}”
             </p>

@@ -41,7 +41,6 @@ export const ACCENT_PALETTE = [
   "#0369a1",
 ] as const;
 
-
 export type Experience = {
   id: string;
   role: string;
@@ -130,7 +129,6 @@ export type Resume = {
   createdAt: string;
   updatedAt: string;
 };
-
 
 export type Profile = {
   id: string;

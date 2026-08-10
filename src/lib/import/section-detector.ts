@@ -104,7 +104,12 @@ export function detectSections(rawText: string): DetectionResult {
     exp.map((e) => `${e.role} ${e.company} ${e.bullets.join(" ")}`).join(" "),
   );
   const edu = parsed.education ?? [];
-  push("education", edu.length, edu.some((e) => e.school), edu.map((e) => `${e.degree} ${e.school}`).join(" "));
+  push(
+    "education",
+    edu.length,
+    edu.some((e) => e.school),
+    edu.map((e) => `${e.degree} ${e.school}`).join(" "),
+  );
   const skills = parsed.skills ?? [];
   push("skills", skills.length, skills.length >= 3, skills.map((s) => s.name).join(" "));
   const langs = parsed.languages ?? [];

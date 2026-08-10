@@ -38,7 +38,6 @@ export const rowToTemplate = (row: TemplateRow): TemplateDef => {
   };
 };
 
-
 export async function fetchTemplates(includeInactive = false): Promise<TemplateDef[]> {
   let query = supabase.from("templates").select("*").order("display_order");
   if (!includeInactive) query = query.eq("active", true);
@@ -65,12 +64,16 @@ export async function saveTemplate(tpl: TemplateDef) {
 }
 
 export async function createTemplate(tpl: TemplateDef) {
-  const { error } = await supabase.from("templates").insert({ id: tpl.id, ...templateColumns(tpl) });
+  const { error } = await supabase
+    .from("templates")
+    .insert({ id: tpl.id, ...templateColumns(tpl) });
   return error ? { error: error.message } : {};
 }
 
 /** Deletes a template only when unused; otherwise deactivates it. */
-export async function deleteOrDeactivateTemplate(id: string): Promise<{ deleted: boolean; error?: string }> {
+export async function deleteOrDeactivateTemplate(
+  id: string,
+): Promise<{ deleted: boolean; error?: string }> {
   const { count } = await supabase
     .from("resumes")
     .select("id", { count: "exact", head: true })
@@ -101,7 +104,6 @@ export async function setUserRole(userId: string, role: "admin" | "user") {
   return error ? { error: error.message } : {};
 }
 
-
 export type AdminUser = {
   id: string;
   email: string;
@@ -114,7 +116,14 @@ export type AdminUser = {
   role: "admin" | "user";
   resumeCount: number;
   lastActivity: string | null;
-  resumeMeta: { id: string; title: string; status: string; completion: number; ats: number; updatedAt: string }[];
+  resumeMeta: {
+    id: string;
+    title: string;
+    status: string;
+    completion: number;
+    ats: number;
+    updatedAt: string;
+  }[];
 };
 
 export async function fetchAdminUsers(): Promise<AdminUser[]> {
@@ -189,7 +198,8 @@ export async function fetchAdminStats(): Promise<AdminStats> {
 
   const rows = resumes.data ?? [];
   const ranking = new Map<string, number>();
-  for (const r of rows) ranking.set(r.template_id ?? "—", (ranking.get(r.template_id ?? "—") ?? 0) + 1);
+  for (const r of rows)
+    ranking.set(r.template_id ?? "—", (ranking.get(r.template_id ?? "—") ?? 0) + 1);
   const totalUsers = profiles.count ?? 0;
 
   return {
@@ -212,7 +222,6 @@ export async function fetchAdminStats(): Promise<AdminStats> {
     })),
   };
 }
-
 
 export type ResumeMeta = {
   id: string;
@@ -260,14 +269,17 @@ export async function fetchAuditLog(limit = 200): Promise<AuditEntry[]> {
     action: a.action,
     target: a.target,
     actorId: a.actor_id,
-    actorEmail: a.actor_id ? emails.get(a.actor_id) ?? null : null,
+    actorEmail: a.actor_id ? (emails.get(a.actor_id) ?? null) : null,
     metadata: (a.metadata as Record<string, unknown> | null) ?? null,
     createdAt: a.created_at,
   }));
 }
 
-
-export async function logAudit(action: string, target?: string, metadata?: Record<string, unknown>) {
+export async function logAudit(
+  action: string,
+  target?: string,
+  metadata?: Record<string, unknown>,
+) {
   const { data } = await supabase.auth.getUser();
   if (!data.user) return;
   await supabase.from("admin_audit_logs").insert({

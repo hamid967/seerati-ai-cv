@@ -29,13 +29,21 @@ const valid = {
 const cases = [
   { name: "valid update_summary is accepted", input: valid, expect: "accept" },
   { name: "invalid JSON string is rejected", input: "{not json", expect: "reject" },
-  { name: "unknown action type is rejected", input: { ...valid, type: "drop_table" }, expect: "reject" },
+  {
+    name: "unknown action type is rejected",
+    input: { ...valid, type: "drop_table" },
+    expect: "reject",
+  },
   {
     name: "mutation with requiresConfirmation:false is rejected",
     input: { ...valid, requiresConfirmation: false },
     expect: "reject",
   },
-  { name: "missing payload is rejected", input: { type: "add_skill", reason: "why" }, expect: "reject" },
+  {
+    name: "missing payload is rejected",
+    input: { type: "add_skill", reason: "why" },
+    expect: "reject",
+  },
   {
     name: "missing reason is rejected",
     input: { type: "add_skill", payload: { name: "Power BI" } },
@@ -46,7 +54,11 @@ const cases = [
     input: { type: "replace_bullet", reason: "why", payload: { experienceId: "e1" } },
     expect: "reject",
   },
-  { name: "empty suggested text is rejected", input: { ...valid, payload: { original: "x", suggested: "  " } }, expect: "reject" },
+  {
+    name: "empty suggested text is rejected",
+    input: { ...valid, payload: { original: "x", suggested: "  " } },
+    expect: "reject",
+  },
   { name: "null is rejected", input: null, expect: "reject" },
   { name: "array is rejected", input: [valid], expect: "reject" },
 ];
@@ -60,5 +72,9 @@ for (const c of cases) {
   console.log(`${ok ? "PASS" : "FAIL"}  ${c.name}${res.ok ? "" : `  (${res.error})`}`);
 }
 
-console.log(failed ? `\n${failed} contract fixture(s) failed.` : `\nAll ${cases.length} contract fixtures OK.`);
+console.log(
+  failed
+    ? `\n${failed} contract fixture(s) failed.`
+    : `\nAll ${cases.length} contract fixtures OK.`,
+);
 process.exit(failed ? 1 : 0);

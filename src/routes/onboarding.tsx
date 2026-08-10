@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
@@ -18,7 +24,10 @@ export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
       { title: "لنبدأ | سيرتي — Seerati Onboarding" },
-      { name: "description", content: "ثلاث خطوات سريعة لتخصيص تجربتك داخل سيرتي قبل بناء سيرتك الذاتية." },
+      {
+        name: "description",
+        content: "ثلاث خطوات سريعة لتخصيص تجربتك داخل سيرتي قبل بناء سيرتك الذاتية.",
+      },
       { property: "og:title", content: "إعداد حسابك في سيرتي" },
       { property: "og:description", content: "حدّد هدفك الوظيفي والقالب المناسب في دقيقة." },
       { name: "robots", content: "noindex" },
@@ -67,14 +76,24 @@ function Onboarding() {
       return;
     }
     const created = await createResume({
-      title: targetRole ? (ar ? `سيرة ${targetRole}` : `${targetRole} resume`) : ar ? "سيرتي الذاتية" : "My resume",
+      title: targetRole
+        ? ar
+          ? `سيرة ${targetRole}`
+          : `${targetRole} resume`
+        : ar
+          ? "سيرتي الذاتية"
+          : "My resume",
       templateId,
       language: cvLang,
       jobTitle: targetRole || currentTitle,
     });
     if (created && importedData) {
       await updateResume(created.id, {
-        data: { ...created.data, ...importedData, personal: { ...created.data.personal, ...(importedData.personal ?? {}) } },
+        data: {
+          ...created.data,
+          ...importedData,
+          personal: { ...created.data.personal, ...(importedData.personal ?? {}) },
+        },
       });
     }
     setSaving(false);
@@ -97,10 +116,11 @@ function Onboarding() {
         </p>
         <Progress value={(step / STEPS) * 100} className="mt-3" />
 
-
         {step === 1 && (
           <section className="mt-8 space-y-5">
-            <h1 className="text-2xl font-extrabold">{ar ? "لنتعرّف عليك" : "Let’s get to know you"}</h1>
+            <h1 className="text-2xl font-extrabold">
+              {ar ? "لنتعرّف عليك" : "Let’s get to know you"}
+            </h1>
             <div className="space-y-1.5">
               <Label htmlFor="name">{ar ? "الاسم الكامل" : "Full name"}</Label>
               <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -126,10 +146,14 @@ function Onboarding() {
             <div className="space-y-1.5">
               <Label>{ar ? "سنوات الخبرة" : "Years of experience"}</Label>
               <Select value={years} onValueChange={setYears}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {["0-1", "1-3", "4-7", "8+"].map((y) => (
-                    <SelectItem key={y} value={y}>{y}</SelectItem>
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -139,13 +163,37 @@ function Onboarding() {
 
         {step === 2 && (
           <section className="mt-8 space-y-5">
-            <h1 className="text-2xl font-extrabold">{ar ? "في أي قطاع تعمل؟" : "Which industry?"}</h1>
+            <h1 className="text-2xl font-extrabold">
+              {ar ? "في أي قطاع تعمل؟" : "Which industry?"}
+            </h1>
             <div className="grid gap-2 sm:grid-cols-2">
               {(ar
-                ? ["تقنية المعلومات", "المالية", "الصحة", "التعليم", "التجزئة", "الطاقة", "الحكومي", "أخرى"]
-                : ["IT", "Finance", "Healthcare", "Education", "Retail", "Energy", "Government", "Other"]
+                ? [
+                    "تقنية المعلومات",
+                    "المالية",
+                    "الصحة",
+                    "التعليم",
+                    "التجزئة",
+                    "الطاقة",
+                    "الحكومي",
+                    "أخرى",
+                  ]
+                : [
+                    "IT",
+                    "Finance",
+                    "Healthcare",
+                    "Education",
+                    "Retail",
+                    "Energy",
+                    "Government",
+                    "Other",
+                  ]
               ).map((i) => (
-                <Button key={i} variant={industry === i ? "default" : "outline"} onClick={() => setIndustry(i)}>
+                <Button
+                  key={i}
+                  variant={industry === i ? "default" : "outline"}
+                  onClick={() => setIndustry(i)}
+                >
                   {i}
                 </Button>
               ))}
@@ -155,21 +203,39 @@ function Onboarding() {
 
         {step === 3 && (
           <section className="mt-8 space-y-6">
-            <h1 className="text-2xl font-extrabold">{ar ? "لغة السيرة وحالتك الحالية" : "Resume language & current status"}</h1>
+            <h1 className="text-2xl font-extrabold">
+              {ar ? "لغة السيرة وحالتك الحالية" : "Resume language & current status"}
+            </h1>
             <div className="space-y-2">
               <Label>{ar ? "بأي لغة تريد سيرتك؟" : "Which language should the resume use?"}</Label>
               <div className="flex gap-2">
-                <Button variant={cvLang === "ar" ? "default" : "outline"} onClick={() => setCvLang("ar")}>العربية</Button>
-                <Button variant={cvLang === "en" ? "default" : "outline"} onClick={() => setCvLang("en")}>English</Button>
+                <Button
+                  variant={cvLang === "ar" ? "default" : "outline"}
+                  onClick={() => setCvLang("ar")}
+                >
+                  العربية
+                </Button>
+                <Button
+                  variant={cvLang === "en" ? "default" : "outline"}
+                  onClick={() => setCvLang("en")}
+                >
+                  English
+                </Button>
               </div>
             </div>
             <div className="space-y-2">
               <Label>{ar ? "هل لديك سيرة ذاتية سابقة؟" : "Do you already have a resume?"}</Label>
               <div className="flex gap-2">
-                <Button variant={hasCv === "yes" ? "default" : "outline"} onClick={() => setHasCv("yes")}>
+                <Button
+                  variant={hasCv === "yes" ? "default" : "outline"}
+                  onClick={() => setHasCv("yes")}
+                >
                   {ar ? "نعم" : "Yes"}
                 </Button>
-                <Button variant={hasCv === "no" ? "default" : "outline"} onClick={() => setHasCv("no")}>
+                <Button
+                  variant={hasCv === "no" ? "default" : "outline"}
+                  onClick={() => setHasCv("no")}
+                >
                   {ar ? "لا، سأبدأ من الصفر" : "No, starting fresh"}
                 </Button>
               </div>
@@ -188,14 +254,18 @@ function Onboarding() {
 
         {step === 4 && (
           <section className="mt-8 space-y-5">
-            <h1 className="text-2xl font-extrabold">{ar ? "اختر قالبك الأول" : "Pick your first template"}</h1>
+            <h1 className="text-2xl font-extrabold">
+              {ar ? "اختر قالبك الأول" : "Pick your first template"}
+            </h1>
             <div className="grid gap-2 sm:grid-cols-2">
               {defaultTemplates.map((tpl) => (
                 <button
                   key={tpl.id}
                   onClick={() => setTemplateId(tpl.id)}
                   className={`rounded-xl border p-4 text-start transition-colors ${
-                    templateId === tpl.id ? "border-primary bg-secondary" : "border-border hover:bg-secondary/60"
+                    templateId === tpl.id
+                      ? "border-primary bg-secondary"
+                      : "border-border hover:bg-secondary/60"
                   }`}
                 >
                   <p className="font-semibold">{tpl.name[lang]}</p>
@@ -208,7 +278,9 @@ function Onboarding() {
 
         {step === 5 && path === "choose" && (
           <section className="mt-8 space-y-4">
-            <h1 className="text-2xl font-extrabold">{ar ? "كيف تريد أن نبدأ؟" : "How would you like to start?"}</h1>
+            <h1 className="text-2xl font-extrabold">
+              {ar ? "كيف تريد أن نبدأ؟" : "How would you like to start?"}
+            </h1>
             <p className="text-sm text-muted-foreground">
               {ar
                 ? "اختر الطريقة الأنسب لك — يمكنك تعديل كل شيء لاحقاً في المحرّر."
@@ -232,10 +304,18 @@ function Onboarding() {
                 className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60 disabled:opacity-60"
               >
                 <p className="font-semibold">
-                  {saving ? (ar ? "جارٍ التهيئة…" : "Setting up…") : ar ? "سأكتبها بنفسي" : "I’ll write it myself"}
+                  {saving
+                    ? ar
+                      ? "جارٍ التهيئة…"
+                      : "Setting up…"
+                    : ar
+                      ? "سأكتبها بنفسي"
+                      : "I’ll write it myself"}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {ar ? "ننشئ مسودة فارغة وتفتح المحرّر مباشرة." : "We create an empty draft and open the builder."}
+                  {ar
+                    ? "ننشئ مسودة فارغة وتفتح المحرّر مباشرة."
+                    : "We create an empty draft and open the builder."}
                 </p>
               </button>
               <button
@@ -243,7 +323,9 @@ function Onboarding() {
                 className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
               >
                 <p className="font-semibold">
-                  {ar ? "لدي LinkedIn/منصة — استخدم ملف التصدير" : "I use LinkedIn/a platform — use my export file"}
+                  {ar
+                    ? "لدي LinkedIn/منصة — استخدم ملف التصدير"
+                    : "I use LinkedIn/a platform — use my export file"}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {ar
@@ -256,7 +338,9 @@ function Onboarding() {
                   onClick={() => navigate({ to: "/import" })}
                   className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
                 >
-                  <p className="font-semibold">{ar ? "استيراد سيرتي السابقة" : "Import my existing resume"}</p>
+                  <p className="font-semibold">
+                    {ar ? "استيراد سيرتي السابقة" : "Import my existing resume"}
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {ar
                       ? "من LinkedIn أو Indeed أو بيت.كوم أو ملف PDF/DOCX — مع مراجعة كل حقل قبل الحفظ."
@@ -299,11 +383,12 @@ function Onboarding() {
                 {ar ? "رجوع" : "Back"}
               </Button>
             )}
-            {step < STEPS && <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>}
+            {step < STEPS && (
+              <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>
+            )}
           </div>
         )}
       </main>
     </div>
   );
 }
-

@@ -148,7 +148,9 @@ function ReviewParsed({
   const ar = lang === "ar";
   const [draft, setDraft] = useState<ParsedResume>(parsed);
 
-  const removeAt = <K extends "experience" | "education" | "skills" | "languages" | "certificates" | "projects">(
+  const removeAt = <
+    K extends "experience" | "education" | "skills" | "languages" | "certificates" | "projects",
+  >(
     key: K,
     idx: number,
   ) => {
@@ -175,11 +177,17 @@ function ReviewParsed({
         </p>
       </div>
 
-      {(draft.contact.emails.length > 0 || draft.contact.phones.length > 0 || draft.contact.links.length > 0) && (
+      {(draft.contact.emails.length > 0 ||
+        draft.contact.phones.length > 0 ||
+        draft.contact.links.length > 0) && (
         <div className="rounded-lg border border-border p-3 text-xs">
-          <p className="mb-1 font-semibold">{ar ? "بيانات تواصل مكتشفة" : "Detected contact info"}</p>
+          <p className="mb-1 font-semibold">
+            {ar ? "بيانات تواصل مكتشفة" : "Detected contact info"}
+          </p>
           <p className="text-muted-foreground">
-            {[...draft.contact.emails, ...draft.contact.phones, ...draft.contact.links].join("  ·  ") || "—"}
+            {[...draft.contact.emails, ...draft.contact.phones, ...draft.contact.links].join(
+              "  ·  ",
+            ) || "—"}
           </p>
         </div>
       )}
@@ -201,12 +209,20 @@ function ReviewParsed({
             key={key}
             title={
               key === "experience"
-                ? ar ? "الخبرات" : "Experience"
+                ? ar
+                  ? "الخبرات"
+                  : "Experience"
                 : key === "education"
-                  ? ar ? "التعليم" : "Education"
+                  ? ar
+                    ? "التعليم"
+                    : "Education"
                   : key === "certificates"
-                    ? ar ? "الدورات والشهادات" : "Certificates"
-                    : ar ? "المشاريع" : "Projects"
+                    ? ar
+                      ? "الدورات والشهادات"
+                      : "Certificates"
+                    : ar
+                      ? "المشاريع"
+                      : "Projects"
             }
             items={
               key === "experience"
@@ -237,7 +253,9 @@ function ReviewParsed({
       )}
 
       <div className="flex flex-wrap gap-2 pt-2">
-        <Button onClick={() => onConfirm(draft)}>{ar ? "استخدم هذه البيانات" : "Use this data"}</Button>
+        <Button onClick={() => onConfirm(draft)}>
+          {ar ? "استخدم هذه البيانات" : "Use this data"}
+        </Button>
         <Button variant="outline" onClick={onBack}>
           {ar ? "رجوع للنص" : "Back to text"}
         </Button>

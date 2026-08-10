@@ -42,11 +42,15 @@ function NewResume() {
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "سيرة ذاتية جديدة" : "New resume"}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {ar ? "سيرة ذاتية جديدة" : "New resume"}
+        </h1>
 
         {atLimit ? (
           <p className="mt-6 rounded-lg border border-border bg-secondary px-4 py-3 text-sm">
-            {ar ? "وصلت الحد الأقصى (٣ سير ذاتية). احذف واحدة للمتابعة." : "You reached the 3-resume limit. Delete one to continue."}
+            {ar
+              ? "وصلت الحد الأقصى (٣ سير ذاتية). احذف واحدة للمتابعة."
+              : "You reached the 3-resume limit. Delete one to continue."}
           </p>
         ) : (
           <>
@@ -60,10 +64,18 @@ function NewResume() {
                 <div>
                   <Label className="mb-2 block">{ar ? "لغة السيرة" : "Resume language"}</Label>
                   <div className="flex gap-2">
-                    <Button variant={resumeLang === "ar" ? "default" : "outline"} size="sm" onClick={() => setResumeLang("ar")}>
+                    <Button
+                      variant={resumeLang === "ar" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setResumeLang("ar")}
+                    >
                       العربية
                     </Button>
-                    <Button variant={resumeLang === "en" ? "default" : "outline"} size="sm" onClick={() => setResumeLang("en")}>
+                    <Button
+                      variant={resumeLang === "en" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setResumeLang("en")}
+                    >
                       English
                     </Button>
                   </div>
@@ -84,14 +96,22 @@ function NewResume() {
                       key={tpl.id}
                       onClick={() => setTemplateId(tpl.id)}
                       className={`rounded-xl border p-4 text-start transition-colors ${
-                        templateId === tpl.id ? "border-primary bg-secondary" : "border-border hover:bg-secondary/60"
+                        templateId === tpl.id
+                          ? "border-primary bg-secondary"
+                          : "border-border hover:bg-secondary/60"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <p className="font-semibold">{tpl.name[lang]}</p>
-                        {tpl.atsFriendly && <Badge variant="outline" className="text-[10px]">ATS</Badge>}
+                        {tpl.atsFriendly && (
+                          <Badge variant="outline" className="text-[10px]">
+                            ATS
+                          </Badge>
+                        )}
                       </div>
-                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{tpl.description[lang]}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {tpl.description[lang]}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -102,7 +122,12 @@ function NewResume() {
               size="lg"
               className="mt-8"
               onClick={async () => {
-                const created = await createResume({ title: title.trim() || "Resume", templateId, language: resumeLang, seed });
+                const created = await createResume({
+                  title: title.trim() || "Resume",
+                  templateId,
+                  language: resumeLang,
+                  seed,
+                });
                 if (!created) {
                   toast.error(ar ? "تعذّر الإنشاء" : "Could not create");
                   return;

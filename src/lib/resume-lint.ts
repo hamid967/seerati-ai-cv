@@ -123,7 +123,10 @@ function structureRules(d: ResumeData): LintFinding[] {
         rule: "invalid_link",
         category: "structure",
         severity: "warning",
-        message: { ar: `رابط غير صالح: ${l.label || l.url}`, en: `Invalid link: ${l.label || l.url}` },
+        message: {
+          ar: `رابط غير صالح: ${l.label || l.url}`,
+          en: `Invalid link: ${l.label || l.url}`,
+        },
         where: l.id,
       });
     }
@@ -185,7 +188,10 @@ function contentRules(d: ResumeData): LintFinding[] {
       rule: "short_summary",
       category: "content",
       severity: "warning",
-      message: { ar: "الملخص قصير جداً (أقل من 20 كلمة).", en: "Summary is very short (under 20 words)." },
+      message: {
+        ar: "الملخص قصير جداً (أقل من 20 كلمة).",
+        en: "Summary is very short (under 20 words).",
+      },
     });
   }
 
@@ -249,7 +255,10 @@ function contentRules(d: ResumeData): LintFinding[] {
         rule: "suspicious_range",
         category: "content",
         severity: "error",
-        message: { ar: "تاريخ النهاية قبل تاريخ البداية.", en: "End date is before the start date." },
+        message: {
+          ar: "تاريخ النهاية قبل تاريخ البداية.",
+          en: "End date is before the start date.",
+        },
         where: exp.id,
       });
     }
@@ -258,7 +267,10 @@ function contentRules(d: ResumeData): LintFinding[] {
         rule: "suspicious_range",
         category: "content",
         severity: "warning",
-        message: { ar: "مدة الخبرة تبدو غير منطقية.", en: "Experience duration looks implausible." },
+        message: {
+          ar: "مدة الخبرة تبدو غير منطقية.",
+          en: "Experience duration looks implausible.",
+        },
         where: exp.id,
       });
     }
@@ -269,7 +281,10 @@ function contentRules(d: ResumeData): LintFinding[] {
         rule: "duplicate_bullet",
         category: "content",
         severity: "warning",
-        message: { ar: "توجد نقاط مكرّرة بين الخبرات.", en: "Duplicate bullets found across roles." },
+        message: {
+          ar: "توجد نقاط مكرّرة بين الخبرات.",
+          en: "Duplicate bullets found across roles.",
+        },
       });
       break;
     }
@@ -321,9 +336,7 @@ function evidenceRules(d: ResumeData, graph?: FactGraph): LintFinding[] {
     }
   }
 
-  const quantified = d.experience
-    .flatMap((x) => x.bullets)
-    .filter((b) => /\d/.test(b));
+  const quantified = d.experience.flatMap((x) => x.bullets).filter((b) => /\d/.test(b));
   if (!quantified.length && d.experience.length) {
     out.push({
       rule: "no_quantified_bullet",
@@ -341,7 +354,8 @@ function evidenceRules(d: ResumeData, graph?: FactGraph): LintFinding[] {
       const unbacked = (b.match(NUM_RE) ?? [])
         .map((n) => n.trim())
         .filter(
-          (n) => !verifiedNumbers.has(n) && !/^(19|20)\d{2}$/.test(n) && n.replace(/\D/g, "").length > 1,
+          (n) =>
+            !verifiedNumbers.has(n) && !/^(19|20)\d{2}$/.test(n) && n.replace(/\D/g, "").length > 1,
         );
       if (unbacked.length) {
         out.push({
@@ -439,7 +453,10 @@ function readabilityRules(d: ResumeData): LintFinding[] {
       message: { ar: "الملخص طويل — اجعله 3-5 أسطر.", en: "Summary is long — keep it 3–5 lines." },
     });
   }
-  const bulletCount = d.experience.reduce((n, x) => n + x.bullets.filter((b) => b.trim()).length, 0);
+  const bulletCount = d.experience.reduce(
+    (n, x) => n + x.bullets.filter((b) => b.trim()).length,
+    0,
+  );
   const density =
     bulletCount * 18 +
     words(d.summary) +
@@ -487,10 +504,7 @@ function readabilityRules(d: ResumeData): LintFinding[] {
 const PENALTY: Record<LintSeverity, number> = { error: 12, warning: 6, info: 2 };
 
 /** Run every deterministic rule and return an explained, category-split score. */
-export function lintResume(
-  input: Resume | ResumeData,
-  graph?: FactGraph,
-): LintReport {
+export function lintResume(input: Resume | ResumeData, graph?: FactGraph): LintReport {
   const d = "data" in input ? input.data : input;
   const findings = [
     ...structureRules(d),

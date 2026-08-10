@@ -168,10 +168,9 @@ export function ResumeCopilot({
       const applied = isTranslate ? applyProtectedTerms(hygienic, terms, answer) : null;
       const brands = isTranslate ? preserveBrandEntities(answer, applied?.text ?? hygienic) : null;
       const text = flagUnverifiedFigures(applied?.text ?? hygienic, replyLang);
-      const droppedTerms = [
-        ...(applied?.missing ?? []),
-        ...(brands?.missing ?? []),
-      ].filter((v, i, a) => a.indexOf(v) === i);
+      const droppedTerms = [...(applied?.missing ?? []), ...(brands?.missing ?? [])].filter(
+        (v, i, a) => a.indexOf(v) === i,
+      );
       const bilingualNote = isTranslate
         ? [
             applied?.restored.length
@@ -189,7 +188,8 @@ export function ResumeCopilot({
             .join(" · ")
         : "";
       const action = makeAction({
-        type: quick?.task === "translate" ? "translate" : activeKey ? "update_field" : "suggest_edit",
+        type:
+          quick?.task === "translate" ? "translate" : activeKey ? "update_field" : "suggest_edit",
         target: activeKey,
         text,
         ...(res.items?.length ? { items: res.items } : {}),
@@ -200,7 +200,9 @@ export function ResumeCopilot({
             : "Professional wording based only on what you told me — nothing invented.",
       });
       if (!isExecutableAction(action)) {
-        setError(ar ? "لم يصل اقتراح صالح. أعد المحاولة." : "No valid suggestion came back. Please retry.");
+        setError(
+          ar ? "لم يصل اقتراح صالح. أعد المحاولة." : "No valid suggestion came back. Please retry.",
+        );
         return;
       }
       // Field edits also travel as a structured protocol action, so the same
@@ -265,7 +267,9 @@ export function ResumeCopilot({
   async function resolve(turnId: string, decision: "applied" | "kept") {
     const turn = turns.find((t) => t.id === turnId);
     if (!turn || turn.role !== "proposal") return;
-    setTurns((prev) => prev.map((t) => (t.id === turnId ? { ...t, resolved: decision, editing: false } : t)));
+    setTurns((prev) =>
+      prev.map((t) => (t.id === turnId ? { ...t, resolved: decision, editing: false } : t)),
+    );
     if (decision === "applied") {
       // The user pressing Apply is the approval gate; re-validate the protocol
       // action so an edited suggestion can never bypass the contract.
@@ -338,7 +342,9 @@ export function ResumeCopilot({
         <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto pe-1">
           {recap && recap.length > 0 && (
             <div className="rounded-xl border bg-muted/40 p-3 text-xs text-muted-foreground">
-              <p className="mb-1 font-medium text-foreground">{ar ? "ما استخرجناه" : "What we extracted"}</p>
+              <p className="mb-1 font-medium text-foreground">
+                {ar ? "ما استخرجناه" : "What we extracted"}
+              </p>
               {recap.map((line, i) => (
                 <p key={i}>• {line}</p>
               ))}
@@ -381,7 +387,9 @@ export function ResumeCopilot({
                       onChange={(e) => editText(turn.id, e.target.value)}
                     />
                   ) : (
-                    <p className="whitespace-pre-line font-medium leading-relaxed">{turn.action.payload.text}</p>
+                    <p className="whitespace-pre-line font-medium leading-relaxed">
+                      {turn.action.payload.text}
+                    </p>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -409,7 +417,9 @@ export function ResumeCopilot({
                       variant="outline"
                       onClick={() =>
                         setTurns((prev) =>
-                          prev.map((t) => (t.id === turn.id && t.role === "proposal" ? { ...t, editing: true } : t)),
+                          prev.map((t) =>
+                            t.id === turn.id && t.role === "proposal" ? { ...t, editing: true } : t,
+                          ),
                         )
                       }
                     >
@@ -420,7 +430,9 @@ export function ResumeCopilot({
                       size="sm"
                       variant="outline"
                       disabled={busy}
-                      onClick={() => void propose(lastAnswer || turn.before || turn.action.payload.text)}
+                      onClick={() =>
+                        void propose(lastAnswer || turn.before || turn.action.payload.text)
+                      }
                     >
                       <RotateCcw className="size-4" />
                       {ar ? "أعد التوليد" : "Regenerate"}
@@ -473,7 +485,11 @@ export function ResumeCopilot({
             }}
             placeholder={ar ? "اكتب إجابتك…" : "Type your answer…"}
           />
-          <Button onClick={() => void send()} disabled={busy || !input.trim()} aria-label={ar ? "إرسال" : "Send"}>
+          <Button
+            onClick={() => void send()}
+            disabled={busy || !input.trim()}
+            aria-label={ar ? "إرسال" : "Send"}
+          >
             {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
           </Button>
         </div>

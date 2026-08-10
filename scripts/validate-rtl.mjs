@@ -74,7 +74,12 @@ for (const file of files) {
 }
 
 console.log(`\nScanned ${files.length} file(s).`);
-if (allowedHits) console.log(`${allowedHits} occurrence(s) allowed (explicitly mirrored or allowlisted).`);
+if (allowedHits)
+  console.log(`${allowedHits} occurrence(s) allowed (explicitly mirrored or allowlisted).`);
 for (const e of allowlist.entries) console.log(`ALLOW ${e.file} — ${e.reason}`);
-console.log(violations ? `\n${violations} RTL violation(s).` : "\nRTL check OK: no unmirrored physical direction utilities.");
+console.log(
+  violations
+    ? `\n${violations} RTL violation(s).`
+    : "\nRTL check OK: no unmirrored physical direction utilities.",
+);
 process.exit(violations ? 1 : 0);

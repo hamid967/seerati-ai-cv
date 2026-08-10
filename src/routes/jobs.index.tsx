@@ -52,7 +52,10 @@ export const Route = createFileRoute("/jobs/")({
   head: () => ({
     meta: [
       { title: "مساحات الوظائف | سيرتي — Job Workspaces" },
-      { name: "description", content: "تابع طلبات التوظيف، حلل الوصف الوظيفي، وجهّز حزمة طلبك في مكان واحد." },
+      {
+        name: "description",
+        content: "تابع طلبات التوظيف، حلل الوصف الوظيفي، وجهّز حزمة طلبك في مكان واحد.",
+      },
       { property: "og:title", content: "مساحات الوظائف | سيرتي" },
       { property: "og:description", content: "تتبّع وظائفك من الحفظ حتى العرض." },
       { name: "robots", content: "noindex" },
@@ -139,12 +142,13 @@ function JobsIndex() {
 
   const handleCreate = async () => {
     if (!user || !form.jobTitle.trim() || !form.company.trim()) {
-      toast.error(ar ? "أدخل المسمى الوظيفي والشركة على الأقل" : "Add at least job title and company");
+      toast.error(
+        ar ? "أدخل المسمى الوظيفي والشركة على الأقل" : "Add at least job title and company",
+      );
       return;
     }
     setSaving(true);
-    const optional = (key: string, value: string) =>
-      value.trim() ? { [key]: value.trim() } : {};
+    const optional = (key: string, value: string) => (value.trim() ? { [key]: value.trim() } : {});
     const created = await createJob(user.id, {
       jobTitle: form.jobTitle.trim(),
       company: form.company.trim(),
@@ -216,7 +220,10 @@ function JobsIndex() {
           </div>
           <div className="grid gap-1.5">
             <Label>{ar ? "الشركة" : "Company"}</Label>
-            <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+            <Input
+              value={form.company}
+              onChange={(e) => setForm({ ...form, company: e.target.value })}
+            />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
@@ -229,17 +236,26 @@ function JobsIndex() {
             </div>
             <div className="grid gap-1.5">
               <Label>{ar ? "رابط الوظيفة" : "Job URL"}</Label>
-              <Input value={form.jobUrl} onChange={(e) => setForm({ ...form, jobUrl: e.target.value })} />
+              <Input
+                value={form.jobUrl}
+                onChange={(e) => setForm({ ...form, jobUrl: e.target.value })}
+              />
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <Label>{ar ? "الراتب المتوقع" : "Expected salary"}</Label>
-              <Input value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} />
+              <Input
+                value={form.salary}
+                onChange={(e) => setForm({ ...form, salary: e.target.value })}
+              />
             </div>
             <div className="grid gap-1.5">
               <Label>{ar ? "الحالة" : "Status"}</Label>
-              <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as JobStatus })}>
+              <Select
+                value={form.status}
+                onValueChange={(v) => setForm({ ...form, status: v as JobStatus })}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -254,7 +270,9 @@ function JobsIndex() {
             </div>
           </div>
           <div className="grid gap-1.5">
-            <Label>{ar ? "الوصف الوظيفي (الصق النص كاملاً)" : "Job description (paste full text)"}</Label>
+            <Label>
+              {ar ? "الوصف الوظيفي (الصق النص كاملاً)" : "Job description (paste full text)"}
+            </Label>
             <Textarea
               rows={6}
               value={form.jobDescription}
@@ -263,7 +281,11 @@ function JobsIndex() {
           </div>
           <div className="grid gap-1.5">
             <Label>{ar ? "ملاحظات" : "Notes"}</Label>
-            <Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+            <Textarea
+              rows={2}
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            />
           </div>
         </div>
         <DialogFooter>
@@ -283,7 +305,9 @@ function JobsIndex() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "مساحات الوظائف" : "Job Workspaces"}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">
+              {ar ? "مساحات الوظائف" : "Job Workspaces"}
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {ar ? `${jobs.length} وظيفة محفوظة` : `${jobs.length} saved jobs`}
             </p>
@@ -344,7 +368,10 @@ function JobsIndex() {
                   onChange={(e) => setQuery(e.target.value)}
                 />
               </div>
-              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as JobStatus | "all")}>
+              <Select
+                value={statusFilter}
+                onValueChange={(v) => setStatusFilter(v as JobStatus | "all")}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
@@ -362,7 +389,9 @@ function JobsIndex() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="updated">{ar ? "الأحدث تحديثاً" : "Recently updated"}</SelectItem>
+                  <SelectItem value="updated">
+                    {ar ? "الأحدث تحديثاً" : "Recently updated"}
+                  </SelectItem>
                   <SelectItem value="score">{ar ? "الأعلى مطابقة" : "Highest match"}</SelectItem>
                 </SelectContent>
               </Select>
@@ -407,7 +436,9 @@ function JobsIndex() {
                           <Badge variant="outline">{JOB_STATUS_LABEL[job.status][lang]}</Badge>
                         </TableCell>
                         <TableCell>{job.matchScore}%</TableCell>
-                        <TableCell className="text-muted-foreground">{job.location || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {job.location || "—"}
+                        </TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {new Date(job.updatedAt).toLocaleDateString(ar ? "ar" : "en")}
                         </TableCell>
@@ -418,7 +449,11 @@ function JobsIndex() {
                                 <ExternalLink className="size-4" />
                               </Link>
                             </Button>
-                            <Button size="icon" variant="ghost" onClick={() => void handleDelete(job.id)}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => void handleDelete(job.id)}
+                            >
                               <Trash2 className="size-4 text-destructive" />
                             </Button>
                           </div>
@@ -430,43 +465,47 @@ function JobsIndex() {
               </Card>
             ) : (
               <div className="mt-4 grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {JOB_STATUSES.filter((s) => s !== "archived" || statusFilter === "archived").map((status) => (
-                  <div key={status} className="min-w-0">
-                    <p className="mb-2 text-sm font-bold">{JOB_STATUS_LABEL[status][lang]}</p>
-                    <div className="space-y-2">
-                      {filtered
-                        .filter((j) => j.status === status)
-                        .map((job) => (
-                          <Card key={job.id}>
-                            <CardContent className="space-y-2 p-3">
-                              <Link to="/jobs/$id" params={{ id: job.id }} className="block">
-                                <p className="text-sm font-bold leading-tight">{job.jobTitle}</p>
-                                <p className="text-xs text-muted-foreground">{job.company}</p>
-                              </Link>
-                              <div className="flex items-center justify-between gap-2">
-                                <Badge variant="secondary">{job.matchScore}%</Badge>
-                                <Select
-                                  value={job.status}
-                                  onValueChange={(v) => void handleStatusChange(job, v as JobStatus)}
-                                >
-                                  <SelectTrigger className="h-7 w-28 text-xs">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {JOB_STATUSES.map((s) => (
-                                      <SelectItem key={s} value={s} className="text-xs">
-                                        {JOB_STATUS_LABEL[s][lang]}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                {JOB_STATUSES.filter((s) => s !== "archived" || statusFilter === "archived").map(
+                  (status) => (
+                    <div key={status} className="min-w-0">
+                      <p className="mb-2 text-sm font-bold">{JOB_STATUS_LABEL[status][lang]}</p>
+                      <div className="space-y-2">
+                        {filtered
+                          .filter((j) => j.status === status)
+                          .map((job) => (
+                            <Card key={job.id}>
+                              <CardContent className="space-y-2 p-3">
+                                <Link to="/jobs/$id" params={{ id: job.id }} className="block">
+                                  <p className="text-sm font-bold leading-tight">{job.jobTitle}</p>
+                                  <p className="text-xs text-muted-foreground">{job.company}</p>
+                                </Link>
+                                <div className="flex items-center justify-between gap-2">
+                                  <Badge variant="secondary">{job.matchScore}%</Badge>
+                                  <Select
+                                    value={job.status}
+                                    onValueChange={(v) =>
+                                      void handleStatusChange(job, v as JobStatus)
+                                    }
+                                  >
+                                    <SelectTrigger className="h-7 w-28 text-xs">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {JOB_STATUSES.map((s) => (
+                                        <SelectItem key={s} value={s} className="text-xs">
+                                          {JOB_STATUS_LABEL[s][lang]}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             )}
           </>

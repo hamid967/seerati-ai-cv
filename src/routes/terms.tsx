@@ -9,7 +9,8 @@ export const Route = createFileRoute("/terms")({
       { title: "شروط الاستخدام | سيرتي Seerati" },
       {
         name: "description",
-        content: "شروط استخدام منصة سيرتي: مسؤولية المحتوى، حدود الاستخدام، وطبيعة نتائج توافق ATS الإرشادية.",
+        content:
+          "شروط استخدام منصة سيرتي: مسؤولية المحتوى، حدود الاستخدام، وطبيعة نتائج توافق ATS الإرشادية.",
       },
       { property: "og:title", content: "شروط الاستخدام | سيرتي Seerati" },
       { property: "og:description", content: "بيان مبدئي لشروط استخدام منصة سيرتي." },
@@ -64,7 +65,9 @@ function TermsPage() {
     : [
         {
           h: "Acceptance",
-          p: ["By using Seerati you agree to these informational terms. They may be updated as the product evolves."],
+          p: [
+            "By using Seerati you agree to these informational terms. They may be updated as the product evolves.",
+          ],
         },
         {
           h: "Account and usage limits",
@@ -89,7 +92,9 @@ function TermsPage() {
         },
         {
           h: "Service availability",
-          p: ["Service may pause for maintenance or development. We aim to minimise downtime but offer no availability guarantee in this release."],
+          p: [
+            "Service may pause for maintenance or development. We aim to minimise downtime but offer no availability guarantee in this release.",
+          ],
         },
         { h: "Contact", p: ["Questions: hello@seerati.sa (demo address in this release)."] },
       ];
@@ -98,7 +103,9 @@ function TermsPage() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-14">
-        <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "شروط الاستخدام" : "Terms of use"}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {ar ? "شروط الاستخدام" : "Terms of use"}
+        </h1>
         <p className="mt-3 rounded-xl border border-border bg-secondary px-4 py-3 text-sm leading-relaxed">
           {ar
             ? "هذه صفحة توضيحية مبدئية وليست صياغة قانونية نهائية."

@@ -26,7 +26,10 @@ export const Route = createFileRoute("/ats")({
           "فحص إرشادي لجاهزية السيرة الذاتية لأنظمة التوظيف: اكتمال الأقسام، الاتصال، الملخص، الإنجازات القابلة للقياس، المهارات، التنسيق، وتغطية كلمات وصف الوظيفة.",
       },
       { property: "og:title", content: "فحص جاهزية ATS | سيرتي" },
-      { property: "og:description", content: "افهم مكوّنات درجة الجاهزية وكيف ترفعها قبل التقديم." },
+      {
+        property: "og:description",
+        content: "افهم مكوّنات درجة الجاهزية وكيف ترفعها قبل التقديم.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -39,7 +42,10 @@ function AtsPage() {
   const ar = lang === "ar";
   const [jd, setJd] = useState("");
   const sample = useMemo(() => demoResume("demo"), []);
-  const report = useMemo(() => analyzeResume(sample, getTemplate(sample.templateId), jd), [sample, jd]);
+  const report = useMemo(
+    () => analyzeResume(sample, getTemplate(sample.templateId), jd),
+    [sample, jd],
+  );
   const lint = useMemo(() => lintResume(sample), [sample]);
   const snapshot = useMemo(
     () => buildRecruiterSnapshot(sample, { graph: emptyFactGraph(), jobDescription: jd }),
@@ -76,14 +82,18 @@ function AtsPage() {
                   </span>
                 </div>
                 <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
-                {c.tips[0] && <p className="mt-2 text-xs text-muted-foreground">{c.tips[0][lang]}</p>}
+                {c.tips[0] && (
+                  <p className="mt-2 text-xs text-muted-foreground">{c.tips[0][lang]}</p>
+                )}
               </div>
             ))}
           </div>
 
           <div className="mt-8 space-y-2">
             <Label htmlFor="jd">
-              {ar ? "جرّب وصف وظيفة لقياس تغطية الكلمات المفتاحية" : "Try a job description to measure keyword coverage"}
+              {ar
+                ? "جرّب وصف وظيفة لقياس تغطية الكلمات المفتاحية"
+                : "Try a job description to measure keyword coverage"}
             </Label>
             <Textarea id="jd" rows={5} value={jd} onChange={(e) => setJd(e.target.value)} />
             {report.keywords && (
@@ -105,7 +115,6 @@ function AtsPage() {
             )}
           </div>
         </div>
-
 
         <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -140,7 +149,10 @@ function AtsPage() {
           {lint.findings.length ? (
             <ul className="mt-5 space-y-2 border-t border-border pt-4">
               {lint.findings.slice(0, 10).map((f) => (
-                <li key={`${f.rule}-${f.where ?? ""}`} className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]">
+                <li
+                  key={`${f.rule}-${f.where ?? ""}`}
+                  className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]"
+                >
                   <Badge
                     variant={f.severity === "error" ? "destructive" : "outline"}
                     className="mt-0.5 text-[10.5px]"
@@ -159,7 +171,9 @@ function AtsPage() {
             </ul>
           ) : (
             <p className="mt-5 border-t border-border pt-4 text-sm text-emerald-accent">
-              {ar ? "لا توجد ملاحظات — بنية السيرة سليمة." : "No findings — the structure looks clean."}
+              {ar
+                ? "لا توجد ملاحظات — بنية السيرة سليمة."
+                : "No findings — the structure looks clean."}
             </p>
           )}
         </section>
@@ -167,9 +181,6 @@ function AtsPage() {
         <div className="mt-8">
           <RecruiterSnapshotCard snapshot={snapshot} />
         </div>
-
-
-
 
         <Button size="lg" className="mt-8" asChild>
           <Link to="/auth" search={{ mode: "signup" }}>

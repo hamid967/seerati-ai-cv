@@ -81,7 +81,11 @@ export const CONNECTORS: Connector[] = [
         "اختر تنزيل السيرة (PDF).",
         "ارفع الملف هنا أو الصق نصه.",
       ],
-      en: ["Open your resume on Indeed.", "Download the resume as PDF.", "Upload it here or paste its text."],
+      en: [
+        "Open your resume on Indeed.",
+        "Download the resume as PDF.",
+        "Upload it here or paste its text.",
+      ],
     },
   },
   {
@@ -91,8 +95,16 @@ export const CONNECTORS: Connector[] = [
     sourceType: "bayt_export",
     accept: FILE_ACCEPT,
     steps: {
-      ar: ["افتح ملفك في بيت.كوم.", "نزّل نسخة السيرة الذاتية (PDF/Word).", "ارفع الملف هنا أو الصق نصه."],
-      en: ["Open your Bayt.com profile.", "Download your CV copy (PDF/Word).", "Upload it here or paste its text."],
+      ar: [
+        "افتح ملفك في بيت.كوم.",
+        "نزّل نسخة السيرة الذاتية (PDF/Word).",
+        "ارفع الملف هنا أو الصق نصه.",
+      ],
+      en: [
+        "Open your Bayt.com profile.",
+        "Download your CV copy (PDF/Word).",
+        "Upload it here or paste its text.",
+      ],
     },
   },
   {
@@ -102,8 +114,16 @@ export const CONNECTORS: Connector[] = [
     sourceType: "naukrigulf_export",
     accept: FILE_ACCEPT,
     steps: {
-      ar: ["افتح حسابك في Naukrigulf.", "نزّل السيرة المرفوعة في ملفك.", "ارفع الملف هنا أو الصق نصه."],
-      en: ["Open your Naukrigulf account.", "Download the resume attached to your profile.", "Upload it here or paste its text."],
+      ar: [
+        "افتح حسابك في Naukrigulf.",
+        "نزّل السيرة المرفوعة في ملفك.",
+        "ارفع الملف هنا أو الصق نصه.",
+      ],
+      en: [
+        "Open your Naukrigulf account.",
+        "Download the resume attached to your profile.",
+        "Upload it here or paste its text.",
+      ],
     },
   },
   {
@@ -114,7 +134,11 @@ export const CONNECTORS: Connector[] = [
     accept: FILE_ACCEPT,
     steps: {
       ar: ["افتح السيرة في Enhancv.", "اختر Download → PDF.", "ارفع الملف هنا أو الصق نصه."],
-      en: ["Open your resume in Enhancv.", "Choose Download → PDF.", "Upload it here or paste its text."],
+      en: [
+        "Open your resume in Enhancv.",
+        "Choose Download → PDF.",
+        "Upload it here or paste its text.",
+      ],
     },
   },
   {
@@ -124,8 +148,16 @@ export const CONNECTORS: Connector[] = [
     sourceType: "resumeio_export",
     accept: FILE_ACCEPT,
     steps: {
-      ar: ["افتح السيرة في Resume.io.", "اختر Download وحدد PDF/DOCX.", "ارفع الملف هنا أو الصق نصه."],
-      en: ["Open your resume in Resume.io.", "Choose Download and pick PDF/DOCX.", "Upload it here or paste its text."],
+      ar: [
+        "افتح السيرة في Resume.io.",
+        "اختر Download وحدد PDF/DOCX.",
+        "ارفع الملف هنا أو الصق نصه.",
+      ],
+      en: [
+        "Open your resume in Resume.io.",
+        "Choose Download and pick PDF/DOCX.",
+        "Upload it here or paste its text.",
+      ],
     },
   },
   {
@@ -169,8 +201,16 @@ export const CONNECTORS: Connector[] = [
     sourceType: "other",
     accept: FILE_ACCEPT,
     steps: {
-      ar: ["صدّر سيرتك من المنصة بصيغة PDF أو DOCX أو نص.", "ارفع الملف هنا.", "أو الصق النص مباشرة."],
-      en: ["Export your resume from the platform as PDF, DOCX or text.", "Upload the file here.", "Or paste the text directly."],
+      ar: [
+        "صدّر سيرتك من المنصة بصيغة PDF أو DOCX أو نص.",
+        "ارفع الملف هنا.",
+        "أو الصق النص مباشرة.",
+      ],
+      en: [
+        "Export your resume from the platform as PDF, DOCX or text.",
+        "Upload the file here.",
+        "Or paste the text directly.",
+      ],
     },
   },
 ];

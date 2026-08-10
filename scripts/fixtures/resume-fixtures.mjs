@@ -28,7 +28,13 @@ export const fixtures = [
       summary: "حديثة تخرج في نظم المعلومات.",
       experience: [],
       education: [
-        { id: "e1", degree: "بكالوريوس نظم المعلومات", school: "جامعة الملك سعود", start: "2020", end: "2024" },
+        {
+          id: "e1",
+          degree: "بكالوريوس نظم المعلومات",
+          school: "جامعة الملك سعود",
+          start: "2020",
+          end: "2024",
+        },
       ],
       skills: [{ id: "s1", name: "إكسل" }],
       languages: [{ id: "l1", name: "العربية", level: "لغة أم" }],
@@ -83,7 +89,13 @@ export const fixtures = [
         },
       ],
       education: [
-        { id: "e1", degree: "بكالوريوس هندسة صناعية", school: "جامعة الملك فهد للبترول والمعادن", start: "2012", end: "2016" },
+        {
+          id: "e1",
+          degree: "بكالوريوس هندسة صناعية",
+          school: "جامعة الملك فهد للبترول والمعادن",
+          start: "2012",
+          end: "2016",
+        },
       ],
       skills: [
         { id: "s1", name: "إدارة المشاريع", level: 5 },
@@ -146,8 +158,21 @@ export const fixtures = [
         ),
       })),
       education: [
-        { id: "e1", degree: "ماجستير إدارة الأعمال التنفيذي — Executive MBA", school: "جامعة الملك عبدالله للعلوم والتقنية (KAUST)", start: "2010", end: "2012" },
-        { id: "e2", degree: "بكالوريوس هندسة الحاسب الآلي والشبكات", school: "جامعة الملك فهد للبترول والمعادن (KFUPM)", start: "2000", end: "2004", note: "مرتبة الشرف الأولى" },
+        {
+          id: "e1",
+          degree: "ماجستير إدارة الأعمال التنفيذي — Executive MBA",
+          school: "جامعة الملك عبدالله للعلوم والتقنية (KAUST)",
+          start: "2010",
+          end: "2012",
+        },
+        {
+          id: "e2",
+          degree: "بكالوريوس هندسة الحاسب الآلي والشبكات",
+          school: "جامعة الملك فهد للبترول والمعادن (KFUPM)",
+          start: "2000",
+          end: "2004",
+          note: "مرتبة الشرف الأولى",
+        },
       ],
       skills: Array.from({ length: 24 }).map((_, i) => ({
         id: `s${i + 1}`,
@@ -159,12 +184,30 @@ export const fixtures = [
         { id: "l2", name: "الإنجليزية", level: "متقدم — C1" },
         { id: "l3", name: "الفرنسية", level: "مبتدئ" },
       ],
-      certificates: Array.from({ length: 8 }).map((_, i) => item(`c${i + 1}`, `شهادة احترافية معتمدة ${i + 1} — Certified Professional ${i + 1}`, "جهة مانحة دولية")),
-      projects: Array.from({ length: 6 }).map((_, i) => item(`p${i + 1}`, `مشروع تحول مؤسسي كبير رقم ${i + 1}`, "وصف تفصيلي طويل يشرح النطاق والأثر والفرق المشاركة والميزانية التقديرية.")),
-      achievements: Array.from({ length: 5 }).map((_, i) => item(`a${i + 1}`, `إنجاز موثق رقم ${i + 1} بنسبة تحسين ${5 + i}%`)),
+      certificates: Array.from({ length: 8 }).map((_, i) =>
+        item(
+          `c${i + 1}`,
+          `شهادة احترافية معتمدة ${i + 1} — Certified Professional ${i + 1}`,
+          "جهة مانحة دولية",
+        ),
+      ),
+      projects: Array.from({ length: 6 }).map((_, i) =>
+        item(
+          `p${i + 1}`,
+          `مشروع تحول مؤسسي كبير رقم ${i + 1}`,
+          "وصف تفصيلي طويل يشرح النطاق والأثر والفرق المشاركة والميزانية التقديرية.",
+        ),
+      ),
+      achievements: Array.from({ length: 5 }).map((_, i) =>
+        item(`a${i + 1}`, `إنجاز موثق رقم ${i + 1} بنسبة تحسين ${5 + i}%`),
+      ),
       volunteering: [item("v1", "عضو مجلس إدارة جمعية تقنية غير ربحية")],
       links: [
-        { id: "k1", label: "LinkedIn", url: "https://www.linkedin.com/in/a-very-long-profile-handle-example" },
+        {
+          id: "k1",
+          label: "LinkedIn",
+          url: "https://www.linkedin.com/in/a-very-long-profile-handle-example",
+        },
         { id: "k2", label: "الموقع الشخصي", url: "https://portfolio.example.com/abdulrahman" },
       ],
       references: [item("r1", "متاحة عند الطلب")],
@@ -206,7 +249,15 @@ export const fixtures = [
       },
       summary: "Marketing graduate focused on content and analytics.",
       experience: [],
-      education: [{ id: "e1", degree: "BA Marketing", school: "King Abdulaziz University", start: "2021", end: "2025" }],
+      education: [
+        {
+          id: "e1",
+          degree: "BA Marketing",
+          school: "King Abdulaziz University",
+          start: "2021",
+          end: "2025",
+        },
+      ],
       skills: [{ id: "s1", name: "SEO" }],
       languages: [{ id: "l1", name: "Arabic", level: "Native" }],
       certificates: [],
@@ -249,7 +300,9 @@ export const fixtures = [
           ],
         },
       ],
-      education: [{ id: "e1", degree: "BSc Statistics", school: "KFUPM", start: "2014", end: "2018" }],
+      education: [
+        { id: "e1", degree: "BSc Statistics", school: "KFUPM", start: "2014", end: "2018" },
+      ],
       skills: [
         { id: "s1", name: "SQL", level: 5 },
         { id: "s2", name: "Power BI", level: 5 },
@@ -260,13 +313,24 @@ export const fixtures = [
         { id: "l2", name: "English", level: "Fluent" },
       ],
       certificates: [item("c1", "Microsoft Certified: Data Analyst Associate")],
-      projects: [item("p1", "Retail churn model", "Reduced report turnaround from 5 days to same-day")],
+      projects: [
+        item("p1", "Retail churn model", "Reduced report turnaround from 5 days to same-day"),
+      ],
       achievements: [],
       volunteering: [],
       links: [{ id: "k1", label: "GitHub", url: "https://github.com/example" }],
       references: [],
       custom: [],
-      sectionOrder: ["summary", "experience", "education", "skills", "languages", "certificates", "projects", "links"],
+      sectionOrder: [
+        "summary",
+        "experience",
+        "education",
+        "skills",
+        "languages",
+        "certificates",
+        "projects",
+        "links",
+      ],
     },
   },
   {
@@ -276,7 +340,8 @@ export const fixtures = [
     data: {
       personal: {
         fullName: "Christopher Alexander Montgomery-Fitzgerald III",
-        jobTitle: "Global Head of Enterprise Transformation, Data Platforms and Operational Excellence",
+        jobTitle:
+          "Global Head of Enterprise Transformation, Data Platforms and Operational Excellence",
         email: "christopher.montgomery.fitzgerald@extremely-long-corporate-domain.example.com",
         phone: "+966 (55) 555-5555",
         city: "King Abdullah Economic City",
@@ -298,8 +363,21 @@ export const fixtures = [
         ),
       })),
       education: [
-        { id: "e1", degree: "MBA, Strategy and Operations", school: "London Business School", start: "2008", end: "2010" },
-        { id: "e2", degree: "BEng Computer Engineering", school: "KFUPM", start: "1999", end: "2003", note: "First class honours" },
+        {
+          id: "e1",
+          degree: "MBA, Strategy and Operations",
+          school: "London Business School",
+          start: "2008",
+          end: "2010",
+        },
+        {
+          id: "e2",
+          degree: "BEng Computer Engineering",
+          school: "KFUPM",
+          start: "1999",
+          end: "2003",
+          note: "First class honours",
+        },
       ],
       skills: Array.from({ length: 26 }).map((_, i) => ({
         id: `s${i + 1}`,
@@ -310,17 +388,35 @@ export const fixtures = [
         { id: "l1", name: "English", level: "Native" },
         { id: "l2", name: "Arabic", level: "Professional" },
       ],
-      certificates: Array.from({ length: 9 }).map((_, i) => item(`c${i + 1}`, `Certified Enterprise Practitioner Level ${i + 1}`, "Global institute")),
-      projects: Array.from({ length: 7 }).map((_, i) => item(`p${i + 1}`, `Enterprise Programme ${i + 1}`, "Long descriptive text covering scope, impact, teams and governance model.")),
-      achievements: Array.from({ length: 6 }).map((_, i) => item(`a${i + 1}`, `Recognised achievement ${i + 1}`)),
+      certificates: Array.from({ length: 9 }).map((_, i) =>
+        item(`c${i + 1}`, `Certified Enterprise Practitioner Level ${i + 1}`, "Global institute"),
+      ),
+      projects: Array.from({ length: 7 }).map((_, i) =>
+        item(
+          `p${i + 1}`,
+          `Enterprise Programme ${i + 1}`,
+          "Long descriptive text covering scope, impact, teams and governance model.",
+        ),
+      ),
+      achievements: Array.from({ length: 6 }).map((_, i) =>
+        item(`a${i + 1}`, `Recognised achievement ${i + 1}`),
+      ),
       volunteering: [item("v1", "Mentor, non-profit technology council")],
       links: [
-        { id: "k1", label: "LinkedIn", url: "https://www.linkedin.com/in/christopher-montgomery-fitzgerald-example" },
+        {
+          id: "k1",
+          label: "LinkedIn",
+          url: "https://www.linkedin.com/in/christopher-montgomery-fitzgerald-example",
+        },
         { id: "k2", label: "Portfolio", url: "https://portfolio.example.com/christopher" },
       ],
       references: [item("r1", "Available on request")],
       custom: [
-        { id: "cs1", title: "Board memberships", items: [item("ci1", "Industry Data Council"), item("ci2", "PMI Chapter")] },
+        {
+          id: "cs1",
+          title: "Board memberships",
+          items: [item("ci1", "Industry Data Council"), item("ci2", "PMI Chapter")],
+        },
       ],
       sectionOrder: [
         "summary",

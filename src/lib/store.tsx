@@ -135,7 +135,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLoadingResumes(false);
   }, []);
 
-
   useEffect(() => {
     let active = true;
 
@@ -196,23 +195,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [loadProfile, loadResumes],
   );
 
-  const signUp = useCallback<Ctx["signUp"]>(async (email, password, fullName) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { full_name: fullName },
-      },
-    });
-    if (error) return { error: error.message };
-    if (data.session?.user) {
-      await loadProfile(data.session.user.id, data.session.user.email ?? email);
-      await loadResumes();
-      return { needsConfirmation: false };
-    }
-    return { needsConfirmation: true };
-  }, [loadProfile, loadResumes]);
+  const signUp = useCallback<Ctx["signUp"]>(
+    async (email, password, fullName) => {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: { full_name: fullName },
+        },
+      });
+      if (error) return { error: error.message };
+      if (data.session?.user) {
+        await loadProfile(data.session.user.id, data.session.user.email ?? email);
+        await loadResumes();
+        return { needsConfirmation: false };
+      }
+      return { needsConfirmation: true };
+    },
+    [loadProfile, loadResumes],
+  );
 
   const value = useMemo<Ctx>(() => {
     const atLimit = resumes.length >= maxResumes;
@@ -281,7 +283,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       updateResume: async (id, patch) => {
         setResumes((list) =>
-          list.map((r) => (r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r)),
+          list.map((r) =>
+            r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
+          ),
         );
         const current = resumes.find((r) => r.id === id);
         const { error } = await supabase

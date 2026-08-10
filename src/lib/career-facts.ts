@@ -215,15 +215,18 @@ export async function createFact(userId: string, input: FactInput): Promise<Care
 
 export async function updateFact(id: string, patch: Partial<FactInput>): Promise<void> {
   const row: Record<string, unknown> = {};
-  if (patch.type) row['type'] = patch.type;
-  if (patch.title !== undefined) row['title'] = patch.title.trim();
-  if (patch.value !== undefined) row['value'] = patch.value.trim();
-  if (patch.metadata) row['metadata'] = patch.metadata;
-  if (patch.sourceType) row['source_type'] = patch.sourceType;
-  if (patch.sourceLabel !== undefined) row['source_label'] = patch.sourceLabel;
-  if (patch.verificationStatus) row['verification_status'] = patch.verificationStatus;
+  if (patch.type) row["type"] = patch.type;
+  if (patch.title !== undefined) row["title"] = patch.title.trim();
+  if (patch.value !== undefined) row["value"] = patch.value.trim();
+  if (patch.metadata) row["metadata"] = patch.metadata;
+  if (patch.sourceType) row["source_type"] = patch.sourceType;
+  if (patch.sourceLabel !== undefined) row["source_label"] = patch.sourceLabel;
+  if (patch.verificationStatus) row["verification_status"] = patch.verificationStatus;
   if (!Object.keys(row).length) return;
-  const { error } = await supabase.from("career_facts").update(row as never).eq("id", id);
+  const { error } = await supabase
+    .from("career_facts")
+    .update(row as never)
+    .eq("id", id);
   if (error) throw new Error(error.message);
 }
 
@@ -282,17 +285,20 @@ export async function createEvidence(
 
 export async function updateEvidence(id: string, patch: Partial<EvidenceInput>): Promise<void> {
   const row: Record<string, unknown> = {};
-  if (patch.factId !== undefined) row['fact_id'] = patch.factId;
-  if (patch.evidenceType) row['evidence_type'] = patch.evidenceType;
-  if (patch.title !== undefined) row['title'] = patch.title.trim();
-  if (patch.description !== undefined) row['description'] = patch.description.trim();
-  if (patch.metricValue !== undefined) row['metric_value'] = patch.metricValue.trim() || null;
-  if (patch.metricUnit !== undefined) row['metric_unit'] = patch.metricUnit.trim() || null;
-  if (patch.sourceUrl !== undefined) row['source_url'] = patch.sourceUrl.trim() || null;
-  if (patch.verified !== undefined) row['verified'] = patch.verified;
-  if (patch.metadata) row['metadata'] = patch.metadata;
+  if (patch.factId !== undefined) row["fact_id"] = patch.factId;
+  if (patch.evidenceType) row["evidence_type"] = patch.evidenceType;
+  if (patch.title !== undefined) row["title"] = patch.title.trim();
+  if (patch.description !== undefined) row["description"] = patch.description.trim();
+  if (patch.metricValue !== undefined) row["metric_value"] = patch.metricValue.trim() || null;
+  if (patch.metricUnit !== undefined) row["metric_unit"] = patch.metricUnit.trim() || null;
+  if (patch.sourceUrl !== undefined) row["source_url"] = patch.sourceUrl.trim() || null;
+  if (patch.verified !== undefined) row["verified"] = patch.verified;
+  if (patch.metadata) row["metadata"] = patch.metadata;
   if (!Object.keys(row).length) return;
-  const { error } = await supabase.from("career_evidence").update(row as never).eq("id", id);
+  const { error } = await supabase
+    .from("career_evidence")
+    .update(row as never)
+    .eq("id", id);
   if (error) throw new Error(error.message);
 }
 
@@ -310,13 +316,15 @@ export async function listProtectedTerms(userId: string): Promise<ProtectedTerm[
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
-  return ((data as Array<{
-    id: string;
-    term: string;
-    translation_policy: string;
-    notes: string | null;
-    created_at: string;
-  }> | null) ?? []).map((r) => ({
+  return (
+    (data as Array<{
+      id: string;
+      term: string;
+      translation_policy: string;
+      notes: string | null;
+      created_at: string;
+    }> | null) ?? []
+  ).map((r) => ({
     id: r.id,
     term: r.term,
     translationPolicy:
@@ -355,15 +363,17 @@ export async function listResumeVersions(resumeId: string): Promise<ResumeVersio
     .eq("resume_id", resumeId)
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
-  return ((data as Array<{
-    id: string;
-    resume_id: string;
-    parent_version_id: string | null;
-    label: string;
-    snapshot: unknown;
-    change_summary: string;
-    created_at: string;
-  }> | null) ?? []).map((r) => ({
+  return (
+    (data as Array<{
+      id: string;
+      resume_id: string;
+      parent_version_id: string | null;
+      label: string;
+      snapshot: unknown;
+      change_summary: string;
+      created_at: string;
+    }> | null) ?? []
+  ).map((r) => ({
     id: r.id,
     resumeId: r.resume_id,
     parentVersionId: r.parent_version_id,
@@ -411,7 +421,6 @@ export type FactGraph = {
 
 /** A graph with no stored data — used by public/demo surfaces. */
 export const emptyFactGraph = (): FactGraph => ({ facts: [], evidence: [] });
-
 
 export async function loadFactGraph(userId: string): Promise<FactGraph> {
   const [facts, evidence] = await Promise.all([listFacts(userId), listEvidence(userId)]);
@@ -497,7 +506,6 @@ export function buildAiFactContext(
  */
 export const buildSafeAiEvidenceContext = buildAiFactContext;
 
-
 /**
  * Truth guardrail: any number in AI text that is not backed by a verified
  * evidence row is flagged so the UI can ask the user to confirm it instead of
@@ -532,7 +540,11 @@ export function describeVault(
   const missing = factsMissingEvidence(g).length;
   const items: string[] = [];
   if (!g.facts.length) {
-    items.push(ar ? "لا توجد حقائق بعد — ابدأ بإضافة إنجاز واحد." : "No facts yet — start with one achievement.");
+    items.push(
+      ar
+        ? "لا توجد حقائق بعد — ابدأ بإضافة إنجاز واحد."
+        : "No facts yet — start with one achievement.",
+    );
   } else {
     items.push(
       ar ? `${v} حقيقة موثّقة من ${g.facts.length}.` : `${v} of ${g.facts.length} facts verified.`,

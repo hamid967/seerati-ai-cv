@@ -111,7 +111,11 @@ export function ResumeVariantSwitcher({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="flex items-center gap-1.5 truncate text-xs font-bold">
-            {isVariant ? <GitBranch className="size-3.5 shrink-0" /> : <History className="size-3.5 shrink-0" />}
+            {isVariant ? (
+              <GitBranch className="size-3.5 shrink-0" />
+            ) : (
+              <History className="size-3.5 shrink-0" />
+            )}
             {v.label}
           </p>
           {v.changeSummary && !v.changeSummary.startsWith("variant:") ? (
@@ -248,7 +252,9 @@ export function ResumeVariantSwitcher({
       <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
         <AlertDialogContent dir={dir}>
           <AlertDialogHeader>
-            <AlertDialogTitle>{ar ? "استعادة هذه النسخة؟" : "Restore this version?"}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {ar ? "استعادة هذه النسخة؟" : "Restore this version?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {ar
                 ? "سيُستبدل محتوى السيرة الحالي بمحتوى هذه النسخة، وستُحفظ نسخة احتياطية من الحالة الحالية أولاً."

@@ -31,12 +31,21 @@ type Step = {
 const STEPS: Step[] = [
   {
     id: "task",
-    question: { ar: "ما المهمة أو المسؤولية التي تريد تحويلها إلى إنجاز؟", en: "Which task or responsibility do you want to turn into an achievement?" },
-    hint: { ar: "مثال: إدارة فريق المبيعات في المنطقة الوسطى.", en: "e.g. Managing the sales team in the central region." },
+    question: {
+      ar: "ما المهمة أو المسؤولية التي تريد تحويلها إلى إنجاز؟",
+      en: "Which task or responsibility do you want to turn into an achievement?",
+    },
+    hint: {
+      ar: "مثال: إدارة فريق المبيعات في المنطقة الوسطى.",
+      en: "e.g. Managing the sales team in the central region.",
+    },
   },
   {
     id: "scope",
-    question: { ar: "ما حجم النطاق؟ (عدد الأشخاص، الميزانية، عدد العملاء)", en: "What was the scope? (people, budget, number of clients)" },
+    question: {
+      ar: "ما حجم النطاق؟ (عدد الأشخاص، الميزانية، عدد العملاء)",
+      en: "What was the scope? (people, budget, number of clients)",
+    },
     hint: { ar: "اكتب ما تعرفه بدقة فقط.", en: "Only write what you know precisely." },
   },
   {
@@ -47,25 +56,43 @@ const STEPS: Step[] = [
   {
     id: "action",
     question: { ar: "ما الذي فعلته أنت تحديداً؟", en: "What exactly did you do?" },
-    hint: { ar: "الإجراء الذي قمت به، لا ما فعله الفريق كله.", en: "Your action, not the whole team's." },
+    hint: {
+      ar: "الإجراء الذي قمت به، لا ما فعله الفريق كله.",
+      en: "Your action, not the whole team's.",
+    },
     multiline: true,
   },
   {
     id: "result",
     question: { ar: "ما النتيجة التي تحققت؟", en: "What was the result?" },
-    hint: { ar: "التغيير الذي حدث بسبب عملك.", en: "The change that happened because of your work." },
+    hint: {
+      ar: "التغيير الذي حدث بسبب عملك.",
+      en: "The change that happened because of your work.",
+    },
     multiline: true,
   },
   {
     id: "metric",
-    question: { ar: "هل هناك رقم يدعم النتيجة؟ (اتركه فارغاً إذا لم تكن متأكداً)", en: "Is there a number behind the result? (leave empty if unsure)" },
-    hint: { ar: "لن نضيف رقماً لم تذكره. الأرقام غير المدعومة تبقى «تحتاج مراجعة».", en: "We never invent a number. Unbacked figures stay “needs review”." },
+    question: {
+      ar: "هل هناك رقم يدعم النتيجة؟ (اتركه فارغاً إذا لم تكن متأكداً)",
+      en: "Is there a number behind the result? (leave empty if unsure)",
+    },
+    hint: {
+      ar: "لن نضيف رقماً لم تذكره. الأرقام غير المدعومة تبقى «تحتاج مراجعة».",
+      en: "We never invent a number. Unbacked figures stay “needs review”.",
+    },
     optional: true,
   },
   {
     id: "proof",
-    question: { ar: "ما الدليل على ذلك؟ (تقرير، لوحة مؤشرات، شخص يمكنه التأكيد)", en: "What is the proof? (report, dashboard, someone who can confirm)" },
-    hint: { ar: "اسم المصدر يكفي، لا ترفع مستندات سرية.", en: "A source name is enough — do not upload confidential documents." },
+    question: {
+      ar: "ما الدليل على ذلك؟ (تقرير، لوحة مؤشرات، شخص يمكنه التأكيد)",
+      en: "What is the proof? (report, dashboard, someone who can confirm)",
+    },
+    hint: {
+      ar: "اسم المصدر يكفي، لا ترفع مستندات سرية.",
+      en: "A source name is enough — do not upload confidential documents.",
+    },
     optional: true,
   },
 ];
@@ -93,14 +120,16 @@ export function AchievementInterview({
   // Assembled from the user's own words — no model in this path.
   const draft = useMemo(() => {
     const a = answers;
-    const parts = [a['action'], a['result']].filter(Boolean).join(ar ? " مما أدى إلى " : ", which led to ");
-    const scope = a['scope'] ? (ar ? ` (${a['scope']})` : ` (${a['scope']})`) : "";
-    const period = a['period'] ? (ar ? ` — ${a['period']}` : ` — ${a['period']}`) : "";
+    const parts = [a["action"], a["result"]]
+      .filter(Boolean)
+      .join(ar ? " مما أدى إلى " : ", which led to ");
+    const scope = a["scope"] ? (ar ? ` (${a["scope"]})` : ` (${a["scope"]})`) : "";
+    const period = a["period"] ? (ar ? ` — ${a["period"]}` : ` — ${a["period"]}`) : "";
     return `${parts}${scope}${period}`.trim();
   }, [answers, ar]);
 
-  const hasMetric = Boolean(answers['metric']?.trim());
-  const hasProof = Boolean(answers['proof']?.trim());
+  const hasMetric = Boolean(answers["metric"]?.trim());
+  const hasProof = Boolean(answers["proof"]?.trim());
 
   function next() {
     if (!step) return;
@@ -115,18 +144,18 @@ export function AchievementInterview({
     try {
       const fact = await createFact(userId, {
         type: "achievement",
-        title: answers['task']?.trim() || draft.slice(0, 80),
+        title: answers["task"]?.trim() || draft.slice(0, 80),
         value: draft,
         sourceType: "interview",
         sourceLabel: ar ? "مقابلة الإنجازات" : "Achievement interview",
         // A figure without proof is never stored as verified.
         verificationStatus: hasMetric && hasProof ? "verified" : "needs_review",
         metadata: {
-          scope: answers['scope'] ?? "",
-          period: answers['period'] ?? "",
-          action: answers['action'] ?? "",
-          result: answers['result'] ?? "",
-          metric: answers['metric'] ?? "",
+          scope: answers["scope"] ?? "",
+          period: answers["period"] ?? "",
+          action: answers["action"] ?? "",
+          result: answers["result"] ?? "",
+          metric: answers["metric"] ?? "",
         },
       });
       if (!fact) throw new Error("save_failed");
@@ -134,8 +163,8 @@ export function AchievementInterview({
         await createEvidence(userId, {
           factId: fact.id,
           evidenceType: hasMetric ? "metric" : "reference",
-          title: answers['proof']?.trim() || (ar ? "دليل الرقم" : "Metric source"),
-          ...(answers['metric']?.trim() ? { metricValue: answers['metric'].trim() } : {}),
+          title: answers["proof"]?.trim() || (ar ? "دليل الرقم" : "Metric source"),
+          ...(answers["metric"]?.trim() ? { metricValue: answers["metric"].trim() } : {}),
           verified: false,
         });
       }

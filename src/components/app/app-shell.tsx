@@ -81,7 +81,11 @@ export function AppShell({
   );
 
   const widthClass =
-    width === "full" ? "w-full" : width === "wide" ? "mx-auto w-full max-w-[1400px]" : "mx-auto w-full max-w-6xl";
+    width === "full"
+      ? "w-full"
+      : width === "wide"
+        ? "mx-auto w-full max-w-[1400px]"
+        : "mx-auto w-full max-w-6xl";
 
   return (
     <AppChromeContext.Provider value={chrome}>

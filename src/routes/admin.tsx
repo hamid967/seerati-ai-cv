@@ -9,7 +9,10 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "لوحة الإدارة | سيرتي" },
-      { name: "description", content: "لوحة إدارة سيرتي: المؤشرات، المستخدمون، القوالب، الإعدادات وسجل العمليات." },
+      {
+        name: "description",
+        content: "لوحة إدارة سيرتي: المؤشرات، المستخدمون، القوالب، الإعدادات وسجل العمليات.",
+      },
       { property: "og:title", content: "لوحة الإدارة | سيرتي" },
       { property: "og:description", content: "إدارة المنصة والقوالب والمستخدمين." },
       { name: "robots", content: "noindex" },
@@ -33,7 +36,9 @@ function AdminLayout() {
       <div className="min-h-screen">
         <div className="mx-auto max-w-lg px-4 py-24 text-center">
           <ShieldAlert className="mx-auto size-10 text-destructive" />
-          <h1 className="mt-4 text-xl font-bold">{ar ? "هذه الصفحة للمسؤولين فقط" : "Admins only"}</h1>
+          <h1 className="mt-4 text-xl font-bold">
+            {ar ? "هذه الصفحة للمسؤولين فقط" : "Admins only"}
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {ar ? "حسابك لا يمتلك صلاحية admin." : "Your account does not have the admin role."}
           </p>
@@ -49,7 +54,12 @@ function AdminLayout() {
     { to: "/admin", label: ar ? "المؤشرات" : "Overview", icon: LayoutDashboard, exact: true },
     { to: "/admin/users", label: ar ? "المستخدمون" : "Users", icon: Users, exact: false },
     { to: "/admin/templates", label: ar ? "القوالب" : "Templates", icon: Palette, exact: false },
-    { to: "/admin/audit", label: ar ? "سجل العمليات" : "Audit log", icon: ScrollText, exact: false },
+    {
+      to: "/admin/audit",
+      label: ar ? "سجل العمليات" : "Audit log",
+      icon: ScrollText,
+      exact: false,
+    },
     { to: "/admin/settings", label: ar ? "الإعدادات" : "Settings", icon: Settings, exact: false },
   ] as const;
 
@@ -67,7 +77,10 @@ function AdminLayout() {
                 to={n.to}
                 activeOptions={{ exact: n.exact }}
                 className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary"
-                activeProps={{ className: "flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold bg-secondary text-foreground" }}
+                activeProps={{
+                  className:
+                    "flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold bg-secondary text-foreground",
+                }}
               >
                 <n.icon className="size-4" />
                 {n.label}

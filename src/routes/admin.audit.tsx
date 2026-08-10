@@ -4,9 +4,22 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n";
 import { fetchAuditLog } from "@/lib/db";
 
@@ -21,12 +34,12 @@ function AdminAudit() {
   const [action, setAction] = useState("all");
   const [from, setFrom] = useState("");
 
-  const { data, isLoading, isError } = useQuery({ queryKey: ["admin-audit", 200], queryFn: () => fetchAuditLog(200) });
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["admin-audit", 200],
+    queryFn: () => fetchAuditLog(200),
+  });
 
-  const actions = useMemo(
-    () => [...new Set((data ?? []).map((a) => a.action))].sort(),
-    [data],
-  );
+  const actions = useMemo(() => [...new Set((data ?? []).map((a) => a.action))].sort(), [data]);
 
   const term = q.trim().toLowerCase();
   const list = (data ?? [])
@@ -42,7 +55,9 @@ function AdminAudit() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-extrabold tracking-tight">{ar ? "سجل العمليات" : "Audit log"}</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight">
+        {ar ? "سجل العمليات" : "Audit log"}
+      </h1>
       <p className="text-sm text-muted-foreground">
         {ar
           ? "سجل غير قابل للتعديل أو الحذف، ويقرأه المسؤولون فقط."
@@ -55,13 +70,21 @@ function AdminAudit() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={ar ? "بحث في العملية أو الهدف" : "Search action or target"} />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={ar ? "بحث في العملية أو الهدف" : "Search action or target"}
+            />
             <Select value={action} onValueChange={setAction}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{ar ? "كل العمليات" : "All actions"}</SelectItem>
                 {actions.map((a) => (
-                  <SelectItem key={a} value={a}>{a}</SelectItem>
+                  <SelectItem key={a} value={a}>
+                    {a}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -102,12 +125,21 @@ function AdminAudit() {
                       <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                         {new Date(a.createdAt).toLocaleString("en-GB")}
                       </TableCell>
-                      <TableCell dir="ltr" className="text-xs">{a.actorEmail ?? a.actorId?.slice(0, 8) ?? "—"}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="font-mono text-[10.5px]">{a.action}</Badge>
+                      <TableCell dir="ltr" className="text-xs">
+                        {a.actorEmail ?? a.actorId?.slice(0, 8) ?? "—"}
                       </TableCell>
-                      <TableCell className="font-mono text-xs">{a.target ? a.target.slice(0, 12) : "—"}</TableCell>
-                      <TableCell className="max-w-56 truncate text-xs text-muted-foreground" dir="ltr">
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono text-[10.5px]">
+                          {a.action}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {a.target ? a.target.slice(0, 12) : "—"}
+                      </TableCell>
+                      <TableCell
+                        className="max-w-56 truncate text-xs text-muted-foreground"
+                        dir="ltr"
+                      >
                         {a.metadata ? JSON.stringify(a.metadata) : "—"}
                       </TableCell>
                     </TableRow>

@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
-import { loadCareerTwin, saveCareerTwin, twinHealth, type CareerTwin, type TwinPatch } from "@/lib/career";
+import {
+  loadCareerTwin,
+  saveCareerTwin,
+  twinHealth,
+  type CareerTwin,
+  type TwinPatch,
+} from "@/lib/career";
 import { agentsForSurface } from "@/lib/team";
 import {
   IdentityCard,
@@ -28,7 +34,8 @@ export const Route = createFileRoute("/career-twin")({
       { title: "ملفي المهني | سيرتي — Career Twin" },
       {
         name: "description",
-        content: "مصدر بياناتك المهنية الموحّد: أدخلها مرة واحدة ليستخدمها كل من السيرة الذاتية وخطاب التقديم والتحضير للمقابلة.",
+        content:
+          "مصدر بياناتك المهنية الموحّد: أدخلها مرة واحدة ليستخدمها كل من السيرة الذاتية وخطاب التقديم والتحضير للمقابلة.",
       },
       { property: "og:title", content: "ملفي المهني | سيرتي" },
       { property: "og:description", content: "بياناتك المهنية في مكان واحد، تُستخدم في كل مكان." },
@@ -147,7 +154,9 @@ function CareerTwinPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <div className="mx-auto w-full max-w-3xl px-4 py-12 text-center text-sm text-muted-foreground">
-          {ar ? "تعذّر تحميل ملفك المهني، حاول تحديث الصفحة." : "Could not load your career twin, try refreshing."}
+          {ar
+            ? "تعذّر تحميل ملفك المهني، حاول تحديث الصفحة."
+            : "Could not load your career twin, try refreshing."}
         </div>
       </div>
     );
@@ -158,7 +167,9 @@ function CareerTwinPage() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "ملفي المهني" : "Career Twin"}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">
+              {ar ? "ملفي المهني" : "Career Twin"}
+            </h1>
             <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
               {ar
                 ? "مصدر بياناتك المهنية الموحّد. كل ما تُدخله هنا مرة واحدة يُعاد استخدامه في كل سيرة ذاتية وخطاب تقديم وتحضير مقابلة."
@@ -206,7 +217,9 @@ function CareerTwinPage() {
                 variant="outline"
                 className="ms-2 shrink-0"
                 onClick={() => {
-                  const target = agent.surfaces.includes("career-twin") ? "identity" : sectionRefKeys[0];
+                  const target = agent.surfaces.includes("career-twin")
+                    ? "identity"
+                    : sectionRefKeys[0];
                   scrollToSection(target);
                 }}
               >
@@ -218,24 +231,64 @@ function CareerTwinPage() {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="space-y-6">
-            <div ref={(el) => { sectionRefs.current["identity"] = el; }}>
-              <IdentityCard twin={twin} ar={ar} onChange={(patch) => update("identity", { ...twin.identity, ...patch })} />
+            <div
+              ref={(el) => {
+                sectionRefs.current["identity"] = el;
+              }}
+            >
+              <IdentityCard
+                twin={twin}
+                ar={ar}
+                onChange={(patch) => update("identity", { ...twin.identity, ...patch })}
+              />
             </div>
 
-            <div ref={(el) => { sectionRefs.current["targets"] = el; }}>
-              <TargetsCard targets={twin.targets} ar={ar} onChange={(next) => update("targets", next)} />
+            <div
+              ref={(el) => {
+                sectionRefs.current["targets"] = el;
+              }}
+            >
+              <TargetsCard
+                targets={twin.targets}
+                ar={ar}
+                onChange={(next) => update("targets", next)}
+              />
             </div>
 
-            <div ref={(el) => { sectionRefs.current["work"] = el; }}>
-              <WorkHistoryCard items={twin.workHistory} ar={ar} onChange={(next) => update("workHistory", next)} />
+            <div
+              ref={(el) => {
+                sectionRefs.current["work"] = el;
+              }}
+            >
+              <WorkHistoryCard
+                items={twin.workHistory}
+                ar={ar}
+                onChange={(next) => update("workHistory", next)}
+              />
             </div>
 
-            <div ref={(el) => { sectionRefs.current["achievements"] = el; }}>
-              <AchievementsCard items={twin.achievements} ar={ar} onChange={(next) => update("achievements", next)} />
+            <div
+              ref={(el) => {
+                sectionRefs.current["achievements"] = el;
+              }}
+            >
+              <AchievementsCard
+                items={twin.achievements}
+                ar={ar}
+                onChange={(next) => update("achievements", next)}
+              />
             </div>
 
-            <div ref={(el) => { sectionRefs.current["education"] = el; }}>
-              <EducationCard items={twin.education} ar={ar} onChange={(next) => update("education", next)} />
+            <div
+              ref={(el) => {
+                sectionRefs.current["education"] = el;
+              }}
+            >
+              <EducationCard
+                items={twin.education}
+                ar={ar}
+                onChange={(next) => update("education", next)}
+              />
             </div>
 
             <SimpleListCard
@@ -248,11 +301,19 @@ function CareerTwinPage() {
               detailPlaceholder={ar ? "الجهة/السنة" : "Issuer / year"}
             />
 
-            <div ref={(el) => { sectionRefs.current["skills"] = el; }}>
+            <div
+              ref={(el) => {
+                sectionRefs.current["skills"] = el;
+              }}
+            >
               <SkillsCard items={twin.skills} ar={ar} onChange={(next) => update("skills", next)} />
             </div>
 
-            <LanguagesCard items={twin.languages} ar={ar} onChange={(next) => update("languages", next)} />
+            <LanguagesCard
+              items={twin.languages}
+              ar={ar}
+              onChange={(next) => update("languages", next)}
+            />
 
             <SimpleListCard
               title={ar ? "المشاريع" : "Projects"}
@@ -266,18 +327,26 @@ function CareerTwinPage() {
 
             <LinksCard items={twin.links} ar={ar} onChange={(next) => update("links", next)} />
 
-            <PreferencesCard prefs={twin.preferences} ar={ar} onChange={(patch) => update("preferences", { ...twin.preferences, ...patch })} />
+            <PreferencesCard
+              prefs={twin.preferences}
+              ar={ar}
+              onChange={(patch) => update("preferences", { ...twin.preferences, ...patch })}
+            />
           </div>
 
           <aside className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{ar ? "اكتمال الملف" : "Profile health"}</CardTitle>
+                <CardTitle className="text-base">
+                  {ar ? "اكتمال الملف" : "Profile health"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{ar ? "النسبة الإجمالية" : "Overall score"}</span>
+                    <span className="text-muted-foreground">
+                      {ar ? "النسبة الإجمالية" : "Overall score"}
+                    </span>
                     <span className="font-bold">{health.score}%</span>
                   </div>
                   <Progress value={health.score} className="mt-2" />
@@ -304,7 +373,9 @@ function CareerTwinPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{ar ? "ملخص التحقق" : "Evidence summary"}</CardTitle>
+                <CardTitle className="text-base">
+                  {ar ? "ملخص التحقق" : "Evidence summary"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">
@@ -312,7 +383,12 @@ function CareerTwinPage() {
                     ? `لديك ${unverifiedAchievements} إنجاز يحتوي رقماً غير مؤكد بعد.`
                     : `You have ${unverifiedAchievements} achievement(s) with an unverified figure.`}
                 </p>
-                <Button type="button" size="sm" variant="outline" onClick={() => scrollToSection("achievements")}>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => scrollToSection("achievements")}
+                >
                   {ar ? "مراجعة الإنجازات" : "Review achievements"}
                 </Button>
               </CardContent>

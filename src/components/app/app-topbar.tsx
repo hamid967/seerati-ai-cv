@@ -144,7 +144,12 @@ export function AppTopbar({ title, subtitle, actions, back }: AppTopbarProps) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-11" aria-label={ar ? "الحساب" : "Account"}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-11"
+                aria-label={ar ? "الحساب" : "Account"}
+              >
                 <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
                   {(user?.fullName || user?.email || "?").trim().charAt(0).toUpperCase()}
                 </span>
@@ -152,7 +157,9 @@ export function AppTopbar({ title, subtitle, actions, back }: AppTopbarProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-2 py-1.5">
-                <p className="truncate text-sm font-semibold">{user?.fullName || (ar ? "مستخدم" : "User")}</p>
+                <p className="truncate text-sm font-semibold">
+                  {user?.fullName || (ar ? "مستخدم" : "User")}
+                </p>
                 <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <DropdownMenuSeparator />

@@ -78,7 +78,11 @@ function PrivacyCenterPage() {
 
   const refresh = useCallback(async (userId: string) => {
     setLoading(true);
-    const [g, t, j] = await Promise.all([loadFactGraph(userId), loadCareerTwin(userId), listJobs(userId)]);
+    const [g, t, j] = await Promise.all([
+      loadFactGraph(userId),
+      loadCareerTwin(userId),
+      listJobs(userId),
+    ]);
     setGraph(g);
     setTwin(t);
     setJobs(j);
@@ -197,7 +201,9 @@ function PrivacyCenterPage() {
       body: ar
         ? "يحذف سجل مصادر الاستيراد فقط. محتوى ملفك المهني وسيرك يبقى كما هو."
         : "Removes only the record of import sources. Your career profile and resume content stay untouched.",
-      confirm: ar ? "سيُحذف سجل المصادر نهائياً." : "The provenance record will be deleted permanently.",
+      confirm: ar
+        ? "سيُحذف سجل المصادر نهائياً."
+        : "The provenance record will be deleted permanently.",
       action: async () => {
         await clearImportProvenance(user.id);
       },
@@ -208,7 +214,9 @@ function PrivacyCenterPage() {
       body: ar
         ? "يحاول حذف سجلات الاستخدام الخاصة بك. إن كانت السياسة تمنع الحذف سنخبرك بذلك بصراحة بدلاً من الادعاء."
         : "Attempts to delete your usage rows. If policy prevents deletion we tell you plainly instead of pretending.",
-      confirm: ar ? "سيتم محاولة حذف سجلات الاستخدام." : "Deletion of your usage rows will be attempted.",
+      confirm: ar
+        ? "سيتم محاولة حذف سجلات الاستخدام."
+        : "Deletion of your usage rows will be attempted.",
       action: async () => {
         const res = await clearAiUsage(user.id);
         if (!res.deleted) {
@@ -247,13 +255,19 @@ function PrivacyCenterPage() {
             : "A plain map of what Seerati actually stores for you, with export and deletion tools you run yourself. This page describes how the app behaves; it is not a compliance certification for any regulation."}
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-xs">
-          <Link to="/privacy" className="rounded-full border border-border px-3 py-1 hover:bg-muted">
+          <Link
+            to="/privacy"
+            className="rounded-full border border-border px-3 py-1 hover:bg-muted"
+          >
             {ar ? "سياسة الخصوصية" : "Privacy policy"}
           </Link>
           <Link to="/terms" className="rounded-full border border-border px-3 py-1 hover:bg-muted">
             {ar ? "الشروط والأحكام" : "Terms"}
           </Link>
-          <Link to="/account" className="rounded-full border border-border px-3 py-1 hover:bg-muted">
+          <Link
+            to="/account"
+            className="rounded-full border border-border px-3 py-1 hover:bg-muted"
+          >
             {ar ? "إعدادات الحساب" : "Account settings"}
           </Link>
         </div>
@@ -264,7 +278,10 @@ function PrivacyCenterPage() {
         <h2 className="text-lg font-bold">{ar ? "خريطة بياناتك" : "Your data map"}</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {dataMap.map((row) => (
-            <div key={row.title} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+            <div
+              key={row.title}
+              className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-3">
                   <span className="rounded-lg bg-muted p-2 text-muted-foreground">
@@ -296,7 +313,11 @@ function PrivacyCenterPage() {
             </p>
           </div>
           <Button onClick={doExport} disabled={busy === "export"}>
-            {busy === "export" ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+            {busy === "export" ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
             {ar ? "تصدير JSON" : "Export JSON"}
           </Button>
         </div>
@@ -304,7 +325,9 @@ function PrivacyCenterPage() {
 
       {/* Protected terms live here too: they are a privacy/naming control. */}
       <section>
-        <h2 className="text-lg font-bold">{ar ? "قواعد الترجمة والأسماء" : "Translation & naming rules"}</h2>
+        <h2 className="text-lg font-bold">
+          {ar ? "قواعد الترجمة والأسماء" : "Translation & naming rules"}
+        </h2>
         <div className="mt-4">
           <ProtectedTermsManager userId={user.id} />
         </div>
@@ -344,9 +367,7 @@ function PrivacyCenterPage() {
                   <AlertDialogFooter>
                     <AlertDialogCancel>{ar ? "إلغاء" : "Cancel"}</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() =>
-                        void run(d.key, d.action, ar ? "تم التنفيذ" : "Done")
-                      }
+                      onClick={() => void run(d.key, d.action, ar ? "تم التنفيذ" : "Done")}
                     >
                       {ar ? "تأكيد الحذف" : "Confirm"}
                     </AlertDialogAction>
@@ -368,7 +389,9 @@ function PrivacyCenterPage() {
                   : "Facts and evidence are deleted from the Evidence Vault, where you can see each item and its evidence first."}
               </p>
               <Button asChild size="sm" variant="outline" className="mt-3">
-                <Link to="/career-evidence">{ar ? "افتح خزانة الأدلة" : "Open Evidence Vault"}</Link>
+                <Link to="/career-evidence">
+                  {ar ? "افتح خزانة الأدلة" : "Open Evidence Vault"}
+                </Link>
               </Button>
             </div>
           </div>
@@ -376,7 +399,9 @@ function PrivacyCenterPage() {
           <div className="flex items-start gap-3 rounded-2xl border border-dashed border-border p-4">
             <TriangleAlert className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
             <div>
-              <p className="text-sm font-semibold">{ar ? "حذف الحساب بالكامل" : "Full account deletion"}</p>
+              <p className="text-sm font-semibold">
+                {ar ? "حذف الحساب بالكامل" : "Full account deletion"}
+              </p>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 {ar
                   ? "حذف الحساب نفسه لا يمكن تنفيذه من داخل التطبيق حالياً لأنه يتطلب صلاحيات إدارية على نظام المصادقة. أرسل طلباً من صفحة الحساب وسيُنفّذ يدوياً — لن ندّعي تنفيذه تلقائياً."

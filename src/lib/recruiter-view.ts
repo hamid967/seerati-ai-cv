@@ -107,7 +107,11 @@ function skillOverlap(data: ResumeData, jobDescription: string) {
     if (parts.length && parts.every((p) => jdTokens.has(p))) matching.push(s.name);
   }
   const resumeText = tokenize(
-    [data.summary, ...data.skills.map((s) => s.name), ...data.experience.flatMap((e) => [e.role, ...e.bullets])].join(" "),
+    [
+      data.summary,
+      ...data.skills.map((s) => s.name),
+      ...data.experience.flatMap((e) => [e.role, ...e.bullets]),
+    ].join(" "),
   );
   const resumeSet = new Set(resumeText);
   // Only multi-character, capital-ish or repeated JD terms are treated as skills.
@@ -119,7 +123,9 @@ function skillOverlap(data: ResumeData, jobDescription: string) {
 
 function factLine(fact: CareerFact, graph: FactGraph): SnapshotInsight {
   const ev = evidenceForFact(graph, fact.id).filter((e) => e.verified);
-  const metric = ev.map((e) => [e.metricValue, e.metricUnit].filter(Boolean).join(" ")).find(Boolean);
+  const metric = ev
+    .map((e) => [e.metricValue, e.metricUnit].filter(Boolean).join(" "))
+    .find(Boolean);
   return {
     id: `fact_${fact.id}`,
     label: { ar: "إنجاز موثّق", en: "Verified achievement" },
@@ -242,12 +248,17 @@ export function buildRecruiterSnapshot(
     contact: {
       complete: missingContact.length === 0,
       missing: missingContact.map((f) => f.en),
-      score: Math.round(((CONTACT_FIELDS.length - missingContact.length) / CONTACT_FIELDS.length) * 100),
+      score: Math.round(
+        ((CONTACT_FIELDS.length - missingContact.length) / CONTACT_FIELDS.length) * 100,
+      ),
     },
     yearsExperience: years,
     yearsNote:
       years === null
-        ? { ar: "غير محسوبة — التواريخ ناقصة أو غير صالحة.", en: "Not derived — dates are missing or invalid." }
+        ? {
+            ar: "غير محسوبة — التواريخ ناقصة أو غير صالحة.",
+            en: "Not derived — dates are missing or invalid.",
+          }
         : { ar: "محسوبة من تواريخ الخبرات فقط.", en: "Derived from experience dates only." },
     topEvidence,
     matchingSkills: overlap.matching,
