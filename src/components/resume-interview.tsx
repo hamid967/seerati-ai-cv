@@ -642,10 +642,10 @@ export function ResumeInterview({
     try {
       await updateProfile({
         onboarded: true,
-        fullName: draft.personal.fullName || undefined,
-        targetRole: draft.targetJob || undefined,
-        yearsExperience: initial?.years || undefined,
-        industry: initial?.industry || undefined,
+        ...(draft.personal.fullName ? { fullName: draft.personal.fullName } : {}),
+        ...(draft.targetJob ? { targetRole: draft.targetJob } : {}),
+        ...(initial?.years ? { yearsExperience: initial.years } : {}),
+        ...(initial?.industry ? { industry: initial.industry } : {}),
       });
       const created = await createResume({
         title: draft.targetJob
