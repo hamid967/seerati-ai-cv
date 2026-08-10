@@ -84,6 +84,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Profile | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
+  const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
+
+  useEffect(() => {
+    void supabase
+      .from("app_settings")
+      .select("max_resumes")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.max_resumes) setMaxResumes(data.max_resumes);
+      });
+  }, []);
 
   const loadProfile = useCallback(async (userId: string, email: string) => {
     const [{ data: profile }, { data: roles }] = await Promise.all([
@@ -302,7 +314,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       getResume: (id) => resumes.find((r) => r.id === id),
     };
-  }, [ready, user, resumes, loadingResumes, signIn, signUp]);
+  }, [ready, user, resumes, loadingResumes, maxResumes, signIn, signUp]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
