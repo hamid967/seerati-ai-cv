@@ -44,10 +44,7 @@ export async function exportResumePdf(
     const totalPages = Math.max(1, Math.ceil(canvas.height / pageHeightPx));
 
     for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
-      const sliceHeightPx = Math.min(
-        pageHeightPx,
-        canvas.height - pageIndex * pageHeightPx,
-      );
+      const sliceHeightPx = Math.min(pageHeightPx, canvas.height - pageIndex * pageHeightPx);
       if (sliceHeightPx <= 0) break;
 
       const sliceCanvas = document.createElement("canvas");

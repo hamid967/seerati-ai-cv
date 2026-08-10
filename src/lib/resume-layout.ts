@@ -20,19 +20,17 @@ export const LAYOUT_LIMITS = {
   columnWidth: { min: 24, max: 38, step: 1 },
 } as const;
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const round = (value: number, digits = 2) => {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
 };
 
-export function normalizeResumeDesign(design?: ResumeUserDesign): Required<
-  Pick<
-    ResumeUserDesign,
-    "pageSize" | "fontScale" | "marginMm" | "lineHeight" | "columnWidth"
-  >
+export function normalizeResumeDesign(
+  design?: ResumeUserDesign,
+): Required<
+  Pick<ResumeUserDesign, "pageSize" | "fontScale" | "marginMm" | "lineHeight" | "columnWidth">
 > &
   ResumeUserDesign {
   return {
@@ -71,10 +69,7 @@ export function getPageMetrics(pageSize: ResumePageSize) {
  * Fit logic measures the real rendered document after every preset and never
  * removes or rewrites resume content.
  */
-export function fitCandidates(
-  target: FitTarget,
-  current: ResumeUserDesign,
-): ResumeUserDesign[] {
+export function fitCandidates(target: FitTarget, current: ResumeUserDesign): ResumeUserDesign[] {
   const normalized = normalizeResumeDesign(current);
   const base = {
     ...current,

@@ -19,7 +19,8 @@ export const Route = createFileRoute("/resumes/$id/preview")({
       { title: "معاينة وتنزيل | سيرتي" },
       {
         name: "description",
-        content: "معاينة الطباعة وتنزيل السيرة الذاتية بصيغة PDF أو نسخة نصية متوافقة مع أنظمة التوظيف.",
+        content:
+          "معاينة الطباعة وتنزيل السيرة الذاتية بصيغة PDF أو نسخة نصية متوافقة مع أنظمة التوظيف.",
       },
       { property: "og:title", content: "معاينة السيرة الذاتية" },
       { property: "og:description", content: "تنزيل PDF أو نسخة نصية ATS." },
@@ -51,7 +52,9 @@ function PreviewResume() {
     return (
       <div className="min-h-screen">
         <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-          <p className="text-lg font-bold">{ar ? "لم نجد هذه السيرة الذاتية" : "Resume not found"}</p>
+          <p className="text-lg font-bold">
+            {ar ? "لم نجد هذه السيرة الذاتية" : "Resume not found"}
+          </p>
           <Button className="mt-6" asChild>
             <Link to="/dashboard">{ar ? "العودة إلى لوحتي" : "Back to dashboard"}</Link>
           </Button>
@@ -133,22 +136,46 @@ function PreviewResume() {
         <div>
           <h1 className="text-xl font-extrabold">{resume.title}</h1>
           <p className="mt-1 text-xs text-muted-foreground">
-            {tpl.name[lang]} · {resume.language.toUpperCase()} · ATS {score}/100 · {page.label} · {design.marginMm}mm
+            {tpl.name[lang]} · {resume.language.toUpperCase()} · ATS {score}/100 · {page.label} ·{" "}
+            {design.marginMm}mm
           </p>
         </div>
         <div className="ms-auto flex flex-wrap gap-2">
-          {tpl.atsFriendly ? <Badge variant="secondary" className="self-center">ATS</Badge> : null}
+          {tpl.atsFriendly ? (
+            <Badge variant="secondary" className="self-center">
+              ATS
+            </Badge>
+          ) : null}
           <Button variant="outline" asChild>
-            <Link to="/resumes/$id/edit" params={{ id: resume.id }}><FileText className="size-4" />{ar ? "تحرير" : "Edit"}</Link>
+            <Link to="/resumes/$id/edit" params={{ id: resume.id }}>
+              <FileText className="size-4" />
+              {ar ? "تحرير" : "Edit"}
+            </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/resumes/$id/studio" params={{ id: resume.id }}><WandSparkles className="size-4" />{ar ? "استوديو التصميم" : "Design studio"}</Link>
+            <Link to="/resumes/$id/studio" params={{ id: resume.id }}>
+              <WandSparkles className="size-4" />
+              {ar ? "استوديو التصميم" : "Design studio"}
+            </Link>
           </Button>
-          <Button variant="outline" onClick={downloadTxt}><Download className="size-4" />{ar ? "نسخة نصية ATS" : "ATS plain text"}</Button>
-          <Button variant="outline" onClick={() => void copyTxt()}><ClipboardCopy className="size-4" />{ar ? "نسخ النص" : "Copy text"}</Button>
-          <Button variant="outline" onClick={printPdf}><Printer className="size-4" />{ar ? "PDF نصي (طباعة)" : "Print / text PDF"}</Button>
+          <Button variant="outline" onClick={downloadTxt}>
+            <Download className="size-4" />
+            {ar ? "نسخة نصية ATS" : "ATS plain text"}
+          </Button>
+          <Button variant="outline" onClick={() => void copyTxt()}>
+            <ClipboardCopy className="size-4" />
+            {ar ? "نسخ النص" : "Copy text"}
+          </Button>
+          <Button variant="outline" onClick={printPdf}>
+            <Printer className="size-4" />
+            {ar ? "PDF نصي (طباعة)" : "Print / text PDF"}
+          </Button>
           <Button onClick={() => void downloadImagePdf()} disabled={exportingImagePdf}>
-            {exportingImagePdf ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+            {exportingImagePdf ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
             {ar ? "تنزيل PDF عالي الدقة" : "Download high-res PDF"}
           </Button>
         </div>
