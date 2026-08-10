@@ -2,7 +2,7 @@ name: Seerati CI
 
 on:
   push:
-    branches: [main, "codex/**", "stage5c/**"]
+    branches: [main, "codex/**", "stage5c/**", "stage5d/**"]
   pull_request:
     branches: [main]
 
@@ -50,6 +50,7 @@ jobs:
           bun run test:templates
           bun run check:rtl
           bun run check:premium-3d
+          node scripts/check-template-gallery-3d.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
