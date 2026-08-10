@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 
+// Stage 5D guard: keep the gallery cinematic, accessible, RTL-safe and print-safe.
 const route = readFileSync("src/routes/templates.tsx", "utf8");
 const component = readFileSync("src/components/template-gallery-3d.tsx", "utf8");
 const css = readFileSync("src/template-gallery-3d.css", "utf8");
