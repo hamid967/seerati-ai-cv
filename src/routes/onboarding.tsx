@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
+import { ResumeInterview } from "@/components/resume-interview";
+import { ResumeImport } from "@/components/resume-import";
+import type { ResumeData } from "@/lib/types";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -28,9 +31,11 @@ function Onboarding() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, resumes, updateProfile, createResume } = useStore();
-  const STEPS = 4;
+  const { user, ready, resumes, updateProfile, createResume, updateResume } = useStore();
+  const STEPS = 5;
   const [step, setStep] = useState(1);
+  const [path, setPath] = useState<"choose" | "manual" | "interview" | "import">("choose");
+  const [importedData, setImportedData] = useState<Partial<ResumeData> | null>(null);
   const [fullName, setFullName] = useState("");
   const [currentTitle, setCurrentTitle] = useState("");
   const [targetRole, setTargetRole] = useState("");
@@ -67,6 +72,11 @@ function Onboarding() {
       language: cvLang,
       jobTitle: targetRole || currentTitle,
     });
+    if (created && importedData) {
+      await updateResume(created.id, {
+        data: { ...created.data, ...importedData, personal: { ...created.data.personal, ...(importedData.personal ?? {}) } },
+      });
+    }
     setSaving(false);
     if (created) {
       toast.success(ar ? "أنشأنا لك سيرة ذاتية للبدء" : "We created a resume to get you started");
@@ -76,14 +86,17 @@ function Onboarding() {
     }
   };
 
+  const interviewing = step === STEPS && path === "interview";
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="mx-auto max-w-xl px-4 py-12">
+      <main className={`mx-auto px-4 py-12 ${interviewing ? "max-w-3xl" : "max-w-xl"}`}>
         <p className="text-xs font-semibold text-muted-foreground">
-          {ar ? `الخطوة ${step} من ٤` : `Step ${step} of ${STEPS}`}
+          {ar ? `الخطوة ${step} من ${STEPS}` : `Step ${step} of ${STEPS}`}
         </p>
         <Progress value={(step / STEPS) * 100} className="mt-3" />
+
 
         {step === 1 && (
           <section className="mt-8 space-y-5">
@@ -193,21 +206,91 @@ function Onboarding() {
           </section>
         )}
 
-        <div className="mt-8 flex gap-3">
-          {step > 1 && (
-            <Button variant="outline" onClick={() => setStep((s) => s - 1)}>
-              {ar ? "رجوع" : "Back"}
-            </Button>
-          )}
-          {step < STEPS ? (
-            <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>
-          ) : (
-            <Button onClick={() => void finish()} disabled={saving}>
-              {saving ? (ar ? "جارٍ التهيئة…" : "Setting up…") : ar ? "ابدأ البناء" : "Start building"}
-            </Button>
-          )}
-        </div>
+        {step === 5 && path === "choose" && (
+          <section className="mt-8 space-y-4">
+            <h1 className="text-2xl font-extrabold">{ar ? "كيف تريد أن نبدأ؟" : "How would you like to start?"}</h1>
+            <p className="text-sm text-muted-foreground">
+              {ar
+                ? "اختر الطريقة الأنسب لك — يمكنك تعديل كل شيء لاحقاً في المحرّر."
+                : "Pick whichever suits you — everything stays editable in the builder."}
+            </p>
+            <div className="grid gap-3">
+              <button
+                onClick={() => setPath("interview")}
+                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+              >
+                <p className="font-semibold">{ar ? "أنشئ سيرتي معي" : "Build my resume with me"}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {ar
+                    ? "أسئلة قصيرة يجيب عليها المساعد معك، ونبني الأقسام تدريجياً."
+                    : "A short guided interview that fills your sections step by step."}
+                </p>
+              </button>
+              <button
+                onClick={() => void finish()}
+                disabled={saving}
+                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60 disabled:opacity-60"
+              >
+                <p className="font-semibold">
+                  {saving ? (ar ? "جارٍ التهيئة…" : "Setting up…") : ar ? "سأكتبها بنفسي" : "I’ll write it myself"}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {ar ? "ننشئ مسودة فارغة وتفتح المحرّر مباشرة." : "We create an empty draft and open the builder."}
+                </p>
+              </button>
+              {hasCv === "yes" && (
+                <button
+                  onClick={() => setPath("import")}
+                  className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+                >
+                  <p className="font-semibold">{ar ? "استيراد سيرتي السابقة" : "Import my existing resume"}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {ar
+                      ? "الصق نص سيرتك (أو ملف .txt) ونستخرج الأقسام لمراجعتها."
+                      : "Paste your resume text (or a .txt file) and review the extracted sections."}
+                  </p>
+                </button>
+              )}
+            </div>
+          </section>
+        )}
+
+        {step === 5 && path === "interview" && (
+          <div className="mt-8">
+            <ResumeInterview
+              lang={cvLang}
+              templateId={templateId}
+              initial={{ fullName, currentTitle, targetJob: targetRole, years, industry }}
+              onCancel={() => setPath("choose")}
+            />
+          </div>
+        )}
+
+        {step === 5 && path === "import" && (
+          <div className="mt-8">
+            <ResumeImport
+              lang={cvLang}
+              onConfirm={(data) => {
+                setImportedData(data);
+                void finish();
+              }}
+              onSkip={() => setPath("choose")}
+            />
+          </div>
+        )}
+
+        {(step < STEPS || path === "choose") && (
+          <div className="mt-8 flex gap-3">
+            {step > 1 && (
+              <Button variant="outline" onClick={() => setStep((s) => s - 1)}>
+                {ar ? "رجوع" : "Back"}
+              </Button>
+            )}
+            {step < STEPS && <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>}
+          </div>
+        )}
       </main>
     </div>
   );
 }
+

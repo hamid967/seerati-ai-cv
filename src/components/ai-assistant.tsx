@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { aiService, summaryWizard, type AiTask } from "@/lib/ai-service";
-import { logAiUsage } from "@/lib/db";
 import { keywordCoverage } from "@/lib/ats";
 import { useI18n } from "@/lib/i18n";
 import type { Resume } from "@/lib/types";
@@ -92,7 +91,6 @@ export function AiAssistant({
       push("assistant", res.text);
       setSuggestion({ task, target, text: res.text, ...(res.items ? { items: res.items } : {}) });
       setLastRun({ task, target, input: text });
-      void logAiUsage(task);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "AI error");
     } finally {

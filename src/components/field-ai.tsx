@@ -3,7 +3,6 @@ import { Check, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { aiService, AI_TASK_LABELS, type AiTask } from "@/lib/ai-service";
-import { logAiUsage } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Resume } from "@/lib/types";
 
@@ -60,7 +59,6 @@ export function FieldAi({
         },
       });
       setSuggestion({ task, text: res.text });
-      void logAiUsage(task);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "AI error");
     } finally {
