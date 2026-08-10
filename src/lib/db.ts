@@ -155,3 +155,42 @@ export async function logAiUsage(task: string) {
   if (!data.user) return;
   await supabase.from("ai_usage").insert({ user_id: data.user.id, task });
 }
+
+export type AppSettings = {
+  id: string;
+  siteName: string;
+  defaultLanguage: "ar" | "en";
+  maxResumes: number;
+  maintenance: boolean;
+  aiMode: string;
+  aiProvider: string | null;
+};
+
+export async function fetchAppSettings(): Promise<AppSettings | null> {
+  const { data } = await supabase.from("app_settings").select("*").limit(1).maybeSingle();
+  if (!data) return null;
+  return {
+    id: data.id,
+    siteName: data.site_name,
+    defaultLanguage: data.default_language === "en" ? "en" : "ar",
+    maxResumes: data.max_resumes,
+    maintenance: data.maintenance,
+    aiMode: data.ai_mode,
+    aiProvider: data.ai_provider,
+  };
+}
+
+export async function saveAppSettings(patch: Partial<AppSettings> & { id: string }) {
+  const { error } = await supabase
+    .from("app_settings")
+    .update({
+      ...(patch.siteName !== undefined ? { site_name: patch.siteName } : {}),
+      ...(patch.defaultLanguage !== undefined ? { default_language: patch.defaultLanguage } : {}),
+      ...(patch.maxResumes !== undefined ? { max_resumes: patch.maxResumes } : {}),
+      ...(patch.maintenance !== undefined ? { maintenance: patch.maintenance } : {}),
+      ...(patch.aiMode !== undefined ? { ai_mode: patch.aiMode } : {}),
+      ...(patch.aiProvider !== undefined ? { ai_provider: patch.aiProvider } : {}),
+    })
+    .eq("id", patch.id);
+  return error ? { error: error.message } : {};
+}

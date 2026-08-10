@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { aiService } from "@/lib/ai-service";
+import { fetchAppSettings, logAudit, saveAppSettings, type AppSettings } from "@/lib/db";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
@@ -26,6 +27,35 @@ function AdminSettings() {
       : "Are templates ATS friendly? | Five single-column templates suit online applications.",
   );
   const [maintenance, setMaintenance] = useState(false);
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [siteName, setSiteName] = useState("سيرتي | Seerati");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    void fetchAppSettings().then((s) => {
+      if (!s) return;
+      setSettings(s);
+      setSiteName(s.siteName);
+      setLimit(s.maxResumes);
+      setMaintenance(s.maintenance);
+    });
+  }, []);
+
+  const save = async () => {
+    if (!settings) {
+      toast.error(ar ? "تعذّر تحميل الإعدادات العامة" : "Global settings unavailable");
+      return;
+    }
+    setSaving(true);
+    const res = await saveAppSettings({ id: settings.id, siteName, maxResumes: limit, maintenance });
+    setSaving(false);
+    if (res.error) {
+      toast.error(ar ? "فشل الحفظ" : "Save failed");
+      return;
+    }
+    await logAudit("settings.update", "app_settings", { maxResumes: limit, maintenance });
+    toast.success(ar ? "تم حفظ الإعدادات" : "Settings saved");
+  };
 
   return (
     <div className="space-y-6">
@@ -69,8 +99,8 @@ function AdminSettings() {
           </div>
           <p className="text-xs text-muted-foreground">
             {ar
-              ? "الحد يُفرض في الواجهة الآن، ومحضّر للفرض على الخادم عبر مشغّل قاعدة بيانات (raise exception عند التجاوز)."
-              : "Enforced in the UI today; prepared for server-side enforcement via a database trigger."}
+              ? "الحد محفوظ في قاعدة البيانات ومفروض على الخادم عبر مشغّل قاعدة بيانات يمنع تجاوز العدد."
+              : "Stored in the database and enforced server-side by a database trigger."}
           </p>
         </CardContent>
       </Card>
@@ -89,14 +119,20 @@ function AdminSettings() {
         <CardHeader>
           <CardTitle className="text-base">{ar ? "إعدادات عامة" : "General"}</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-between">
-          <Label htmlFor="maint">{ar ? "وضع الصيانة" : "Maintenance mode"}</Label>
-          <Switch id="maint" checked={maintenance} onCheckedChange={setMaintenance} />
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="site">{ar ? "اسم الموقع" : "Site name"}</Label>
+            <Input id="site" value={siteName} onChange={(e) => setSiteName(e.target.value)} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="maint">{ar ? "وضع الصيانة" : "Maintenance mode"}</Label>
+            <Switch id="maint" checked={maintenance} onCheckedChange={setMaintenance} />
+          </div>
         </CardContent>
       </Card>
 
-      <Button onClick={() => toast.success(ar ? "تم حفظ الإعدادات في هذه الجلسة" : "Settings saved for this session")}>
-        {ar ? "حفظ" : "Save"}
+      <Button onClick={() => void save()} disabled={saving}>
+        {saving ? (ar ? "جارٍ الحفظ…" : "Saving…") : ar ? "حفظ" : "Save"}
       </Button>
     </div>
   );
