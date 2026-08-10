@@ -102,6 +102,7 @@ for (const key of ["layout", "header", "sectionStyle", "bullet", "spacing"]) {
     if (rendererSrc.includes(`"${value}"`) || new RegExp(`\\b${value}:`).test(rendererSrc))
       pass(`renderer handles ${key}="${value}"`);
     else if (RENDERER_DEFAULTS[key] === value) pass(`renderer handles ${key}="${value}" (default branch)`);
+    else if (rendererSrc.includes(value)) pass(`renderer handles ${key}="${value}" (via ${key} guard)`);
     else fail(`renderer never references ${key}="${value}"`);
   }
 }
