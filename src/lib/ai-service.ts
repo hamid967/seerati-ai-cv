@@ -45,7 +45,7 @@ export class RateLimiter {
     const now = Date.now();
     this.hits = this.hits.filter((t) => now - t < this.config.windowMs);
     if (this.hits.length >= this.config.maxRequests) {
-      const retryIn = Math.ceil((this.config.windowMs - (now - this.hits[0])) / 1000);
+      const retryIn = Math.ceil((this.config.windowMs - (now - (this.hits[0] ?? now))) / 1000);
       return { allowed: false as const, retryIn };
     }
     this.hits.push(now);
