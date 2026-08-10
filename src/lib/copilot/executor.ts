@@ -156,12 +156,14 @@ export function applyToDraft(
       }
       return null;
     }
-    case "update_job_target":
+    case "update_job_target": {
+      const jd = action.payload.jobDescription || draft.jobDescription;
       return {
         ...draft,
         targetJob: action.payload.targetJob,
-        jobDescription: action.payload.jobDescription || draft.jobDescription,
+        ...(jd ? { jobDescription: jd } : {}),
       };
+    }
     default:
       return null;
   }
