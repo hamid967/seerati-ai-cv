@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { AiAssistant } from "@/components/ai-assistant";
+import { FieldAi } from "@/components/field-ai";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,6 +72,52 @@ const sectionLabels: Record<SectionKey, { ar: string; en: string }> = {
   references: { ar: "المراجع", en: "References" },
   custom: { ar: "أقسام مخصصة", en: "Custom sections" },
 };
+
+function swap<T>(arr: T[], a: number, b: number) {
+  if (a < 0 || b < 0 || a >= arr.length || b >= arr.length) return;
+  [arr[a], arr[b]] = [arr[b]!, arr[a]!];
+}
+
+function MoveButtons({
+  ar,
+  upDisabled,
+  downDisabled,
+  vertical,
+  onMove,
+}: {
+  ar: boolean;
+  upDisabled: boolean;
+  downDisabled: boolean;
+  vertical?: boolean;
+  onMove: (dir: -1 | 1) => void;
+}) {
+  return (
+    <div className={vertical ? "flex flex-col gap-1" : "flex gap-1"}>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="size-7"
+        aria-label={ar ? "تحريك لأعلى" : "Move up"}
+        disabled={upDisabled}
+        onClick={() => onMove(-1)}
+      >
+        <ArrowUp className="size-3.5" />
+      </Button>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="size-7"
+        aria-label={ar ? "تحريك لأسفل" : "Move down"}
+        disabled={downDisabled}
+        onClick={() => onMove(1)}
+      >
+        <ArrowDown className="size-3.5" />
+      </Button>
+    </div>
+  );
+}
+
+
 
 function EditResume() {
   const { id } = Route.useParams();
@@ -222,18 +270,70 @@ function EditResume() {
               <SheetTrigger asChild>
                 <Button size="sm" variant="outline" className="lg:hidden">
                   <Eye className="size-4" />
-                  {ar ? "معاينة" : "Preview"}
+                  {ar ? "معاينة ومساعد" : "Preview & AI"}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="h-[88vh] overflow-auto">
+              <SheetContent side="bottom" className="flex h-[90vh] flex-col overflow-hidden">
                 <SheetHeader>
-                  <SheetTitle>{ar ? "معاينة مباشرة" : "Live preview"}</SheetTitle>
+                  <SheetTitle>{ar ? "معاينة ومساعد سيرتي" : "Preview & assistant"}</SheetTitle>
                 </SheetHeader>
-                <div className="mt-3">
-                  <ResumePreview resume={draft} />
-                </div>
+                <Tabs defaultValue="preview" className="mt-2 flex min-h-0 flex-1 flex-col">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="preview" className="flex-1">{ar ? "معاينة" : "Preview"}</TabsTrigger>
+                    <TabsTrigger value="ai" className="flex-1">{ar ? "مساعد" : "Assistant"}</TabsTrigger>
+                    <TabsTrigger value="ats" className="flex-1">ATS</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="preview" className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl bg-secondary/40 p-2">
+                    <ResumePreview resume={draft} />
+                  </TabsContent>
+                  <TabsContent value="ai" className="mt-2 min-h-0 flex-1">
+                    <AiAssistant
+                      resume={draft}
+                      section={step}
+                      onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                      onApplyBullets={(bullets) =>
+                        setData((data) => {
+                          if (!data.experience.length) data.experience.push({ id: uid(), role: "", company: "", bullets });
+                          else data.experience[0]!.bullets = bullets;
+                        })
+                      }
+                      onAddSkills={(skills) =>
+                        setData((data) => {
+                          skills.forEach((name) => {
+                            if (name && !data.skills.some((s) => s.name.toLowerCase() === name.toLowerCase()))
+                              data.skills.push({ id: uid(), name });
+                          });
+                        })
+                      }
+                    />
+                  </TabsContent>
+                  <TabsContent value="ats" className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl border border-border p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="font-bold">{ar ? "جاهزية ATS" : "ATS readiness"}</p>
+                      <p className="text-lg font-extrabold text-emerald-accent">{score}/100</p>
+                    </div>
+                    <Progress value={score} className="mt-2" />
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      {ar
+                        ? "النتيجة إرشادية مبنية على قواعد كتابة معروفة، وليست تقييماً من نظام توظيف فعلي."
+                        : "The score is advisory, based on known writing rules — not a verdict from a real ATS."}
+                    </p>
+                    <ul className="mt-3 space-y-2">
+                      {(report?.categories ?? []).map((c) => (
+                        <li key={c.id} className="rounded-lg border border-border p-2.5">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="text-[12px] font-semibold">{c.label[lang]}</span>
+                            <span className="text-[12px] text-muted-foreground">{c.earned}/{c.max}</span>
+                          </div>
+                          {c.tips[0] && <p className="mt-1 text-[11px] text-muted-foreground">{c.tips[0][lang]}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  </TabsContent>
+                </Tabs>
               </SheetContent>
             </Sheet>
+
             <Button size="sm" variant="outline" asChild>
               <Link to="/resumes/$id/preview" params={{ id: draft.id }}>
                 <Eye className="size-4" />
@@ -321,6 +421,14 @@ function EditResume() {
                 <p className="text-xs text-muted-foreground">
                   {ar ? "عدد الكلمات" : "Words"}: {d.summary.trim().split(/\s+/).filter(Boolean).length}
                 </p>
+                <FieldAi
+                  resume={draft}
+                  value={d.summary}
+                  section="summary"
+                  jobDescription={jobDescription}
+                  onApply={(text) => setData((data) => { data.summary = text; })}
+                />
+
               </div>
             )}
 
@@ -328,6 +436,19 @@ function EditResume() {
               <div className="space-y-5">
                 {d.experience.map((e, idx) => (
                   <div key={e.id} className="rounded-xl border border-border p-4">
+                    <div className="mb-3 flex items-center gap-1">
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {ar ? "خبرة" : "Experience"} {idx + 1}
+                      </span>
+                      <div className="ms-auto flex items-center gap-1">
+                        <MoveButtons
+                          ar={ar}
+                          upDisabled={idx === 0}
+                          downDisabled={idx === d.experience.length - 1}
+                          onMove={(dir) => setData((data) => { swap(data.experience, idx, idx + dir); })}
+                        />
+                      </div>
+                    </div>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Input placeholder={ar ? "المسمى الوظيفي" : "Role"} value={e.role} onChange={(ev) => setData((data) => { data.experience[idx]!.role = ev.target.value; })} />
                       <Input placeholder={ar ? "جهة العمل" : "Company"} value={e.company} onChange={(ev) => setData((data) => { data.experience[idx]!.company = ev.target.value; })} />
@@ -341,18 +462,36 @@ function EditResume() {
                       <Checkbox checked={Boolean(e.current)} onCheckedChange={(v) => setData((data) => { data.experience[idx]!.current = Boolean(v); })} />
                       {ar ? "أعمل هنا حالياً" : "I currently work here"}
                     </label>
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-3 space-y-3">
                       <Label>{ar ? "نقاط الإنجاز" : "Achievement bullets"}</Label>
                       {e.bullets.map((b, bi) => (
-                        <div key={bi} className="flex gap-2">
-                          <Textarea
-                            rows={2}
+                        <div key={bi} className="space-y-1.5 rounded-lg bg-secondary/40 p-2.5">
+                          <div className="flex gap-2">
+                            <Textarea
+                              rows={2}
+                              value={b}
+                              onChange={(ev) => setData((data) => { data.experience[idx]!.bullets[bi] = ev.target.value; })}
+                            />
+                            <div className="flex flex-col gap-1">
+                              <MoveButtons
+                                ar={ar}
+                                vertical
+                                upDisabled={bi === 0}
+                                downDisabled={bi === e.bullets.length - 1}
+                                onMove={(dir) => setData((data) => { swap(data.experience[idx]!.bullets, bi, bi + dir); })}
+                              />
+                              <Button variant="ghost" size="icon" className="size-7" aria-label={ar ? "حذف" : "Delete"} onClick={() => setData((data) => { data.experience[idx]!.bullets.splice(bi, 1); })}>
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                          <FieldAi
+                            resume={draft}
                             value={b}
-                            onChange={(ev) => setData((data) => { data.experience[idx]!.bullets[bi] = ev.target.value; })}
+                            section="experience"
+                            jobDescription={jobDescription}
+                            onApply={(text) => setData((data) => { data.experience[idx]!.bullets[bi] = text; })}
                           />
-                          <Button variant="ghost" size="icon" aria-label={ar ? "حذف" : "Delete"} onClick={() => setData((data) => { data.experience[idx]!.bullets.splice(bi, 1); })}>
-                            <Trash2 className="size-4" />
-                          </Button>
                         </div>
                       ))}
                       <Button size="sm" variant="outline" onClick={() => setData((data) => { data.experience[idx]!.bullets.push(""); })}>
@@ -370,6 +509,7 @@ function EditResume() {
                       {ar ? "حذف الخبرة" : "Remove experience"}
                     </Button>
                   </div>
+
                 ))}
                 <Button
                   onClick={() =>
@@ -395,10 +535,19 @@ function EditResume() {
                       <Input placeholder={ar ? "إلى" : "To"} value={e.end ?? ""} onChange={(ev) => setData((data) => { data.education[idx]!.end = ev.target.value; })} />
                     </div>
                     <Input placeholder={ar ? "ملاحظة (التقدير مثلاً)" : "Note (e.g. GPA)"} value={e.note ?? ""} onChange={(ev) => setData((data) => { data.education[idx]!.note = ev.target.value; })} />
-                    <Button size="sm" variant="ghost" className="text-destructive sm:col-span-2" onClick={() => setData((data) => { data.education.splice(idx, 1); })}>
-                      <Trash2 className="size-4" />
-                      {ar ? "حذف" : "Remove"}
-                    </Button>
+                    <div className="flex items-center gap-1 sm:col-span-2">
+                      <MoveButtons
+                        ar={ar}
+                        upDisabled={idx === 0}
+                        downDisabled={idx === d.education.length - 1}
+                        onMove={(dir) => setData((data) => { swap(data.education, idx, idx + dir); })}
+                      />
+                      <Button size="sm" variant="ghost" className="ms-auto text-destructive" onClick={() => setData((data) => { data.education.splice(idx, 1); })}>
+                        <Trash2 className="size-4" />
+                        {ar ? "حذف" : "Remove"}
+                      </Button>
+                    </div>
+
                   </div>
                 ))}
                 <Button onClick={() => setData((data) => { data.education.push({ id: uid(), degree: "", school: "" }); })}>
@@ -470,9 +619,16 @@ function EditResume() {
                       <div key={item.id} className="mb-2 flex gap-2">
                         <Input value={item.title} placeholder={ar ? "العنوان" : "Title"} onChange={(ev) => setData((data) => { data[key][idx]!.title = ev.target.value; })} />
                         <Input value={item.detail ?? ""} placeholder={ar ? "التفاصيل" : "Detail"} onChange={(ev) => setData((data) => { data[key][idx]!.detail = ev.target.value; })} />
+                        <MoveButtons
+                          ar={ar}
+                          upDisabled={idx === 0}
+                          downDisabled={idx === d[key].length - 1}
+                          onMove={(dir) => setData((data) => { swap(data[key], idx, idx + dir); })}
+                        />
                         <Button variant="ghost" size="icon" aria-label={ar ? "حذف" : "Remove"} onClick={() => setData((data) => { data[key].splice(idx, 1); })}>
                           <Trash2 className="size-4" />
                         </Button>
+
                       </div>
                     ))}
                     <Button size="sm" variant="outline" onClick={() => setData((data) => { data[key].push({ id: uid(), title: "", detail: "" }); })}>
