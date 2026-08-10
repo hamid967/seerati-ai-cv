@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { TaxonomyInput } from "@/components/taxonomy-input";
+import { cityOptions, titleOptions } from "@/lib/saudi-career-taxonomy";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -206,7 +208,11 @@ function JobsIndex() {
         <div className="grid gap-3">
           <div className="grid gap-1.5">
             <Label>{ar ? "المسمى الوظيفي" : "Job title"}</Label>
-            <Input value={form.jobTitle} onChange={(e) => setForm({ ...form, jobTitle: e.target.value })} />
+            <TaxonomyInput
+              value={form.jobTitle}
+              options={titleOptions(ar ? "ar" : "en")}
+              onChange={(v) => setForm({ ...form, jobTitle: v })}
+            />
           </div>
           <div className="grid gap-1.5">
             <Label>{ar ? "الشركة" : "Company"}</Label>
@@ -215,7 +221,11 @@ function JobsIndex() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="grid gap-1.5">
               <Label>{ar ? "الموقع" : "Location"}</Label>
-              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+              <TaxonomyInput
+                value={form.location}
+                options={cityOptions(ar ? "ar" : "en")}
+                onChange={(v) => setForm({ ...form, location: v })}
+              />
             </div>
             <div className="grid gap-1.5">
               <Label>{ar ? "رابط الوظيفة" : "Job URL"}</Label>
