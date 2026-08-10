@@ -487,14 +487,19 @@ function ImportCenterPage() {
         )}
 
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => void save()} disabled={busy}>
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-            {ar ? "حفظ في ملفي المهني" : "Save to my profile"}
+          <Button onClick={() => void save("gaps")} disabled={busy}>
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+            {ar ? "اعتماد واستكمال مع المساعد" : "Approve and continue with the copilot"}
+          </Button>
+          <Button variant="outline" onClick={() => void save("only")} disabled={busy}>
+            <Upload className="size-4" />
+            {ar ? "استيراد فقط" : "Import only"}
           </Button>
           <Button variant="ghost" onClick={() => setStep("source")} disabled={busy}>
             {ar ? "رجوع" : "Back"}
           </Button>
         </div>
+
       </div>
     );
   }
