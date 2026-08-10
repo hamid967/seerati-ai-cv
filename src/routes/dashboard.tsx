@@ -219,14 +219,24 @@ function Dashboard() {
                       </span>
                     </div>
 
-                    <div className="mt-5 flex gap-2">
+                    <div className="mt-5 flex flex-wrap gap-2">
                       <Button size="sm" className="flex-1" asChild>
-                        <Link to="/resumes/$id/edit" params={{ id: r.id }}>{t("edit")}</Link>
+                        <Link to="/resumes/$id/edit" params={{ id: r.id }}>
+                          {ar ? "أكمل التحرير" : "Continue editing"}
+                        </Link>
                       </Button>
                       <Button size="sm" variant="outline" className="flex-1" asChild>
-                        <Link to="/resumes/$id/preview" params={{ id: r.id }}>{t("preview")}</Link>
+                        <Link to="/resumes/$id/edit" params={{ id: r.id }} hash="ats">
+                          {ar ? "فحص ATS" : "Analyze ATS"}
+                        </Link>
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1" asChild>
+                        <Link to="/resumes/$id/preview" params={{ id: r.id }}>
+                          {ar ? "معاينة وتنزيل" : "Preview & download"}
+                        </Link>
                       </Button>
                     </div>
+
                   </CardContent>
                 </Card>
               );
