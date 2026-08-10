@@ -75,7 +75,7 @@ export function SiteHeader() {
                 )}
                 <DropdownMenuItem
                   onClick={() => {
-                    signOut();
+                    void signOut();
                     router.navigate({ to: "/" });
                   }}
                 >

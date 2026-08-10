@@ -139,15 +139,15 @@ function AuthPage() {
                   {errors['password'] && <p className="text-xs text-destructive">{errors['password']}</p>}
                 </div>
               )}
-              <Button type="submit" className="w-full" size="lg">
+              <Button type="submit" className="w-full" size="lg" disabled={busy}>
                 {tab === "signin" ? t("auth_signin") : tab === "signup" ? t("auth_signup") : t("auth_reset")}
               </Button>
             </form>
 
             <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground">
               {ar
-                ? "نسخة تجريبية: الحساب يُحفظ في هذا المتصفح فقط. استخدم بريداً يبدأ بـ admin للدخول إلى لوحة الإدارة."
-                : "Demo build: accounts are stored in this browser only. Use an email starting with “admin” to reach the admin panel."}
+                ? "حسابك محفوظ بأمان في السحابة. الحد الأقصى ٣ سير ذاتية لكل حساب."
+                : "Your account is stored securely in the cloud. Up to 3 resumes per account."}
             </p>
             <p className="mt-3 text-center text-xs">
               <Link to="/" className="text-primary hover:underline">
