@@ -44,8 +44,9 @@ import {
   type JobWorkspace,
   type CareerTwin,
   type ApplicationAsset,
+  type MatchGap,
 } from "@/lib/career";
-import { parseJobDescription, matchTwinToJob, GAP_LABEL, type MatchGap } from "@/lib/job-match";
+import { parseJobDescription, matchTwinToJob, GAP_LABEL } from "@/lib/job-match";
 import { agentsForSurface } from "@/lib/team";
 
 export const Route = createFileRoute("/jobs/$id")({
