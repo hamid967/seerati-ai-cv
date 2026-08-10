@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareerTwinRouteImport } from './routes/career-twin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as ImportRouteImport } from './routes/import'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TemplatesRouteImport } from './routes/templates'
@@ -70,6 +71,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const FeaturesRoute = FeaturesRouteImport.update({
   id: '/features',
   path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportRoute = ImportRouteImport.update({
+  id: '/import',
+  path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
+  '/import': typeof ImportRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/templates': typeof TemplatesRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
+  '/import': typeof ImportRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/templates': typeof TemplatesRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
+  '/import': typeof ImportRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/templates': typeof TemplatesRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/career-twin'
     | '/dashboard'
     | '/features'
+    | '/import'
     | '/onboarding'
     | '/privacy'
     | '/templates'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/career-twin'
     | '/dashboard'
     | '/features'
+    | '/import'
     | '/onboarding'
     | '/privacy'
     | '/templates'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/career-twin'
     | '/dashboard'
     | '/features'
+    | '/import'
     | '/onboarding'
     | '/privacy'
     | '/templates'
@@ -298,6 +310,7 @@ export interface RootRouteChildren {
   CareerTwinRoute: typeof CareerTwinRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
+  ImportRoute: typeof ImportRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   TemplatesRoute: typeof TemplatesRoute
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/features'
       fullPath: '/features'
       preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/import': {
+      id: '/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof ImportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareerTwinRoute: CareerTwinRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
+  ImportRoute: ImportRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   TemplatesRoute: TemplatesRoute,
