@@ -118,16 +118,17 @@ export function applyExperienceChoice(
   if (choice === "replace") {
     return list.map((e) => (e.id === hit.existing!.id ? { ...hit.incoming, id: e.id } : e));
   }
-  return list.map((e) =>
-    e.id === hit.existing!.id
-      ? {
-          ...e,
-          role: e.role || hit.incoming.role,
-          company: e.company || hit.incoming.company,
-          start: e.start || hit.incoming.start,
-          end: e.end || hit.incoming.end,
-          bullets: dedupeBullets([...e.bullets, ...hit.incoming.bullets]),
-        }
-      : e,
-  );
+  return list.map<Experience>((e) => {
+    if (e.id !== hit.existing!.id) return e;
+    const start = e.start || hit.incoming.start;
+    const end = e.end || hit.incoming.end;
+    return {
+      ...e,
+      role: e.role || hit.incoming.role,
+      company: e.company || hit.incoming.company,
+      ...(start ? { start } : {}),
+      ...(end ? { end } : {}),
+      bullets: dedupeBullets([...e.bullets, ...hit.incoming.bullets]),
+    };
+  });
 }
