@@ -1,7 +1,9 @@
 name: Stage5G Prettier Autofix
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - stage5g/smart-pagination-page-composer
 
 permissions:
   contents: write
