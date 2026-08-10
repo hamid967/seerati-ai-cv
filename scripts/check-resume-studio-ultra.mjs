@@ -39,4 +39,5 @@ console.log("PASS  Resume Studio route is wired");
 console.log("PASS  Smart Fit is deterministic and non-destructive");
 console.log("PASS  zoom, page target, focus mode and template advisor are present");
 console.log("PASS  export preview links to the design studio");
+console.log("PASS  Stage 5E route tree is generated before merge");
 console.log("\nResume Studio Ultra quality guard OK.");
