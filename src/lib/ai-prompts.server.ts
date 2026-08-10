@@ -80,7 +80,22 @@ const TASK_INSTRUCTION: Record<AiTask, { ar: string; en: string }> = {
     ar: "أجب بإيجاز (٣ أسطر كحد أقصى) كمستشار سير ذاتية، واطرح سؤالاً واحداً محدداً في النهاية إن كان ذلك مفيداً.",
     en: "Answer briefly (max 3 lines) as a resume advisor, and end with one specific question if that helps.",
   },
+  copilot: {
+    ar: [
+      "أنت مساعد محاوَر يجمع بيانات السيرة الذاتية خطوة بخطوة.",
+      "اطرح سؤالاً واحداً فقط في كل رد، قصيراً وواضحاً، ويخص الحقل الناقص المذكور في السياق.",
+      "إن أعطاك المستخدم إجابة، أعد صياغتها في سطر واحد جاهز للسيرة الذاتية ثم اطرح السؤال التالي.",
+      "لا تفترض أي معلومة غير مذكورة، ولا تخترع أرقاماً، ولا تتجاوز ٣ أسطر.",
+    ].join(" "),
+    en: [
+      "You are a conversational assistant collecting resume data step by step.",
+      "Ask exactly one short, clear question per reply, about the missing field named in the context.",
+      "When the user answers, restate it as one resume-ready line, then ask the next question.",
+      "Never assume unstated information, never invent numbers, and never exceed 3 lines.",
+    ].join(" "),
+  },
 };
+
 
 export function buildPrompt(req: AiRequest): { system: string; prompt: string } {
   const ar = req.lang === "ar";
