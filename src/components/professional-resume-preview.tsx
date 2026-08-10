@@ -52,9 +52,9 @@ export const ProfessionalResumePreview = forwardRef<
     sections.forEach((section, index) => {
       const key = keys[index];
       if (!key) return;
-      section.dataset.cvSectionKey = key;
-      section.dataset.manualBreak = manualBreaks.has(key) ? "true" : "false";
-      section.dataset.keepTogether = keepTogether.has(key) ? "true" : "false";
+      section.dataset["cvSectionKey"] = key;
+      section.dataset["manualBreak"] = manualBreaks.has(key) ? "true" : "false";
+      section.dataset["keepTogether"] = keepTogether.has(key) ? "true" : "false";
       section.style.breakBefore = manualBreaks.has(key) ? "page" : "auto";
       section.style.pageBreakBefore = manualBreaks.has(key) ? "always" : "auto";
       section.style.breakInside = keepTogether.has(key) ? "avoid" : "auto";
