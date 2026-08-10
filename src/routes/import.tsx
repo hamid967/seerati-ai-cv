@@ -452,7 +452,7 @@ function ImportCenterPage() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{title || sub}</p>
                         {title && sub && <p className="truncate text-xs text-muted-foreground">{sub}</p>}
-                        {(v["start"] || v["end"]) && (
+                        {Boolean(v["start"] || v["end"]) && (
                           <p className="text-xs text-muted-foreground">
                             {String(v["start"] ?? "")} – {String(v["end"] ?? "")}
                           </p>
