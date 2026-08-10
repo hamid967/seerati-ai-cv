@@ -10,6 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { analyzeResume } from "@/lib/ats";
 import { explainFinding, LINT_CATEGORY_LABEL, lintResume } from "@/lib/resume-lint";
+import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
+import { emptyFactGraph } from "@/lib/career-facts";
+import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
 import { demoResume } from "@/lib/demo-data";
 import { getTemplate } from "@/components/resume-preview";
 
