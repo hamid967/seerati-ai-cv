@@ -294,7 +294,7 @@ function EvidenceVaultPage() {
       ) : null}
 
       <div className="mt-6">
-        <AchievementInterview userId={user.id} onSaved={() => void refresh(user.id)} />
+        {user ? <AchievementInterview userId={user.id} onSaved={() => void refresh(user.id)} /> : null}
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
