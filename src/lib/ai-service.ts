@@ -168,24 +168,67 @@ const localProvider: AiProvider = {
   },
 };
 
-const activeProvider: AiProvider = localProvider;
+/* ----------------------------- gateway provider --------------------------- */
+
+const gatewayProvider: AiProvider = {
+  id: "lovable-ai-gateway",
+  async run(req) {
+    const res = await runAiTask({ data: req });
+    if (res.ok) return { text: res.text, ...(res.items ? { items: res.items } : {}) };
+
+    const ar = req.lang === "ar";
+    if (res.code === "rate_limited") {
+      throw new AiUserError(
+        ar
+          ? "تجاوزت عدد الطلبات المسموح في الدقيقة. انتظر قليلاً ثم أعد المحاولة."
+          : "You have exceeded the per-minute request limit. Please wait a moment and retry.",
+      );
+    }
+    if (res.code === "quota_exceeded") {
+      throw new AiUserError(
+        ar
+          ? "استنفدت حصتك اليومية من طلبات الذكاء الاصطناعي. حاول غداً."
+          : "You have used your daily AI quota. Please try again tomorrow.",
+      );
+    }
+    throw new Error(res.code);
+  },
+};
+
+/** Error whose message is already user-facing and must not trigger a fallback. */
+export class AiUserError extends Error {}
+
 const limiter = new RateLimiter({ maxRequests: 25, windowMs: 60_000 });
 
 export const aiService = {
-  providerId: activeProvider.id,
-  isMock: activeProvider.id === "local-draft",
+  providerId: gatewayProvider.id,
+  isMock: false,
+  /** Provider that served the most recent successful request. */
+  lastProvider: gatewayProvider.id as string,
   async run(req: AiRequest): Promise<AiResponse> {
     const gate = limiter.check();
     if (!gate.allowed) {
-      throw new Error(
+      throw new AiUserError(
         req.lang === "ar"
           ? `تم تجاوز الحد المسموح، أعد المحاولة بعد ${gate.retryIn} ثانية.`
           : `Rate limit reached, retry in ${gate.retryIn}s.`,
       );
     }
-    return activeProvider.run(req);
+
+    try {
+      const result = await gatewayProvider.run(req);
+      aiService.lastProvider = gatewayProvider.id;
+      return result;
+    } catch (error) {
+      // Rate limits and quota messages are final — never mask them with a draft.
+      if (error instanceof AiUserError) throw error;
+      console.warn("[ai] gateway unavailable, using local draft provider", error);
+      aiService.lastProvider = localProvider.id;
+      return localProvider.run(req);
+    }
   },
 };
+
 
 /* --------------------------------- wizard --------------------------------- */
 
