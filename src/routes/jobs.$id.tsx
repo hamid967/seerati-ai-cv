@@ -766,6 +766,31 @@ function JobWorkspacePage() {
           />
         </div>
 
+        <div className="mt-6">
+          <CoverLetterPanel
+            userId={user.id}
+            jobId={job.id}
+            jobTitle={job.jobTitle}
+            company={job.company}
+            jobDescription={form.jobDescription}
+            graph={graph}
+            twin={twin}
+            resumeData={(baseResume?.data as ResumeData | undefined) ?? null}
+            resumeId={baseResume?.id ?? null}
+            existing={letter}
+            onSaved={() => {
+              void listCoverLetters(job.id).then((l) => setLetter(l[0] ?? null));
+              void addJobEvent(user.id, {
+                jobId: job.id,
+                eventType: "cover_letter",
+                title: ar ? "حفظ خطاب التقديم" : "Cover letter saved",
+              }).then(refreshEvents);
+            }}
+          />
+        </div>
+
+
+
         <section id="interview-pack" className="mt-6 space-y-3">
           <div>
             <h2 className="text-lg font-bold">{ar ? "تحضير المقابلة بالأدلة" : "Evidence-based interview prep"}</h2>
