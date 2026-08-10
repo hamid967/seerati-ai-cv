@@ -197,7 +197,24 @@
     box-shadow: none !important;
     transform: none !important;
   }
+  /* Keep single entries (a role, a degree, a card) from splitting across pages. */
+  #print-area [data-cv-item],
+  #print-area li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  #print-area [data-cv-section] {
+    break-inside: auto;
+  }
+  #print-area h1,
+  #print-area h2,
+  #print-area h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
   @page {
+    size: A4;
     margin: 12mm;
   }
 }
+
