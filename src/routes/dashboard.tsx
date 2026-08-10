@@ -29,8 +29,12 @@ import {
   twinHealth,
   type AgentActivity,
   type CareerTask,
+  type CareerTwin,
   type JobWorkspace,
 } from "@/lib/career";
+import { emptyFactGraph, loadFactGraph, type FactGraph } from "@/lib/career-facts";
+import { computeNextActions } from "@/lib/next-best-action";
+import { NextBestActions } from "@/components/next-best-actions";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
