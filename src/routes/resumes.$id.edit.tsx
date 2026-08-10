@@ -380,6 +380,19 @@ function EditResume() {
               <div className="space-y-5">
                 {d.experience.map((e, idx) => (
                   <div key={e.id} className="rounded-xl border border-border p-4">
+                    <div className="mb-3 flex items-center gap-1">
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {ar ? "خبرة" : "Experience"} {idx + 1}
+                      </span>
+                      <div className="ms-auto flex items-center gap-1">
+                        <MoveButtons
+                          ar={ar}
+                          upDisabled={idx === 0}
+                          downDisabled={idx === d.experience.length - 1}
+                          onMove={(dir) => setData((data) => { swap(data.experience, idx, idx + dir); })}
+                        />
+                      </div>
+                    </div>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Input placeholder={ar ? "المسمى الوظيفي" : "Role"} value={e.role} onChange={(ev) => setData((data) => { data.experience[idx]!.role = ev.target.value; })} />
                       <Input placeholder={ar ? "جهة العمل" : "Company"} value={e.company} onChange={(ev) => setData((data) => { data.experience[idx]!.company = ev.target.value; })} />
@@ -393,18 +406,36 @@ function EditResume() {
                       <Checkbox checked={Boolean(e.current)} onCheckedChange={(v) => setData((data) => { data.experience[idx]!.current = Boolean(v); })} />
                       {ar ? "أعمل هنا حالياً" : "I currently work here"}
                     </label>
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-3 space-y-3">
                       <Label>{ar ? "نقاط الإنجاز" : "Achievement bullets"}</Label>
                       {e.bullets.map((b, bi) => (
-                        <div key={bi} className="flex gap-2">
-                          <Textarea
-                            rows={2}
+                        <div key={bi} className="space-y-1.5 rounded-lg bg-secondary/40 p-2.5">
+                          <div className="flex gap-2">
+                            <Textarea
+                              rows={2}
+                              value={b}
+                              onChange={(ev) => setData((data) => { data.experience[idx]!.bullets[bi] = ev.target.value; })}
+                            />
+                            <div className="flex flex-col gap-1">
+                              <MoveButtons
+                                ar={ar}
+                                vertical
+                                upDisabled={bi === 0}
+                                downDisabled={bi === e.bullets.length - 1}
+                                onMove={(dir) => setData((data) => { swap(data.experience[idx]!.bullets, bi, bi + dir); })}
+                              />
+                              <Button variant="ghost" size="icon" className="size-7" aria-label={ar ? "حذف" : "Delete"} onClick={() => setData((data) => { data.experience[idx]!.bullets.splice(bi, 1); })}>
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                          <FieldAi
+                            resume={draft}
                             value={b}
-                            onChange={(ev) => setData((data) => { data.experience[idx]!.bullets[bi] = ev.target.value; })}
+                            section="experience"
+                            jobDescription={jobDescription}
+                            onApply={(text) => setData((data) => { data.experience[idx]!.bullets[bi] = text; })}
                           />
-                          <Button variant="ghost" size="icon" aria-label={ar ? "حذف" : "Delete"} onClick={() => setData((data) => { data.experience[idx]!.bullets.splice(bi, 1); })}>
-                            <Trash2 className="size-4" />
-                          </Button>
                         </div>
                       ))}
                       <Button size="sm" variant="outline" onClick={() => setData((data) => { data.experience[idx]!.bullets.push(""); })}>
@@ -422,6 +453,7 @@ function EditResume() {
                       {ar ? "حذف الخبرة" : "Remove experience"}
                     </Button>
                   </div>
+
                 ))}
                 <Button
                   onClick={() =>
