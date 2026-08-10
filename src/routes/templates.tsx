@@ -59,6 +59,13 @@ function TemplatesPage() {
             ? "كل قالب مبني كمكوّن مستقل، ويمكن تبديله في أي وقت دون فقدان بياناتك."
             : "Each template is a standalone component and can be switched anytime without losing your data."}
         </p>
+        <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+          {/* Badges below reflect actual registry metadata plus the static checks in
+              scripts/template-smoke.mjs and scripts/validate-rtl.mjs — not a visual audit. */}
+          {ar
+            ? "الشارات أدناه مبنية على إعدادات القالب الفعلية وفحوصات آلية للبنية والاتجاه وحالات المحتوى الطويل، وليست تقييماً بصرياً يدوياً."
+            : "The badges below reflect real template configuration plus automated structure, direction and long-content checks — not a manual visual audit."}
+        </p>
 
         <div className="mt-6 flex flex-wrap gap-2">
           {filters.map((f) => (
@@ -85,9 +92,20 @@ function TemplatesPage() {
               </div>
               <div className="flex items-center justify-between gap-2">
                 <p className="font-bold">{tpl.name[lang]}</p>
-                <div className="flex gap-1">
-                  {tpl.atsFriendly && <Badge variant="outline" className="text-[10px]">ATS</Badge>}
-                  {tpl.supportsRTL && <Badge variant="secondary" className="text-[10px]">RTL</Badge>}
+                <div className="flex flex-wrap justify-end gap-1">
+                  {tpl.atsFriendly && (
+                    <Badge variant="outline" className="text-[10px]">
+                      {ar ? "إعداد متوافق مع ATS" : "ATS-friendly config"}
+                    </Badge>
+                  )}
+                  {tpl.supportsRTL && (
+                    <Badge variant="secondary" className="text-[10px]">
+                      {ar ? "RTL مفحوص" : "RTL checked"}
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="text-[10px]">
+                    {ar ? "مُختبر بحالات ضغط" : "Stress-fixture checked"}
+                  </Badge>
                 </div>
               </div>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{tpl.description[lang]}</p>
