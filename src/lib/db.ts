@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import { baseDesign, defaultTemplates } from "./templates";
 import type { TemplateDef } from "./types";
 
-/** Cloud reads/writes for templates, admin users list and the audit log. */
+/** Cloud reads/writes for templates, admin users, settings and the audit log. */
 
 type TemplateRow = {
   id: string;
@@ -18,25 +19,25 @@ type TemplateRow = {
   design: unknown;
 };
 
-const defaultDesign: TemplateDef["design"] = {
-  accent: "#1e3a5f",
-  headingFont: "sans",
-  spacing: "normal",
-  sectionStyle: "line",
-  layout: "single",
+export const rowToTemplate = (row: TemplateRow): TemplateDef => {
+  const seed = defaultTemplates.find((t) => t.id === row.id);
+  return {
+    id: row.id,
+    name: { ar: row.name_ar, en: row.name_en },
+    description: { ar: row.description_ar ?? "", en: row.description_en ?? "" },
+    category: row.category as TemplateDef["category"],
+    supportsRTL: row.supports_rtl,
+    atsFriendly: row.ats_friendly,
+    active: row.active,
+    order: row.display_order,
+    design: {
+      ...baseDesign,
+      ...(seed?.design ?? {}),
+      ...((row.design as Partial<TemplateDef["design"]>) ?? {}),
+    },
+  };
 };
 
-export const rowToTemplate = (row: TemplateRow): TemplateDef => ({
-  id: row.id,
-  name: { ar: row.name_ar, en: row.name_en },
-  description: { ar: row.description_ar ?? "", en: row.description_en ?? "" },
-  category: row.category as TemplateDef["category"],
-  supportsRTL: row.supports_rtl,
-  atsFriendly: row.ats_friendly,
-  active: row.active,
-  order: row.display_order,
-  design: { ...defaultDesign, ...((row.design as TemplateDef["design"]) ?? {}) },
-});
 
 export async function fetchTemplates(includeInactive = false): Promise<TemplateDef[]> {
   let query = supabase.from("templates").select("*").order("display_order");
