@@ -737,6 +737,82 @@ function JobWorkspacePage() {
             ))}
           </div>
         </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          {snapshot ? (
+            <RecruiterSnapshotCard snapshot={snapshot} />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  {ar ? "نظرة مسؤول التوظيف — ملخص سريع" : "Recruiter Snapshot"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  {ar
+                    ? "أنشئ سيرة أولاً لعرض الملخص السريع."
+                    : "Create a resume first to see the snapshot."}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          <ApplicationTimeline
+            userId={user.id}
+            jobId={job.id}
+            events={events}
+            loading={loadingEvents}
+            onChanged={refreshEvents}
+          />
+        </div>
+
+        <section id="interview-pack" className="mt-6 space-y-3">
+          <div>
+            <h2 className="text-lg font-bold">{ar ? "تحضير المقابلة بالأدلة" : "Evidence-based interview prep"}</h2>
+            <p className="text-xs text-muted-foreground">
+              {ar
+                ? "قائمة التحضير: ٣ قصص جاهزة، أسئلة عن الوظيفة، ومهارات ناقصة من الوصف الوظيفي."
+                : "Checklist: 3 ready stories, questions about the job, and skill gaps from the description."}
+            </p>
+          </div>
+
+          <Card>
+            <CardContent className="space-y-2 p-4 text-xs">
+              <p>
+                {ar ? "قصص STAR الجاهزة: " : "Ready STAR stories: "}
+                <span className="font-bold">
+                  {graph.facts.filter((f) => f.type === "star_story").length} / 3
+                </span>
+              </p>
+              <p className="text-muted-foreground">
+                {ar ? "مهارات ناقصة من الوصف: " : "Skill gaps from the description: "}
+                {job.matchAnalysis?.missingSkills.length
+                  ? job.matchAnalysis.missingSkills.slice(0, 6).join(ar ? "، " : ", ")
+                  : ar
+                    ? "لا شيء بعد التحليل"
+                    : "none after analysis"}
+              </p>
+              <p className="text-muted-foreground">
+                {ar
+                  ? "أسئلة تسألها: عن الفريق، معايير النجاح في أول ٩٠ يوماً، وخطوات التوظيف. لا نجلب معلومات سوق أو شركة غير متوفرة لدينا."
+                  : "Questions to ask: about the team, success criteria in the first 90 days, and hiring steps. We do not fetch market or company data we don't have."}
+              </p>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            {interviewQuestions.map((q) => (
+              <InterviewEvidenceAnswer
+                key={q}
+                userId={user.id}
+                question={q}
+                graph={graph}
+                jobDescription={form.jobDescription}
+                onSaved={() => setReload((n) => n + 1)}
+              />
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );
