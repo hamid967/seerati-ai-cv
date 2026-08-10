@@ -93,7 +93,7 @@ export function AppSidebarNav({
   const { lang } = useI18n();
   const ar = lang === "ar";
   const { user, signOut } = useStore();
-  const isAdmin = Boolean(user?.isAdmin);
+  const isAdmin = user?.role === "admin";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const groups: { key: AppNavItem["group"]; title?: { ar: string; en: string } }[] = [
@@ -213,7 +213,7 @@ export function AppSidebar() {
 
   return (
     <aside
-      className={`sticky top-0 hidden h-dvh shrink-0 border-e border-sidebar-border bg-sidebar px-3 py-4 md:block ${
+      className={`relative sticky top-0 hidden h-dvh shrink-0 border-e border-sidebar-border bg-sidebar px-3 py-4 md:block ${
         collapsed ? "w-[72px]" : "w-[248px]"
       }`}
       data-collapsed={collapsed}
@@ -225,8 +225,7 @@ export function AppSidebar() {
         size="icon"
         onClick={toggleCollapsed}
         aria-label={ar ? "طيّ القائمة" : "Toggle sidebar"}
-        className="absolute -bottom-0 end-2 top-4 h-9 w-9 text-sidebar-foreground/60 hover:text-sidebar-foreground"
-        style={{ position: "absolute", inset: "auto", top: "1rem" }}
+        className="absolute end-2 top-4 h-9 w-9 text-sidebar-foreground/60 hover:text-sidebar-foreground"
       >
         {collapsed ? <PanelsTopLeft className="size-4" /> : <ChevronsLeftRight className="size-4" />}
       </Button>
