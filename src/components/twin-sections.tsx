@@ -136,7 +136,7 @@ export function TargetsCard({
               <Input
                 placeholder={ar ? "نمط العمل (حضوري/هجين/عن بعد)" : "Work mode"}
                 value={tg.workMode ?? ""}
-                onChange={(e) => update(i, { workMode: e.target.value as CareerTarget["workMode"] })}
+                onChange={(e) => { const v = e.target.value as CareerTarget["workMode"]; if (v) update(i, { workMode: v }); else { const { workMode, ...rest } = tg; onChange(targets.map((t, idx) => (idx === i ? rest : t))); } }}
               />
             </div>
           </RowShell>
@@ -515,7 +515,14 @@ export function PreferencesCard({
         <Field label={ar ? "نمط العمل" : "Work mode"}>
           <Input
             value={prefs.workMode ?? ""}
-            onChange={(e) => onChange({ workMode: e.target.value as CareerTwin["preferences"]["workMode"] })}
+            onChange={(e) => {
+              const v = e.target.value as CareerTwin["preferences"]["workMode"];
+              if (v) onChange({ workMode: v });
+              else {
+                const { workMode, ...rest } = prefs;
+                onChange(rest);
+              }
+            }}
           />
         </Field>
         <Field label={ar ? "الصناعات" : "Industries"}>
