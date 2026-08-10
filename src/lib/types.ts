@@ -94,6 +94,10 @@ export type ResumeData = {
     photoUrl?: string;
   };
   summary: string;
+  /** Target role this resume is tailored for (Phase 2: Job Target). */
+  targetJob?: string;
+  /** Pasted job description kept with the resume for ATS matching. */
+  jobDescription?: string;
   experience: Experience[];
   education: Education[];
   skills: SkillItem[];
@@ -152,6 +156,8 @@ export const emptyResumeData = (): ResumeData => ({
     country: "",
   },
   summary: "",
+  targetJob: "",
+  jobDescription: "",
   experience: [],
   education: [],
   skills: [],
