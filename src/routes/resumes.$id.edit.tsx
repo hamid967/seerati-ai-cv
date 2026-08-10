@@ -247,6 +247,32 @@ function EditResume() {
     [patch],
   );
 
+  /**
+   * AI-approved edits rewrite whole blocks, so we keep a restore point first.
+   * ensureSessionSnapshot reuses a recent auto snapshot instead of piling up
+   * one row per suggestion in the same session.
+   */
+  const applyAi = useCallback(
+    (reason: string, fn: (d: ResumeData) => void) => {
+      const current = draft?.data;
+      if (user && current) {
+        void ensureSessionSnapshot({
+          userId: user.id,
+          resumeId: id,
+          current,
+          reason,
+          lang: ar ? "ar" : "en",
+          versions,
+        }).then((v) => {
+          if (v && !versions.some((x) => x.id === v.id)) refreshVersions();
+        });
+      }
+      setData(fn);
+    },
+    [draft, user, id, ar, versions, refreshVersions, setData],
+  );
+
+
   const jobDescription = draft?.data.jobDescription ?? "";
   const setJobDescription = useCallback(
     (v: string) => setData((data) => { data.jobDescription = v; }),
