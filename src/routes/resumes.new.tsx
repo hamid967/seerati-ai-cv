@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
 
 export const Route = createFileRoute("/resumes/new")({
@@ -38,9 +38,7 @@ function NewResume() {
   const [resumeLang, setResumeLang] = useState<"ar" | "en">(lang);
   const [seed, setSeed] = useState(false);
 
-  useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   return (
     <div className="min-h-screen bg-background">

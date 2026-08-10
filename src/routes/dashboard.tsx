@@ -44,8 +44,7 @@ function Dashboard() {
   const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume } = useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
-  useEffect(() => {
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   if (!ready || !user) {
     return (

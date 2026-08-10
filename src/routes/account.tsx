@@ -33,12 +33,14 @@ function AccountPage() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
 
+  useAuthGuard();
+
   useEffect(() => {
     if (user) {
       setName(user.fullName);
       setRole(user.targetRole ?? "");
     }
-  }, [ready, user, navigate]);
+  }, [user]);
 
   if (!user) return null;
 

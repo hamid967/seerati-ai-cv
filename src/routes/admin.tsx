@@ -25,8 +25,7 @@ function AdminLayout() {
   const { ready, user } = useStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   if (!ready) return null;
 

@@ -35,8 +35,7 @@ function Onboarding() {
   const [industry, setIndustry] = useState("");
   const [templateId, setTemplateId] = useState("saudi-professional");
 
-  useEffect(() => {
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   const finish = async () => {
     await updateProfile({ onboarded: true, targetRole, yearsExperience: years, industry });

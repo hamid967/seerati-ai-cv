@@ -7,7 +7,7 @@ import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 import { atsScore, runAtsChecks, toPlainText } from "@/lib/ats";
 
 export const Route = createFileRoute("/resumes/$id/preview")({
@@ -31,9 +31,7 @@ function PreviewResume() {
   const { ready, user, getResume } = useStore();
   const resume = getResume(id);
 
-  useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   if (!ready) return null;
 

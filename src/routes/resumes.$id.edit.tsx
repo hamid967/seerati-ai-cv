@@ -23,7 +23,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
 import { atsScore, keywordGaps, runAtsChecks } from "@/lib/ats";
 import { uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
@@ -80,9 +80,7 @@ function EditResume() {
   const [jobDescription, setJobDescription] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   useEffect(() => {
     if (stored && !draft) setDraft(stored);
