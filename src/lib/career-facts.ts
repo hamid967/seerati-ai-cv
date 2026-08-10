@@ -492,6 +492,13 @@ export function buildAiFactContext(
 }
 
 /**
+ * Stage 2 name for the same guarantee: the ONLY professional context an AI
+ * feature may see is the user's own verified facts and evidence.
+ */
+export const buildSafeAiEvidenceContext = buildAiFactContext;
+
+
+/**
  * Truth guardrail: any number in AI text that is not backed by a verified
  * evidence row is flagged so the UI can ask the user to confirm it instead of
  * silently publishing an invented figure.
