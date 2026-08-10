@@ -14,7 +14,8 @@
     "qa:ai": "node scripts/qa-ai-contract.mjs",
     "check:routes-shell": "node scripts/check-route-shell.mjs",
     "test:ai-contract": "node --experimental-strip-types scripts/ai-contract-fixtures.mjs",
-    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract"
+    "test:resume-diff": "node scripts/resume-diff-fixtures.mjs",
+    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",
