@@ -9,8 +9,7 @@
   --seerati-hairline: color-mix(in oklab, var(--border) 78%, transparent);
   --seerati-paper-border: oklch(0.9 0.012 250);
   --seerati-paper-shadow:
-    0 1px 1px rgb(15 23 42 / 0.04),
-    0 14px 40px -24px rgb(15 23 42 / 0.2),
+    0 1px 1px rgb(15 23 42 / 0.04), 0 14px 40px -24px rgb(15 23 42 / 0.2),
     0 36px 90px -48px rgb(15 23 42 / 0.28);
   --seerati-depth-1: 0 1px 2px rgb(15 23 42 / 0.05), 0 12px 28px -20px rgb(15 23 42 / 0.22);
   --seerati-depth-2: 0 20px 70px -38px rgb(15 23 42 / 0.42);
@@ -69,7 +68,9 @@ body {
     0 8px 18px -9px color-mix(in oklab, var(--primary) 72%, transparent),
     inset 0 1px 0 rgb(255 255 255 / 0.22),
     inset -5px -6px 12px rgb(0 0 0 / 0.12);
-  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 260ms ease;
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 260ms ease;
 }
 
 .seerati-logo-cube::after {
@@ -122,7 +123,10 @@ body {
     linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px),
     radial-gradient(circle at 50% 18%, oklch(0.7 0.13 165 / 0.18), transparent 54%);
-  background-size: 38px 38px, 38px 38px, auto;
+  background-size:
+    38px 38px,
+    38px 38px,
+    auto;
   transform: translateX(-50%) rotateX(68deg) translateZ(-120px);
   transform-origin: center center;
   box-shadow: 0 -40px 120px -45px oklch(0.62 0.13 165 / 0.32);
@@ -142,7 +146,12 @@ body {
   border-radius: 50%;
   background:
     radial-gradient(circle at 38% 34%, rgb(255 255 255 / 0.32), transparent 6%),
-    radial-gradient(circle at 42% 40%, oklch(0.77 0.12 85 / 0.24), oklch(0.62 0.13 165 / 0.12) 34%, transparent 68%);
+    radial-gradient(
+      circle at 42% 40%,
+      oklch(0.77 0.12 85 / 0.24),
+      oklch(0.62 0.13 165 / 0.12) 34%,
+      transparent 68%
+    );
   filter: blur(1px);
   box-shadow: var(--seerati-glow-gold);
   animation: seerati-orbit 12s ease-in-out infinite alternate;
@@ -222,7 +231,11 @@ body {
   isolation: isolate;
   perspective: var(--seerati-perspective);
   background:
-    radial-gradient(circle at 8% 4%, color-mix(in oklab, var(--emerald-accent) 10%, transparent), transparent 24rem),
+    radial-gradient(
+      circle at 8% 4%,
+      color-mix(in oklab, var(--emerald-accent) 10%, transparent),
+      transparent 24rem
+    ),
     radial-gradient(circle at 92% 8%, rgb(191 145 70 / 0.09), transparent 25rem),
     linear-gradient(180deg, color-mix(in oklab, var(--sand) 88%, var(--background)), var(--sand));
 }
@@ -251,7 +264,11 @@ body {
   z-index: -1;
   pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in oklab, var(--emerald-accent) 16%, transparent), transparent 68%);
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--emerald-accent) 16%, transparent),
+    transparent 68%
+  );
   filter: blur(14px);
 }
 
@@ -300,7 +317,13 @@ body {
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: linear-gradient(115deg, rgb(255 255 255 / 0.18), transparent 24%, transparent 74%, rgb(255 255 255 / 0.06));
+  background: linear-gradient(
+    115deg,
+    rgb(255 255 255 / 0.18),
+    transparent 24%,
+    transparent 74%,
+    rgb(255 255 255 / 0.06)
+  );
   opacity: 0.55;
 }
 
@@ -365,7 +388,9 @@ body {
   background-image:
     linear-gradient(180deg, rgb(255 255 255 / 0.55), transparent 14%),
     radial-gradient(circle at 12% 8%, rgb(15 23 42 / 0.018) 0 0.6px, transparent 0.8px);
-  background-size: auto, 8px 8px;
+  background-size:
+    auto,
+    8px 8px;
   opacity: 0.7;
 }
 
@@ -402,7 +427,13 @@ body {
 
 .seerati-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border) 12%, var(--border) 88%, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border) 12%,
+    var(--border) 88%,
+    transparent
+  );
 }
 
 .seerati-status-dot {

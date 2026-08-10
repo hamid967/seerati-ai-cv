@@ -14,7 +14,11 @@ requireText(css, "perspective:", "3D theme must define perspective");
 requireText(css, "transform-style: preserve-3d", "3D theme must preserve nested depth");
 requireText(css, "@media (prefers-reduced-motion: reduce)", "3D theme must support reduced motion");
 requireText(css, "@media print", "3D theme must define print cleanup");
-requireText(css, "transform: none !important", "print/reduced-motion cleanup must flatten transforms");
+requireText(
+  css,
+  "transform: none !important",
+  "print/reduced-motion cleanup must flatten transforms",
+);
 requireText(css, ".surface-ink", "landing hero depth styles missing");
 requireText(css, ".seerati-app-3d", "app shell depth styles missing");
 requireText(css, ".seerati-logo-cube", "premium logo depth styles missing");
@@ -24,8 +28,10 @@ requireText(header, "seerati-site-header", "SiteHeader premium class missing");
 requireText(header, "seerati-logo-cube", "SiteHeader logo depth class missing");
 
 const printBlock = css.match(/@media print\s*\{([\s\S]*)\}\s*$/)?.[1] ?? "";
-if (!printBlock.includes(".paper")) failures.push("print cleanup must explicitly cover resume paper");
-if (!printBlock.includes("box-shadow: none")) failures.push("print cleanup must remove screen shadows");
+if (!printBlock.includes(".paper"))
+  failures.push("print cleanup must explicitly cover resume paper");
+if (!printBlock.includes("box-shadow: none"))
+  failures.push("print cleanup must remove screen shadows");
 
 if (failures.length) {
   for (const failure of failures) console.error(`FAIL  ${failure}`);
