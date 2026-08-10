@@ -240,14 +240,14 @@ function Onboarding() {
               </button>
               {hasCv === "yes" && (
                 <button
-                  onClick={() => setPath("import")}
+                  onClick={() => navigate({ to: "/import" })}
                   className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
                 >
                   <p className="font-semibold">{ar ? "استيراد سيرتي السابقة" : "Import my existing resume"}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {ar
-                      ? "الصق نص سيرتك (أو ملف .txt) ونستخرج الأقسام لمراجعتها."
-                      : "Paste your resume text (or a .txt file) and review the extracted sections."}
+                      ? "من LinkedIn أو Indeed أو بيت.كوم أو ملف PDF/DOCX — مع مراجعة كل حقل قبل الحفظ."
+                      : "From LinkedIn, Indeed, Bayt or a PDF/DOCX file — with a full review before anything is saved."}
                   </p>
                 </button>
               )}

@@ -1,5 +1,6 @@
 import {
   Briefcase,
+  Upload,
   FileText,
   LayoutDashboard,
   LayoutTemplate,
@@ -24,6 +25,7 @@ import {
 export type AppNavId =
   | "home"
   | "career-twin"
+  | "import"
   | "resumes"
   | "jobs"
   | "cover-letters"
@@ -70,6 +72,15 @@ export const APP_NAV: AppNavItem[] = [
     matches: ["/career-profile"],
     enabled: true,
     mobile: true,
+    group: "main",
+  },
+  {
+    id: "import",
+    label: { ar: "استيراد", en: "Import" },
+    hint: { ar: "من LinkedIn وملفاتك", en: "From LinkedIn and your files" },
+    icon: Upload,
+    to: "/import",
+    enabled: true,
     group: "main",
   },
   {

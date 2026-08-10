@@ -215,6 +215,7 @@ export type Database = {
           education: Json
           id: string
           identity: Json
+          import_meta: Json
           languages: Json
           links: Json
           preferences: Json
@@ -235,6 +236,7 @@ export type Database = {
           education?: Json
           id?: string
           identity?: Json
+          import_meta?: Json
           languages?: Json
           links?: Json
           preferences?: Json
@@ -255,6 +257,7 @@ export type Database = {
           education?: Json
           id?: string
           identity?: Json
+          import_meta?: Json
           languages?: Json
           links?: Json
           preferences?: Json
