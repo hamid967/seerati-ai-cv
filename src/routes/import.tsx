@@ -393,6 +393,39 @@ function ImportCenterPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle className="text-base">{ar ? "الأقسام المكتشفة" : "Detected sections"}</CardTitle>
+            <CardDescription>
+              {ar
+                ? "ثقة نوعية فقط — لا نسب مئوية مضللة."
+                : "Qualitative confidence only — no misleading percentages."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {(["experience", "education", "skills", "languages", "certificates", "projects"] as ListKind[]).map(
+              (kind) => {
+                const items = draft[kind] as ListCandidate<Record<string, unknown>>[];
+                if (!items.length) return null;
+                const worst: Confidence = items.some((i) => i.confidence === "low")
+                  ? "low"
+                  : items.some((i) => i.confidence === "medium")
+                    ? "medium"
+                    : "high";
+                return (
+                  <span
+                    key={kind}
+                    className={`rounded-full px-3 py-1 text-xs ${CONFIDENCE_STYLE[worst]}`}
+                  >
+                    {LIST_LABEL[kind][ar ? "ar" : "en"]} · {items.length} ·{" "}
+                    {CONFIDENCE_LABEL[worst][ar ? "ar" : "en"]}
+                  </span>
+                );
+              },
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle className="text-base">{ar ? "المعلومات الأساسية" : "Core details"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -445,10 +478,69 @@ function ImportCenterPage() {
                   }
                 />
                 {field.existing && (
-                  <p className="mt-2 text-xs text-amber-700 dark:text-amber-500">
-                    {ar ? "القيمة الحالية في ملفك:" : "Current value on your profile:"} {field.existing} —{" "}
-                    {ar ? "اختر الحقل لاستبدالها." : "tick the field to replace it."}
-                  </p>
+                  <div className="mt-2 space-y-2 rounded-lg border border-amber-500/40 bg-amber-500/5 p-2">
+                    <p className="text-xs text-amber-700 dark:text-amber-500">
+                      {ar ? "تعارض مع ملفك الحالي:" : "Conflict with your current profile:"} {field.existing}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant={field.include ? "outline" : "secondary"}
+                        onClick={() =>
+                          setDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  fields: d.fields.map((x) =>
+                                    x.key === field.key ? { ...x, include: false } : x,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
+                      >
+                        {ar ? "أبقِ الحالي" : "Keep existing"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={field.include ? "secondary" : "outline"}
+                        onClick={() =>
+                          setDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  fields: d.fields.map((x) =>
+                                    x.key === field.key ? { ...x, include: true } : x,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
+                      >
+                        {ar ? "استخدم المستورد" : "Use imported"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          setDraft((d) =>
+                            d
+                              ? {
+                                  ...d,
+                                  fields: d.fields.map((x) =>
+                                    x.key === field.key
+                                      ? { ...x, include: true, value: `${field.existing} — ${x.value}` }
+                                      : x,
+                                  ),
+                                }
+                              : d,
+                          )
+                        }
+                      >
+                        {ar ? "دمج يدوي" : "Merge manually"}
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
