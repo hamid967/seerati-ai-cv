@@ -422,9 +422,9 @@ function EditResume() {
                     <AiAssistant
                       resume={draft}
                       section={step}
-                      onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                      onApplySummary={(text) => applyAi("summary", (data) => { data.summary = text; })}
                       onApplyBullets={(bullets) =>
-                        setData((data) => {
+                        applyAi("bullets", (data) => {
                           if (!data.experience.length) data.experience.push({ id: uid(), role: "", company: "", bullets });
                           else data.experience[0]!.bullets = bullets;
                         })
@@ -1018,9 +1018,9 @@ function EditResume() {
               <AiAssistant
                 resume={draft}
                 section={step}
-                onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                onApplySummary={(text) => applyAi("summary", (data) => { data.summary = text; })}
                 onApplyBullets={(bullets) =>
-                  setData((data) => {
+                  applyAi("bullets", (data) => {
                     if (!data.experience.length) {
                       data.experience.push({ id: uid(), role: "", company: "", bullets });
                     } else {
