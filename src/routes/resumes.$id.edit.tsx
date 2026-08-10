@@ -73,6 +73,52 @@ const sectionLabels: Record<SectionKey, { ar: string; en: string }> = {
   custom: { ar: "أقسام مخصصة", en: "Custom sections" },
 };
 
+function swap<T>(arr: T[], a: number, b: number) {
+  if (a < 0 || b < 0 || a >= arr.length || b >= arr.length) return;
+  [arr[a], arr[b]] = [arr[b]!, arr[a]!];
+}
+
+function MoveButtons({
+  ar,
+  upDisabled,
+  downDisabled,
+  vertical,
+  onMove,
+}: {
+  ar: boolean;
+  upDisabled: boolean;
+  downDisabled: boolean;
+  vertical?: boolean;
+  onMove: (dir: -1 | 1) => void;
+}) {
+  return (
+    <div className={vertical ? "flex flex-col gap-1" : "flex gap-1"}>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="size-7"
+        aria-label={ar ? "تحريك لأعلى" : "Move up"}
+        disabled={upDisabled}
+        onClick={() => onMove(-1)}
+      >
+        <ArrowUp className="size-3.5" />
+      </Button>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="size-7"
+        aria-label={ar ? "تحريك لأسفل" : "Move down"}
+        disabled={downDisabled}
+        onClick={() => onMove(1)}
+      >
+        <ArrowDown className="size-3.5" />
+      </Button>
+    </div>
+  );
+}
+
+
+
 function EditResume() {
   const { id } = Route.useParams();
   const { lang } = useI18n();
