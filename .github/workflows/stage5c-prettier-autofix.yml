@@ -1,0 +1,33 @@
+name: Stage5C Prettier Autofix
+
+on:
+  push:
+    branches:
+      - stage5c/premium-3d-theme
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage5c/premium-3d-theme
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Format Stage 5C files
+        run: |
+          bunx prettier --write scripts/check-premium-3d.mjs scripts/template-smoke.mjs src/lib/templates.ts src/premium-theme.css
+          rm .github/workflows/stage5c-prettier-autofix.yml
+      - name: Commit formatted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/check-premium-3d.mjs scripts/template-smoke.mjs src/lib/templates.ts src/premium-theme.css .github/workflows/stage5c-prettier-autofix.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "style: format stage5c premium theme"
+          git push origin HEAD:stage5c/premium-3d-theme
