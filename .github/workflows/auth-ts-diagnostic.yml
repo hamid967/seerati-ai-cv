@@ -1,0 +1,32 @@
+name: Auth Type Diagnostic
+
+on:
+  push:
+    branches: [codex/auth-portal-stage4]
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: ${{ !contains(github.event.head_commit.message, '[auth-ts-diagnostic]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: codex/auth-portal-stage4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Capture TypeScript output
+        run: bunx tsc --noEmit > auth-ts-diagnostics.txt 2>&1 || true
+      - name: Commit diagnostics and remove workflow
+        run: |
+          rm .github/workflows/auth-ts-diagnostic.yml
+          git config user.name "seerati-auth-diagnostic"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: capture auth type diagnostics [auth-ts-diagnostic]"
+          git push origin HEAD:codex/auth-portal-stage4
