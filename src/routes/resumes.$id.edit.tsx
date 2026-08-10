@@ -138,12 +138,27 @@ function EditResume() {
   const past = useRef<Resume[]>([]);
   const future = useRef<Resume[]>([]);
   const [, bumpHistory] = useState(0);
+  const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [loadingVersions, setLoadingVersions] = useState(true);
 
   useAuthGuard();
 
   useEffect(() => {
     if (stored && !draft) setDraft(stored);
   }, [stored, draft]);
+
+  const refreshVersions = useCallback(() => {
+    setLoadingVersions(true);
+    void listResumeVersions(id).then((list) => {
+      setVersions(list);
+      setLoadingVersions(false);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    if (user) refreshVersions();
+  }, [user, refreshVersions]);
+
 
   const scheduleSave = useCallback(
     (next: Resume) => {
