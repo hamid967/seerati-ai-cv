@@ -1,0 +1,33 @@
+name: Stage5D Prettier Autofix
+
+on:
+  push:
+    branches:
+      - stage5d/3d-resume-gallery
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage5d/3d-resume-gallery
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Format Stage 5D files
+        run: |
+          bunx prettier --write scripts/check-template-gallery-3d.mjs src/components/template-gallery-3d.tsx src/routes/templates.tsx src/template-gallery-3d.css
+          rm .github/workflows/stage5d-prettier-autofix.yml
+      - name: Commit formatted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/check-template-gallery-3d.mjs src/components/template-gallery-3d.tsx src/routes/templates.tsx src/template-gallery-3d.css .github/workflows/stage5d-prettier-autofix.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "style: format stage5d 3d gallery"
+          git push origin HEAD:stage5d/3d-resume-gallery
