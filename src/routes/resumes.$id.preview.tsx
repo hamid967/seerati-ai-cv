@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Download, FileText, Printer } from "lucide-react";
+import { ClipboardCopy, Download, FileText, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
@@ -61,12 +61,34 @@ function PreviewResume() {
   const tpl = getTemplate(resume.templateId);
   const score = analyzeResume(resume, tpl).score;
 
+  const fileBase = (() => {
+    const name = (resume.data.personal.fullName || resume.title || "resume").trim();
+    const slug = name.split(/\s+/).filter(Boolean).slice(0, 3).join("-").replace(/[\\/:*?"<>|]/g, "");
+    return `${slug || "resume"}-CV`;
+  })();
+
+  const printPdf = () => {
+    const previous = document.title;
+    document.title = fileBase;
+    window.print();
+    window.setTimeout(() => { document.title = previous; }, 1000);
+  };
+
+  const copyTxt = async () => {
+    try {
+      await navigator.clipboard.writeText(toPlainText(resume));
+      toast.success(ar ? "تم نسخ النسخة النصية" : "Plain text copied");
+    } catch {
+      toast.error(ar ? "تعذّر النسخ — استخدم زر التنزيل" : "Copy failed — use the download button");
+    }
+  };
+
   const downloadTxt = () => {
     const blob = new Blob([toPlainText(resume)], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${resume.title || "resume"}.txt`;
+    a.download = `${fileBase}.txt`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(ar ? "تم تنزيل النسخة النصية" : "Plain text downloaded");
@@ -80,6 +102,7 @@ function PreviewResume() {
           <h1 className="text-xl font-extrabold">{resume.title}</h1>
           <p className="mt-1 text-xs text-muted-foreground">
             {tpl.name[lang]} · {resume.language.toUpperCase()} · ATS {score}/100
+            {resume.data.targetJob ? ` · ${ar ? "الوظيفة المستهدفة" : "Target"}: ${resume.data.targetJob}` : ""}
           </p>
         </div>
         <div className="ms-auto flex flex-wrap gap-2">
@@ -94,7 +117,11 @@ function PreviewResume() {
             <Download className="size-4" />
             {ar ? "نسخة نصية ATS" : "ATS plain text"}
           </Button>
-          <Button onClick={() => window.print()}>
+          <Button variant="outline" onClick={() => void copyTxt()}>
+            <ClipboardCopy className="size-4" />
+            {ar ? "نسخ النص" : "Copy text"}
+          </Button>
+          <Button onClick={printPdf}>
             <Printer className="size-4" />
             {ar ? "تنزيل PDF" : "Download PDF"}
           </Button>
@@ -103,8 +130,8 @@ function PreviewResume() {
 
       <p className="mx-auto max-w-5xl px-4 pb-4 text-xs text-muted-foreground">
         {ar
-          ? "يفتح زر التنزيل نافذة الطباعة — اختر «حفظ كـ PDF» للحصول على ملف يحفظ اتجاه النص العربي."
-          : "The download button opens the print dialog — choose “Save as PDF” to keep Arabic text direction intact."}
+          ? `يفتح زر التنزيل نافذة الطباعة — اختر «حفظ كـ PDF». اسم الملف المقترح: ${fileBase}.pdf`
+          : `The download button opens the print dialog — choose “Save as PDF”. Suggested file name: ${fileBase}.pdf`}
       </p>
 
       <div className="mx-auto max-w-5xl px-4 pb-16">
