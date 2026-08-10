@@ -19,7 +19,8 @@ export const Route = createFileRoute("/templates")({
       { property: "og:title", content: "معرض قوالب سيرتي ثلاثي الأبعاد" },
       {
         property: "og:description",
-        content: "استعرض وقارن قوالب السيرة الذاتية بالعربية والإنجليزية قبل اختيار القالب المناسب لمسارك.",
+        content:
+          "استعرض وقارن قوالب السيرة الذاتية بالعربية والإنجليزية قبل اختيار القالب المناسب لمسارك.",
       },
     ],
   }),
@@ -44,7 +45,9 @@ function TemplatesPage() {
               {ar ? "تجربة قوالب سينمائية" : "Cinematic template experience"}
             </Badge>
             <h1 className="mt-5 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">
-              {ar ? "اختر القالب كما لو كنت تمسكه بيدك" : "Choose a template as if it were in your hands"}
+              {ar
+                ? "اختر القالب كما لو كنت تمسكه بيدك"
+                : "Choose a template as if it were in your hands"}
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-8 text-muted-foreground md:text-base">
               {ar

@@ -12,7 +12,11 @@
   height: 22rem;
   z-index: -1;
   border-radius: 999px;
-  background: radial-gradient(circle, color-mix(in oklab, var(--emerald-accent) 12%, transparent), transparent 68%);
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--emerald-accent) 12%, transparent),
+    transparent 68%
+  );
   filter: blur(36px);
   pointer-events: none;
 }
@@ -89,7 +93,11 @@
   height: 15rem;
   z-index: 0;
   border-radius: 999px;
-  background: radial-gradient(circle, color-mix(in oklab, var(--emerald-accent) 11%, transparent), transparent 72%);
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--emerald-accent) 11%, transparent),
+    transparent 72%
+  );
   filter: blur(24px);
   pointer-events: none;
 }
@@ -193,7 +201,11 @@
   overflow: hidden;
   padding: 2rem;
   background:
-    radial-gradient(circle at 20% 10%, color-mix(in oklab, var(--emerald-accent) 20%, transparent), transparent 34%),
+    radial-gradient(
+      circle at 20% 10%,
+      color-mix(in oklab, var(--emerald-accent) 20%, transparent),
+      transparent 34%
+    ),
     radial-gradient(circle at 86% 8%, rgb(191 145 70 / 0.13), transparent 30%),
     linear-gradient(145deg, oklch(0.15 0.035 258), oklch(0.21 0.05 255));
   transform-style: preserve-3d;

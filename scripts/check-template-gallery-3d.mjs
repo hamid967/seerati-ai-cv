@@ -14,14 +14,18 @@ requireText(route, "TemplateGallery3D", "templates route must render the 3D gall
 requireText(component, "MAX_COMPARE = 3", "comparison must stay capped at three templates");
 requireText(component, "previewLanguage", "gallery must support Arabic/English preview switching");
 requireText(component, "onPointerMove", "gallery must expose pointer-based depth interaction");
-requireText(component, "pointerType === \"touch\"", "touch devices must avoid pointer tilt calculations");
+requireText(
+  component,
+  'pointerType === "touch"',
+  "touch devices must avoid pointer tilt calculations",
+);
 requireText(component, "sample data", "gallery must disclose sample preview data in English");
 requireText(component, "بيانات نموذجية", "gallery must disclose sample preview data in Arabic");
 requireText(css, "perspective:", "gallery CSS must define perspective depth");
 requireText(css, "@media (prefers-reduced-motion: reduce)", "gallery must support reduced motion");
 requireText(css, "@media print", "gallery must define print cleanup");
 requireText(css, "@media (max-width: 767px)", "gallery must include a mobile-specific fallback");
-requireText(css, "[dir=\"rtl\"]", "gallery must include RTL-specific transform handling");
+requireText(css, '[dir="rtl"]', "gallery must include RTL-specific transform handling");
 requireText(css, ".seerati-compare-dock", "comparison dock styles are missing");
 requireText(css, ".seerati-cinematic-preview", "cinematic preview styles are missing");
 

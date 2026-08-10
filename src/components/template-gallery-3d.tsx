@@ -3,12 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Check, Eye, GitCompareArrows, Sparkles, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ResumeThumb } from "@/components/resume-preview";
 import { demoResume } from "@/lib/demo-data";
 import { useI18n } from "@/lib/i18n";
@@ -104,7 +99,10 @@ export function TemplateGallery3D() {
 
   return (
     <>
-      <section className="seerati-gallery-stage" aria-label={ar ? "معرض القوالب" : "Template gallery"}>
+      <section
+        className="seerati-gallery-stage"
+        aria-label={ar ? "معرض القوالب" : "Template gallery"}
+      >
         <div className="seerati-gallery-toolbar">
           <div className="flex flex-wrap gap-2">
             {FILTERS.map((id) => (
@@ -214,7 +212,11 @@ export function TemplateGallery3D() {
                       disabled={!isCompared && compareIds.length >= MAX_COMPARE}
                       onClick={() => toggleCompare(template.id)}
                     >
-                      {isCompared ? <Check className="size-4" /> : <GitCompareArrows className="size-4" />}
+                      {isCompared ? (
+                        <Check className="size-4" />
+                      ) : (
+                        <GitCompareArrows className="size-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -225,10 +227,16 @@ export function TemplateGallery3D() {
       </section>
 
       {compareIds.length > 0 && (
-        <div className="seerati-compare-dock" role="region" aria-label={ar ? "مقارنة القوالب" : "Template comparison"}>
+        <div
+          className="seerati-compare-dock"
+          role="region"
+          aria-label={ar ? "مقارنة القوالب" : "Template comparison"}
+        >
           <div className="min-w-0">
             <p className="text-sm font-bold">
-              {ar ? `مقارنة ${compareIds.length} من ${MAX_COMPARE}` : `Compare ${compareIds.length} of ${MAX_COMPARE}`}
+              {ar
+                ? `مقارنة ${compareIds.length} من ${MAX_COMPARE}`
+                : `Compare ${compareIds.length} of ${MAX_COMPARE}`}
             </p>
             <p className="truncate text-xs text-muted-foreground">
               {compared.map((template) => template.name[lang]).join(" · ")}
@@ -239,7 +247,12 @@ export function TemplateGallery3D() {
               <GitCompareArrows className="size-4" />
               {ar ? "قارن" : "Compare"}
             </Button>
-            <Button size="icon" variant="ghost" aria-label={ar ? "مسح المقارنة" : "Clear comparison"} onClick={() => setCompareIds([])}>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label={ar ? "مسح المقارنة" : "Clear comparison"}
+              onClick={() => setCompareIds([])}
+            >
               <X className="size-4" />
             </Button>
           </div>
@@ -295,7 +308,9 @@ export function TemplateGallery3D() {
           <DialogHeader>
             <DialogTitle>{ar ? "مقارنة القوالب" : "Compare templates"}</DialogTitle>
           </DialogHeader>
-          <div className={`grid gap-4 ${compared.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
+          <div
+            className={`grid gap-4 ${compared.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}
+          >
             {compared.map((template) => (
               <div key={template.id} className="rounded-2xl border border-border bg-card p-4">
                 <div className="h-[420px] overflow-hidden rounded-xl bg-muted/40 p-2">
@@ -304,7 +319,9 @@ export function TemplateGallery3D() {
                 <div className="mt-4 flex items-center justify-between gap-2">
                   <div>
                     <p className="font-bold">{template.name[lang]}</p>
-                    <p className="text-xs text-muted-foreground">{template.atsFriendly ? "ATS" : template.category}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {template.atsFriendly ? "ATS" : template.category}
+                    </p>
                   </div>
                   <Button size="sm" asChild>
                     <Link to="/resumes/new" search={{ template: template.id }}>
