@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Palette, Settings, ShieldAlert, Users } from "lucide-react";
+import { LayoutDashboard, Palette, ScrollText, Settings, ShieldAlert, Users } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
@@ -51,6 +51,7 @@ function AdminLayout() {
     { to: "/admin", label: ar ? "المؤشرات" : "Overview", icon: LayoutDashboard, exact: true },
     { to: "/admin/users", label: ar ? "المستخدمون" : "Users", icon: Users, exact: false },
     { to: "/admin/templates", label: ar ? "القوالب" : "Templates", icon: Palette, exact: false },
+    { to: "/admin/audit", label: ar ? "سجل العمليات" : "Audit log", icon: ScrollText, exact: false },
     { to: "/admin/settings", label: ar ? "الإعدادات" : "Settings", icon: Settings, exact: false },
   ] as const;
 

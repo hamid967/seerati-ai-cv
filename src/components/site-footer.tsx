@@ -23,6 +23,8 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/auth" className="hover:text-foreground">{t("nav_login")}</Link></li>
             <li><Link to="/dashboard" className="hover:text-foreground">{t("nav_dashboard")}</Link></li>
+            <li><Link to="/privacy" className="hover:text-foreground">{t("brand") === "سيرتي" ? "سياسة الخصوصية" : "Privacy policy"}</Link></li>
+            <li><Link to="/terms" className="hover:text-foreground">{t("brand") === "سيرتي" ? "شروط الاستخدام" : "Terms of use"}</Link></li>
           </ul>
         </div>
         <div className="text-sm text-muted-foreground">
