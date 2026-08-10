@@ -28,23 +28,46 @@ function Onboarding() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, updateProfile, createResume } = useStore();
+  const { user, ready, resumes, updateProfile, createResume } = useStore();
+  const STEPS = 4;
   const [step, setStep] = useState(1);
+  const [fullName, setFullName] = useState("");
+  const [currentTitle, setCurrentTitle] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [years, setYears] = useState("1-3");
   const [industry, setIndustry] = useState("");
+  const [cvLang, setCvLang] = useState<"ar" | "en">(lang);
+  const [hasCv, setHasCv] = useState<"yes" | "no">("no");
   const [templateId, setTemplateId] = useState("saudi-professional");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user?.fullName && !fullName) setFullName(user.fullName);
+  }, [user, fullName]);
 
   useAuthGuard();
 
   const finish = async () => {
-    await updateProfile({ onboarded: true, targetRole, yearsExperience: years, industry });
+    setSaving(true);
+    await updateProfile({
+      onboarded: true,
+      fullName: fullName.trim() || user?.fullName || "",
+      targetRole,
+      yearsExperience: years,
+      industry,
+    });
+    if (resumes.length > 0) {
+      setSaving(false);
+      navigate({ to: "/dashboard" });
+      return;
+    }
     const created = await createResume({
       title: targetRole ? (ar ? `سيرة ${targetRole}` : `${targetRole} resume`) : ar ? "سيرتي الذاتية" : "My resume",
       templateId,
-      language: lang,
-      jobTitle: targetRole,
+      language: cvLang,
+      jobTitle: targetRole || currentTitle,
     });
+    setSaving(false);
     if (created) {
       toast.success(ar ? "أنشأنا لك سيرة ذاتية للبدء" : "We created a resume to get you started");
       navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
@@ -58,13 +81,26 @@ function Onboarding() {
       <SiteHeader />
       <main className="mx-auto max-w-xl px-4 py-12">
         <p className="text-xs font-semibold text-muted-foreground">
-          {ar ? `الخطوة ${step} من ٣` : `Step ${step} of 3`}
+          {ar ? `الخطوة ${step} من ٤` : `Step ${step} of ${STEPS}`}
         </p>
-        <Progress value={(step / 3) * 100} className="mt-3" />
+        <Progress value={(step / STEPS) * 100} className="mt-3" />
 
         {step === 1 && (
           <section className="mt-8 space-y-5">
-            <h1 className="text-2xl font-extrabold">{ar ? "ما الوظيفة التي تستهدفها؟" : "What role are you targeting?"}</h1>
+            <h1 className="text-2xl font-extrabold">{ar ? "لنتعرّف عليك" : "Let’s get to know you"}</h1>
+            <div className="space-y-1.5">
+              <Label htmlFor="name">{ar ? "الاسم الكامل" : "Full name"}</Label>
+              <Input id="name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="current">{ar ? "مسمّاك الحالي" : "Current job title"}</Label>
+              <Input
+                id="current"
+                value={currentTitle}
+                onChange={(e) => setCurrentTitle(e.target.value)}
+                placeholder={ar ? "مثال: أخصائي تقارير" : "e.g. Reporting Specialist"}
+              />
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="role">{ar ? "المسمى الوظيفي المستهدف" : "Target job title"}</Label>
               <Input
@@ -105,6 +141,39 @@ function Onboarding() {
         )}
 
         {step === 3 && (
+          <section className="mt-8 space-y-6">
+            <h1 className="text-2xl font-extrabold">{ar ? "لغة السيرة وحالتك الحالية" : "Resume language & current status"}</h1>
+            <div className="space-y-2">
+              <Label>{ar ? "بأي لغة تريد سيرتك؟" : "Which language should the resume use?"}</Label>
+              <div className="flex gap-2">
+                <Button variant={cvLang === "ar" ? "default" : "outline"} onClick={() => setCvLang("ar")}>العربية</Button>
+                <Button variant={cvLang === "en" ? "default" : "outline"} onClick={() => setCvLang("en")}>English</Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>{ar ? "هل لديك سيرة ذاتية سابقة؟" : "Do you already have a resume?"}</Label>
+              <div className="flex gap-2">
+                <Button variant={hasCv === "yes" ? "default" : "outline"} onClick={() => setHasCv("yes")}>
+                  {ar ? "نعم" : "Yes"}
+                </Button>
+                <Button variant={hasCv === "no" ? "default" : "outline"} onClick={() => setHasCv("no")}>
+                  {ar ? "لا، سأبدأ من الصفر" : "No, starting fresh"}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {hasCv === "yes"
+                  ? ar
+                    ? "سنبدأ بمسودة فارغة يمكنك نسخ محتوى سيرتك القديمة إليها قسماً بقسم."
+                    : "We’ll start a draft so you can paste your existing content section by section."
+                  : ar
+                    ? "سيساعدك «مساعد سيرتي» في صياغة الملخص والنقاط من الصفر."
+                    : "The Seerati Assistant will help you draft the summary and bullets from scratch."}
+              </p>
+            </div>
+          </section>
+        )}
+
+        {step === 4 && (
           <section className="mt-8 space-y-5">
             <h1 className="text-2xl font-extrabold">{ar ? "اختر قالبك الأول" : "Pick your first template"}</h1>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -130,10 +199,12 @@ function Onboarding() {
               {ar ? "رجوع" : "Back"}
             </Button>
           )}
-          {step < 3 ? (
+          {step < STEPS ? (
             <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>
           ) : (
-            <Button onClick={finish}>{ar ? "ابدأ البناء" : "Start building"}</Button>
+            <Button onClick={() => void finish()} disabled={saving}>
+              {saving ? (ar ? "جارٍ التهيئة…" : "Setting up…") : ar ? "ابدأ البناء" : "Start building"}
+            </Button>
           )}
         </div>
       </main>
