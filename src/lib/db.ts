@@ -287,6 +287,7 @@ export async function logAiUsage(task: string) {
 export type AppSettings = {
   id: string;
   siteName: string;
+  logoUrl: string | null;
   defaultLanguage: "ar" | "en";
   maxResumes: number;
   maintenance: boolean;
@@ -300,6 +301,7 @@ export async function fetchAppSettings(): Promise<AppSettings | null> {
   return {
     id: data.id,
     siteName: data.site_name,
+    logoUrl: data.logo_url,
     defaultLanguage: data.default_language === "en" ? "en" : "ar",
     maxResumes: data.max_resumes,
     maintenance: data.maintenance,
@@ -313,6 +315,7 @@ export async function saveAppSettings(patch: Partial<AppSettings> & { id: string
     .from("app_settings")
     .update({
       ...(patch.siteName !== undefined ? { site_name: patch.siteName } : {}),
+      ...(patch.logoUrl !== undefined ? { logo_url: patch.logoUrl } : {}),
       ...(patch.defaultLanguage !== undefined ? { default_language: patch.defaultLanguage } : {}),
       ...(patch.maxResumes !== undefined ? { max_resumes: patch.maxResumes } : {}),
       ...(patch.maintenance !== undefined ? { maintenance: patch.maintenance } : {}),
