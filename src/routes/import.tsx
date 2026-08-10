@@ -303,7 +303,7 @@ function ImportCenterPage() {
 
     const lists: ListKind[] = ["experience", "education", "skills", "languages", "certificates", "projects"];
 
-    async function save() {
+    async function save(next: "gaps" | "only") {
       if (!user || !draft) return;
       setBusy(true);
       try {
