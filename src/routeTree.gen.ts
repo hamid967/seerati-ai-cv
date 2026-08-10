@@ -27,6 +27,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
@@ -121,6 +122,11 @@ const JobsIndexRoute = JobsIndexRouteImport.update({
   path: '/jobs/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesNewRoute = ResumesNewRouteImport.update({
   id: '/resumes/new',
   path: '/resumes/new',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin': typeof AdminIndexRoute
   '/jobs': typeof JobsIndexRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
+    | '/jobs/$id'
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
+    | '/jobs/$id'
     | '/resumes/new'
     | '/admin'
     | '/jobs'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
+    | '/jobs/$id'
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
@@ -290,6 +302,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
+  JobsIdRoute: typeof JobsIdRoute
   ResumesNewRoute: typeof ResumesNewRoute
   JobsIndexRoute: typeof JobsIndexRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/new': {
       id: '/resumes/new'
       path: '/resumes/new'
@@ -479,6 +499,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
+  JobsIdRoute: JobsIdRoute,
   ResumesNewRoute: ResumesNewRoute,
   JobsIndexRoute: JobsIndexRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,

@@ -143,15 +143,17 @@ function JobsIndex() {
       return;
     }
     setSaving(true);
+    const optional = (key: string, value: string) =>
+      value.trim() ? { [key]: value.trim() } : {};
     const created = await createJob(user.id, {
       jobTitle: form.jobTitle.trim(),
       company: form.company.trim(),
-      location: form.location.trim() || undefined,
-      jobUrl: form.jobUrl.trim() || undefined,
-      salary: form.salary.trim() || undefined,
-      jobDescription: form.jobDescription.trim() || undefined,
-      notes: form.notes.trim() || undefined,
       status: form.status,
+      ...optional("location", form.location),
+      ...optional("jobUrl", form.jobUrl),
+      ...optional("salary", form.salary),
+      ...optional("jobDescription", form.jobDescription),
+      ...optional("notes", form.notes),
     });
     setSaving(false);
     if (!created) {
