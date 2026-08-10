@@ -94,7 +94,9 @@ function AtsPage() {
                 )}
               </div>
             )}
+          </div>
         </div>
+
 
         <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="flex flex-wrap items-center justify-between gap-2">
