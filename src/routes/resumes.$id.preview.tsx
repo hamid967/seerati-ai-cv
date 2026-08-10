@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ClipboardCopy, Download, FileText, Printer } from "lucide-react";
+import { ClipboardCopy, Download, FileText, Loader2, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
@@ -10,6 +10,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeResume, toPlainText } from "@/lib/ats";
+import { exportResumePdf } from "@/lib/pdf";
 
 export const Route = createFileRoute("/resumes/$id/preview")({
   head: () => ({
@@ -33,6 +34,7 @@ function PreviewResume() {
   const resume = getResume(id);
 
   useAuthGuard();
+  const [exportingImagePdf, setExportingImagePdf] = useState(false);
 
   // Stamp the view once per mounted resume; a direct write avoids re-render loops.
   const stamped = useRef<string | null>(null);
@@ -72,6 +74,23 @@ function PreviewResume() {
     document.title = fileBase;
     window.print();
     window.setTimeout(() => { document.title = previous; }, 1000);
+  };
+
+  const downloadImagePdf = async () => {
+    const el = document.getElementById("print-area");
+    if (!el) {
+      toast.error(ar ? "تعذّر العثور على السيرة الذاتية" : "Could not find the resume content");
+      return;
+    }
+    setExportingImagePdf(true);
+    try {
+      await exportResumePdf(el, fileBase);
+      toast.success(ar ? "تم تنزيل ملف PDF" : "PDF downloaded");
+    } catch {
+      toast.error(ar ? "تعذّر إنشاء ملف PDF" : "Failed to generate the PDF");
+    } finally {
+      setExportingImagePdf(false);
+    }
   };
 
   const copyTxt = async () => {
@@ -121,9 +140,13 @@ function PreviewResume() {
             <ClipboardCopy className="size-4" />
             {ar ? "نسخ النص" : "Copy text"}
           </Button>
-          <Button onClick={printPdf}>
+          <Button variant="outline" onClick={printPdf}>
             <Printer className="size-4" />
-            {ar ? "تنزيل PDF" : "Download PDF"}
+            {ar ? "PDF نصي (طباعة)" : "Print / text PDF"}
+          </Button>
+          <Button onClick={() => void downloadImagePdf()} disabled={exportingImagePdf}>
+            {exportingImagePdf ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+            {ar ? "تنزيل PDF (صورة عالية الدقة)" : "Download PDF (high-res image)"}
           </Button>
         </div>
       </div>

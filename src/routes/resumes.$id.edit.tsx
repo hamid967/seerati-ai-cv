@@ -523,9 +523,14 @@ function EditResume() {
             )}
 
             {step === "experience" && (
-              <div className="space-y-5">
+              <SortableList
+                className="space-y-5"
+                ids={d.experience.map((e) => e.id)}
+                onReorder={(from, to) => setData((data) => { reorderArray(data.experience, from, to); })}
+              >
                 {d.experience.map((e, idx) => (
-                  <div key={e.id} className="rounded-xl border border-border p-4">
+                  <SortableItem key={e.id} id={e.id} ar={ar} className="flex gap-2 rounded-xl border border-border p-4">
+                  <div className="min-w-0 flex-1">
                     <div className="mb-3 flex items-center gap-1">
                       <span className="text-xs font-semibold text-muted-foreground">
                         {ar ? "خبرة" : "Experience"} {idx + 1}
@@ -563,36 +568,40 @@ function EditResume() {
                     </label>
                     <div className="mt-3 space-y-3">
                       <Label>{ar ? "نقاط الإنجاز" : "Achievement bullets"}</Label>
-                      {e.bullets.map((b, bi) => (
-                        <div key={bi} className="space-y-1.5 rounded-lg bg-secondary/40 p-2.5">
-                          <div className="flex gap-2">
-                            <Textarea
-                              rows={2}
-                              value={b}
-                              onChange={(ev) => setData((data) => { data.experience[idx]!.bullets[bi] = ev.target.value; })}
-                            />
-                            <div className="flex flex-col gap-1">
-                              <MoveButtons
-                                ar={ar}
-                                vertical
-                                upDisabled={bi === 0}
-                                downDisabled={bi === e.bullets.length - 1}
-                                onMove={(dir) => setData((data) => { swap(data.experience[idx]!.bullets, bi, bi + dir); })}
+                      <SortableList
+                        className="space-y-3"
+                        ids={e.bullets.map((_, bi) => `${e.id}-b${bi}`)}
+                        onReorder={(from, to) => setData((data) => { reorderArray(data.experience[idx]!.bullets, from, to); })}
+                      >
+                        {e.bullets.map((b, bi) => (
+                          <SortableItem
+                            key={`${e.id}-b${bi}`}
+                            id={`${e.id}-b${bi}`}
+                            ar={ar}
+                            className="flex gap-2 rounded-lg bg-secondary/40 p-2.5"
+                          >
+                            <div className="min-w-0 flex-1 space-y-1.5">
+                              <div className="flex gap-2">
+                                <Textarea
+                                  rows={2}
+                                  value={b}
+                                  onChange={(ev) => setData((data) => { data.experience[idx]!.bullets[bi] = ev.target.value; })}
+                                />
+                                <Button variant="ghost" size="icon" className="size-7 shrink-0" aria-label={ar ? "حذف" : "Delete"} onClick={() => setData((data) => { data.experience[idx]!.bullets.splice(bi, 1); })}>
+                                  <Trash2 className="size-3.5" />
+                                </Button>
+                              </div>
+                              <FieldAi
+                                resume={draft}
+                                value={b}
+                                section="experience"
+                                jobDescription={jobDescription}
+                                onApply={(text) => setData((data) => { data.experience[idx]!.bullets[bi] = text; })}
                               />
-                              <Button variant="ghost" size="icon" className="size-7" aria-label={ar ? "حذف" : "Delete"} onClick={() => setData((data) => { data.experience[idx]!.bullets.splice(bi, 1); })}>
-                                <Trash2 className="size-3.5" />
-                              </Button>
                             </div>
-                          </div>
-                          <FieldAi
-                            resume={draft}
-                            value={b}
-                            section="experience"
-                            jobDescription={jobDescription}
-                            onApply={(text) => setData((data) => { data.experience[idx]!.bullets[bi] = text; })}
-                          />
-                        </div>
-                      ))}
+                          </SortableItem>
+                        ))}
+                      </SortableList>
                       <Button size="sm" variant="outline" onClick={() => setData((data) => { data.experience[idx]!.bullets.push(""); })}>
                         <Plus className="size-4" />
                         {ar ? "أضف نقطة" : "Add bullet"}
@@ -608,25 +617,32 @@ function EditResume() {
                       {ar ? "حذف الخبرة" : "Remove experience"}
                     </Button>
                   </div>
-
+                  </SortableItem>
                 ))}
-                <Button
-                  onClick={() =>
-                    setData((data) => {
-                      data.experience.push({ id: uid(), role: "", company: "", bullets: [""] });
-                    })
-                  }
-                >
-                  <Plus className="size-4" />
-                  {ar ? "إضافة خبرة" : "Add experience"}
-                </Button>
-              </div>
+              </SortableList>
+            )}
+            {step === "experience" && (
+              <Button
+                className="mt-5"
+                onClick={() =>
+                  setData((data) => {
+                    data.experience.push({ id: uid(), role: "", company: "", bullets: [""] });
+                  })
+                }
+              >
+                <Plus className="size-4" />
+                {ar ? "إضافة خبرة" : "Add experience"}
+              </Button>
             )}
 
             {step === "education" && (
-              <div className="space-y-4">
+              <SortableList
+                className="space-y-4"
+                ids={d.education.map((e) => e.id)}
+                onReorder={(from, to) => setData((data) => { reorderArray(data.education, from, to); })}
+              >
                 {d.education.map((e, idx) => (
-                  <div key={e.id} className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-2">
+                  <SortableItem key={e.id} id={e.id} ar={ar} className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-2">
                     <Input placeholder={ar ? "المؤهل" : "Degree"} value={e.degree} onChange={(ev) => setData((data) => { data.education[idx]!.degree = ev.target.value; })} />
                     <Input placeholder={ar ? "الجهة التعليمية" : "School"} value={e.school} onChange={(ev) => setData((data) => { data.education[idx]!.school = ev.target.value; })} />
                     <div className="flex gap-2">
@@ -656,13 +672,15 @@ function EditResume() {
                       </Button>
                     </div>
 
-                  </div>
+                  </SortableItem>
                 ))}
-                <Button onClick={() => setData((data) => { data.education.push({ id: uid(), degree: "", school: "" }); })}>
-                  <Plus className="size-4" />
-                  {ar ? "إضافة مؤهل" : "Add education"}
-                </Button>
-              </div>
+              </SortableList>
+            )}
+            {step === "education" && (
+              <Button className="mt-4" onClick={() => setData((data) => { data.education.push({ id: uid(), degree: "", school: "" }); })}>
+                <Plus className="size-4" />
+                {ar ? "إضافة مؤهل" : "Add education"}
+              </Button>
             )}
 
             {step === "skills" && (
