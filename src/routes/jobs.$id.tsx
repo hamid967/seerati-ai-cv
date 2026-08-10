@@ -463,19 +463,55 @@ function JobWorkspacePage() {
             <h1 className="text-2xl font-extrabold tracking-tight">{form.jobTitle || (ar ? "وظيفة بلا عنوان" : "Untitled job")}</h1>
             <p className="text-sm text-muted-foreground">{form.company}</p>
           </div>
-          <Select value={form.status} onValueChange={(v) => handleStatusChange(v as JobWorkspace["status"])}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {JOB_STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {JOB_STATUS_LABEL[s][lang]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            {baseResume ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => void handleCreateVariant()}
+                  disabled={branching}
+                >
+                  <GitBranch className="size-4" />
+                  {branching
+                    ? ar
+                      ? "جارِ الإنشاء…"
+                      : "Creating…"
+                    : ar
+                      ? "نسخة لهذه الوظيفة"
+                      : "Variant for this job"}
+                </Button>
+                <ResumeVariantSwitcher
+                  userId={user.id}
+                  resumeId={baseResume.id}
+                  current={baseResume.data as ResumeData}
+                  versions={versions}
+                  onRestored={(data) => void updateResume(baseResume.id, { data })}
+                  onChanged={() => setReload((n) => n + 1)}
+                />
+              </>
+            ) : null}
+            <Select value={form.status} onValueChange={(v) => handleStatusChange(v as JobWorkspace["status"])}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {JOB_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {JOB_STATUS_LABEL[s][lang]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+
+        {nextActions.length ? (
+          <div className="mt-6">
+            <NextBestActions actions={nextActions} />
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_280px]">
           {/* Zone 1: job fields */}
