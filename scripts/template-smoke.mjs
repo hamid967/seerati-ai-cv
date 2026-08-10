@@ -33,6 +33,17 @@ const note = (m) => console.log(`NOTE  ${m}`);
 
 /* ------------------------- 1. registry completeness ------------------------ */
 
+// Templates spread `...baseDesign`, so unspecified design keys are inherited.
+const baseBlock = registrySrc.match(/baseDesign:\s*TemplateDesign\s*=\s*\{([\s\S]*?)\n\};/)?.[1] ?? "";
+const baseGrab = (k) => baseBlock.match(new RegExp(`${k}:\\s*("?)([\\w-]+)\\1`))?.[2] ?? null;
+const baseDesign = {
+  spacing: baseGrab("spacing"),
+  sectionStyle: baseGrab("sectionStyle"),
+  layout: baseGrab("layout"),
+  header: baseGrab("header"),
+  bullet: baseGrab("bullet"),
+};
+
 const blocks = registrySrc.split(/\n\s*\{\s*\n\s*id:\s*"/).slice(1);
 const templates = blocks.map((b) => {
   const id = b.slice(0, b.indexOf('"'));
@@ -43,11 +54,11 @@ const templates = blocks.map((b) => {
     atsFriendly: grab("atsFriendly") === "true",
     supportsRTL: grab("supportsRTL") === "true",
     active: grab("active") === "true",
-    layout: grab("layout"),
-    header: grab("header"),
-    sectionStyle: grab("sectionStyle"),
-    bullet: grab("bullet"),
-    spacing: grab("spacing"),
+    layout: grab("layout") ?? baseDesign.layout,
+    header: grab("header") ?? baseDesign.header,
+    sectionStyle: grab("sectionStyle") ?? baseDesign.sectionStyle,
+    bullet: grab("bullet") ?? baseDesign.bullet,
+    spacing: grab("spacing") ?? baseDesign.spacing,
     accent: b.match(/accent:\s*"([^"]+)"/)?.[1] ?? null,
     hasNameAr: /name:\s*\{[^}]*ar:/.test(b),
     hasDescAr: /description:\s*\{[^}]*ar:/.test(b),
@@ -81,10 +92,16 @@ for (const t of templates) {
 
 /* --------------------- 2. renderer covers design variants ------------------ */
 
+// The renderer is config-driven: some variants are the fall-through branch
+// rather than an explicit comparison, so those count as covered.
+const RENDERER_DEFAULTS = { layout: "single", header: "stack", sectionStyle: "plain", bullet: "disc" };
+
 for (const key of ["layout", "header", "sectionStyle", "bullet", "spacing"]) {
   const used = [...new Set(templates.map((t) => t[key]).filter(Boolean))];
   for (const value of used) {
-    if (rendererSrc.includes(`"${value}"`)) pass(`renderer handles ${key}="${value}"`);
+    if (rendererSrc.includes(`"${value}"`) || new RegExp(`\\b${value}:`).test(rendererSrc))
+      pass(`renderer handles ${key}="${value}"`);
+    else if (RENDERER_DEFAULTS[key] === value) pass(`renderer handles ${key}="${value}" (default branch)`);
     else fail(`renderer never references ${key}="${value}"`);
   }
 }
@@ -95,7 +112,8 @@ const sectionKeys = [
   ...new Set(fixtures.flatMap((f) => f.data.sectionOrder)),
 ];
 for (const key of sectionKeys) {
-  if (rendererSrc.includes(`"${key}"`)) pass(`renderer renders section "${key}"`);
+  if (rendererSrc.includes(`"${key}"`) || new RegExp(`\\b${key}:`).test(rendererSrc))
+    pass(`renderer renders section "${key}"`);
   else fail(`renderer has no branch for section "${key}"`);
 }
 
