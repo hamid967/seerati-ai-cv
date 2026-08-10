@@ -213,9 +213,13 @@ export async function generateCoverLetter(args: {
 
   const res = await aiService.run({
     task: "chat",
-    text: prompt,
-    language: args.lang,
-    tone: args.tone,
+    lang: args.lang,
+    input: prompt,
+    context: {
+      targetRole: args.jobTitle,
+      jobDescription: args.jobDescription,
+      section: "cover_letter",
+    },
   });
   const parts = (res.text ?? "")
     .split(/\n\s*\n/)
