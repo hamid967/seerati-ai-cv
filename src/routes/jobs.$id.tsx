@@ -329,11 +329,67 @@ function JobWorkspacePage() {
 
       const list = await listAssets(job.id);
       setAssets(list);
+      // Events describe what actually happened, so the resume line is
+      // conditional on a resume having really been created.
+      if (resumeId) {
+        await addJobEvent(user.id, {
+          jobId: job.id,
+          eventType: "resume_variant",
+          title: ar ? `سيرة مخصصة: ${title}` : `Tailored resume: ${title}`,
+          metadata: { resumeId },
+        });
+      }
+      await addJobEvent(user.id, {
+        jobId: job.id,
+        eventType: "cover_letter",
+        title: ar ? "مسودة خطاب تقديم" : "Cover letter draft",
+        metadata: { coverLetterId: job.id },
+      });
+      refreshEvents();
       toast.success(ar ? "تم تجهيز حزمة الطلب" : "Application pack is ready");
     } finally {
       setPreparing(false);
     }
   };
+
+  /** Branch a job-specific variant inside the existing resume (no new resume). */
+  const handleCreateVariant = async () => {
+    if (!job || !user || !baseResume) return;
+    setBranching(true);
+    try {
+      const version = await createJobVariantSnapshot({
+        userId: user.id,
+        resumeId: baseResume.id,
+        snapshot: baseResume.data as ResumeData,
+        jobTitle: job.jobTitle,
+        company: job.company,
+        jobId: job.id,
+        jobDescription: job.jobDescription,
+      });
+      if (!version) {
+        toast.error(ar ? "تعذّر إنشاء النسخة." : "Could not create the variant.");
+        return;
+      }
+      await addJobEvent(user.id, {
+        jobId: job.id,
+        eventType: "resume_variant",
+        title: ar ? `نسخة سيرة: ${version.label}` : `Resume variant: ${version.label}`,
+        metadata: { resumeId: baseResume.id, versionId: version.id },
+      });
+      setVersions(await listResumeVersions(baseResume.id));
+      refreshEvents();
+      toast.success(
+        ar
+          ? "أُنشئت نسخة داخل نفس السيرة — لم تُستهلك من حدّ الثلاث سير."
+          : "A variant was created inside this resume — your 3-resume limit is untouched.",
+      );
+    } catch {
+      toast.error(ar ? "تعذّر إنشاء النسخة." : "Could not create the variant.");
+    } finally {
+      setBranching(false);
+    }
+  };
+
 
   if (!ready || !user || job === undefined) {
     return (
