@@ -49,8 +49,10 @@ const stepDefs = [
   { key: "education", ar: "التعليم", en: "Education" },
   { key: "skills", ar: "المهارات واللغات", en: "Skills & languages" },
   { key: "extras", ar: "أقسام إضافية", en: "Extra sections" },
+  { key: "design", ar: "التصميم", en: "Design" },
   { key: "order", ar: "ترتيب الأقسام", en: "Section order" },
 ] as const;
+
 
 const sectionLabels: Record<SectionKey, { ar: string; en: string }> = {
   summary: { ar: "الملخص المهني", en: "Summary" },
