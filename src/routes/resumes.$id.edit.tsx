@@ -18,6 +18,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
+import { SortableList, SortableItem, reorderArray } from "@/components/sortable";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
