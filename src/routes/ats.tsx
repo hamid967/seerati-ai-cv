@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { analyzeResume } from "@/lib/ats";
+import { explainFinding, LINT_CATEGORY_LABEL, lintResume } from "@/lib/resume-lint";
 import { demoResume } from "@/lib/demo-data";
 import { getTemplate } from "@/components/resume-preview";
 
@@ -36,6 +37,7 @@ function AtsPage() {
   const [jd, setJd] = useState("");
   const sample = useMemo(() => demoResume("demo"), []);
   const report = useMemo(() => analyzeResume(sample, getTemplate(sample.templateId), jd), [sample, jd]);
+  const lint = useMemo(() => lintResume(sample), [sample]);
 
   return (
     <div className="flex min-h-screen flex-col">
