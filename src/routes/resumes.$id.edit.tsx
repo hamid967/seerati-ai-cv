@@ -462,6 +462,7 @@ function EditResume() {
                         </li>
                       ))}
                     </ul>
+                    <BilingualSyncCard current={draft} all={resumes} />
                   </TabsContent>
                 </Tabs>
               </SheetContent>
