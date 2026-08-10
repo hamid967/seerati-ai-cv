@@ -100,43 +100,17 @@ function Dashboard() {
     );
   }
 
-  // Next-best-actions, derived only from real state — no fabricated activity.
-  const nextActions: NextAction[] = [];
-  if (twinScore !== null && twinScore < 70) {
-    nextActions.push({
-      key: "twin",
-      label: ar ? "أكمل ملفك المهني الموحّد" : "Complete your unified career profile",
-      href: "/career-twin",
-    });
-  }
-  const weakResume = resumes.find((r) => analyzeResume(r, getTemplate(r.templateId)).score < 60);
-  if (weakResume) {
-    nextActions.push({
-      key: "ats",
-      label: ar ? `ارفع جاهزية ATS لسيرة «${weakResume.title}»` : `Improve ATS readiness for "${weakResume.title}"`,
-      href: "/resumes/$id/edit",
-      internal: true,
-    });
-  }
-  const openTask = tasks.find((tk) => !tk.done);
-  if (openTask) {
-    nextActions.push({
-      key: "task",
-      label: ar ? `مهمة متابعة: ${openTask.title}` : `Follow-up: ${openTask.title}`,
-      href: "/jobs",
-    });
-  }
-  const staleJob = jobs.find((j) => j.status === "saved" || j.status === "preparing");
-  if (staleJob) {
-    nextActions.push({
-      key: "job",
-      label: ar ? `جهّز مساحة وظيفة «${staleJob.jobTitle}»` : `Prepare the "${staleJob.jobTitle}" job space`,
-      href: "/jobs",
-    });
-  }
-  if (resumes.length === 0) {
-    nextActions.push({ key: "resume", label: ar ? "أنشئ أول سيرة ذاتية" : "Create your first resume", href: "/resumes/new", internal: true });
-  }
+  // Actions come from the deterministic engine, so nothing here is invented.
+  const nextActions = computeNextActions({
+    twin,
+    graph,
+    resumes,
+    jobs,
+    upcomingInterviews: jobs
+      .filter((j) => j.status === "interview" && j.nextActionAt)
+      .map((j) => ({ jobId: j.id, jobTitle: j.jobTitle, occurredAt: j.nextActionAt as string })),
+  });
+
 
   return (
     <div className="flex min-h-screen flex-col">
