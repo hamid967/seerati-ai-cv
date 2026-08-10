@@ -92,14 +92,14 @@ function PrivacyCenterPage() {
 
   if (!ready || !user) return null;
 
-  const importMeta = (twin?.importMeta ?? {}) as Record<string, unknown>;
+  const provenanceCount = twin?.importHistory.length ?? 0;
   const counts: Counts = {
     resumes: 0,
     facts: graph.facts.length,
     evidence: graph.evidence.length,
     jobs: jobs.length,
     twin: Boolean(twin),
-    provenance: Object.keys(importMeta).length,
+    provenance: provenanceCount,
   };
 
   const dataMap: Array<{ icon: typeof Database; title: string; body: string; meta?: string }> = [

@@ -81,7 +81,7 @@ export function downloadJson(doc: unknown, filename: string) {
 export async function clearImportProvenance(userId: string): Promise<void> {
   const { error } = await supabase
     .from("career_profiles")
-    .update({ import_meta: {} })
+    .update({ import_meta: [] })
     .eq("user_id", userId);
   if (error) throw new Error(error.message);
 }
