@@ -34,6 +34,7 @@ import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
+import { Route as ResumesIdStudioRouteImport } from './routes/resumes.$id.studio'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -160,6 +161,11 @@ const ResumesIdPreviewRoute = ResumesIdPreviewRouteImport.update({
   path: '/resumes/$id/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIdStudioRoute = ResumesIdStudioRouteImport.update({
+  id: '/resumes/$id/studio',
+  path: '/resumes/$id/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/jobs/': typeof JobsIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -213,6 +220,7 @@ export interface FileRoutesByTo {
   '/jobs': typeof JobsIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/jobs/': typeof JobsIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/jobs/'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/studio'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/jobs'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/studio'
   id:
     | '__root__'
     | '/'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/jobs/'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/studio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -346,6 +358,7 @@ export interface RootRouteChildren {
   JobsIndexRoute: typeof JobsIndexRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
+  ResumesIdStudioRoute: typeof ResumesIdStudioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -525,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesIdPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/$id/studio': {
+      id: '/resumes/$id/studio'
+      path: '/resumes/$id/studio'
+      fullPath: '/resumes/$id/studio'
+      preLoaderRoute: typeof ResumesIdStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -567,7 +587,18 @@ const rootRouteChildren: RootRouteChildren = {
   JobsIndexRoute: JobsIndexRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
+  ResumesIdStudioRoute: ResumesIdStudioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
