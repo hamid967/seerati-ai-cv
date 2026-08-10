@@ -17,8 +17,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -66,14 +69,29 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemplatesRoute = TemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -116,7 +134,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
   '/templates': typeof TemplatesRoute
+  '/terms': typeof TermsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
@@ -133,7 +154,10 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
   '/templates': typeof TemplatesRoute
+  '/terms': typeof TermsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
@@ -152,7 +176,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy': typeof PrivacyRoute
   '/templates': typeof TemplatesRoute
+  '/terms': typeof TermsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
@@ -172,7 +199,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/features'
     | '/onboarding'
+    | '/privacy'
     | '/templates'
+    | '/terms'
+    | '/admin/audit'
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
@@ -189,7 +219,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/features'
     | '/onboarding'
+    | '/privacy'
     | '/templates'
+    | '/terms'
+    | '/admin/audit'
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
@@ -207,7 +240,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/features'
     | '/onboarding'
+    | '/privacy'
     | '/templates'
+    | '/terms'
+    | '/admin/audit'
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
@@ -226,7 +262,9 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   OnboardingRoute: typeof OnboardingRoute
+  PrivacyRoute: typeof PrivacyRoute
   TemplatesRoute: typeof TemplatesRoute
+  TermsRoute: typeof TermsRoute
   ResumesNewRoute: typeof ResumesNewRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
@@ -290,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/templates': {
       id: '/templates'
       path: '/templates'
@@ -297,11 +342,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
@@ -350,6 +409,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -357,6 +417,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -374,7 +435,9 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   OnboardingRoute: OnboardingRoute,
+  PrivacyRoute: PrivacyRoute,
   TemplatesRoute: TemplatesRoute,
+  TermsRoute: TermsRoute,
   ResumesNewRoute: ResumesNewRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,

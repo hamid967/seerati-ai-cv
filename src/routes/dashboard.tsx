@@ -20,7 +20,6 @@ import {
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useI18n, useT } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
-import { RESUME_LIMIT } from "@/lib/types";
 import { analyzeResume, completeness, resumeStatus } from "@/lib/ats";
 
 export const Route = createFileRoute("/dashboard")({
@@ -41,7 +40,7 @@ function Dashboard() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume } = useStore();
+  const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume, maxResumes } = useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   useAuthGuard();
@@ -76,9 +75,9 @@ function Dashboard() {
           <div className="flex items-center gap-4">
             <div className="min-w-32">
               <p className="text-xs text-muted-foreground">
-                {t("usage")} {resumes.length}/{RESUME_LIMIT}
+                {t("usage")} {resumes.length}/{maxResumes}
               </p>
-              <Progress value={(resumes.length / RESUME_LIMIT) * 100} className="mt-2" />
+              <Progress value={(resumes.length / maxResumes) * 100} className="mt-2" />
             </div>
             {atLimit ? (
               <Button disabled title={t("limit_reached")}>

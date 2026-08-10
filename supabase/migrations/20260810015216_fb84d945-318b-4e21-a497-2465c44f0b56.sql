@@ -1,0 +1,1 @@
+revoke execute on function public.admin_set_user_role(uuid, app_role) from anon;

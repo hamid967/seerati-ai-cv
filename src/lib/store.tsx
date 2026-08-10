@@ -44,6 +44,7 @@ type Ctx = {
   deleteResume: (id: string) => Promise<void>;
   getResume: (id: string) => Resume | undefined;
   atLimit: boolean;
+  maxResumes: number;
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -83,6 +84,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Profile | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
+  const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
+
+  useEffect(() => {
+    void supabase
+      .from("app_settings")
+      .select("max_resumes")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.max_resumes) setMaxResumes(data.max_resumes);
+      });
+  }, []);
 
   const loadProfile = useCallback(async (userId: string, email: string) => {
     const [{ data: profile }, { data: roles }] = await Promise.all([
@@ -105,13 +118,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const loadResumes = useCallback(async () => {
     setLoadingResumes(true);
+    // Admins can read every resume via RLS, so scope the dashboard to the signed-in owner.
+    const { data: auth } = await supabase.auth.getUser();
+    const uid = auth.user?.id;
+    if (!uid) {
+      setResumes([]);
+      setLoadingResumes(false);
+      return;
+    }
     const { data } = await supabase
       .from("resumes")
       .select("*")
+      .eq("user_id", uid)
       .order("updated_at", { ascending: false });
     setResumes(((data as ResumeRow[] | null) ?? []).map(toResume));
     setLoadingResumes(false);
   }, []);
+
 
   useEffect(() => {
     let active = true;
@@ -192,13 +215,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [loadProfile, loadResumes]);
 
   const value = useMemo<Ctx>(() => {
-    const atLimit = resumes.length >= RESUME_LIMIT;
+    const atLimit = resumes.length >= maxResumes;
     return {
       ready,
       user,
       resumes,
       loadingResumes,
       atLimit,
+      maxResumes,
       signIn,
       signUp,
       resetPassword: async (email) => {
@@ -300,7 +324,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       getResume: (id) => resumes.find((r) => r.id === id),
     };
-  }, [ready, user, resumes, loadingResumes, signIn, signUp]);
+  }, [ready, user, resumes, loadingResumes, maxResumes, signIn, signUp]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
