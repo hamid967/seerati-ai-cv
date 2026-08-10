@@ -1,0 +1,27 @@
+name: Stage5G CI Format Diagnostic
+
+on:
+  push:
+    branches:
+      - stage5g/smart-pagination-page-composer
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage5g/smart-pagination-page-composer
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Print Prettier-formatted CI
+        run: |
+          bunx prettier --write .github/workflows/ci.yml
+          echo '---BEGIN-CI---'
+          cat .github/workflows/ci.yml
+          echo '---END-CI---'
