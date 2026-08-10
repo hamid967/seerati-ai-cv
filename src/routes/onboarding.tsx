@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
+import { ResumeInterview } from "@/components/resume-interview";
+import { ResumeImport } from "@/components/resume-import";
+import type { ResumeData } from "@/lib/types";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -28,9 +31,11 @@ function Onboarding() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, resumes, updateProfile, createResume } = useStore();
-  const STEPS = 4;
+  const { user, ready, resumes, updateProfile, createResume, updateResume } = useStore();
+  const STEPS = 5;
   const [step, setStep] = useState(1);
+  const [path, setPath] = useState<"choose" | "manual" | "interview" | "import">("choose");
+  const [importedData, setImportedData] = useState<Partial<ResumeData> | null>(null);
   const [fullName, setFullName] = useState("");
   const [currentTitle, setCurrentTitle] = useState("");
   const [targetRole, setTargetRole] = useState("");
@@ -67,6 +72,11 @@ function Onboarding() {
       language: cvLang,
       jobTitle: targetRole || currentTitle,
     });
+    if (created && importedData) {
+      await updateResume(created.id, {
+        data: { ...created.data, ...importedData, personal: { ...created.data.personal, ...(importedData.personal ?? {}) } },
+      });
+    }
     setSaving(false);
     if (created) {
       toast.success(ar ? "أنشأنا لك سيرة ذاتية للبدء" : "We created a resume to get you started");
