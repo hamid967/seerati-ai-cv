@@ -41,6 +41,7 @@ import {
   type ResumeVersion,
 } from "@/lib/resume-versions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
+import { BilingualSyncCard } from "@/components/bilingual-sync-card";
 
 
 export const Route = createFileRoute("/resumes/$id/edit")({
@@ -134,7 +135,7 @@ function EditResume() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { ready, user, getResume, updateResume } = useStore();
+  const { ready, user, resumes, getResume, updateResume } = useStore();
 
   const stored = getResume(id);
   const [draft, setDraft] = useState<Resume | null>(null);
@@ -1103,6 +1104,7 @@ function EditResume() {
                   </div>
                 )}
               </div>
+              <BilingualSyncCard current={draft} all={resumes} />
             </TabsContent>
           </Tabs>
         </div>

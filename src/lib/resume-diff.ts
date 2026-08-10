@@ -63,7 +63,7 @@ const SECTION_LABEL: Record<string, { ar: string; en: string }> = {
   design: { ar: "التصميم", en: "Design" },
 };
 
-const sectionLabel = (section: string) =>
+export const sectionLabel = (section: string) =>
   SECTION_LABEL[section] ?? { ar: section, en: section };
 
 const text = (v: unknown): string => {
