@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ClipboardCopy, Download, FileText, Loader2, Printer } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ClipboardCopy, Download, FileText, Loader2, Printer, WandSparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
@@ -32,14 +32,12 @@ function PreviewResume() {
   const { id } = Route.useParams();
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const navigate = useNavigate();
   const { ready, user, getResume } = useStore();
   const resume = getResume(id);
 
   useAuthGuard();
   const [exportingImagePdf, setExportingImagePdf] = useState(false);
 
-  // Stamp the view once per mounted resume; a direct write avoids re-render loops.
   const stamped = useRef<string | null>(null);
   useEffect(() => {
     if (!ready || !user || stamped.current === id) return;
@@ -146,6 +144,12 @@ function PreviewResume() {
             <Link to="/resumes/$id/edit" params={{ id: resume.id }}>
               <FileText className="size-4" />
               {ar ? "تحرير" : "Edit"}
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/resumes/$id/studio" params={{ id: resume.id }}>
+              <WandSparkles className="size-4" />
+              {ar ? "استوديو التصميم" : "Design studio"}
             </Link>
           </Button>
           <Button variant="outline" onClick={downloadTxt}>

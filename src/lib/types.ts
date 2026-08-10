@@ -28,6 +28,11 @@ export type ResumeUserDesign = {
   accent?: string;
   density?: "compact" | "normal" | "airy";
   showPhoto?: boolean;
+  pageSize?: "a4" | "letter";
+  fontScale?: number;
+  marginMm?: number;
+  lineHeight?: number;
+  columnWidth?: number;
 };
 
 export const ACCENT_PALETTE = [
