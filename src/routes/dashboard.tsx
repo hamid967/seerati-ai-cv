@@ -142,42 +142,16 @@ function Dashboard() {
 
         {/* Next best actions */}
         <section>
-          <h2 className="text-lg font-bold">{ar ? "الخطوة التالية" : "Next best step"}</h2>
           {loadingCenter ? (
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {[0, 1].map((i) => (
                 <Skeleton key={i} className="h-16 rounded-xl" />
               ))}
             </div>
-          ) : nextActions.length === 0 ? (
-            <p className="mt-3 rounded-xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
-              {ar ? "لا توجد خطوات معلّقة الآن — ملفك ووظائفك في حالة جيدة." : "No pending steps right now — your profile and jobs look in good shape."}
-            </p>
           ) : (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {nextActions.slice(0, 4).map((a) =>
-                a.internal ? (
-                  <Link
-                    key={a.key}
-                    to={a.href as "/resumes/new"}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 text-sm font-medium shadow-soft transition-colors hover:bg-secondary"
-                  >
-                    {a.label}
-                    <ArrowLeft className="size-4 shrink-0 rtl:rotate-0 ltr:rotate-180" />
-                  </Link>
-                ) : (
-                  <a
-                    key={a.key}
-                    href={a.href}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 text-sm font-medium shadow-soft transition-colors hover:bg-secondary"
-                  >
-                    {a.label}
-                    <ArrowLeft className="size-4 shrink-0 rtl:rotate-0 ltr:rotate-180" />
-                  </a>
-                ),
-              )}
-            </div>
+            <NextBestActions actions={nextActions} />
           )}
+
         </section>
 
         {/* Team status strip */}
