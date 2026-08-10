@@ -1,12 +1,13 @@
 /**
  * Conversational Resume Copilot.
  *
- * Fills the gaps the import could not: it asks one question at a time about a
- * specific missing field, and every suggestion is applied only after the user
- * approves it (before/after is shown). Language follows the app language.
+ * One question at a time, never a questionnaire. Every model reply becomes a
+ * validated action (see `ai-actions.ts`) and any write is shown as
+ * Original / Suggested / Reason with Apply · Edit then apply · Regenerate ·
+ * Keep original — nothing is ever auto-written.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Loader2, MessageSquare, Send, X } from "lucide-react";
+import { Check, Languages, Loader2, MessageSquare, Pencil, RotateCcw, Send, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { AiUserError, aiService } from "@/lib/ai-service";
+import {
+  flagUnverifiedFigures,
+  isExecutableAction,
+  LANGUAGE_MODE_LABEL,
+  makeAction,
+  QUICK_ACTIONS,
+  resolveReplyLanguage,
+  type CopilotAction,
+  type LanguageMode,
+  type QuickAction,
+} from "@/lib/ai-actions";
 
 export type CopilotGap = {
   /** Field the question targets, e.g. "summary" or "skills". */
@@ -25,68 +37,116 @@ export type CopilotGap = {
 type Turn =
   | { id: string; role: "assistant"; text: string }
   | { id: string; role: "user"; text: string }
-  | { id: string; role: "proposal"; gapKey: string; before: string; after: string; resolved?: "applied" | "skipped" };
+  | {
+      id: string;
+      role: "proposal";
+      gapKey: string;
+      before: string;
+      action: CopilotAction;
+      editing?: boolean;
+      resolved?: "applied" | "kept";
+    };
 
 const rid = () => Math.random().toString(36).slice(2, 10);
+const MODES: LanguageMode[] = ["auto", "ar", "en"];
 
 export function ResumeCopilot({
   gaps,
   currentValue,
   onApply,
   targetRole,
+  jobDescription,
+  recap,
+  progress,
 }: {
   gaps: CopilotGap[];
   /** Existing value of a gap field, for an honest before/after. */
   currentValue: (key: string) => string;
   onApply: (key: string, value: string) => void | Promise<void>;
   targetRole?: string;
+  jobDescription?: string;
+  /** Short recap lines shown once, e.g. right after an import. */
+  recap?: string[];
+  /** Descriptive progress lines (never a fake score). */
+  progress?: string[];
 }) {
   const { lang, dir } = useI18n();
   const ar = lang === "ar";
+  const [mode, setMode] = useState<LanguageMode>("auto");
   const [index, setIndex] = useState(0);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastAnswer, setLastAnswer] = useState("");
   const scroller = useRef<HTMLDivElement>(null);
+  const composer = useRef<HTMLTextAreaElement>(null);
 
   const gap = gaps[index];
   const openedRef = useRef<string | null>(null);
 
-  // Ask the first question for each gap exactly once (no effect loops).
+  // Ask the next question exactly once per gap (no effect loops).
   useEffect(() => {
-    if (!gap || openedRef.current === gap.key) return;
-    openedRef.current = gap.key;
-    setTurns((prev) => [...prev, { id: rid(), role: "assistant", text: gap.question[ar ? "ar" : "en"] }]);
+    const key = gap ? gap.key : "__done__";
+    if (openedRef.current === key) return;
+    openedRef.current = key;
+    const text = gap
+      ? gap.question[ar ? "ar" : "en"]
+      : ar
+        ? "ما الوظيفة التي تستهدفها الآن؟ سأخصص السيرة لها."
+        : "Which role are you targeting next? I will tailor the resume to it.";
+    setTurns((prev) => [...prev, { id: rid(), role: "assistant", text }]);
   }, [gap, ar]);
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: "smooth" });
   }, [turns]);
 
-  const remaining = useMemo(() => Math.max(0, gaps.length - index), [gaps.length, index]);
+  useEffect(() => {
+    composer.current?.focus();
+  }, [busy]);
 
-  async function send() {
-    const answer = input.trim();
-    if (!answer || !gap || busy) return;
-    setInput("");
+  const remaining = useMemo(() => Math.max(0, gaps.length - index), [gaps.length, index]);
+  const activeKey = gap?.key ?? "headline";
+
+  async function propose(source: string, quick?: QuickAction) {
+    if (busy) return;
+    const answer = source.trim();
+    if (!answer) return;
     setError(null);
-    setTurns((prev) => [...prev, { id: rid(), role: "user", text: answer }]);
     setBusy(true);
+    const replyLang = quick?.forceLang ?? resolveReplyLanguage(mode, answer, lang);
     try {
       const res = await aiService.run({
-        task: gap.key === "summary" ? "summary" : "copilot",
-        lang,
+        task: quick ? quick.task : activeKey === "summary" ? "summary" : "copilot",
+        lang: replyLang,
         input: answer,
         context: {
-          section: gap.key,
+          section: activeKey,
           ...(targetRole ? { targetRole } : {}),
+          ...(jobDescription ? { jobDescription } : {}),
         },
       });
-      const after = (res.items?.[0] ?? res.text).trim();
+      const raw = (res.items?.[0] ?? res.text).trim();
+      const text = flagUnverifiedFigures(raw, replyLang);
+      const action = makeAction({
+        type: quick?.task === "translate" ? "translate" : activeKey ? "update_field" : "suggest_edit",
+        target: activeKey,
+        text,
+        ...(res.items?.length ? { items: res.items } : {}),
+        reason: quick
+          ? quick.reason[replyLang]
+          : replyLang === "ar"
+            ? "صياغة مهنية مبنية على ما ذكرته، بدون إضافة معلومات لم تقدّمها."
+            : "Professional wording based only on what you told me — nothing invented.",
+      });
+      if (!isExecutableAction(action)) {
+        setError(ar ? "لم يصل اقتراح صالح. أعد المحاولة." : "No valid suggestion came back. Please retry.");
+        return;
+      }
       setTurns((prev) => [
         ...prev,
-        { id: rid(), role: "proposal", gapKey: gap.key, before: currentValue(gap.key), after },
+        { id: rid(), role: "proposal", gapKey: activeKey, before: currentValue(activeKey), action },
       ]);
     } catch (e) {
       setError(
@@ -101,28 +161,95 @@ export function ResumeCopilot({
     }
   }
 
-  function resolve(turnId: string, decision: "applied" | "skipped") {
+  async function send() {
+    const answer = input.trim();
+    if (!answer || busy) return;
+    setInput("");
+    setLastAnswer(answer);
+    setTurns((prev) => [...prev, { id: rid(), role: "user", text: answer }]);
+    await propose(answer);
+  }
+
+  function editText(turnId: string, value: string) {
     setTurns((prev) =>
-      prev.map((t) => (t.id === turnId && t.role === "proposal" ? { ...t, resolved: decision } : t)),
+      prev.map((t) =>
+        t.id === turnId && t.role === "proposal"
+          ? { ...t, action: { ...t.action, payload: { ...t.action.payload, text: value } } }
+          : t,
+      ),
     );
+  }
+
+  async function resolve(turnId: string, decision: "applied" | "kept") {
     const turn = turns.find((t) => t.id === turnId);
-    if (turn?.role === "proposal" && decision === "applied") void onApply(turn.gapKey, turn.after);
+    if (!turn || turn.role !== "proposal") return;
+    setTurns((prev) => prev.map((t) => (t.id === turnId ? { ...t, resolved: decision, editing: false } : t)));
+    if (decision === "applied") {
+      await onApply(turn.gapKey, turn.action.payload.text.trim());
+    }
     setIndex((i) => Math.min(gaps.length, i + 1));
   }
 
+  const quickSource = lastAnswer || currentValue(activeKey);
+
   return (
-    <Card dir={dir}>
-      <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <MessageSquare className="size-4 text-primary" />
-          {ar ? "أكمل الناقص بالمحادثة" : "Finish the gaps by chatting"}
-        </CardTitle>
-        <Badge variant="secondary">
-          {ar ? `${remaining} سؤال متبقٍ` : `${remaining} question${remaining === 1 ? "" : "s"} left`}
-        </Badge>
+    <Card dir={dir} className="flex max-h-[80vh] flex-col">
+      <CardHeader className="space-y-3 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MessageSquare className="size-4 text-primary" />
+            {ar ? "مساعد سيرتي" : "Seerati copilot"}
+          </CardTitle>
+          <Badge variant="secondary">
+            {remaining > 0
+              ? ar
+                ? `${remaining} نقطة متبقية`
+                : `${remaining} gap${remaining === 1 ? "" : "s"} left`
+              : ar
+                ? "الأساسيات مكتملة"
+                : "Basics complete"}
+          </Badge>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Languages className="size-3.5" />
+            {ar ? "لغة المحادثة" : "Chat language"}
+          </span>
+          <div className="flex overflow-hidden rounded-lg border">
+            {MODES.map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                aria-pressed={mode === m}
+                className={`px-2.5 py-1 text-xs transition ${
+                  mode === m ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                }`}
+              >
+                {LANGUAGE_MODE_LABEL[m][ar ? "ar" : "en"]}
+              </button>
+            ))}
+          </div>
+        </div>
+        {progress && progress.length > 0 && (
+          <ul className="space-y-0.5 text-xs text-muted-foreground">
+            {progress.map((p, i) => (
+              <li key={i}>• {p}</li>
+            ))}
+          </ul>
+        )}
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div ref={scroller} className="max-h-80 space-y-3 overflow-y-auto pe-1">
+
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
+        <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto pe-1">
+          {recap && recap.length > 0 && (
+            <div className="rounded-xl border bg-muted/40 p-3 text-xs text-muted-foreground">
+              <p className="mb-1 font-medium text-foreground">{ar ? "ما استخرجناه" : "What we extracted"}</p>
+              {recap.map((line, i) => (
+                <p key={i}>• {line}</p>
+              ))}
+            </div>
+          )}
           {turns.map((turn) => {
             if (turn.role === "assistant")
               return (
@@ -140,34 +267,73 @@ export function ResumeCopilot({
                 </p>
               );
             return (
-              <div key={turn.id} className="rounded-xl border bg-muted/40 p-3 text-sm">
-                {turn.before ? (
-                  <p className="mb-2 text-muted-foreground line-through">{turn.before}</p>
-                ) : (
-                  <p className="mb-2 text-xs text-muted-foreground">
-                    {ar ? "الحقل فارغ حالياً" : "This field is currently empty"}
+              <div key={turn.id} className="space-y-2 rounded-xl border bg-muted/40 p-3 text-sm">
+                <div>
+                  <p className="text-[11px] font-medium uppercase text-muted-foreground">
+                    {ar ? "النص الحالي" : "Original"}
                   </p>
-                )}
-                <p className="font-medium leading-relaxed">{turn.after}</p>
+                  <p className="text-muted-foreground">
+                    {turn.before || (ar ? "لا يوجد نص حالي." : "Currently empty.")}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-medium uppercase text-muted-foreground">
+                    {ar ? "المقترح" : "Suggested"}
+                  </p>
+                  {turn.editing && !turn.resolved ? (
+                    <Textarea
+                      rows={4}
+                      value={turn.action.payload.text}
+                      onChange={(e) => editText(turn.id, e.target.value)}
+                    />
+                  ) : (
+                    <p className="whitespace-pre-line font-medium leading-relaxed">{turn.action.payload.text}</p>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium">{ar ? "السبب: " : "Reason: "}</span>
+                  {turn.action.reason}
+                </p>
                 {turn.resolved ? (
-                  <p className="mt-2 text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     {turn.resolved === "applied"
                       ? ar
-                        ? "تم الحفظ في ملفك المهني."
-                        : "Saved to your career profile."
+                        ? "تم الحفظ في ملفك المهني — يمكنك التعديل أو التراجع من المحرّر."
+                        : "Saved to your career profile — editable and reversible in the builder."
                       : ar
-                        ? "تم التجاهل."
-                        : "Skipped."}
+                        ? "أبقينا النص الأصلي."
+                        : "Kept your original text."}
                   </p>
                 ) : (
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" onClick={() => resolve(turn.id, "applied")}>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => void resolve(turn.id, "applied")}>
                       <Check className="size-4" />
-                      {ar ? "اعتماد" : "Approve"}
+                      {ar ? "تطبيق" : "Apply"}
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => resolve(turn.id, "skipped")}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setTurns((prev) =>
+                          prev.map((t) => (t.id === turn.id && t.role === "proposal" ? { ...t, editing: true } : t)),
+                        )
+                      }
+                    >
+                      <Pencil className="size-4" />
+                      {ar ? "عدّل ثم طبّق" : "Edit then apply"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => void propose(lastAnswer || turn.before || turn.action.payload.text)}
+                    >
+                      <RotateCcw className="size-4" />
+                      {ar ? "أعد التوليد" : "Regenerate"}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => void resolve(turn.id, "kept")}>
                       <X className="size-4" />
-                      {ar ? "تجاهل" : "Skip"}
+                      {ar ? "أبقِ الأصلي" : "Keep original"}
                     </Button>
                   </div>
                 )}
@@ -175,38 +341,48 @@ export function ResumeCopilot({
             );
           })}
           {busy && (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              {ar ? "أصيغ اقتراحاً…" : "Drafting a suggestion…"}
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="size-3.5 animate-spin" />
+              {ar ? "أعمل على الصياغة…" : "Working on it…"}
             </p>
           )}
         </div>
 
+        <div className="flex flex-wrap gap-1.5">
+          {QUICK_ACTIONS.map((qa) => (
+            <Button
+              key={qa.id}
+              size="sm"
+              variant="secondary"
+              className="h-7 text-xs"
+              disabled={busy || !quickSource.trim()}
+              onClick={() => void propose(quickSource, qa)}
+            >
+              {qa.label[ar ? "ar" : "en"]}
+            </Button>
+          ))}
+        </div>
+
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        {gap ? (
-          <div className="flex items-end gap-2">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              rows={2}
-              placeholder={ar ? "اكتب إجابتك…" : "Type your answer…"}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void send();
-                }
-              }}
-            />
-            <Button onClick={() => void send()} disabled={busy || !input.trim()} size="icon">
-              <Send className="size-4" />
-            </Button>
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            {ar ? "أكملنا كل الأسئلة. يمكنك المتابعة إلى ملفك المهني." : "All questions are done — continue to your career profile."}
-          </p>
-        )}
+        <div className="flex items-end gap-2 pb-[env(safe-area-inset-bottom)]">
+          <Textarea
+            ref={composer}
+            rows={2}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                void send();
+              }
+            }}
+            placeholder={ar ? "اكتب إجابتك…" : "Type your answer…"}
+          />
+          <Button onClick={() => void send()} disabled={busy || !input.trim()} aria-label={ar ? "إرسال" : "Send"}>
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
