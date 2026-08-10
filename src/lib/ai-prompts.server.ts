@@ -32,6 +32,7 @@ function contextBlock(req: AiRequest): string {
   if (c.answers?.["industry"]) bits.push(`Industry: ${c.answers["industry"]}`);
   if (c.section) bits.push(`Resume section: ${c.section}`);
   if (c.jobDescription) bits.push(`Job description (excerpt): ${c.jobDescription.slice(0, 1500)}`);
+  if (c.protectedTerms) bits.push(c.protectedTerms.slice(0, 1200));
   return bits.length ? `\n\nContext:\n${bits.join("\n")}` : "";
 }
 

@@ -1,0 +1,9 @@
+{
+  "_comment": "Files allowed to use physical direction utilities. Each entry needs a reason; the RTL check prints them on every run so the list stays visible.",
+  "entries": [
+    {
+      "file": "src/components/resume-preview.tsx",
+      "reason": "Printed resume renderer: alignment is mirrored explicitly from the resume language (rtl flag) so the PDF matches the document direction, not the app direction."
+    }
+  ]
+}

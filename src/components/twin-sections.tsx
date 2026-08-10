@@ -12,6 +12,15 @@ import type {
   CareerSkill,
 } from "@/lib/career";
 import type { Experience, Education, LanguageItem, LinkItem } from "@/lib/types";
+import { TaxonomyInput } from "@/components/taxonomy-input";
+import {
+  SECTORS,
+  SENIORITY_LABEL,
+  cityOptions,
+  inferSeniority,
+  normalizeJobTitle,
+  titleOptions,
+} from "@/lib/saudi-career-taxonomy";
 
 
 type WorkMode = "onsite" | "hybrid" | "remote";
@@ -122,25 +131,33 @@ export function TargetsCard({
         {targets.map((tg, i) => (
           <RowShell key={tg.id} ar={ar} onRemove={() => remove(i)}>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Input
+              <TaxonomyInput
+                aria-label={ar ? "المسمى الوظيفي المستهدف" : "Target title"}
                 placeholder={ar ? "المسمى الوظيفي المستهدف" : "Target title"}
                 value={tg.title}
-                onChange={(e) => update(i, { title: e.target.value })}
+                options={titleOptions(ar ? "ar" : "en")}
+                onChange={(v) => update(i, { title: v })}
               />
-              <Input
+              <TaxonomyInput
+                aria-label={ar ? "المستوى" : "Seniority"}
                 placeholder={ar ? "المستوى (مبتدئ/متوسط/أول)" : "Seniority"}
                 value={tg.seniority ?? ""}
-                onChange={(e) => update(i, { seniority: e.target.value })}
+                options={Object.values(SENIORITY_LABEL).map((l) => l[ar ? "ar" : "en"])}
+                onChange={(v) => update(i, { seniority: v })}
               />
-              <Input
+              <TaxonomyInput
+                aria-label={ar ? "الصناعة" : "Industry"}
                 placeholder={ar ? "الصناعة" : "Industry"}
                 value={tg.industry ?? ""}
-                onChange={(e) => update(i, { industry: e.target.value })}
+                options={SECTORS.map((x) => x.label[ar ? "ar" : "en"])}
+                onChange={(v) => update(i, { industry: v })}
               />
-              <Input
+              <TaxonomyInput
+                aria-label={ar ? "المدن" : "Cities"}
                 placeholder={ar ? "المدن" : "Cities"}
                 value={tg.cities ?? ""}
-                onChange={(e) => update(i, { cities: e.target.value })}
+                options={cityOptions(ar ? "ar" : "en")}
+                onChange={(v) => update(i, { cities: v })}
               />
               <Input
                 placeholder={ar ? "نمط العمل (حضوري/هجين/عن بعد)" : "Work mode"}
@@ -155,6 +172,7 @@ export function TargetsCard({
                 }}
               />
             </div>
+            <TargetHint target={tg} ar={ar} onApply={(patch) => update(i, patch)} />
           </RowShell>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={add}>
@@ -163,6 +181,51 @@ export function TargetsCard({
         </Button>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * Taxonomy suggestion strip. Suggestions only — the user's own wording is never
+ * overwritten automatically, and the inferred seniority comes from the title
+ * text alone with its confidence shown.
+ */
+function TargetHint({
+  target,
+  ar,
+  onApply,
+}: {
+  target: CareerTarget;
+  ar: Ar;
+  onApply: (patch: Partial<CareerTarget>) => void;
+}) {
+  const locale = ar ? "ar" : "en";
+  const match = target.title.trim() ? normalizeJobTitle(target.title, locale) : null;
+  if (!match) return null;
+  const level = inferSeniority(target.title);
+  const suggestTitle = match.canonical !== target.title.trim();
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+      {suggestTitle && (
+        <button
+          type="button"
+          className="rounded-full border border-border px-2 py-0.5 hover:bg-muted"
+          onClick={() => onApply({ title: match.canonical })}
+        >
+          {ar ? `المسمى المعياري: ${match.canonical}` : `Standard title: ${match.canonical}`}
+        </button>
+      )}
+      {level.cue && !target.seniority && (
+        <button
+          type="button"
+          className="rounded-full border border-border px-2 py-0.5 hover:bg-muted"
+          onClick={() => onApply({ seniority: SENIORITY_LABEL[level.level][locale] })}
+        >
+          {ar
+            ? `المستوى المقترح: ${SENIORITY_LABEL[level.level].ar}`
+            : `Suggested level: ${SENIORITY_LABEL[level.level].en}`}
+        </button>
+      )}
+    </div>
   );
 }
 

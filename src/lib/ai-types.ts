@@ -27,6 +27,8 @@ export type AiRequest = {
     jobDescription?: string;
     section?: string;
     answers?: Record<string, string>;
+    /** Protected-term policy block (see bilingual-intelligence.ts). */
+    protectedTerms?: string;
   };
 };
 
