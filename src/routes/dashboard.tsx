@@ -166,7 +166,7 @@ function Dashboard() {
                             <Copy className="size-4" /> {t("duplicate")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            variant="destructive"
+                            className="text-destructive"
                             onClick={() => {
                               deleteResume(r.id);
                               toast.success(ar ? "تم الحذف" : "Deleted");

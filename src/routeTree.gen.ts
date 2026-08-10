@@ -13,9 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -37,6 +39,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeaturesRoute = FeaturesRouteImport.update({
   id: '/features',
   path: '/features',
@@ -52,24 +59,33 @@ const TemplatesRoute = TemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesNewRoute = ResumesNewRouteImport.update({
+  id: '/resumes/new',
+  path: '/resumes/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/resumes/new': typeof ResumesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/resumes/new': typeof ResumesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,9 +93,11 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/resumes/new': typeof ResumesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,27 +106,33 @@ export interface FileRouteTypes {
     | '/account'
     | '/ats'
     | '/auth'
+    | '/dashboard'
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/resumes/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
     | '/ats'
     | '/auth'
+    | '/dashboard'
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/resumes/new'
   id:
     | '__root__'
     | '/'
     | '/account'
     | '/ats'
     | '/auth'
+    | '/dashboard'
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/resumes/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +140,11 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   OnboardingRoute: typeof OnboardingRoute
   TemplatesRoute: typeof TemplatesRoute
+  ResumesNewRoute: typeof ResumesNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/features': {
       id: '/features'
       path: '/features'
@@ -172,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/new': {
+      id: '/resumes/new'
+      path: '/resumes/new'
+      fullPath: '/resumes/new'
+      preLoaderRoute: typeof ResumesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -180,9 +220,11 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   OnboardingRoute: OnboardingRoute,
   TemplatesRoute: TemplatesRoute,
+  ResumesNewRoute: ResumesNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
