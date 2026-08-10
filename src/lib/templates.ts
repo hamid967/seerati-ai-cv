@@ -1,0 +1,88 @@
+import type { TemplateDef } from "./types";
+
+export const defaultTemplates: TemplateDef[] = [
+  {
+    id: "classic-ats",
+    name: { ar: "كلاسيكي ATS", en: "Classic ATS" },
+    description: {
+      ar: "تنسيق بسيط بعمود واحد وعناوين واضحة، الأنسب لأنظمة التوظيف.",
+      en: "Single column with clear headings — the safest choice for ATS.",
+    },
+    category: "ats",
+    atsFriendly: true,
+    supportsRTL: true,
+    active: true,
+    order: 1,
+    design: { accent: "#1e3a5f", headingFont: "sans", spacing: "normal", sectionStyle: "line", layout: "single" },
+  },
+  {
+    id: "modern",
+    name: { ar: "عصري", en: "Modern" },
+    description: {
+      ar: "عناوين ملوّنة وتوزيع متوازن يمنح السيرة طابعاً حديثاً.",
+      en: "Coloured headings and balanced spacing for a contemporary feel.",
+    },
+    category: "modern",
+    atsFriendly: true,
+    supportsRTL: true,
+    active: true,
+    order: 2,
+    design: { accent: "#0f766e", headingFont: "sans", spacing: "normal", sectionStyle: "bar", layout: "single" },
+  },
+  {
+    id: "executive",
+    name: { ar: "تنفيذي", en: "Executive" },
+    description: {
+      ar: "طابع رسمي بخطوط رصينة يناسب المناصب القيادية.",
+      en: "Formal serif styling suited to senior and leadership roles.",
+    },
+    category: "executive",
+    atsFriendly: true,
+    supportsRTL: true,
+    active: true,
+    order: 3,
+    design: { accent: "#111827", headingFont: "serif", spacing: "airy", sectionStyle: "line", layout: "single" },
+  },
+  {
+    id: "minimal",
+    name: { ar: "مبسّط", en: "Minimal" },
+    description: {
+      ar: "مساحات بيضاء واسعة وتفاصيل قليلة للتركيز على المحتوى.",
+      en: "Generous whitespace and minimal ornament to focus on content.",
+    },
+    category: "minimal",
+    atsFriendly: true,
+    supportsRTL: true,
+    active: true,
+    order: 4,
+    design: { accent: "#334155", headingFont: "sans", spacing: "airy", sectionStyle: "plain", layout: "single" },
+  },
+  {
+    id: "saudi-professional",
+    name: { ar: "سعودي مهني", en: "Saudi Professional" },
+    description: {
+      ar: "تنسيق عربي أولاً مع عمود جانبي للمهارات واللغات.",
+      en: "Arabic-first layout with a sidebar for skills and languages.",
+    },
+    category: "modern",
+    atsFriendly: true,
+    supportsRTL: true,
+    active: true,
+    order: 5,
+    design: { accent: "#166534", headingFont: "sans", spacing: "normal", sectionStyle: "bar", layout: "sidebar" },
+  },
+  {
+    id: "creative",
+    name: { ar: "إبداعي", en: "Creative" },
+    description: {
+      ar: "عمود جانبي بلون بارز يناسب التخصصات التصميمية والتسويقية.",
+      en: "Bold accent sidebar for design and marketing profiles.",
+    },
+    category: "creative",
+    atsFriendly: false,
+    supportsRTL: true,
+    active: true,
+    order: 6,
+    design: { accent: "#7c2d12", headingFont: "serif", spacing: "compact", sectionStyle: "bar", layout: "sidebar" },
+  },
+];

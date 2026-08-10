@@ -10,33 +10,226 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AtsRouteImport } from './routes/ats'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as ResumesNewRouteImport } from './routes/resumes.new'
+import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
+import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtsRoute = AtsRouteImport.update({
+  id: '/ats',
+  path: '/ats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ResumesNewRoute = ResumesNewRouteImport.update({
+  id: '/resumes/new',
+  path: '/resumes/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResumesIdEditRoute = ResumesIdEditRouteImport.update({
+  id: '/resumes/$id/edit',
+  path: '/resumes/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResumesIdPreviewRoute = ResumesIdPreviewRouteImport.update({
+  id: '/resumes/$id/preview',
+  path: '/resumes/$id/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/ats': typeof AtsRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/features': typeof FeaturesRoute
+  '/onboarding': typeof OnboardingRoute
+  '/templates': typeof TemplatesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/resumes/new': typeof ResumesNewRoute
+  '/admin/': typeof AdminIndexRoute
+  '/resumes/$id/edit': typeof ResumesIdEditRoute
+  '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/ats': typeof AtsRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/features': typeof FeaturesRoute
+  '/onboarding': typeof OnboardingRoute
+  '/templates': typeof TemplatesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/resumes/new': typeof ResumesNewRoute
+  '/admin': typeof AdminIndexRoute
+  '/resumes/$id/edit': typeof ResumesIdEditRoute
+  '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/ats': typeof AtsRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/features': typeof FeaturesRoute
+  '/onboarding': typeof OnboardingRoute
+  '/templates': typeof TemplatesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/resumes/new': typeof ResumesNewRoute
+  '/admin/': typeof AdminIndexRoute
+  '/resumes/$id/edit': typeof ResumesIdEditRoute
+  '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/admin'
+    | '/ats'
+    | '/auth'
+    | '/dashboard'
+    | '/features'
+    | '/onboarding'
+    | '/templates'
+    | '/admin/settings'
+    | '/admin/templates'
+    | '/admin/users'
+    | '/resumes/new'
+    | '/admin/'
+    | '/resumes/$id/edit'
+    | '/resumes/$id/preview'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/account'
+    | '/ats'
+    | '/auth'
+    | '/dashboard'
+    | '/features'
+    | '/onboarding'
+    | '/templates'
+    | '/admin/settings'
+    | '/admin/templates'
+    | '/admin/users'
+    | '/resumes/new'
+    | '/admin'
+    | '/resumes/$id/edit'
+    | '/resumes/$id/preview'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/admin'
+    | '/ats'
+    | '/auth'
+    | '/dashboard'
+    | '/features'
+    | '/onboarding'
+    | '/templates'
+    | '/admin/settings'
+    | '/admin/templates'
+    | '/admin/users'
+    | '/resumes/new'
+    | '/admin/'
+    | '/resumes/$id/edit'
+    | '/resumes/$id/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AtsRoute: typeof AtsRoute
+  AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
+  FeaturesRoute: typeof FeaturesRoute
+  OnboardingRoute: typeof OnboardingRoute
+  TemplatesRoute: typeof TemplatesRoute
+  ResumesNewRoute: typeof ResumesNewRoute
+  ResumesIdEditRoute: typeof ResumesIdEditRoute
+  ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +241,144 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ats': {
+      id: '/ats'
+      path: '/ats'
+      fullPath: '/ats'
+      preLoaderRoute: typeof AtsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/templates': {
+      id: '/admin/templates'
+      path: '/templates'
+      fullPath: '/admin/templates'
+      preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/resumes/new': {
+      id: '/resumes/new'
+      path: '/resumes/new'
+      fullPath: '/resumes/new'
+      preLoaderRoute: typeof ResumesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resumes/$id/edit': {
+      id: '/resumes/$id/edit'
+      path: '/resumes/$id/edit'
+      fullPath: '/resumes/$id/edit'
+      preLoaderRoute: typeof ResumesIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resumes/$id/preview': {
+      id: '/resumes/$id/preview'
+      path: '/resumes/$id/preview'
+      fullPath: '/resumes/$id/preview'
+      preLoaderRoute: typeof ResumesIdPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTemplatesRoute: typeof AdminTemplatesRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTemplatesRoute: AdminTemplatesRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AtsRoute: AtsRoute,
+  AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
+  FeaturesRoute: FeaturesRoute,
+  OnboardingRoute: OnboardingRoute,
+  TemplatesRoute: TemplatesRoute,
+  ResumesNewRoute: ResumesNewRoute,
+  ResumesIdEditRoute: ResumesIdEditRoute,
+  ResumesIdPreviewRoute: ResumesIdPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
