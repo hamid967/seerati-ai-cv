@@ -164,6 +164,12 @@ function AtsPage() {
           )}
         </section>
 
+        <div className="mt-8">
+          <RecruiterSnapshotCard snapshot={snapshot} />
+        </div>
+
+
+
 
         <Button size="lg" className="mt-8" asChild>
           <Link to="/auth" search={{ mode: "signup" }}>
