@@ -26,15 +26,21 @@ type SectionId =
   | "certificates"
   | "projects";
 
-// Bilingual heading synonyms. Matching is case-insensitive and diacritics-agnostic.
+// Bilingual heading synonyms, including headings used by LinkedIn/Indeed/Bayt
+// and common resume-builder exports. Matching is case-insensitive.
 const HEADINGS: Record<SectionId, RegExp> = {
-  summary: /^(الملخص|نبذة|نبذة عني|ملخص|about me|profile|summary)\s*:?$/i,
-  experience: /^(الخبرة|الخبرات|الخبرة العملية|experience|work experience|employment)\s*:?$/i,
-  education: /^(التعليم|المؤهلات العلمية|education|academic background)\s*:?$/i,
-  skills: /^(المهارات|skills|technical skills)\s*:?$/i,
-  languages: /^(اللغات|languages)\s*:?$/i,
-  certificates: /^(الدورات|الشهادات|الدورات والشهادات|courses|certificates|certifications)\s*:?$/i,
-  projects: /^(المشاريع|projects)\s*:?$/i,
+  summary:
+    /^(الملخص|الملخص المهني|نبذة|نبذة عني|ملخص|الهدف الوظيفي|about me|about|profile|summary|professional summary|career objective|objective)\s*:?$/i,
+  experience:
+    /^(الخبرة|الخبرات|الخبرات العملية|الخبرة العملية|التاريخ الوظيفي|experience|work experience|professional experience|employment|employment history|work history|career history)\s*:?$/i,
+  education:
+    /^(التعليم|المؤهلات|المؤهلات العلمية|المؤهل العلمي|education|education and training|academic background|academic qualifications)\s*:?$/i,
+  skills:
+    /^(المهارات|المهارات الرئيسية|المهارات التقنية|skills|top skills|key skills|core skills|technical skills|skills? (?:&|and) expertise)\s*:?$/i,
+  languages: /^(اللغات|اللغة|languages|language skills)\s*:?$/i,
+  certificates:
+    /^(الدورات|الشهادات|الدورات والشهادات|التدريب|الجوائز|التطوع|العمل التطوعي|courses|certificates|certifications|licenses (?:&|and) certifications|training|awards|honors(?:\s*[-&]\s*awards)?|volunteering|volunteer experience)\s*:?$/i,
+  projects: /^(المشاريع|المشروعات|projects|selected projects|portfolio|publications)\s*:?$/i,
 };
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
