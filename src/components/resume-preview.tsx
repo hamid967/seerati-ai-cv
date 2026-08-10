@@ -97,7 +97,7 @@ export function ResumePreview({
   const simpleList = (items: { id: string; title: string; detail?: string }[]) => (
     <ul className="space-y-1">
       {items.map((i) => (
-        <li key={i.id} style={{ fontSize: fs }} className="leading-relaxed">
+        <li key={i.id} data-cv-item style={{ fontSize: fs }} className="leading-relaxed">
           <span className="font-semibold">{i.title}</span>
           {i.detail ? <span className="text-[#4b5768]"> — {i.detail}</span> : null}
         </li>
@@ -114,7 +114,7 @@ export function ResumePreview({
     experience: d.experience.length ? (
       <div className="space-y-3">
         {d.experience.map((e) => (
-          <div key={e.id}>
+          <div key={e.id} data-cv-item>
             <div className="flex flex-wrap items-baseline justify-between gap-1">
               <p className="text-[13px] font-bold">{e.role}</p>
               <p className="text-[11px] text-[#5a6779]">
@@ -143,7 +143,7 @@ export function ResumePreview({
     education: d.education.length ? (
       <div className="space-y-2">
         {d.education.map((e) => (
-          <div key={e.id} className="flex flex-wrap items-baseline justify-between gap-1">
+          <div key={e.id} data-cv-item className="flex flex-wrap items-baseline justify-between gap-1">
             <div>
               <p className="text-[12.5px] font-bold">{e.degree}</p>
               <p className="text-[12px] text-[#4b5768]">
@@ -225,7 +225,7 @@ export function ResumePreview({
       if (!node) return null;
       const title = k === "custom" && d.custom.length === 1 ? d.custom[0]!.title : L(k as keyof typeof labels);
       return (
-        <section key={k} style={{ marginBottom: gap }}>
+        <section key={k} data-cv-section style={{ marginBottom: gap }}>
           <SectionTitle design={design}>{title}</SectionTitle>
           {node}
         </section>

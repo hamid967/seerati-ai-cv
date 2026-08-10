@@ -16,14 +16,13 @@ export type BuilderStep =
   | "design";
 
 export type AtsCategoryId =
-  | "completeness"
   | "contact"
   | "summary"
   | "experience"
-  | "achievements"
   | "skills"
-  | "formatting"
+  | "education"
   | "keywords";
+
 
 export type AtsTip = { ar: string; en: string; step: BuilderStep };
 
@@ -94,60 +93,34 @@ export function analyzeResume(
   const bullets = d.experience.flatMap((e) => e.bullets.filter((b) => b.trim()));
   const measurable = bullets.filter((b) => /\d/.test(b) || /[٠-٩]/.test(b));
   const summaryWords = words(d.summary);
-  const keywords = jobDescription?.trim() ? keywordCoverage(jobDescription, d) : null;
+  const jd = (jobDescription ?? d.jobDescription ?? "").trim();
+  const keywords = jd ? keywordCoverage(jd, d) : null;
   const atsFriendly = template?.atsFriendly ?? true;
-  const singleColumn = (template?.design.layout ?? "single") === "single";
 
   const categories: AtsCategory[] = [];
 
-  /* completeness — 15 */
-  const filled = [
-    Boolean(p.fullName),
-    Boolean(p.jobTitle),
-    d.summary.length > 20,
-    d.experience.length > 0,
-    d.education.length > 0,
-    d.skills.length > 0,
-    d.languages.length > 0,
-  ];
-  categories.push({
-    id: "completeness",
-    label: { ar: "اكتمال الأقسام", en: "Section completeness" },
-    earned: Math.round((filled.filter(Boolean).length / filled.length) * 15),
-    max: 15,
-    step: "personal",
-    tips: filled.every(Boolean)
-      ? []
-      : [
-          {
-            ar: "أكمل الأقسام الأساسية: الملخص، الخبرة، التعليم، المهارات واللغات.",
-            en: "Complete the core sections: summary, experience, education, skills and languages.",
-            step: "summary",
-          },
-        ],
-  });
-
-  /* contact — 12 */
+  /* ---------------------------- contact — 10 ---------------------------- */
   const contactBits = [p.fullName, p.email, p.phone, p.city].filter(Boolean).length;
+  const contactExtra = [p.jobTitle, d.links.length ? "l" : ""].filter(Boolean).length;
   categories.push({
     id: "contact",
     label: { ar: "معلومات الاتصال", en: "Contact details" },
-    earned: Math.round((contactBits / 4) * 12),
-    max: 12,
+    earned: clamp(Math.round((contactBits / 4) * 8) + contactExtra, 10),
+    max: 10,
     step: "personal",
     tips:
-      contactBits === 4
+      contactBits === 4 && contactExtra === 2
         ? []
         : [
             {
-              ar: "أضف الاسم الكامل والبريد ورقم الجوال والمدينة في أعلى السيرة.",
-              en: "Add full name, email, phone and city at the top of the resume.",
+              ar: "أضف الاسم الكامل والمسمى الوظيفي والبريد والجوال والمدينة ورابطاً مهنياً واحداً.",
+              en: "Add full name, job title, email, phone, city and one professional link.",
               step: "personal",
             },
           ],
   });
 
-  /* summary — 15 */
+  /* ---------------------------- summary — 15 ---------------------------- */
   let summaryScore = 0;
   const summaryTips: AtsTip[] = [];
   if (summaryWords >= 30 && summaryWords <= 90) summaryScore += 9;
@@ -160,11 +133,12 @@ export function analyzeResume(
         en: "Include at least one figure in the summary (years of experience or scale of impact).",
         step: "summary",
       });
-    if (p.jobTitle && d.summary.toLowerCase().includes(p.jobTitle.toLowerCase().slice(0, 6))) summaryScore += 3;
+    const target = (d.targetJob || p.jobTitle || "").toLowerCase().slice(0, 6);
+    if (target && d.summary.toLowerCase().includes(target)) summaryScore += 3;
     else
       summaryTips.push({
-        ar: "اذكر المسمى المستهدف صريحاً داخل الملخص.",
-        en: "Mention the target job title explicitly inside the summary.",
+        ar: "اذكر الوظيفة المستهدفة صريحاً داخل الملخص.",
+        en: "Mention the target job explicitly inside the summary.",
         step: "summary",
       });
   }
@@ -184,115 +158,113 @@ export function analyzeResume(
     tips: summaryTips,
   });
 
-  /* experience — 18 */
+  /* --------------------------- experience — 25 -------------------------- */
   let expScore = 0;
   const expTips: AtsTip[] = [];
   if (d.experience.length >= 1) expScore += 6;
   if (d.experience.length >= 2) expScore += 2;
-  const dated = d.experience.filter((e) => e.start && (e.end || e.current)).length;
-  if (d.experience.length && dated === d.experience.length) expScore += 4;
-  else if (d.experience.length)
-    expTips.push({
-      ar: "أضف تواريخ البداية والنهاية لكل خبرة (أو حدّد «أعمل هنا حالياً»).",
-      en: "Add start and end dates for every role (or mark it as current).",
-      step: "experience",
-    });
+  if (d.experience.every((e) => e.role && e.company)) expScore += 2;
+  if (d.experience.some((e) => e.start)) expScore += 2;
   if (bullets.length >= 3) expScore += 4;
-  if (bullets.length >= 6) expScore += 2;
-  if (bullets.length < 3)
-    expTips.push({
-      ar: "اكتب ٣ نقاط إنجاز أو أكثر لكل خبرة رئيسية.",
-      en: "Write three or more achievement bullets for each main role.",
-      step: "experience",
-    });
+  if (bullets.length >= 6) expScore += 3;
+  const ratio = bullets.length ? measurable.length / bullets.length : 0;
+  expScore += Math.round(clamp(ratio * 2, 1) * 6);
   if (!d.experience.length)
     expTips.push({
       ar: "أضف خبرة عملية واحدة على الأقل بترتيب زمني عكسي.",
       en: "Add at least one role in reverse-chronological order.",
       step: "experience",
     });
-  categories.push({
-    id: "experience",
-    label: { ar: "الخبرات العملية", en: "Work experience" },
-    earned: clamp(expScore, 18),
-    max: 18,
-    step: "experience",
-    tips: expTips,
-  });
-
-  /* measurable achievements — 12 */
-  const ratio = bullets.length ? measurable.length / bullets.length : 0;
-  categories.push({
-    id: "achievements",
-    label: { ar: "إنجازات قابلة للقياس", en: "Measurable achievements" },
-    earned: Math.round(clamp(ratio * 2, 1) * 12),
-    max: 12,
-    step: "experience",
-    tips:
-      ratio >= 0.5
-        ? []
-        : [
-            {
-              ar: "حوّل المهام إلى إنجازات بأرقام: «خفّضت زمن المعالجة ٢٥٪».",
-              en: "Turn duties into quantified achievements: “cut processing time by 25%”.",
-              step: "experience",
-            },
-          ],
-  });
-
-  /* skills — 10 */
-  const skillScore = d.skills.length >= 8 ? 10 : d.skills.length >= 5 ? 7 : d.skills.length >= 3 ? 4 : 0;
-  categories.push({
-    id: "skills",
-    label: { ar: "المهارات واللغات", en: "Skills & languages" },
-    earned: skillScore + (d.languages.length ? 0 : 0),
-    max: 10,
-    step: "skills",
-    tips:
-      d.skills.length >= 8
-        ? []
-        : [
-            {
-              ar: "أضف ٨ مهارات أو أكثر مطابقة لمصطلحات الوظيفة المستهدفة.",
-              en: "List eight or more skills that mirror the target job's terminology.",
-              step: "skills",
-            },
-          ],
-  });
-
-  /* formatting — 8 */
-  let fmt = 0;
-  const fmtTips: AtsTip[] = [];
-  if (atsFriendly) fmt += 4;
-  else
-    fmtTips.push({
+  if (bullets.length < 3)
+    expTips.push({
+      ar: "اكتب ٣ نقاط إنجاز أو أكثر لكل خبرة رئيسية.",
+      en: "Write three or more achievement bullets for each main role.",
+      step: "experience",
+    });
+  if (ratio < 0.5)
+    expTips.push({
+      ar: "حوّل المهام إلى إنجازات بأرقام: «خفّضت زمن المعالجة ٢٥٪».",
+      en: "Turn duties into quantified achievements: “cut processing time by 25%”.",
+      step: "experience",
+    });
+  if (!atsFriendly)
+    expTips.push({
       ar: "هذا القالب أقل ملاءمة لبعض أنظمة ATS. استخدم «كلاسيكي ATS» أو «مبسّط» للتقديم الإلكتروني.",
       en: "This template is less ATS-safe. Use Classic ATS or Minimal for online applications.",
       step: "design",
     });
-  if (singleColumn) fmt += 2;
-  if (d.sectionOrder[0] === "summary") fmt += 2;
-  else
-    fmtTips.push({
-      ar: "ابدأ السيرة بالملخص المهني ثم الخبرات.",
-      en: "Start the resume with the summary, then experience.",
-      step: "design",
-    });
   categories.push({
-    id: "formatting",
-    label: { ar: "التنسيق وملاءمة القالب", en: "Formatting & template fit" },
-    earned: clamp(fmt, 8),
-    max: 8,
-    step: "design",
-    tips: fmtTips,
+    id: "experience",
+    label: { ar: "الخبرات العملية", en: "Work experience" },
+    earned: clamp(expScore, 25),
+    max: 25,
+    step: "experience",
+    tips: expTips,
   });
 
-  /* job-description keywords — 10 */
+  /* ----------------------------- skills — 20 ---------------------------- */
+  let skillScore = d.skills.length >= 10 ? 12 : d.skills.length >= 8 ? 10 : d.skills.length >= 5 ? 7 : d.skills.length >= 3 ? 4 : 0;
+  if (d.languages.length >= 1) skillScore += 4;
+  if (d.languages.length >= 2) skillScore += 2;
+  if (d.certificates.length || d.projects.length) skillScore += 2;
+  const skillTips: AtsTip[] = [];
+  if (d.skills.length < 8)
+    skillTips.push({
+      ar: "أضف ٨ مهارات أو أكثر مطابقة لمصطلحات الوظيفة المستهدفة.",
+      en: "List eight or more skills that mirror the target job's terminology.",
+      step: "skills",
+    });
+  if (!d.languages.length)
+    skillTips.push({
+      ar: "أضف اللغات ومستوى الإتقان (العربية والإنجليزية على الأقل).",
+      en: "Add languages with proficiency (at least Arabic and English).",
+      step: "skills",
+    });
+  categories.push({
+    id: "skills",
+    label: { ar: "المهارات واللغات", en: "Skills & languages" },
+    earned: clamp(skillScore, 20),
+    max: 20,
+    step: "skills",
+    tips: skillTips,
+  });
+
+  /* --------------------------- education — 10 --------------------------- */
+  let eduScore = 0;
+  if (d.education.length >= 1) eduScore += 6;
+  if (d.education.every((e) => e.degree && e.school)) eduScore += 2;
+  if (d.education.some((e) => e.end || e.start)) eduScore += 2;
+  categories.push({
+    id: "education",
+    label: { ar: "التعليم", en: "Education" },
+    earned: d.education.length ? clamp(eduScore, 10) : 0,
+    max: 10,
+    step: "education",
+    tips: d.education.length
+      ? eduScore >= 10
+        ? []
+        : [
+            {
+              ar: "أكمل بيانات المؤهل: الدرجة، الجهة التعليمية، وسنة التخرج.",
+              en: "Complete each qualification: degree, institution and graduation year.",
+              step: "education",
+            },
+          ]
+      : [
+          {
+            ar: "أضف مؤهلك التعليمي الأعلى.",
+            en: "Add your highest qualification.",
+            step: "education",
+          },
+        ],
+  });
+
+  /* --------------------------- keywords — 20 ---------------------------- */
   categories.push({
     id: "keywords",
     label: { ar: "تغطية كلمات الوظيفة", en: "Job-description keywords" },
-    earned: keywords ? Math.round((keywords.coverage / 100) * 10) : 0,
-    max: 10,
+    earned: keywords ? Math.round((keywords.coverage / 100) * 20) : 0,
+    max: 20,
     step: "skills",
     tips: !keywords
       ? [
