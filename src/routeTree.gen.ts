@@ -19,6 +19,8 @@ import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
@@ -74,6 +76,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -105,6 +117,8 @@ export interface FileRoutesByFullPath {
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
@@ -120,6 +134,8 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin': typeof AdminIndexRoute
@@ -137,6 +153,8 @@ export interface FileRoutesById {
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
@@ -155,6 +173,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/admin/settings'
+    | '/admin/templates'
     | '/admin/users'
     | '/resumes/new'
     | '/admin/'
@@ -170,6 +190,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/admin/settings'
+    | '/admin/templates'
     | '/admin/users'
     | '/resumes/new'
     | '/admin'
@@ -186,6 +208,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/admin/settings'
+    | '/admin/templates'
     | '/admin/users'
     | '/resumes/new'
     | '/admin/'
@@ -280,6 +304,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/templates': {
+      id: '/admin/templates'
+      path: '/templates'
+      fullPath: '/admin/templates'
+      preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -312,11 +350,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTemplatesRoute: AdminTemplatesRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
