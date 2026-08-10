@@ -48,6 +48,8 @@ import {
 import { parseJobDescription, matchTwinToJob, GAP_LABEL } from "@/lib/job-match";
 import { agentsForSurface } from "@/lib/team";
 import { ApplicationTimeline } from "@/components/application-timeline";
+import { CoverLetterPanel } from "@/components/cover-letter-panel";
+import { listCoverLetters, type CoverLetter } from "@/lib/cover-letters";
 import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
 import { NextBestActions } from "@/components/next-best-actions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
