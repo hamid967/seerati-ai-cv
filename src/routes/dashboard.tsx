@@ -49,8 +49,6 @@ export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
-type NextAction = { key: string; label: string; href: string; internal?: boolean };
-
 function Dashboard() {
   const t = useT();
   const { lang } = useI18n();
@@ -59,6 +57,8 @@ function Dashboard() {
   const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume, maxResumes } = useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
+  const [twin, setTwin] = useState<CareerTwin | null>(null);
+  const [graph, setGraph] = useState<FactGraph>(() => emptyFactGraph());
   const [twinScore, setTwinScore] = useState<number | null>(null);
   const [jobs, setJobs] = useState<JobWorkspace[]>([]);
   const [tasks, setTasks] = useState<CareerTask[]>([]);
@@ -76,18 +76,22 @@ function Dashboard() {
       listJobs(user.id),
       listTasks(user.id),
       listAgentActivity(user.id, 6),
-    ]).then(([twin, jobList, taskList, activityList]) => {
+      loadFactGraph(user.id),
+    ]).then(([twinData, jobList, taskList, activityList, factGraph]) => {
       if (!active) return;
-      setTwinScore(twinHealth(twin).score);
+      setTwin(twinData);
+      setTwinScore(twinHealth(twinData).score);
       setJobs(jobList);
       setTasks(taskList);
       setActivity(activityList);
+      setGraph(factGraph);
       setLoadingCenter(false);
     });
     return () => {
       active = false;
     };
   }, [user]);
+
 
   if (!ready || !user) {
     return (
