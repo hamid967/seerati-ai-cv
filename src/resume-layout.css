@@ -1,0 +1,85 @@
+/* Stage 5F — Professional document layout engine.
+ * These rules affect the actual resume page inside Studio/Preview/Export.
+ * Gallery thumbnails and marketing surfaces remain unchanged.
+ */
+
+.professional-resume-page {
+  --resume-page-width: 210mm;
+  --resume-page-height: 297mm;
+  --resume-margin: 10mm;
+  --resume-font-scale: 1;
+  --resume-line-height: 1.65;
+  --resume-sidebar-width: 28%;
+  width: var(--resume-page-width);
+  margin-inline: auto;
+}
+
+.professional-resume-page > .paper {
+  width: var(--resume-page-width) !important;
+  max-width: none !important;
+  min-height: var(--resume-page-height) !important;
+  aspect-ratio: auto !important;
+  padding: var(--resume-margin) !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.professional-resume-page > .paper [data-cv-section] {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.professional-resume-page > .paper [data-cv-item] {
+  font-size: calc(12px * var(--resume-font-scale)) !important;
+  line-height: var(--resume-line-height) !important;
+}
+
+.professional-resume-page > .paper [data-cv-item] li,
+.professional-resume-page > .paper [data-cv-item] p,
+.professional-resume-page > .paper section > p,
+.professional-resume-page > .paper section li {
+  line-height: var(--resume-line-height) !important;
+}
+
+.professional-resume-page > .paper section > p,
+.professional-resume-page > .paper section > ul,
+.professional-resume-page > .paper section > div:not(.grid) {
+  font-size: calc(1em * var(--resume-font-scale));
+}
+
+/* Existing sidebar templates use a fixed 210px track. Stage 5F makes the
+ * sidebar width user-adjustable while preserving the template's direction. */
+.professional-resume-page > .paper .grid.grid-cols-\[210px_1fr\] {
+  grid-template-columns: var(--resume-sidebar-width) minmax(0, 1fr) !important;
+}
+
+.professional-resume-page > .paper .grid.grid-cols-\[1fr_210px\] {
+  grid-template-columns: minmax(0, 1fr) var(--resume-sidebar-width) !important;
+}
+
+.resume-page-boundary {
+  position: absolute;
+  inset-inline: 0;
+  height: 1px;
+  border-top: 1px dashed color-mix(in oklab, var(--muted-foreground) 38%, transparent);
+  pointer-events: none;
+  z-index: 4;
+}
+
+@media print {
+  .professional-resume-page {
+    width: var(--resume-page-width) !important;
+    margin: 0 !important;
+  }
+
+  .professional-resume-page > .paper {
+    width: var(--resume-page-width) !important;
+    min-height: var(--resume-page-height) !important;
+    padding: var(--resume-margin) !important;
+    box-shadow: none !important;
+  }
+
+  .resume-page-boundary {
+    display: none !important;
+  }
+}
