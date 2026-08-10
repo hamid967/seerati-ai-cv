@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import type { Experience, Education, SkillItem, LanguageItem, LinkItem } from "./types";
 import type { AgentId } from "./team";
 
@@ -156,7 +157,7 @@ export async function saveCareerTwin(userId: string, patch: TwinPatch): Promise<
   if (patch.verifiedFacts) row["verified_facts"] = patch.verifiedFacts;
   if (typeof patch.completionScore === "number") row["completion_score"] = patch.completionScore;
   if (!Object.keys(row).length) return;
-  await supabase.from("career_profiles").update(row).eq("user_id", userId);
+  await supabase.from("career_profiles").update(row as Record<string, Json>).eq("user_id", userId);
 }
 
 /** Section-by-section health of the Career Twin. Descriptive, not predictive. */
@@ -377,7 +378,7 @@ export async function updateJob(
   if (patch.appliedAt !== undefined) row["applied_at"] = patch.appliedAt;
   if (patch.nextActionAt !== undefined) row["next_action_at"] = patch.nextActionAt;
   if (!Object.keys(row).length) return;
-  await supabase.from("job_workspaces").update(row).eq("id", id);
+  await supabase.from("job_workspaces").update(row as Record<string, Json>).eq("id", id);
 }
 
 export async function deleteJob(id: string): Promise<void> {
@@ -428,7 +429,7 @@ export async function saveAsset(
     asset_type: assetType,
     resume_id: refs?.resumeId ?? null,
     cover_letter_id: refs?.coverLetterId ?? null,
-    content,
+    content: content as Json,
   });
 }
 
