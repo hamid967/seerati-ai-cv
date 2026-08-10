@@ -4,7 +4,7 @@ import { LayoutDashboard, Palette, Settings, ShieldAlert, Users } from "lucide-r
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -25,9 +25,7 @@ function AdminLayout() {
   const { ready, user } = useStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
-  }, [ready, user, navigate]);
+  useAuthGuard();
 
   if (!ready) return null;
 

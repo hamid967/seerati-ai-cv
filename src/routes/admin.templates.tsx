@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ResumePreview } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
+import { fetchTemplates, logAudit, saveTemplate } from "@/lib/db";
 import { demoResumeData } from "@/lib/demo-data";
 import type { Resume, TemplateDef } from "@/lib/types";
 
@@ -20,9 +22,22 @@ export const Route = createFileRoute("/admin/templates")({
 function AdminTemplates() {
   const { lang } = useI18n();
   const ar = lang === "ar";
+  const { data: cloudTemplates } = useQuery({
+    queryKey: ["admin-templates"],
+    queryFn: () => fetchTemplates(true),
+  });
   const [templates, setTemplates] = useState<TemplateDef[]>(defaultTemplates);
   const [selectedId, setSelectedId] = useState(defaultTemplates[0]!.id);
-  const selected = templates.find((t) => t.id === selectedId)!;
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (cloudTemplates && cloudTemplates.length > 0) {
+      setTemplates(cloudTemplates);
+      setSelectedId((id) => (cloudTemplates.some((t) => t.id === id) ? id : cloudTemplates[0]!.id));
+    }
+  }, [cloudTemplates]);
+
+  const selected = templates.find((t) => t.id === selectedId) ?? templates[0]!;
 
   const update = (patch: Partial<TemplateDef>) =>
     setTemplates((list) => list.map((t) => (t.id === selectedId ? { ...t, ...patch } : t)));
@@ -157,13 +172,18 @@ function AdminTemplates() {
             </div>
 
             <Button
-              onClick={() =>
-                toast.success(
-                  ar
-                    ? "التعديلات معروضة الآن في المعاينة، وستُحفظ في جدول القوالب عند تفعيل قاعدة البيانات."
-                    : "Changes are reflected in the preview and will persist to the templates table once the database is enabled.",
-                )
-              }
+              disabled={saving}
+              onClick={async () => {
+                setSaving(true);
+                const res = await saveTemplate(selected);
+                setSaving(false);
+                if (res.error) {
+                  toast.error(ar ? "تعذّر الحفظ" : "Could not save");
+                  return;
+                }
+                await logAudit("template.update", selected.id);
+                toast.success(ar ? "تم حفظ القالب" : "Template saved");
+              }}
             >
               {ar ? "حفظ القالب" : "Save template"}
             </Button>

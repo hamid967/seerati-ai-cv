@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { aiService, type AiTask } from "@/lib/ai-service";
+import { logAiUsage } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Resume } from "@/lib/types";
 
@@ -56,6 +57,7 @@ export function AiAssistant({
         context: { ...resume.data, targetRole: resume.data.personal.jobTitle },
       });
       push("assistant", res.text);
+      void logAiUsage(task);
       if (task === "summary" && onApplySummary) {
         onApplySummary(res.text);
         toast.success(lang === "ar" ? "تم إدراج الملخص في السيرة" : "Summary added to your resume");
