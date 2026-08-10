@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 
+// Stage 5F guard: keep document layout, measurement and export behavior in sync.
 const studio = readFileSync("src/routes/resumes.$id.studio.tsx", "utf8");
 const preview = readFileSync("src/routes/resumes.$id.preview.tsx", "utf8");
 const pdf = readFileSync("src/lib/pdf.ts", "utf8");
