@@ -1,44 +1,22 @@
 /**
  * AI service abstraction.
  *
- * The UI only ever talks to `aiService`. Today it is fulfilled by a deterministic
- * local provider so the product is fully usable with no secrets in the browser.
- * To go live, implement `AiProvider` against a server function (Lovable Cloud AI
- * gateway) and swap `activeProvider` — no UI changes are required.
+ * The UI only ever talks to `aiService`. Requests go to the Lovable Cloud AI
+ * gateway through an authenticated server function (no key ever reaches the
+ * browser). If the gateway is unavailable, rate limited or returns something
+ * unusable, we degrade gracefully to a deterministic local draft provider so the
+ * product never breaks in front of the user.
  */
-import type { ResumeData } from "./types";
+import { runAiTask } from "./ai.functions";
+import type { AiRequest, AiResponse, AiTask } from "./ai-types";
 
-export type AiTask =
-  | "summary"
-  | "improve"
-  | "rewrite"
-  | "shorten"
-  | "expand"
-  | "quantify"
-  | "suggest_skills"
-  | "proofread"
-  | "ats_keywords"
-  | "translate"
-  | "chat";
-
-export type AiRequest = {
-  task: AiTask;
-  lang: "ar" | "en";
-  input: string;
-  context?: Partial<ResumeData> & {
-    targetRole?: string;
-    jobDescription?: string;
-    section?: string;
-    answers?: Record<string, string>;
-  };
-};
-
-export type AiResponse = { text: string; items?: string[] };
+export type { AiRequest, AiResponse, AiTask };
 
 export interface AiProvider {
   id: string;
   run(req: AiRequest): Promise<AiResponse>;
 }
+
 
 export const AI_TASK_LABELS: Record<AiTask, { ar: string; en: string }> = {
   summary: { ar: "اكتب ملخصاً", en: "Write summary" },
