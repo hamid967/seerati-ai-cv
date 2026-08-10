@@ -6,6 +6,7 @@ import {
   LayoutTemplate,
   Mic,
   Mail,
+  Lock,
   Shield,
   ShieldCheck,
   Sparkles,
@@ -36,6 +37,7 @@ export type AppNavId =
   | "team"
   | "ats"
   | "account"
+  | "privacy-center"
   | "admin";
 
 export type AppNavItem = {
@@ -167,6 +169,15 @@ export const APP_NAV: AppNavItem[] = [
     to: "/account",
     enabled: true,
     mobile: true,
+    group: "footer",
+  },
+  {
+    id: "privacy-center",
+    label: { ar: "مركز الخصوصية", en: "Privacy center" },
+    hint: { ar: "بياناتك: عرض وتصدير وحذف", en: "View, export, delete your data" },
+    icon: Lock,
+    to: "/privacy-center",
+    enabled: true,
     group: "footer",
   },
   {

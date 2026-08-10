@@ -17,6 +17,7 @@ const APP_ROUTES = [
   "/resumes",
   "/import",
   "/admin",
+  "/privacy-center",
 ];
 
 const root = readFileSync("src/routes/__root.tsx", "utf8");
