@@ -32,7 +32,7 @@ import {
   type CareerTwin,
   type JobWorkspace,
 } from "@/lib/career";
-import { emptyFactGraph, loadFactGraph, type FactGraph } from "@/lib/career-facts";
+import { describeVault, emptyFactGraph, loadFactGraph, type FactGraph } from "@/lib/career-facts";
 import { computeNextActions } from "@/lib/next-best-action";
 import { NextBestActions } from "@/components/next-best-actions";
 
@@ -107,6 +107,8 @@ function Dashboard() {
       </div>
     );
   }
+
+  const vault = describeVault(graph, lang);
 
   // Actions come from the deterministic engine, so nothing here is invented.
   const nextActions = computeNextActions({
