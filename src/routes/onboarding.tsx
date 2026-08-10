@@ -228,9 +228,12 @@ function Onboarding() {
               </button>
               <button
                 onClick={() => void finish()}
-                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+                disabled={saving}
+                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60 disabled:opacity-60"
               >
-                <p className="font-semibold">{ar ? "سأكتبها بنفسي" : "I’ll write it myself"}</p>
+                <p className="font-semibold">
+                  {saving ? (ar ? "جارٍ التهيئة…" : "Setting up…") : ar ? "سأكتبها بنفسي" : "I’ll write it myself"}
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {ar ? "ننشئ مسودة فارغة وتفتح المحرّر مباشرة." : "We create an empty draft and open the builder."}
                 </p>
