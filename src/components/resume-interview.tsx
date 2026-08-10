@@ -197,7 +197,7 @@ export function ResumeInterview({
     ] as StepId[];
   }, [extraExp2]);
 
-  const step = steps[stepIdx];
+  const step: StepId = steps[stepIdx] ?? "done";
 
   const say = (text: string) => setMessages((m) => [...m, { from: "bot", text }]);
   const reply = (text: string) => setMessages((m) => [...m, { from: "user", text }]);
@@ -268,7 +268,7 @@ export function ResumeInterview({
         task: "summary",
         lang,
         input: raw,
-        context: { ...draft, targetRole: draft.targetJob, answers: { years: draft.personal.jobTitle } },
+        context: { ...draft, targetRole: draft.targetJob ?? "", answers: { years: draft.personal.jobTitle } },
       });
       setAiPanel({
         before: draft.summary || (ar ? "لا يوجد ملخص بعد" : "No summary yet"),
@@ -340,7 +340,7 @@ export function ResumeInterview({
         break;
       case "exp1_dates": {
         const [start, end] = value.split(/[-–]/).map((s) => s.trim());
-        exp1Ref.current.start = start;
+        exp1Ref.current.start = start ?? "";
         exp1Ref.current.end = end || (ar ? "حتى الآن" : "Present");
         break;
       }
@@ -356,8 +356,8 @@ export function ResumeInterview({
           id: uid(),
           company: exp1Ref.current.company ?? "",
           role: exp1Ref.current.role ?? "",
-          start: exp1Ref.current.start,
-          end: exp1Ref.current.end,
+          start: exp1Ref.current.start ?? "",
+          end: exp1Ref.current.end ?? "",
           bullets,
         };
         setDraft((d) => ({ ...d, experience: [...d.experience.filter((e) => e.id !== exp.id), exp] }));
@@ -387,7 +387,7 @@ export function ResumeInterview({
         break;
       case "exp2_dates": {
         const [start, end] = value.split(/[-–]/).map((s) => s.trim());
-        exp2Ref.current.start = start;
+        exp2Ref.current.start = start ?? "";
         exp2Ref.current.end = end || (ar ? "حتى الآن" : "Present");
         break;
       }
@@ -402,8 +402,8 @@ export function ResumeInterview({
           id: uid(),
           company: exp2Ref.current.company ?? "",
           role: exp2Ref.current.role ?? "",
-          start: exp2Ref.current.start,
-          end: exp2Ref.current.end,
+          start: exp2Ref.current.start ?? "",
+          end: exp2Ref.current.end ?? "",
           bullets,
         };
         setDraft((d) => ({ ...d, experience: [...d.experience, exp] }));
@@ -474,7 +474,7 @@ export function ResumeInterview({
     }
 
     const nextIdx = stepIdx + 1;
-    const nextStepId = steps[nextIdx];
+    const nextStepId: StepId = steps[nextIdx] ?? "done";
     if (step === "hasSecondExp" && !/^(نعم|yes|y)/i.test(value)) {
       // Skip straight past the exp2 block since ORDER already excludes it when extraExp2=false.
     }
@@ -492,7 +492,7 @@ export function ResumeInterview({
   const handleSkip = () => {
     reply(ar ? "تخطي" : "Skip");
     const nextIdx = stepIdx + 1;
-    const nextStepId = steps[nextIdx];
+    const nextStepId: StepId = steps[nextIdx] ?? "done";
     if (nextStepId === "summary") {
       advance();
       void finalizeSummary(`${draft.personal.fullName} — ${draft.targetJob || draft.personal.jobTitle}`);
@@ -599,7 +599,7 @@ export function ResumeInterview({
             if (step === "exp1_achv" || step === "exp2_achv") {
               setAiPanel(null);
               const nextIdx = stepIdx + 1;
-              const nextStepId = steps[nextIdx];
+              const nextStepId: StepId = steps[nextIdx] ?? "done";
               if (nextStepId === "summary") {
                 advance();
                 void finalizeSummary(`${draft.personal.fullName} — ${draft.targetJob || draft.personal.jobTitle}`);
