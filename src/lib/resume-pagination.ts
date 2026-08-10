@@ -1,10 +1,7 @@
 import type { SectionKey } from "@/lib/types";
 
 export type PaginationWarningType =
-  | "section-split"
-  | "item-split"
-  | "widow-heading"
-  | "oversized-item";
+  "section-split" | "item-split" | "widow-heading" | "oversized-item";
 
 export type PaginationWarning = {
   id: string;

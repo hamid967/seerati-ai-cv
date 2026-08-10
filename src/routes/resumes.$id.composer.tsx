@@ -127,7 +127,9 @@ function SmartPageComposer() {
           <div>
             <div className="flex items-center gap-2">
               <Layers3 className="size-5 text-emerald-accent" />
-              <h1 className="font-extrabold">{ar ? "مؤلف الصفحات الذكي" : "Smart Page Composer"}</h1>
+              <h1 className="font-extrabold">
+                {ar ? "مؤلف الصفحات الذكي" : "Smart Page Composer"}
+              </h1>
             </div>
             <p className="mt-0.5 text-xs text-muted-foreground">{resume.title}</p>
           </div>
@@ -141,12 +143,17 @@ function SmartPageComposer() {
                 : "Layout looks clean"}
           </Badge>
           <Badge variant="outline">
-            {pageCount} {ar ? (pageCount === 1 ? "صفحة" : "صفحات") : pageCount === 1 ? "page" : "pages"}
+            {pageCount}{" "}
+            {ar ? (pageCount === 1 ? "صفحة" : "صفحات") : pageCount === 1 ? "page" : "pages"}
           </Badge>
           <div className="ms-auto flex items-center gap-2">
-            <Button variant="outline" onClick={() => setZoom((value) => Math.max(45, value - 10))}>−</Button>
+            <Button variant="outline" onClick={() => setZoom((value) => Math.max(45, value - 10))}>
+              −
+            </Button>
             <span className="min-w-12 text-center text-xs font-bold">{zoom}%</span>
-            <Button variant="outline" onClick={() => setZoom((value) => Math.min(120, value + 10))}>+</Button>
+            <Button variant="outline" onClick={() => setZoom((value) => Math.min(120, value + 10))}>
+              +
+            </Button>
             <Button variant="outline" asChild>
               <Link to="/resumes/$id/studio" params={{ id }}>
                 <ArrowLeft className="size-4" />
@@ -175,7 +182,12 @@ function SmartPageComposer() {
                     : "Add a page break before a section or prefer keeping a section together when it fits. Content is never deleted or rewritten."}
                 </p>
               </div>
-              <Button size="icon" variant="ghost" onClick={() => void resetPagination()} title={ar ? "إعادة الضبط" : "Reset"}>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => void resetPagination()}
+                title={ar ? "إعادة الضبط" : "Reset"}
+              >
                 <RotateCcw className="size-4" />
               </Button>
             </div>
@@ -186,7 +198,10 @@ function SmartPageComposer() {
                 const breakActive = manualBreaks.has(key);
                 const keepActive = keepTogether.has(key);
                 return (
-                  <div key={key} className="rounded-xl border border-border/70 bg-background/70 p-3">
+                  <div
+                    key={key}
+                    className="rounded-xl border border-border/70 bg-background/70 p-3"
+                  >
                     <p className="text-sm font-semibold">{SECTION_LABELS[key][lang]}</p>
                     <div className="mt-2 grid grid-cols-2 gap-2">
                       <Button
@@ -217,7 +232,11 @@ function SmartPageComposer() {
         <section className="relative min-h-[82vh] overflow-auto rounded-3xl border border-border/60 bg-secondary/45 p-4 md:p-8">
           <div
             className="mx-auto origin-top transition-transform duration-200"
-            style={{ width: metrics.widthPx, transform: `scale(${zoom / 100})`, transformOrigin: "top center" }}
+            style={{
+              width: metrics.widthPx,
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: "top center",
+            }}
           >
             <ProfessionalResumePreview ref={previewRef} resume={resume} showPageBoundaries />
           </div>
@@ -227,19 +246,32 @@ function SmartPageComposer() {
           <section className="seerati-panel p-4">
             <h2 className="font-bold">{ar ? "تشخيص الصفحات" : "Pagination diagnostics"}</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              {ar ? "تحليل مبني على القياس الفعلي للمستند." : "Based on the actual rendered document measurement."}
+              {ar
+                ? "تحليل مبني على القياس الفعلي للمستند."
+                : "Based on the actual rendered document measurement."}
             </p>
             <div className="mt-4 space-y-2">
               {warnings.length ? (
                 warnings.slice(0, 10).map((warning) => (
-                  <div key={warning.id} className="rounded-xl border border-border/70 bg-background/75 p-3">
+                  <div
+                    key={warning.id}
+                    className="rounded-xl border border-border/70 bg-background/75 p-3"
+                  >
                     <div className="flex items-center gap-2">
-                      <AlertTriangle className={`size-4 ${warning.severity === "warning" ? "text-destructive" : "text-muted-foreground"}`} />
-                      <span className="text-xs font-bold">{ar ? `صفحة ${warning.page}` : `Page ${warning.page}`}</span>
+                      <AlertTriangle
+                        className={`size-4 ${warning.severity === "warning" ? "text-destructive" : "text-muted-foreground"}`}
+                      />
+                      <span className="text-xs font-bold">
+                        {ar ? `صفحة ${warning.page}` : `Page ${warning.page}`}
+                      </span>
                     </div>
-                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{warning.message[lang]}</p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                      {warning.message[lang]}
+                    </p>
                     {warning.sectionKey ? (
-                      <p className="mt-1 text-[10px] font-medium text-foreground/70">{SECTION_LABELS[warning.sectionKey][lang]}</p>
+                      <p className="mt-1 text-[10px] font-medium text-foreground/70">
+                        {SECTION_LABELS[warning.sectionKey][lang]}
+                      </p>
                     ) : null}
                   </div>
                 ))
@@ -257,8 +289,13 @@ function SmartPageComposer() {
             <h2 className="font-bold">{ar ? "خريطة الصفحات" : "Page map"}</h2>
             <div className="mt-3 grid grid-cols-2 gap-2">
               {Array.from({ length: Math.min(pageCount, 8) }, (_, index) => (
-                <div key={index} className="aspect-[1/1.414] rounded-md border border-border bg-white shadow-sm">
-                  <div className="flex h-full items-center justify-center text-[10px] font-bold text-slate-500">{index + 1}</div>
+                <div
+                  key={index}
+                  className="aspect-[1/1.414] rounded-md border border-border bg-white shadow-sm"
+                >
+                  <div className="flex h-full items-center justify-center text-[10px] font-bold text-slate-500">
+                    {index + 1}
+                  </div>
                 </div>
               ))}
             </div>

@@ -19,7 +19,11 @@ requireText(composer, "toggleBreak", "manual page-break control missing");
 requireText(composer, "toggleKeep", "keep-together control missing");
 requireText(composer, "pageBreakBefore", "manual page break state must persist");
 requireText(composer, "keepTogetherSections", "keep-together state must persist");
-requireText(composer, "ProfessionalResumePreview", "composer must use the shared professional renderer");
+requireText(
+  composer,
+  "ProfessionalResumePreview",
+  "composer must use the shared professional renderer",
+);
 requireText(pagination, "widow-heading", "widow heading diagnostic missing");
 requireText(pagination, "item-split", "item split diagnostic missing");
 requireText(pagination, "oversized-item", "oversized item diagnostic missing");
