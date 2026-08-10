@@ -1,5 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
+
+type TwinUpdate = Database["public"]["Tables"]["career_profiles"]["Update"];
+type JobUpdate = Database["public"]["Tables"]["job_workspaces"]["Update"];
 import type { Experience, Education, SkillItem, LanguageItem, LinkItem } from "./types";
 import type { AgentId } from "./team";
 
@@ -141,23 +144,23 @@ export async function loadCareerTwin(userId: string): Promise<CareerTwin | null>
 export type TwinPatch = Partial<Omit<CareerTwin, "id" | "userId" | "updatedAt">>;
 
 export async function saveCareerTwin(userId: string, patch: TwinPatch): Promise<void> {
-  const row: Record<string, unknown> = {};
-  if (patch.identity) row["identity"] = patch.identity;
-  if (patch.targets) row["targets"] = patch.targets;
-  if (patch.workHistory) row["work_history"] = patch.workHistory;
-  if (patch.achievements) row["achievements"] = patch.achievements;
-  if (patch.education) row["education"] = patch.education;
-  if (patch.certifications) row["certifications"] = patch.certifications;
-  if (patch.skills) row["skills"] = patch.skills;
-  if (patch.languages) row["languages"] = patch.languages;
-  if (patch.projects) row["projects"] = patch.projects;
-  if (patch.links) row["links"] = patch.links;
-  if (patch.preferences) row["preferences"] = patch.preferences;
-  if (patch.storyBank) row["story_bank"] = patch.storyBank;
-  if (patch.verifiedFacts) row["verified_facts"] = patch.verifiedFacts;
-  if (typeof patch.completionScore === "number") row["completion_score"] = patch.completionScore;
+  const row: TwinUpdate = {};
+  if (patch.identity) row.identity = patch.identity as unknown as Json;
+  if (patch.targets) row.targets = patch.targets as unknown as Json;
+  if (patch.workHistory) row.work_history = patch.workHistory as unknown as Json;
+  if (patch.achievements) row.achievements = patch.achievements as unknown as Json;
+  if (patch.education) row.education = patch.education as unknown as Json;
+  if (patch.certifications) row.certifications = patch.certifications as unknown as Json;
+  if (patch.skills) row.skills = patch.skills as unknown as Json;
+  if (patch.languages) row.languages = patch.languages as unknown as Json;
+  if (patch.projects) row.projects = patch.projects as unknown as Json;
+  if (patch.links) row.links = patch.links as unknown as Json;
+  if (patch.preferences) row.preferences = patch.preferences as unknown as Json;
+  if (patch.storyBank) row.story_bank = patch.storyBank as unknown as Json;
+  if (patch.verifiedFacts) row.verified_facts = patch.verifiedFacts as unknown as Json;
+  if (typeof patch.completionScore === "number") row.completion_score = patch.completionScore;
   if (!Object.keys(row).length) return;
-  await supabase.from("career_profiles").update(row as Record<string, Json>).eq("user_id", userId);
+  await supabase.from("career_profiles").update(row).eq("user_id", userId);
 }
 
 /** Section-by-section health of the Career Twin. Descriptive, not predictive. */
@@ -360,25 +363,25 @@ export async function updateJob(
     >
   >,
 ): Promise<void> {
-  const row: Record<string, unknown> = {};
-  if (patch.jobTitle !== undefined) row["job_title"] = patch.jobTitle;
-  if (patch.company !== undefined) row["company"] = patch.company;
-  if (patch.location !== undefined) row["location"] = patch.location;
-  if (patch.jobUrl !== undefined) row["job_url"] = patch.jobUrl;
-  if (patch.jobDescription !== undefined) row["job_description"] = patch.jobDescription;
-  if (patch.salary !== undefined) row["salary"] = patch.salary;
-  if (patch.notes !== undefined) row["notes"] = patch.notes;
+  const row: JobUpdate = {};
+  if (patch.jobTitle !== undefined) row.job_title = patch.jobTitle;
+  if (patch.company !== undefined) row.company = patch.company;
+  if (patch.location !== undefined) row.location = patch.location;
+  if (patch.jobUrl !== undefined) row.job_url = patch.jobUrl;
+  if (patch.jobDescription !== undefined) row.job_description = patch.jobDescription;
+  if (patch.salary !== undefined) row.salary = patch.salary;
+  if (patch.notes !== undefined) row.notes = patch.notes;
   if (patch.status !== undefined) {
-    row["status"] = patch.status;
-    if (patch.status === "applied") row["applied_at"] = new Date().toISOString();
+    row.status = patch.status;
+    if (patch.status === "applied") row.applied_at = new Date().toISOString();
   }
-  if (patch.requirements !== undefined) row["requirements"] = patch.requirements;
-  if (patch.matchAnalysis !== undefined) row["match_analysis"] = patch.matchAnalysis;
-  if (patch.matchScore !== undefined) row["match_score"] = patch.matchScore;
-  if (patch.appliedAt !== undefined) row["applied_at"] = patch.appliedAt;
-  if (patch.nextActionAt !== undefined) row["next_action_at"] = patch.nextActionAt;
+  if (patch.requirements !== undefined) row.requirements = patch.requirements as unknown as Json;
+  if (patch.matchAnalysis !== undefined) row.match_analysis = patch.matchAnalysis as unknown as Json;
+  if (patch.matchScore !== undefined) row.match_score = patch.matchScore;
+  if (patch.appliedAt !== undefined) row.applied_at = patch.appliedAt;
+  if (patch.nextActionAt !== undefined) row.next_action_at = patch.nextActionAt;
   if (!Object.keys(row).length) return;
-  await supabase.from("job_workspaces").update(row as Record<string, Json>).eq("id", id);
+  await supabase.from("job_workspaces").update(row).eq("id", id);
 }
 
 export async function deleteJob(id: string): Promise<void> {
