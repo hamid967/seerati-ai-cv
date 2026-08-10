@@ -44,9 +44,9 @@ function AuthPage() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) e.email = ar ? "بريد إلكتروني غير صحيح" : "Invalid email";
-    if (tab !== "reset" && password.length < 6) e.password = ar ? "٦ أحرف على الأقل" : "At least 6 characters";
-    if (tab === "signup" && name.trim().length < 3) e.name = ar ? "اكتب اسمك الكامل" : "Enter your full name";
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) e['email'] = ar ? "بريد إلكتروني غير صحيح" : "Invalid email";
+    if (tab !== "reset" && password.length < 6) e['password'] = ar ? "٦ أحرف على الأقل" : "At least 6 characters";
+    if (tab === "signup" && name.trim().length < 3) e['name'] = ar ? "اكتب اسمك الكامل" : "Enter your full name";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -97,19 +97,19 @@ function AuthPage() {
                 <div className="space-y-1.5">
                   <Label htmlFor="name">{t("full_name")}</Label>
                   <Input id="name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-                  {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                  {errors['name'] && <p className="text-xs text-destructive">{errors['name']}</p>}
                 </div>
               )}
               <div className="space-y-1.5">
                 <Label htmlFor="email">{t("email")}</Label>
                 <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" dir="ltr" />
-                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                {errors['email'] && <p className="text-xs text-destructive">{errors['email']}</p>}
               </div>
               {tab !== "reset" && (
                 <div className="space-y-1.5">
                   <Label htmlFor="password">{t("password")}</Label>
                   <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} dir="ltr" />
-                  {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+                  {errors['password'] && <p className="text-xs text-destructive">{errors['password']}</p>}
                 </div>
               )}
               <Button type="submit" className="w-full" size="lg">
