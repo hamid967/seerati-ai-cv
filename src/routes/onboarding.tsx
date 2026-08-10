@@ -63,45 +63,56 @@ function Onboarding() {
 
   const finish = async () => {
     setSaving(true);
-    await updateProfile({
-      onboarded: true,
-      fullName: fullName.trim() || user?.fullName || "",
-      targetRole,
-      yearsExperience: years,
-      industry,
-    });
-    if (resumes.length > 0) {
-      setSaving(false);
-      navigate({ to: "/dashboard" });
-      return;
-    }
-    const created = await createResume({
-      title: targetRole
-        ? ar
-          ? `سيرة ${targetRole}`
-          : `${targetRole} resume`
-        : ar
-          ? "سيرتي الذاتية"
-          : "My resume",
-      templateId,
-      language: cvLang,
-      jobTitle: targetRole || currentTitle,
-    });
-    if (created && importedData) {
-      await updateResume(created.id, {
-        data: {
-          ...created.data,
-          ...importedData,
-          personal: { ...created.data.personal, ...(importedData.personal ?? {}) },
-        },
+    try {
+      await updateProfile({
+        onboarded: true,
+        fullName: fullName.trim() || user?.fullName || "",
+        targetRole,
+        yearsExperience: years,
+        industry,
       });
-    }
-    setSaving(false);
-    if (created) {
+      if (resumes.length > 0) {
+        navigate({ to: "/dashboard" });
+        return;
+      }
+      const created = await createResume({
+        title: targetRole
+          ? ar
+            ? `سيرة ${targetRole}`
+            : `${targetRole} resume`
+          : ar
+            ? "سيرتي الذاتية"
+            : "My resume",
+        templateId,
+        language: cvLang,
+        jobTitle: targetRole || currentTitle,
+      });
+      if (!created) {
+        toast.error(
+          ar
+            ? "تعذّر إنشاء السيرة. حاول مرة أخرى أو أنشئها من لوحة التحكم."
+            : "Could not create the resume. Try again or create it from the dashboard.",
+        );
+        return;
+      }
+      if (importedData) {
+        await updateResume(created.id, {
+          data: {
+            ...created.data,
+            ...importedData,
+            personal: { ...created.data.personal, ...(importedData.personal ?? {}) },
+          },
+        });
+      }
       toast.success(ar ? "أنشأنا لك سيرة ذاتية للبدء" : "We created a resume to get you started");
       navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
-    } else {
-      navigate({ to: "/dashboard" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(
+        ar ? `تعذّر إكمال الإعداد: ${message}` : `Could not finish onboarding: ${message}`,
+      );
+    } finally {
+      setSaving(false);
     }
   };
 

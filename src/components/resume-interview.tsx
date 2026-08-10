@@ -197,7 +197,7 @@ export function ResumeInterview({
 }) {
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { createResume, updateResume } = useStore();
+  const { createResume, updateResume, updateProfile } = useStore();
 
   const [stepIdx, setStepIdx] = useState(0);
   const [extraExp2, setExtraExp2] = useState(false);
@@ -639,32 +639,44 @@ export function ResumeInterview({
 
   const finish = async () => {
     setBusySave(true);
-    const created = await createResume({
-      title: draft.targetJob
-        ? ar
-          ? `سيرة ${draft.targetJob}`
-          : `${draft.targetJob} resume`
-        : ar
-          ? "سيرتي الذاتية"
-          : "My resume",
-      templateId,
-      language: lang,
-      jobTitle: draft.targetJob || draft.personal.jobTitle,
-    });
-    if (!created) {
+    try {
+      await updateProfile({
+        onboarded: true,
+        ...(draft.personal.fullName ? { fullName: draft.personal.fullName } : {}),
+        ...(draft.targetJob ? { targetRole: draft.targetJob } : {}),
+        ...(initial?.years ? { yearsExperience: initial.years } : {}),
+        ...(initial?.industry ? { industry: initial.industry } : {}),
+      });
+      const created = await createResume({
+        title: draft.targetJob
+          ? ar
+            ? `سيرة ${draft.targetJob}`
+            : `${draft.targetJob} resume`
+          : ar
+            ? "سيرتي الذاتية"
+            : "My resume",
+        templateId,
+        language: lang,
+        jobTitle: draft.targetJob || draft.personal.jobTitle,
+      });
+      if (!created) {
+        toast.error(ar ? "تعذّر إنشاء السيرة الذاتية" : "Couldn’t create the resume");
+        return;
+      }
+      await updateResume(created.id, {
+        data: {
+          ...draft,
+          personal: { ...draft.personal, email: created.data.personal.email },
+        },
+      });
+      toast.success(ar ? "سيرتك جاهزة للتحرير" : "Your resume is ready to edit");
+      navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(ar ? `تعذّر الحفظ: ${message}` : `Could not save: ${message}`);
+    } finally {
       setBusySave(false);
-      toast.error(ar ? "تعذّر إنشاء السيرة الذاتية" : "Couldn’t create the resume");
-      return;
     }
-    await updateResume(created.id, {
-      data: {
-        ...draft,
-        personal: { ...draft.personal, email: created.data.personal.email },
-      },
-    });
-    setBusySave(false);
-    toast.success(ar ? "سيرتك جاهزة للتحرير" : "Your resume is ready to edit");
-    navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
   };
 
   if (step === "done") {
