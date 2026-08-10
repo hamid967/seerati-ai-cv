@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Download, FileText, Printer } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 import { analyzeResume, toPlainText } from "@/lib/ats";
 
 export const Route = createFileRoute("/resumes/$id/preview")({
@@ -32,6 +33,14 @@ function PreviewResume() {
   const resume = getResume(id);
 
   useAuthGuard();
+
+  // Stamp the view once per mounted resume; a direct write avoids re-render loops.
+  const stamped = useRef<string | null>(null);
+  useEffect(() => {
+    if (!ready || !user || stamped.current === id) return;
+    stamped.current = id;
+    void supabase.from("resumes").update({ last_viewed_at: new Date().toISOString() }).eq("id", id);
+  }, [ready, user, id]);
 
   if (!ready) return null;
 
