@@ -153,8 +153,8 @@ function PreviewResume() {
 
       <p className="mx-auto max-w-5xl px-4 pb-4 text-xs text-muted-foreground">
         {ar
-          ? `يفتح زر التنزيل نافذة الطباعة — اختر «حفظ كـ PDF». اسم الملف المقترح: ${fileBase}.pdf`
-          : `The download button opens the print dialog — choose “Save as PDF”. Suggested file name: ${fileBase}.pdf`}
+          ? `« PDF نصي (طباعة) » يفتح نافذة الطباعة وينتج نصًا قابلاً للتحديد. أمّا « تنزيل PDF (صورة عالية الدقة) » فيحافظ على التصميم العربي بدقة تامة لكن نصه غير قابل للتحديد. اسم الملف المقترح: ${fileBase}.pdf`
+          : `"Print / text PDF" opens the print dialog and produces selectable text. "Download PDF (high-res image)" preserves the Arabic layout exactly, but its text is not selectable. Suggested file name: ${fileBase}.pdf`}
       </p>
 
       <div className="mx-auto max-w-5xl px-4 pb-16">

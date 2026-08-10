@@ -903,8 +903,13 @@ function EditResume() {
                 <p className="text-sm text-muted-foreground">
                   {ar ? "رتّب أقسام السيرة الذاتية. الأقسام الفارغة لا تظهر في المعاينة." : "Reorder sections. Empty sections are hidden in the preview."}
                 </p>
+                <SortableList
+                  ids={d.sectionOrder}
+                  onReorder={(from, to) => setData((data) => { reorderArray(data.sectionOrder, from, to); })}
+                  className="space-y-2"
+                >
                 {d.sectionOrder.map((key, idx) => (
-                  <div key={key} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
+                  <SortableItem key={key} id={key} ar={ar} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                     <span className="text-sm font-medium">{sectionLabels[key][lang]}</span>
                     <div className="ms-auto flex gap-1">
                       <Button
@@ -932,8 +937,9 @@ function EditResume() {
                         <ArrowDown className="size-4" />
                       </Button>
                     </div>
-                  </div>
+                  </SortableItem>
                 ))}
+                </SortableList>
               </div>
             )}
           </div>
