@@ -40,7 +40,20 @@ const HEADINGS: Record<SectionId, RegExp> = {
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 // Saudi/Gulf-friendly phone matcher: optional +country code, groups of digits/spaces/dashes.
 const PHONE_RE = /(\+?\d[\d\s()-]{6,}\d)/g;
-const LINK_RE = /((https?:\/\/|www\.)[^\s,؛]+)/gi;
+// Bare domains (linkedin.com/in/x, github.com/x) as well as full URLs.
+const LINK_RE =
+  /((?:https?:\/\/|www\.)[^\s,؛|]+|(?:[a-z0-9-]+\.)+(?:com|net|org|io|dev|me|sa)(?:\/[^\s,؛|]*)?)/gi;
+// A year range such as "(2020 - 2024)" or "2016 – 2020"; also "حتى الآن"/"Present".
+const DATES_RE =
+  /\(?\s*((?:19|20)\d{2}|[A-Za-z\u0600-\u06FF]{3,}\s+(?:19|20)\d{2})\s*[-–—to]{1,3}\s*((?:19|20)\d{2}|حتى الآن|الآن|Present|present|current)\s*\)?/;
+
+/** True when a "phone" candidate is really a year range or a plain year. */
+function looksLikeDate(candidate: string): boolean {
+  const years = candidate.match(/\b(19|20)\d{2}\b/g) ?? [];
+  if (years.length >= 2) return true;
+  const digits = candidate.replace(/\D/g, "");
+  return digits.length < 8 || digits.length > 15;
+}
 
 /** Splits a text block into clean bullet lines, stripping common bullet markers. */
 function toBullets(block: string): string[] {
@@ -49,6 +62,42 @@ function toBullets(block: string): string[] {
     .map((l) => l.replace(/^[-•*\u2022▪◦·]\s*/, "").trim())
     .filter(Boolean);
 }
+
+/**
+ * Splits a heading line such as "Acme — Data Analyst (2020 - 2024)" into its
+ * parts. Everything is best-effort: whatever cannot be identified is left empty
+ * for the user to fill in during review.
+ */
+function parseEntryHeading(line: string): {
+  left: string;
+  right: string;
+  start?: string;
+  end?: string;
+} {
+  let rest = line;
+  let start: string | undefined;
+  let end: string | undefined;
+
+  const dates = rest.match(DATES_RE);
+  if (dates) {
+    start = dates[1]?.trim();
+    end = dates[2]?.trim();
+    rest = rest.replace(dates[0], "").trim();
+  }
+
+  const parts = rest
+    .split(/\s*[—–\-|·,]\s+|\s+[—–|]\s*/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  return {
+    left: parts[0] ?? rest.trim(),
+    right: parts.slice(1).join(" — "),
+    ...(start ? { start } : {}),
+    ...(end ? { end } : {}),
+  };
+}
+
 
 /** Removes any line that only contains a heading we matched, keeping section bodies pure. */
 function isHeadingLine(line: string): SectionId | null {
