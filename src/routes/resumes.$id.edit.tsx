@@ -78,7 +78,7 @@ function EditResume() {
 
   const stored = getResume(id);
   const [draft, setDraft] = useState<Resume | null>(null);
-  const [status, setStatus] = useState<"idle" | "saving" | "saved">("saved");
+  const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("saved");
   const [step, setStep] = useState<(typeof stepDefs)[number]["key"]>("personal");
   const [jobDescription, setJobDescription] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,8 +94,18 @@ function EditResume() {
       setStatus("saving");
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => {
-        updateResume(next.id, { title: next.title, templateId: next.templateId, language: next.language, data: next.data });
-        setStatus("saved");
+        const tplNext = getTemplate(next.templateId);
+        void updateResume(next.id, {
+          title: next.title,
+          templateId: next.templateId,
+          language: next.language,
+          data: next.data,
+          status: resumeStatus(next),
+          completionScore: completeness(next),
+          atsScore: analyzeResume(next, tplNext).score,
+        })
+          .then(() => setStatus("saved"))
+          .catch(() => setStatus("error"));
       }, 700);
     },
     [updateResume],
@@ -119,12 +129,18 @@ function EditResume() {
   );
 
   const tpl = useMemo(() => (draft ? getTemplate(draft.templateId) : null), [draft]);
-  const checks = useMemo(() => (draft ? runAtsChecks(draft.data, tpl?.atsFriendly ?? true) : []), [draft, tpl]);
-  const score = checks.length ? atsScore(checks) : 0;
+  const report = useMemo(
+    () => (draft ? analyzeResume(draft, tpl ?? undefined, jobDescription) : null),
+    [draft, tpl, jobDescription],
+  );
+  const score = report?.score ?? 0;
+  const items = useMemo(() => (draft ? checklist(draft) : []), [draft]);
+  const completion = draft ? completeness(draft) : 0;
   const gaps = useMemo(
-    () => (draft && jobDescription.trim() ? keywordGaps(jobDescription, draft.data) : null),
+    () => (draft && jobDescription.trim() ? keywordCoverage(jobDescription, draft.data) : null),
     [jobDescription, draft],
   );
+
 
   if (!ready) return null;
   if (!draft) {
