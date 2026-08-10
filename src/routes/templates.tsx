@@ -1,134 +1,76 @@
-import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { TemplateGallery3D } from "@/components/template-gallery-3d";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
-import { ResumeThumb } from "@/components/resume-preview";
-import { demoResume } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({
     meta: [
-      { title: "القوالب | سيرتي — Seerati Templates" },
+      { title: "القوالب | سيرتي — Seerati 3D Template Gallery" },
       {
         name: "description",
         content:
-          "ستة قوالب سير ذاتية تدعم العربية والإنجليزية، منها قوالب متوافقة مع أنظمة التوظيف ATS وأخرى عصرية وإبداعية.",
+          "معرض ثلاثي الأبعاد لقوالب سيرتي: قوالب عربية وإنجليزية، ATS، تنفيذية وعصرية مع معاينة ومقارنة تفاعلية قبل إنشاء السيرة.",
       },
-      { property: "og:title", content: "قوالب السير الذاتية | سيرتي" },
+      { property: "og:title", content: "معرض قوالب سيرتي ثلاثي الأبعاد" },
       {
         property: "og:description",
-        content: "قوالب ATS وعصرية وتنفيذية ومبسطة وسعودية مهنية وإبداعية.",
+        content:
+          "استعرض وقارن قوالب السيرة الذاتية بالعربية والإنجليزية قبل اختيار القالب المناسب لمسارك.",
       },
     ],
   }),
   component: TemplatesPage,
 });
 
-type Filter = "all" | "ats" | "modern" | "arabic" | "english";
-
 function TemplatesPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const [filter, setFilter] = useState<Filter>("all");
-  const sample = demoResume("preview");
-
-  const filters: { id: Filter; label: string }[] = [
-    { id: "all", label: ar ? "الكل" : "All" },
-    { id: "ats", label: "ATS" },
-    { id: "modern", label: ar ? "عصري" : "Modern" },
-    { id: "arabic", label: ar ? "عربي" : "Arabic" },
-    { id: "english", label: ar ? "إنجليزي" : "English" },
-  ];
-
-  const list = defaultTemplates.filter((t) => {
-    if (!t.active) return false;
-    if (filter === "ats") return t.atsFriendly;
-    if (filter === "modern") return t.category === "modern" || t.category === "creative";
-    if (filter === "arabic") return t.supportsRTL;
-    if (filter === "english") return true;
-    return true;
-  });
+  const activeTemplates = defaultTemplates.filter((template) => template.active);
+  const atsTemplates = activeTemplates.filter((template) => template.atsFriendly).length;
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">
-          {ar ? "معرض القوالب" : "Template gallery"}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          {ar
-            ? "كل قالب مبني كمكوّن مستقل، ويمكن تبديله في أي وقت دون فقدان بياناتك."
-            : "Each template is a standalone component and can be switched anytime without losing your data."}
-        </p>
-        <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-          {/* Badges below reflect actual registry metadata plus the static checks in
-              scripts/template-smoke.mjs and scripts/validate-rtl.mjs — not a visual audit. */}
-          {ar
-            ? "الشارات أدناه مبنية على إعدادات القالب الفعلية وفحوصات آلية للبنية والاتجاه وحالات المحتوى الطويل، وليست تقييماً بصرياً يدوياً."
-            : "The badges below reflect real template configuration plus automated structure, direction and long-content checks — not a manual visual audit."}
-        </p>
-
-        <div className="mt-6 flex flex-wrap gap-2">
-          {filters.map((f) => (
-            <Button
-              key={f.id}
-              size="sm"
-              variant={filter === f.id ? "default" : "outline"}
-              onClick={() => setFilter(f.id)}
-            >
-              {f.label}
-            </Button>
-          ))}
-        </div>
-
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((tpl) => (
-            <div key={tpl.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-              <div className="mb-4">
-                <ResumeThumb
-                  resume={{
-                    ...sample,
-                    templateId: tpl.id,
-                    language: filter === "english" ? "en" : sample.language,
-                  }}
-                  template={tpl}
-                  scale={0.3}
-                />
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-bold">{tpl.name[lang]}</p>
-                <div className="flex flex-wrap justify-end gap-1">
-                  {tpl.atsFriendly && (
-                    <Badge variant="outline" className="text-[10px]">
-                      {ar ? "إعداد متوافق مع ATS" : "ATS-friendly config"}
-                    </Badge>
-                  )}
-                  {tpl.supportsRTL && (
-                    <Badge variant="secondary" className="text-[10px]">
-                      {ar ? "RTL مفحوص" : "RTL checked"}
-                    </Badge>
-                  )}
-                  <Badge variant="outline" className="text-[10px]">
-                    {ar ? "مُختبر بحالات ضغط" : "Stress-fixture checked"}
-                  </Badge>
-                </div>
-              </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                {tpl.description[lang]}
-              </p>
-              <Button className="mt-4 w-full" size="sm" asChild>
-                <Link to="/resumes/new" search={{ template: tpl.id }}>
-                  {ar ? "استخدم هذا القالب" : "Use this template"}
-                </Link>
-              </Button>
+      <main className="flex-1">
+        <section className="relative overflow-hidden border-b border-border/70 px-4 py-14 md:py-20">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklab,var(--emerald-accent)_12%,transparent),transparent_42%)]" />
+          <div className="mx-auto max-w-6xl">
+            <Badge variant="secondary" className="gap-1.5 rounded-full">
+              <Sparkles className="size-3.5" />
+              {ar ? "تجربة قوالب سينمائية" : "Cinematic template experience"}
+            </Badge>
+            <h1 className="mt-5 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">
+              {ar
+                ? "اختر القالب كما لو كنت تمسكه بيدك"
+                : "Choose a template as if it were in your hands"}
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-8 text-muted-foreground md:text-base">
+              {ar
+                ? "حرّك القالب بالماوس، افتحه بمعاينة سينمائية، وقارن حتى ثلاثة تصاميم جنباً إلى جنب. بيانات المعاينة نموذجية وواضحة ولا تختلط بحسابك الحقيقي."
+                : "Tilt templates with your pointer, open a cinematic preview, and compare up to three designs side by side. Preview data is clearly sample-only and never mixed into your real account."}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <span className="rounded-full border border-border bg-card/80 px-3 py-1.5">
+                {activeTemplates.length} {ar ? "قالباً فعالاً" : "active templates"}
+              </span>
+              <span className="rounded-full border border-border bg-card/80 px-3 py-1.5">
+                {atsTemplates} {ar ? "إعدادات ATS محافظة" : "conservative ATS configurations"}
+              </span>
+              <span className="rounded-full border border-border bg-card/80 px-3 py-1.5">
+                AR / EN · RTL / LTR
+              </span>
             </div>
-          ))}
-        </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-10 md:py-14">
+          <TemplateGallery3D />
+        </section>
       </main>
       <SiteFooter />
     </div>
