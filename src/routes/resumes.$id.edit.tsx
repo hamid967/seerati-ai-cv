@@ -5,7 +5,10 @@ import {
   ArrowDown,
   ArrowUp,
   Check,
+  Copy,
   Eye,
+  Redo2,
+  Undo2,
   Loader2,
   Plus,
   Trash2,
@@ -130,8 +133,10 @@ function EditResume() {
   const [draft, setDraft] = useState<Resume | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("saved");
   const [step, setStep] = useState<(typeof stepDefs)[number]["key"]>("personal");
-  const [jobDescription, setJobDescription] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const past = useRef<Resume[]>([]);
+  const future = useRef<Resume[]>([]);
+  const [, bumpHistory] = useState(0);
 
   useAuthGuard();
 
@@ -166,6 +171,9 @@ function EditResume() {
       setDraft((prev) => {
         if (!prev) return prev;
         const next = fn(structuredClone(prev));
+        past.current = [...past.current.slice(-49), prev];
+        future.current = [];
+        bumpHistory((v) => v + 1);
         scheduleSave(next);
         return next;
       });
@@ -173,9 +181,48 @@ function EditResume() {
     [scheduleSave],
   );
 
+  const undo = useCallback(() => {
+    setDraft((prev) => {
+      const previous = past.current.pop();
+      if (!prev || !previous) return prev;
+      future.current = [...future.current, prev];
+      bumpHistory((v) => v + 1);
+      scheduleSave(previous);
+      return previous;
+    });
+  }, [scheduleSave]);
+
+  const redo = useCallback(() => {
+    setDraft((prev) => {
+      const next = future.current.pop();
+      if (!prev || !next) return prev;
+      past.current = [...past.current, prev];
+      bumpHistory((v) => v + 1);
+      scheduleSave(next);
+      return next;
+    });
+  }, [scheduleSave]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "z") return;
+      e.preventDefault();
+      if (e.shiftKey) redo();
+      else undo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo, redo]);
+
   const setData = useCallback(
     (fn: (d: ResumeData) => void) => patch((r) => { fn(r.data); return r; }),
     [patch],
+  );
+
+  const jobDescription = draft?.data.jobDescription ?? "";
+  const setJobDescription = useCallback(
+    (v: string) => setData((data) => { data.jobDescription = v; }),
+    [setData],
   );
 
   const tpl = useMemo(() => (draft ? getTemplate(draft.templateId) : null), [draft]);
@@ -262,6 +309,28 @@ function EditResume() {
           </span>
 
           <div className="ms-auto flex items-center gap-2">
+            <Button
+              size="icon"
+              variant="outline"
+              className="size-9"
+              aria-label={ar ? "تراجع" : "Undo"}
+              title={ar ? "تراجع (Ctrl+Z)" : "Undo (Ctrl+Z)"}
+              disabled={past.current.length === 0}
+              onClick={undo}
+            >
+              <Undo2 className="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="size-9"
+              aria-label={ar ? "إعادة" : "Redo"}
+              title={ar ? "إعادة (Ctrl+Shift+Z)" : "Redo (Ctrl+Shift+Z)"}
+              disabled={future.current.length === 0}
+              onClick={redo}
+            >
+              <Redo2 className="size-4" />
+            </Button>
             <Badge variant="secondary">
               {ar ? "الاكتمال" : "Complete"} {completion}%
             </Badge>
@@ -405,6 +474,20 @@ function EditResume() {
                     />
                   </div>
                 ))}
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label htmlFor="targetJob">{ar ? "الوظيفة المستهدفة" : "Target job"}</Label>
+                  <Input
+                    id="targetJob"
+                    value={d.targetJob ?? ""}
+                    placeholder={ar ? "مثال: مدير مشاريع أول — قطاع الطاقة" : "e.g. Senior Project Manager — Energy"}
+                    onChange={(e) => setData((data) => { data.targetJob = e.target.value; })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {ar
+                      ? "نستخدمها في مطابقة الكلمات المفتاحية وفي اقتراحات المساعد."
+                      : "Used for keyword matching and assistant suggestions."}
+                  </p>
+                </div>
               </div>
             )}
 
@@ -542,7 +625,16 @@ function EditResume() {
                         downDisabled={idx === d.education.length - 1}
                         onMove={(dir) => setData((data) => { swap(data.education, idx, idx + dir); })}
                       />
-                      <Button size="sm" variant="ghost" className="ms-auto text-destructive" onClick={() => setData((data) => { data.education.splice(idx, 1); })}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="ms-auto"
+                        onClick={() => setData((data) => { data.education.splice(idx + 1, 0, { ...structuredClone(data.education[idx]!), id: uid() }); })}
+                      >
+                        <Copy className="size-4" />
+                        {ar ? "تكرار" : "Duplicate"}
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setData((data) => { data.education.splice(idx, 1); })}>
                         <Trash2 className="size-4" />
                         {ar ? "حذف" : "Remove"}
                       </Button>
