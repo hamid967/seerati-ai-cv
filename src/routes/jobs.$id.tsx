@@ -212,9 +212,25 @@ function JobWorkspacePage() {
     });
   });
 
+  const refreshEvents = useCallback(() => {
+    if (!job) return;
+    void listJobEvents(job.id).then(setEvents);
+  }, [job]);
+
   const handleStatusChange = (status: JobWorkspace["status"]) => {
     setForm((f) => ({ ...f, status }));
     persist({ status });
+    if (user && job) {
+      // Logged after the status write is issued, describing the real new state.
+      void addJobEvent(user.id, {
+        jobId: job.id,
+        eventType: status === "applied" ? "applied" : "status_change",
+        title: ar
+          ? `الحالة: ${JOB_STATUS_LABEL[status].ar}`
+          : `Status: ${JOB_STATUS_LABEL[status].en}`,
+        metadata: { status },
+      }).then(refreshEvents);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -236,6 +252,15 @@ function JobWorkspacePage() {
         ? `تحليل وصف ${job.jobTitle} — نسبة مطابقة ${matchAnalysis.score}%`
         : `Parsed ${job.jobTitle} — ${matchAnalysis.score}% match`,
     });
+    await addJobEvent(user.id, {
+      jobId: job.id,
+      eventType: "analyzed",
+      title: ar
+        ? `تحليل الوصف — مطابقة ${matchAnalysis.score}%`
+        : `Description analyzed — ${matchAnalysis.score}% match`,
+      metadata: { matchScore: matchAnalysis.score },
+    });
+    refreshEvents();
     setAnalyzing(false);
     toast.success(ar ? "تم تحليل الوصف الوظيفي" : "Job description analyzed");
   };
