@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 const searchSchema = z.object({ mode: z.enum(["signin", "signup", "reset"]).optional() });
 
 type AuthMode = "signin" | "signup" | "reset";
+type AuthErrors = Partial<Record<"email" | "password" | "confirm" | "name" | "terms", string>>;
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -68,7 +69,7 @@ function AuthPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<AuthErrors>({});
 
   useEffect(() => {
     if (modeFromSearch) setTab(modeFromSearch);
@@ -91,7 +92,7 @@ function AuthPage() {
           : t("auth_strength_strong");
 
   const validate = () => {
-    const e: Record<string, string> = {};
+    const e: AuthErrors = {};
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) e.email = t("auth_err_email");
     if (tab !== "reset") {
       if (tab === "signup") {
