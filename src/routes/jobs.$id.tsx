@@ -116,6 +116,7 @@ function JobWorkspacePage() {
   const [preparing, setPreparing] = useState(false);
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [letter, setLetter] = useState<CoverLetter | null>(null);
   const [graph, setGraph] = useState<FactGraph>({ facts: [], evidence: [] });
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
   const [branching, setBranching] = useState(false);
