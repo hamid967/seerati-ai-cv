@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "qa:routes": "node scripts/qa-routes.mjs",
     "qa:ai": "node scripts/qa-ai-contract.mjs",
-    "qa": "npm run qa:routes && npm run qa:ai"
+    "check:routes-shell": "node scripts/check-route-shell.mjs",
+    "test:ai-contract": "node --experimental-strip-types scripts/ai-contract-fixtures.mjs",
+    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",
