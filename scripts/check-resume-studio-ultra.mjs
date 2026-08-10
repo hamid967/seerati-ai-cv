@@ -4,18 +4,27 @@ import { readFileSync } from "node:fs";
 const route = readFileSync("src/routes/resumes.$id.studio.tsx", "utf8");
 const advisor = readFileSync("src/lib/resume-studio.ts", "utf8");
 const preview = readFileSync("src/routes/resumes.$id.preview.tsx", "utf8");
+const layoutEngine = readFileSync("src/lib/resume-layout.ts", "utf8");
 
 const failures = [];
 const requireText = (source, token, message) => {
   if (!source.includes(token)) failures.push(message);
 };
 
-requireText(route, "Resume Studio Ultra", "studio route title missing");
+if (!route.includes("Resume Studio Ultra") && !route.includes("Professional Layout Engine")) {
+  failures.push("studio route title missing");
+}
 requireText(route, "Smart Fit", "Smart Fit control missing");
 requireText(route, "pageSize", "A4/US Letter preview target missing");
 requireText(route, "setZoom", "zoom controls missing");
 requireText(route, "setFullscreen", "focus/fullscreen control missing");
-requireText(route, "applyDensity", "Smart Fit must persist density only");
+
+const hasLegacyDensityFit = route.includes("applyDensity");
+const hasMeasuredLayoutFit = route.includes("fitToPages") && layoutEngine.includes("fitCandidates");
+if (!hasLegacyDensityFit && !hasMeasuredLayoutFit) {
+  failures.push("Smart Fit must remain deterministic and non-destructive");
+}
+
 requireText(advisor, "contentUnits", "deterministic content-load analysis missing");
 requireText(advisor, "recommendedTemplateIds", "template recommendations missing");
 requireText(
@@ -28,6 +37,10 @@ requireText(preview, 'to="/resumes/$id/studio"', "export preview must link to th
 
 if (route.includes("Math.random")) failures.push("Studio route must not use random design metrics");
 if (advisor.includes("Math.random")) failures.push("Design advisor must remain deterministic");
+if (layoutEngine.includes("Math.random")) failures.push("Layout fitting must remain deterministic");
+if (route.includes("splice(") || route.includes("hiddenSections")) {
+  failures.push("Smart Fit must not delete or hide resume content");
+}
 
 if (failures.length) {
   failures.forEach((failure) => console.error(`FAIL  ${failure}`));
@@ -39,5 +52,5 @@ console.log("PASS  Resume Studio route is wired");
 console.log("PASS  Smart Fit is deterministic and non-destructive");
 console.log("PASS  zoom, page target, focus mode and template advisor are present");
 console.log("PASS  export preview links to the design studio");
-console.log("PASS  Stage 5E route tree is generated before merge");
+console.log("PASS  Stage 5E invariants remain valid after layout-engine evolution");
 console.log("\nResume Studio Ultra quality guard OK.");
