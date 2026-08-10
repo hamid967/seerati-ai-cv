@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
+import { ResumeThumb } from "@/components/resume-preview";
+import { demoResume } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({
@@ -28,6 +30,7 @@ function TemplatesPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const [filter, setFilter] = useState<Filter>("all");
+  const sample = demoResume("preview");
 
   const filters: { id: Filter; label: string }[] = [
     { id: "all", label: ar ? "الكل" : "All" },
@@ -73,17 +76,12 @@ function TemplatesPage() {
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((tpl) => (
             <div key={tpl.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-              <div
-                className="mb-4 space-y-2 rounded-xl border p-4"
-                style={{ background: `${tpl.design.accent}0a`, borderColor: `${tpl.design.accent}2e` }}
-              >
-                <div className="h-2.5 w-24 rounded-full" style={{ background: tpl.design.accent }} />
-                <div className="h-1.5 w-16 rounded-full bg-muted" />
-                <div className="mt-3 space-y-1.5">
-                  {[100, 88, 72, 92, 60].map((w, i) => (
-                    <div key={i} className="h-1.5 rounded-full bg-muted" style={{ width: `${w}%` }} />
-                  ))}
-                </div>
+              <div className="mb-4">
+                <ResumeThumb
+                  resume={{ ...sample, templateId: tpl.id, language: filter === "english" ? "en" : sample.language }}
+                  template={tpl}
+                  scale={0.3}
+                />
               </div>
               <div className="flex items-center justify-between gap-2">
                 <p className="font-bold">{tpl.name[lang]}</p>
