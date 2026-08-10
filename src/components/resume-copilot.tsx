@@ -154,7 +154,10 @@ export function ResumeCopilot({
         activeKey === "summary"
           ? {
               type: "update_summary",
-              reason: action.payload.reason,
+              reason:
+                replyLang === "ar"
+                  ? "صياغة مبنية على ما ذكرته فقط."
+                  : "Wording based only on what you provided.",
               evidenceUsed: [],
               payload: { original: before, suggested: text },
             }
