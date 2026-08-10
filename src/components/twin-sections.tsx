@@ -13,6 +13,15 @@ import type {
 } from "@/lib/career";
 import type { Experience, Education, LanguageItem, LinkItem } from "@/lib/types";
 
+
+type WorkMode = "onsite" | "hybrid" | "remote";
+const WORK_MODES: WorkMode[] = ["onsite", "hybrid", "remote"];
+/** Returns a valid work mode, or null when the field should be cleared. */
+function toWorkMode(raw: string): WorkMode | null {
+  const v = raw.trim();
+  return WORK_MODES.includes(v as WorkMode) ? (v as WorkMode) : null;
+}
+
 export const newId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID().slice(0, 8)
@@ -136,7 +145,14 @@ export function TargetsCard({
               <Input
                 placeholder={ar ? "نمط العمل (حضوري/هجين/عن بعد)" : "Work mode"}
                 value={tg.workMode ?? ""}
-                onChange={(e) => { const v = e.target.value as CareerTarget["workMode"]; if (v) update(i, { workMode: v }); else { const { workMode, ...rest } = tg; onChange(targets.map((t, idx) => (idx === i ? rest : t))); } }}
+                onChange={(e) => {
+                  const v = toWorkMode(e.target.value);
+                  if (v !== null) update(i, { workMode: v });
+                  else {
+                    const { workMode: _drop, ...rest } = tg;
+                    onChange(targets.map((t, idx) => (idx === i ? rest : t)));
+                  }
+                }}
               />
             </div>
           </RowShell>
@@ -516,10 +532,10 @@ export function PreferencesCard({
           <Input
             value={prefs.workMode ?? ""}
             onChange={(e) => {
-              const v = e.target.value as CareerTwin["preferences"]["workMode"];
-              if (v) onChange({ workMode: v });
+              const v = toWorkMode(e.target.value);
+              if (v !== null) onChange({ workMode: v });
               else {
-                const { workMode, ...rest } = prefs;
+                const { workMode: _drop, ...rest } = prefs;
                 onChange(rest);
               }
             }}

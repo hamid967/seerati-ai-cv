@@ -48,7 +48,7 @@ import {
   type JobWorkspace,
 } from "@/lib/career";
 
-export const Route = createFileRoute("/jobs")({
+export const Route = createFileRoute("/jobs/")({
   head: () => ({
     meta: [
       { title: "مساحات الوظائف | سيرتي — Job Workspaces" },
