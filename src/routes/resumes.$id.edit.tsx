@@ -373,6 +373,14 @@ function EditResume() {
                 <p className="text-xs text-muted-foreground">
                   {ar ? "عدد الكلمات" : "Words"}: {d.summary.trim().split(/\s+/).filter(Boolean).length}
                 </p>
+                <FieldAi
+                  resume={draft}
+                  value={d.summary}
+                  section="summary"
+                  jobDescription={jobDescription}
+                  onApply={(text) => setData((data) => { data.summary = text; })}
+                />
+
               </div>
             )}
 
