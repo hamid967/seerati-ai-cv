@@ -74,7 +74,7 @@ export function computeNextActions(input: NextActionInput, limit = 5): NextActio
         },
         to: "/jobs/$id",
         params: { id: iv.jobId },
-        personaOwner: "majid",
+        personaOwner: "majed",
       });
     }
   }
