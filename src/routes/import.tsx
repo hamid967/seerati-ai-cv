@@ -678,6 +678,15 @@ function ImportCenterPage() {
       {gaps.length > 0 ? (
         <ResumeCopilot
           gaps={gaps}
+          recap={recap}
+          progress={describeProgress(
+            {
+              hasBasics: Boolean(twin?.identity.fullName && twin?.identity.email),
+              achievementsNeeded: Math.max(0, 2 - (twin?.achievements.length ?? 0)),
+              missing: gaps.map((g) => g.label[ar ? "ar" : "en"]),
+            },
+            ar ? "ar" : "en",
+          )}
           targetRole={twin?.identity.headline ?? ""}
           currentValue={(key) =>
             key === "summary" ? (twin?.identity.summary ?? "") : key === "headline" ? (twin?.identity.headline ?? "") : ""
@@ -706,13 +715,36 @@ function ImportCenterPage() {
         </Card>
       )}
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{ar ? "لغة السيرة الذاتية" : "Resume language"}</CardTitle>
+          <CardDescription>
+            {ar
+              ? "لغة المحادثة مستقلة عن لغة السيرة. لن نترجم أسماء الشركات أو الشهادات."
+              : "Chat language is separate from resume language. Company and certificate names stay as written."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          {(["ar", "en", "bilingual"] as ResumeLanguage[]).map((rl) => (
+            <Button
+              key={rl}
+              size="sm"
+              variant={resumeLang === rl ? "default" : "outline"}
+              onClick={() => setResumeLang(rl)}
+            >
+              {RESUME_LANGUAGE_LABEL[rl][ar ? "ar" : "en"]}
+            </Button>
+          ))}
+        </CardContent>
+      </Card>
+
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => navigate({ to: "/career-twin" })}>
           {ar ? "افتح ملفي المهني" : "Open my career profile"}
           <ArrowRight className="size-4" />
         </Button>
         <Button variant="outline" onClick={() => navigate({ to: "/resumes/new" })}>
-          {ar ? "أنشئ سيرة ذاتية" : "Create a resume"}
+          {ar ? "إنشاء سيرتي الآن" : "Create my resume now"}
         </Button>
         <Button
           variant="ghost"
