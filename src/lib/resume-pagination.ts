@@ -41,7 +41,7 @@ export function analyzeResumePagination(
   );
 
   for (const section of sections) {
-    const sectionKey = section.dataset.cvSectionKey as SectionKey | undefined;
+    const sectionKey = section.dataset["cvSectionKey"] as SectionKey | undefined;
     const box = relativeBox(section);
     const start = pageIndex(box.top, pageHeight);
     const end = pageIndex(Math.max(box.top, box.bottom - 1), pageHeight);
