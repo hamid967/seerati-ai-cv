@@ -9,7 +9,10 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "qa:routes": "node scripts/qa-routes.mjs",
+    "qa:ai": "node scripts/qa-ai-contract.mjs",
+    "qa": "npm run qa:routes && npm run qa:ai"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",

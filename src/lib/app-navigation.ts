@@ -7,6 +7,7 @@ import {
   Mic,
   Mail,
   Shield,
+  ShieldCheck,
   Sparkles,
   User,
   UserSquare2,
@@ -25,6 +26,7 @@ import {
 export type AppNavId =
   | "home"
   | "career-twin"
+  | "career-evidence"
   | "import"
   | "resumes"
   | "jobs"
@@ -72,6 +74,15 @@ export const APP_NAV: AppNavItem[] = [
     matches: ["/career-profile"],
     enabled: true,
     mobile: true,
+    group: "main",
+  },
+  {
+    id: "career-evidence",
+    label: { ar: "خزانة الأدلة", en: "Evidence vault" },
+    hint: { ar: "حقائقك الموثّقة", en: "Your verified facts" },
+    icon: ShieldCheck,
+    to: "/career-evidence",
+    enabled: true,
     group: "main",
   },
   {
