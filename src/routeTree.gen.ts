@@ -11,12 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
@@ -29,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtsRoute = AtsRouteImport.update({
@@ -61,6 +69,16 @@ const TemplatesRoute = TemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ResumesNewRoute = ResumesNewRouteImport.update({
   id: '/resumes/new',
   path: '/resumes/new',
@@ -80,13 +98,16 @@ const ResumesIdPreviewRoute = ResumesIdPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
   '/resumes/new': typeof ResumesNewRoute
+  '/admin/': typeof AdminIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
@@ -99,7 +120,9 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
   '/resumes/new': typeof ResumesNewRoute
+  '/admin': typeof AdminIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
@@ -107,13 +130,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
   '/templates': typeof TemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
   '/resumes/new': typeof ResumesNewRoute
+  '/admin/': typeof AdminIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
@@ -122,13 +148,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/admin'
     | '/ats'
     | '/auth'
     | '/dashboard'
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/admin/users'
     | '/resumes/new'
+    | '/admin/'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -141,20 +170,25 @@ export interface FileRouteTypes {
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/admin/users'
     | '/resumes/new'
+    | '/admin'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
   id:
     | '__root__'
     | '/'
     | '/account'
+    | '/admin'
     | '/ats'
     | '/auth'
     | '/dashboard'
     | '/features'
     | '/onboarding'
     | '/templates'
+    | '/admin/users'
     | '/resumes/new'
+    | '/admin/'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
   fileRoutesById: FileRoutesById
@@ -162,6 +196,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
@@ -187,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ats': {
@@ -231,6 +273,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/resumes/new': {
       id: '/resumes/new'
       path: '/resumes/new'
@@ -255,9 +311,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  AdminRoute: AdminRouteWithChildren,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
