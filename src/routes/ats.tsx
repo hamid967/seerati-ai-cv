@@ -41,6 +41,10 @@ function AtsPage() {
   const sample = useMemo(() => demoResume("demo"), []);
   const report = useMemo(() => analyzeResume(sample, getTemplate(sample.templateId), jd), [sample, jd]);
   const lint = useMemo(() => lintResume(sample), [sample]);
+  const snapshot = useMemo(
+    () => buildRecruiterSnapshot(sample, { graph: emptyFactGraph(), jobDescription: jd }),
+    [sample, jd],
+  );
 
   return (
     <div className="flex min-h-screen flex-col">
