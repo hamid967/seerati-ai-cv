@@ -23,8 +23,9 @@ export function parseAiRequest(input: unknown): AiRequest {
 
   const context =
     raw["context"] && typeof raw["context"] === "object"
-      ? (raw["context"] as AiRequest["context"])
+      ? (raw["context"] as NonNullable<AiRequest["context"]>)
       : undefined;
 
-  return { task: task as AiTask, lang, input: text, context };
+  return { task: task as AiTask, lang, input: text, ...(context ? { context } : {}) };
+
 }
