@@ -619,9 +619,16 @@ function EditResume() {
                       <div key={item.id} className="mb-2 flex gap-2">
                         <Input value={item.title} placeholder={ar ? "العنوان" : "Title"} onChange={(ev) => setData((data) => { data[key][idx]!.title = ev.target.value; })} />
                         <Input value={item.detail ?? ""} placeholder={ar ? "التفاصيل" : "Detail"} onChange={(ev) => setData((data) => { data[key][idx]!.detail = ev.target.value; })} />
+                        <MoveButtons
+                          ar={ar}
+                          upDisabled={idx === 0}
+                          downDisabled={idx === d[key].length - 1}
+                          onMove={(dir) => setData((data) => { swap(data[key], idx, idx + dir); })}
+                        />
                         <Button variant="ghost" size="icon" aria-label={ar ? "حذف" : "Remove"} onClick={() => setData((data) => { data[key].splice(idx, 1); })}>
                           <Trash2 className="size-4" />
                         </Button>
+
                       </div>
                     ))}
                     <Button size="sm" variant="outline" onClick={() => setData((data) => { data[key].push({ id: uid(), title: "", detail: "" }); })}>
