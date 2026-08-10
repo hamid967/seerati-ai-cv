@@ -206,6 +206,107 @@ export type Database = {
           },
         ]
       }
+      career_evidence: {
+        Row: {
+          created_at: string
+          description: string
+          evidence_type: string
+          fact_id: string | null
+          file_ref: string | null
+          id: string
+          metadata: Json
+          metric_unit: string | null
+          metric_value: string | null
+          source_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          evidence_type?: string
+          fact_id?: string | null
+          file_ref?: string | null
+          id?: string
+          metadata?: Json
+          metric_unit?: string | null
+          metric_value?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          evidence_type?: string
+          fact_id?: string | null
+          file_ref?: string | null
+          id?: string
+          metadata?: Json
+          metric_unit?: string | null
+          metric_value?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "career_evidence_fact_id_fkey"
+            columns: ["fact_id"]
+            isOneToOne: false
+            referencedRelation: "career_facts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      career_facts: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          source_label: string | null
+          source_type: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+          value: string
+          verification_status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          source_label?: string | null
+          source_type?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id: string
+          value?: string
+          verification_status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          source_label?: string | null
+          source_type?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          value?: string
+          verification_status?: string
+        }
+        Relationships: []
+      }
       career_profiles: {
         Row: {
           achievements: Json
@@ -515,6 +616,81 @@ export type Database = {
           years_experience?: string | null
         }
         Relationships: []
+      }
+      protected_terms: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          term: string
+          translation_policy: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          term: string
+          translation_policy?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          term?: string
+          translation_policy?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      resume_versions: {
+        Row: {
+          change_summary: string
+          created_at: string
+          id: string
+          label: string
+          parent_version_id: string | null
+          resume_id: string
+          snapshot: Json
+          user_id: string
+        }
+        Insert: {
+          change_summary?: string
+          created_at?: string
+          id?: string
+          label?: string
+          parent_version_id?: string | null
+          resume_id: string
+          snapshot?: Json
+          user_id: string
+        }
+        Update: {
+          change_summary?: string
+          created_at?: string
+          id?: string
+          label?: string
+          parent_version_id?: string | null
+          resume_id?: string
+          snapshot?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_versions_parent_version_id_fkey"
+            columns: ["parent_version_id"]
+            isOneToOne: false
+            referencedRelation: "resume_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resume_versions_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       resumes: {
         Row: {

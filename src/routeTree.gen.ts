@@ -14,6 +14,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CareerEvidenceRouteImport } from './routes/career-evidence'
 import { Route as CareerTwinRouteImport } from './routes/career-twin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
@@ -56,6 +57,11 @@ const AtsRoute = AtsRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerEvidenceRoute = CareerEvidenceRouteImport.update({
+  id: '/career-evidence',
+  path: '/career-evidence',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CareerTwinRoute = CareerTwinRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/career-evidence': typeof CareerEvidenceRoute
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/career-evidence': typeof CareerEvidenceRoute
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/career-evidence': typeof CareerEvidenceRoute
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ats'
     | '/auth'
+    | '/career-evidence'
     | '/career-twin'
     | '/dashboard'
     | '/features'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/ats'
     | '/auth'
+    | '/career-evidence'
     | '/career-twin'
     | '/dashboard'
     | '/features'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ats'
     | '/auth'
+    | '/career-evidence'
     | '/career-twin'
     | '/dashboard'
     | '/features'
@@ -307,6 +319,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
+  CareerEvidenceRoute: typeof CareerEvidenceRoute
   CareerTwinRoute: typeof CareerTwinRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
@@ -357,6 +370,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career-evidence': {
+      id: '/career-evidence'
+      path: '/career-evidence'
+      fullPath: '/career-evidence'
+      preLoaderRoute: typeof CareerEvidenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/career-twin': {
@@ -512,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
+  CareerEvidenceRoute: CareerEvidenceRoute,
   CareerTwinRoute: CareerTwinRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
@@ -529,13 +550,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
