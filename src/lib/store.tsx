@@ -44,6 +44,7 @@ type Ctx = {
   deleteResume: (id: string) => Promise<void>;
   getResume: (id: string) => Resume | undefined;
   atLimit: boolean;
+  maxResumes: number;
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -192,13 +193,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [loadProfile, loadResumes]);
 
   const value = useMemo<Ctx>(() => {
-    const atLimit = resumes.length >= RESUME_LIMIT;
+    const atLimit = resumes.length >= maxResumes;
     return {
       ready,
       user,
       resumes,
       loadingResumes,
       atLimit,
+      maxResumes,
       signIn,
       signUp,
       resetPassword: async (email) => {
