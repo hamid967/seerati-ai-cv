@@ -15,7 +15,8 @@ export type AiTask =
   | "proofread"
   | "ats_keywords"
   | "translate"
-  | "chat";
+  | "chat"
+  | "copilot";
 
 export type AiRequest = {
   task: AiTask;
@@ -52,4 +53,5 @@ export const ALL_AI_TASKS: AiTask[] = [
   "ats_keywords",
   "translate",
   "chat",
+  "copilot",
 ];
