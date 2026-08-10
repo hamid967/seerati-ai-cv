@@ -409,6 +409,10 @@ export type FactGraph = {
   evidence: CareerEvidence[];
 };
 
+/** A graph with no stored data — used by public/demo surfaces. */
+export const emptyFactGraph = (): FactGraph => ({ facts: [], evidence: [] });
+
+
 export async function loadFactGraph(userId: string): Promise<FactGraph> {
   const [facts, evidence] = await Promise.all([listFacts(userId), listEvidence(userId)]);
   return { facts, evidence };
