@@ -1,0 +1,31 @@
+name: Stage5G Route Tree Generator
+
+on:
+  push:
+    branches:
+      - stage5g/smart-pagination-page-composer
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage5g/smart-pagination-page-composer
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Generate TanStack route tree
+        run: bun run build
+      - name: Commit generated route tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routeTree.gen.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: generate route tree for page composer"
+          git push origin HEAD:stage5g/smart-pagination-page-composer
