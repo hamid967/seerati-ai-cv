@@ -530,7 +530,16 @@ function EditResume() {
                           downDisabled={idx === d.experience.length - 1}
                           onMove={(dir) => setData((data) => { swap(data.experience, idx, idx + dir); })}
                         />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setData((data) => { data.experience.splice(idx + 1, 0, { ...structuredClone(data.experience[idx]!), id: uid() }); })}
+                        >
+                          <Copy className="size-4" />
+                          {ar ? "تكرار" : "Duplicate"}
+                        </Button>
                       </div>
+
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Input placeholder={ar ? "المسمى الوظيفي" : "Role"} value={e.role} onChange={(ev) => setData((data) => { data.experience[idx]!.role = ev.target.value; })} />
