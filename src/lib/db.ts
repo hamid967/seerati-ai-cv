@@ -107,32 +107,112 @@ export type AdminUser = {
   email: string;
   fullName: string;
   targetRole: string | null;
+  yearsExperience: string | null;
+  industry: string | null;
   onboarded: boolean;
   createdAt: string;
   role: "admin" | "user";
   resumeCount: number;
+  lastActivity: string | null;
+  resumeMeta: { id: string; title: string; status: string; completion: number; ats: number; updatedAt: string }[];
 };
 
 export async function fetchAdminUsers(): Promise<AdminUser[]> {
   const [{ data: profiles }, { data: roles }, { data: resumes }] = await Promise.all([
     supabase.from("profiles").select("*").order("created_at", { ascending: false }),
     supabase.from("user_roles").select("user_id, role"),
-    supabase.from("resumes").select("user_id"),
+    supabase
+      .from("resumes")
+      .select("id, user_id, title, status, completion_score, ats_score, updated_at")
+      .order("updated_at", { ascending: false }),
   ]);
   const adminIds = new Set((roles ?? []).filter((r) => r.role === "admin").map((r) => r.user_id));
-  const counts = new Map<string, number>();
-  for (const r of resumes ?? []) counts.set(r.user_id, (counts.get(r.user_id) ?? 0) + 1);
-  return (profiles ?? []).map((p) => ({
-    id: p.id,
-    email: p.email,
-    fullName: p.full_name ?? "",
-    targetRole: p.target_role,
-    onboarded: p.onboarded,
-    createdAt: p.created_at,
-    role: adminIds.has(p.id) ? "admin" : "user",
-    resumeCount: counts.get(p.id) ?? 0,
-  }));
+  const byUser = new Map<string, AdminUser["resumeMeta"]>();
+  for (const r of resumes ?? []) {
+    const list = byUser.get(r.user_id) ?? [];
+    list.push({
+      id: r.id,
+      title: r.title,
+      status: r.status,
+      completion: r.completion_score,
+      ats: r.ats_score,
+      updatedAt: r.updated_at,
+    });
+    byUser.set(r.user_id, list);
+  }
+  return (profiles ?? []).map((p) => {
+    const meta = byUser.get(p.id) ?? [];
+    return {
+      id: p.id,
+      email: p.email,
+      fullName: p.full_name ?? "",
+      targetRole: p.target_role,
+      yearsExperience: p.years_experience,
+      industry: p.industry,
+      onboarded: p.onboarded,
+      createdAt: p.created_at,
+      role: adminIds.has(p.id) ? "admin" : ("user" as const),
+      resumeCount: meta.length,
+      lastActivity: meta[0]?.updatedAt ?? null,
+      resumeMeta: meta,
+    };
+  });
 }
+
+export type AdminStats = {
+  totalUsers: number;
+  newUsers30d: number;
+  totalResumes: number;
+  avgResumesPerUser: number;
+  drafts: number;
+  complete: number;
+  aiTotal: number;
+  ai30d: number;
+  templateRanking: { id: string; count: number }[];
+  recentSignups: { id: string; email: string; fullName: string; createdAt: string }[];
+};
+
+export async function fetchAdminStats(): Promise<AdminStats> {
+  const since = new Date(Date.now() - 30 * 864e5).toISOString();
+  const [profiles, newProfiles, resumes, aiAll, ai30, signups] = await Promise.all([
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since),
+    supabase.from("resumes").select("status, template_id"),
+    supabase.from("ai_usage").select("id", { count: "exact", head: true }),
+    supabase.from("ai_usage").select("id", { count: "exact", head: true }).gte("created_at", since),
+    supabase
+      .from("profiles")
+      .select("id, email, full_name, created_at")
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
+
+  const rows = resumes.data ?? [];
+  const ranking = new Map<string, number>();
+  for (const r of rows) ranking.set(r.template_id ?? "—", (ranking.get(r.template_id ?? "—") ?? 0) + 1);
+  const totalUsers = profiles.count ?? 0;
+
+  return {
+    totalUsers,
+    newUsers30d: newProfiles.count ?? 0,
+    totalResumes: rows.length,
+    avgResumesPerUser: totalUsers ? Math.round((rows.length / totalUsers) * 10) / 10 : 0,
+    drafts: rows.filter((r) => r.status !== "complete").length,
+    complete: rows.filter((r) => r.status === "complete").length,
+    aiTotal: aiAll.count ?? 0,
+    ai30d: ai30.count ?? 0,
+    templateRanking: [...ranking.entries()]
+      .map(([id, count]) => ({ id, count }))
+      .sort((a, b) => b.count - a.count),
+    recentSignups: (signups.data ?? []).map((p) => ({
+      id: p.id,
+      email: p.email,
+      fullName: p.full_name ?? "",
+      createdAt: p.created_at,
+    })),
+  };
+}
+
 
 export type ResumeMeta = {
   id: string;
