@@ -658,40 +658,73 @@ function EditResume() {
         </div>
 
         {/* Right column */}
-        <div className="lg:sticky lg:top-36 lg:h-[calc(100vh-10rem)]">
-          <Tabs defaultValue="preview" className="h-full">
+        <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[calc(100vh-10rem)]">
+          <Tabs defaultValue="preview" className="flex h-full flex-col">
             <TabsList className="w-full">
               <TabsTrigger value="preview" className="flex-1">{ar ? "معاينة" : "Preview"}</TabsTrigger>
               <TabsTrigger value="ai" className="flex-1">{ar ? "مساعد سيرتي" : "Assistant"}</TabsTrigger>
               <TabsTrigger value="ats" className="flex-1">ATS</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="preview" className="mt-3 h-[calc(100%-3rem)] overflow-auto rounded-2xl bg-secondary/40 p-3">
+            <TabsContent value="preview" className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl bg-secondary/40 p-3">
               <ResumePreview resume={draft} />
             </TabsContent>
 
-            <TabsContent value="ai" className="mt-3 h-[calc(100%-3rem)]">
+            <TabsContent value="ai" className="mt-3 min-h-0 flex-1">
               <AiAssistant
                 resume={draft}
+                section={step}
                 onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                onApplyBullets={(bullets) =>
+                  setData((data) => {
+                    if (!data.experience.length) {
+                      data.experience.push({ id: uid(), role: "", company: "", bullets });
+                    } else {
+                      data.experience[0]!.bullets = bullets;
+                    }
+                  })
+                }
+                onAddSkills={(skills) =>
+                  setData((data) => {
+                    skills.forEach((name) => {
+                      if (name && !data.skills.some((s) => s.name.toLowerCase() === name.toLowerCase()))
+                        data.skills.push({ id: uid(), name });
+                    });
+                  })
+                }
               />
             </TabsContent>
 
-            <TabsContent value="ats" className="mt-3 h-[calc(100%-3rem)] overflow-auto rounded-2xl border border-border bg-card p-4">
+            <TabsContent value="ats" className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <p className="font-bold">{ar ? "جاهزية ATS" : "ATS readiness"}</p>
                 <p className="text-xl font-extrabold text-emerald-accent">{score}/100</p>
               </div>
               <Progress value={score} className="mt-3" />
-              <ul className="mt-4 space-y-2.5">
-                {checks.map((c) => (
-                  <li key={c.id} className="text-sm">
-                    <span className={c.passed ? "text-emerald-accent" : "text-destructive"}>{c.passed ? "✓" : "✕"}</span>{" "}
-                    <span className="font-medium">{c.label[lang]}</span>
-                    {!c.passed && <p className="ms-4 text-xs text-muted-foreground">{c.hint[lang]}</p>}
-                  </li>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                {ar
+                  ? "النتيجة إرشادية مبنية على قواعد كتابة معروفة، وليست تقييماً من نظام توظيف فعلي."
+                  : "The score is advisory, based on known writing rules — not a verdict from a real ATS."}
+              </p>
+
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {(report?.categories ?? []).map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setStep(c.step)}
+                    className="rounded-xl border border-border p-3 text-start transition hover:border-accent"
+                  >
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-[12px] font-semibold">{c.label[lang]}</span>
+                      <span className="text-[12px] font-bold text-muted-foreground">
+                        {c.earned}/{c.max}
+                      </span>
+                    </div>
+                    <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
+                    {c.tips[0] && <p className="mt-2 text-[11px] text-muted-foreground">{c.tips[0][lang]}</p>}
+                  </button>
                 ))}
-              </ul>
+              </div>
 
               <div className="mt-6 space-y-2">
                 <Label htmlFor="jd">{ar ? "الصق وصف الوظيفة لاستخراج الكلمات المفتاحية" : "Paste a job description for keywords"}</Label>
@@ -699,11 +732,11 @@ function EditResume() {
                 {gaps && (
                   <div className="text-xs">
                     <p className="font-semibold">
-                      {ar ? "مطابقة" : "Matched"}: {gaps.matched}/{gaps.total}
+                      {ar ? "التطابق" : "Match"}: {gaps.coverage}% ({gaps.matched.length}/{gaps.total})
                     </p>
                     {gaps.missing.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
-                        {gaps.missing.map((m) => (
+                        {gaps.missing.slice(0, 18).map((m) => (
                           <Badge key={m} variant="outline" className="text-[10.5px]">{m}</Badge>
                         ))}
                       </div>
@@ -729,6 +762,7 @@ function EditResume() {
             </TabsContent>
           </Tabs>
         </div>
+
       </main>
     </div>
   );
