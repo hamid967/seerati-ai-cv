@@ -43,8 +43,10 @@ function contentUnits(resume: Resume) {
 export function adviseResumeStudio(resume: Resume, templates: TemplateDef[]): StudioAdvice {
   const units = contentUnits(resume);
   const load: StudioAdvice["load"] = units > 4200 ? "dense" : units < 1750 ? "light" : "balanced";
-  const density: StudioDensity = load === "dense" ? "compact" : load === "light" ? "airy" : "normal";
-  const target = `${resume.data.targetJob ?? ""} ${resume.data.personal.jobTitle ?? ""}`.toLowerCase();
+  const density: StudioDensity =
+    load === "dense" ? "compact" : load === "light" ? "airy" : "normal";
+  const target =
+    `${resume.data.targetJob ?? ""} ${resume.data.personal.jobTitle ?? ""}`.toLowerCase();
   const senior = /director|executive|head|vp|chief|مدير|تنفيذي|رئيس/.test(target);
   const tech = /engineer|developer|software|data|product|تقني|برمج|بيانات|منتج/.test(target);
   const finance = /finance|account|investment|audit|مالي|محاسب|استثمار|تدقيق/.test(target);

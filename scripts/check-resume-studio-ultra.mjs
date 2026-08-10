@@ -18,7 +18,11 @@ requireText(route, "setFullscreen", "focus/fullscreen control missing");
 requireText(route, "applyDensity", "Smart Fit must persist density only");
 requireText(advisor, "contentUnits", "deterministic content-load analysis missing");
 requireText(advisor, "recommendedTemplateIds", "template recommendations missing");
-requireText(advisor, "without deleting information", "advisor must state non-destructive behavior in English");
+requireText(
+  advisor,
+  "without deleting information",
+  "advisor must state non-destructive behavior in English",
+);
 requireText(advisor, "بدون حذف أي معلومة", "advisor must state non-destructive behavior in Arabic");
 requireText(preview, 'to="/resumes/$id/studio"', "export preview must link to the Studio route");
 
