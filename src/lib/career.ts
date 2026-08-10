@@ -5,6 +5,7 @@ type TwinUpdate = Database["public"]["Tables"]["career_profiles"]["Update"];
 type JobUpdate = Database["public"]["Tables"]["job_workspaces"]["Update"];
 import type { Experience, Education, SkillItem, LanguageItem, LinkItem } from "./types";
 import type { AgentId } from "./team";
+import type { ImportProvenance } from "./import-connectors";
 
 /* ============================ Career Twin ============================ */
 
@@ -72,6 +73,8 @@ export type CareerTwin = {
   storyBank: StarStory[];
   /** Map of fact key → user confirmation. */
   verifiedFacts: Record<string, boolean>;
+  /** Where imported data came from — labels only, never the raw file. */
+  importHistory: ImportProvenance[];
   completionScore: number;
   updatedAt: string;
 };
@@ -105,6 +108,7 @@ type TwinRow = {
   preferences: unknown;
   story_bank: unknown;
   verified_facts: unknown;
+  import_meta?: unknown;
   completion_score: number;
   updated_at: string;
 };
@@ -125,6 +129,7 @@ const toTwin = (row: TwinRow): CareerTwin => ({
   preferences: obj<CareerPreferences>(row.preferences, {}),
   storyBank: arr<StarStory>(row.story_bank),
   verifiedFacts: obj<Record<string, boolean>>(row.verified_facts, {}),
+  importHistory: arr<ImportProvenance>(row.import_meta),
   completionScore: row.completion_score ?? 0,
   updatedAt: row.updated_at,
 });
@@ -158,6 +163,10 @@ export async function saveCareerTwin(userId: string, patch: TwinPatch): Promise<
   if (patch.preferences) row.preferences = patch.preferences as unknown as Json;
   if (patch.storyBank) row.story_bank = patch.storyBank as unknown as Json;
   if (patch.verifiedFacts) row.verified_facts = patch.verifiedFacts as unknown as Json;
+  if (patch.importHistory) {
+    // `import_meta` may not be present in the generated types yet.
+    (row as Record<string, unknown>)["import_meta"] = patch.importHistory as unknown as Json;
+  }
   if (typeof patch.completionScore === "number") row.completion_score = patch.completionScore;
   if (!Object.keys(row).length) return;
   await supabase.from("career_profiles").update(row).eq("user_id", userId);
