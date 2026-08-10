@@ -119,7 +119,7 @@ async function extractPdf(file: File): Promise<{ text: string; pages: number }> 
     chunks.push(line);
   }
   const pages = doc.numPages;
-  await doc.destroy();
+  await doc.cleanup();
   return { text: chunks.join("\n"), pages };
 }
 
