@@ -222,18 +222,70 @@ function EditResume() {
               <SheetTrigger asChild>
                 <Button size="sm" variant="outline" className="lg:hidden">
                   <Eye className="size-4" />
-                  {ar ? "معاينة" : "Preview"}
+                  {ar ? "معاينة ومساعد" : "Preview & AI"}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="h-[88vh] overflow-auto">
+              <SheetContent side="bottom" className="flex h-[90vh] flex-col overflow-hidden">
                 <SheetHeader>
-                  <SheetTitle>{ar ? "معاينة مباشرة" : "Live preview"}</SheetTitle>
+                  <SheetTitle>{ar ? "معاينة ومساعد سيرتي" : "Preview & assistant"}</SheetTitle>
                 </SheetHeader>
-                <div className="mt-3">
-                  <ResumePreview resume={draft} />
-                </div>
+                <Tabs defaultValue="preview" className="mt-2 flex min-h-0 flex-1 flex-col">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="preview" className="flex-1">{ar ? "معاينة" : "Preview"}</TabsTrigger>
+                    <TabsTrigger value="ai" className="flex-1">{ar ? "مساعد" : "Assistant"}</TabsTrigger>
+                    <TabsTrigger value="ats" className="flex-1">ATS</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="preview" className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl bg-secondary/40 p-2">
+                    <ResumePreview resume={draft} />
+                  </TabsContent>
+                  <TabsContent value="ai" className="mt-2 min-h-0 flex-1">
+                    <AiAssistant
+                      resume={draft}
+                      section={step}
+                      onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                      onApplyBullets={(bullets) =>
+                        setData((data) => {
+                          if (!data.experience.length) data.experience.push({ id: uid(), role: "", company: "", bullets });
+                          else data.experience[0]!.bullets = bullets;
+                        })
+                      }
+                      onAddSkills={(skills) =>
+                        setData((data) => {
+                          skills.forEach((name) => {
+                            if (name && !data.skills.some((s) => s.name.toLowerCase() === name.toLowerCase()))
+                              data.skills.push({ id: uid(), name });
+                          });
+                        })
+                      }
+                    />
+                  </TabsContent>
+                  <TabsContent value="ats" className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl border border-border p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="font-bold">{ar ? "جاهزية ATS" : "ATS readiness"}</p>
+                      <p className="text-lg font-extrabold text-emerald-accent">{score}/100</p>
+                    </div>
+                    <Progress value={score} className="mt-2" />
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      {ar
+                        ? "النتيجة إرشادية مبنية على قواعد كتابة معروفة، وليست تقييماً من نظام توظيف فعلي."
+                        : "The score is advisory, based on known writing rules — not a verdict from a real ATS."}
+                    </p>
+                    <ul className="mt-3 space-y-2">
+                      {(report?.categories ?? []).map((c) => (
+                        <li key={c.id} className="rounded-lg border border-border p-2.5">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="text-[12px] font-semibold">{c.label[lang]}</span>
+                            <span className="text-[12px] text-muted-foreground">{c.earned}/{c.max}</span>
+                          </div>
+                          {c.tips[0] && <p className="mt-1 text-[11px] text-muted-foreground">{c.tips[0][lang]}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  </TabsContent>
+                </Tabs>
               </SheetContent>
             </Sheet>
+
             <Button size="sm" variant="outline" asChild>
               <Link to="/resumes/$id/preview" params={{ id: draft.id }}>
                 <Eye className="size-4" />
