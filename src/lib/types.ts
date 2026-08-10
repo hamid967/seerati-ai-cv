@@ -106,7 +106,11 @@ export type ResumeData = {
   references: SimpleItem[];
   custom: CustomSection[];
   sectionOrder: SectionKey[];
+  hiddenSections?: SectionKey[];
+  design?: ResumeUserDesign;
 };
+
+export type ResumeStatus = "draft" | "complete";
 
 export type Resume = {
   id: string;
@@ -115,9 +119,14 @@ export type Resume = {
   templateId: string;
   language: "ar" | "en";
   data: ResumeData;
+  status: ResumeStatus;
+  completionScore: number;
+  atsScore: number;
+  lastViewedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 };
+
 
 export type Profile = {
   id: string;
