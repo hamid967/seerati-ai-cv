@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,8 +29,7 @@ export const Route = createFileRoute("/account")({
 function AccountPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const navigate = useNavigate();
-  const { user, ready, resumes, updateProfile, maxResumes } = useStore();
+  const { user, resumes, updateProfile, maxResumes } = useStore();
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
 
@@ -86,11 +86,30 @@ function AccountPage() {
               {ar ? "السير الذاتية" : "Resumes"}: {resumes.length}/{maxResumes}
             </p>
             <Progress value={(resumes.length / maxResumes) * 100} className="mt-3" />
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
               {ar
-                ? "الحد مطبّق في الواجهة حالياً، ومحضّر للتطبيق على الخادم عبر قاعدة بيانات مع سياسات RLS."
-                : "The limit is enforced in the UI today and prepared for server-side enforcement with RLS."}
+                ? "حد السير الذاتية مفروض على مستوى قاعدة البيانات، وليس مجرد منع بصري في الواجهة. إذا وصل حسابك للحد فلن تُنشأ سيرة إضافية حتى لو أُرسل الطلب مباشرة إلى الخادم."
+                : "The resume limit is enforced at the database layer, not only in the interface. Once your account reaches the limit, an additional resume is rejected even if the request is sent directly to the backend."}
             </p>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ShieldCheck className="size-4" />
+              {ar ? "بياناتي وخصوصيتي" : "My data & privacy"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {ar
+                ? "راجع ما تخزنه سيرتي عن ملفك المهني، صدّر بياناتك بصيغة JSON، أو نفّذ الحذف الانتقائي من مركز الخصوصية."
+                : "Review what Seerati stores about your career profile, export your data as JSON, or run selective deletion from the Privacy Center."}
+            </p>
+            <Button asChild variant="outline" className="mt-4">
+              <Link to="/privacy-center">{ar ? "فتح مركز الخصوصية" : "Open Privacy Center"}</Link>
+            </Button>
           </CardContent>
         </Card>
       </main>
