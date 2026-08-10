@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 import { RESUME_LIMIT } from "@/lib/types";
 
 export const Route = createFileRoute("/account")({
@@ -34,7 +34,6 @@ function AccountPage() {
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
     if (user) {
       setName(user.fullName);
       setRole(user.targetRole ?? "");

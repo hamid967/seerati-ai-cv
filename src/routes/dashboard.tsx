@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useI18n, useT } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 import { RESUME_LIMIT } from "@/lib/types";
 import { atsScore, completeness, runAtsChecks } from "@/lib/ats";
 
@@ -45,7 +45,6 @@ function Dashboard() {
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
   }, [ready, user, navigate]);
 
   if (!ready || !user) {

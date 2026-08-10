@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
-import { useStore } from "@/lib/store";
+import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
 
 export const Route = createFileRoute("/onboarding")({
@@ -36,7 +36,6 @@ function Onboarding() {
   const [templateId, setTemplateId] = useState("saudi-professional");
 
   useEffect(() => {
-    if (ready && !user) navigate({ to: "/auth" });
   }, [ready, user, navigate]);
 
   const finish = async () => {

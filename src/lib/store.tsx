@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { emptyResumeData, RESUME_LIMIT, type Profile, type Resume, type ResumeData } from "./types";
 import { demoResumeData } from "./demo-data";
@@ -289,6 +290,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [ready, user, resumes, loadingResumes, signIn, signUp]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+}
+
+/** Redirects to /auth only after confirming there is really no cloud session. */
+export function useAuthGuard() {
+  const { ready, user } = useStore();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!ready || user) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void supabase.auth.getSession().then(({ data }) => {
+        if (!cancelled && !data.session) navigate({ to: "/auth" });
+      });
+    }, 350);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [ready, user, navigate]);
+  return { ready, user };
 }
 
 export function useStore() {
