@@ -133,7 +133,7 @@ function AtsPage() {
           {lint.findings.length ? (
             <ul className="mt-5 space-y-2 border-t border-border pt-4">
               {lint.findings.slice(0, 10).map((f) => (
-                <li key={f.id} className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]">
+                <li key={`${f.rule}-${f.where ?? ""}`} className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]">
                   <Badge
                     variant={f.severity === "error" ? "destructive" : "outline"}
                     className="mt-0.5 text-[10.5px]"
