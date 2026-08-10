@@ -88,12 +88,12 @@ const localProvider: AiProvider = {
     const ar = lang === "ar";
     const role =
       context?.targetRole || context?.personal?.jobTitle || (ar ? "المسمى المستهدف" : "your target role");
-    const years = context?.answers?.years ?? "";
+    const years = context?.answers?.["years"] ?? "";
     const lines = input.split("\n").map(stripBullet).filter(Boolean);
 
     switch (task) {
       case "summary": {
-        const industry = context?.answers?.industry ?? "";
+        const industry = context?.answers?.["industry"] ?? "";
         return {
           text: ar
             ? tidy(`${role}${years ? ` بخبرة ${years} سنوات` : ""}${industry ? ` في قطاع ${industry}` : ""}،
