@@ -260,16 +260,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           list.map((r) => (r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r)),
         );
         const current = resumes.find((r) => r.id === id);
-        await supabase
+        const { error } = await supabase
           .from("resumes")
           .update({
             title: patch.title ?? current?.title ?? "",
             template_id: patch.templateId ?? current?.templateId ?? "classic-ats",
             language: patch.language ?? current?.language ?? "ar",
             data: (patch.data ?? current?.data ?? emptyResumeData()) as never,
+            status: patch.status ?? current?.status ?? "draft",
+            completion_score: patch.completionScore ?? current?.completionScore ?? 0,
+            ats_score: patch.atsScore ?? current?.atsScore ?? 0,
           })
           .eq("id", id);
+        if (error) throw new Error(error.message);
       },
+
       duplicateResume: async (id) => {
         const src = resumes.find((r) => r.id === id);
         if (!src || !user || atLimit) return null;
