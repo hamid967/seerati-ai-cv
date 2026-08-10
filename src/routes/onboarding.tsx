@@ -86,14 +86,17 @@ function Onboarding() {
     }
   };
 
+  const interviewing = step === STEPS && path === "interview";
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="mx-auto max-w-xl px-4 py-12">
+      <main className={`mx-auto px-4 py-12 ${interviewing ? "max-w-3xl" : "max-w-xl"}`}>
         <p className="text-xs font-semibold text-muted-foreground">
-          {ar ? `الخطوة ${step} من ٤` : `Step ${step} of ${STEPS}`}
+          {ar ? `الخطوة ${step} من ${STEPS}` : `Step ${step} of ${STEPS}`}
         </p>
         <Progress value={(step / STEPS) * 100} className="mt-3" />
+
 
         {step === 1 && (
           <section className="mt-8 space-y-5">
