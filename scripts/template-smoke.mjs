@@ -187,12 +187,18 @@ for (const f of stress) {
   const mixed =
     /[\u0600-\u06FF]/.test(JSON.stringify(f.data)) && /[A-Za-z]/.test(JSON.stringify(f.data));
   if (bullets >= 30 && longName && mixed && f.data.skills.length >= 20)
-    pass(`stress fixture ${f.id}: ${bullets} bullets, ${f.data.skills.length} skills, long name, mixed RTL/LTR`);
-  else fail(`stress fixture ${f.id} is not stressful enough (bullets=${bullets}, skills=${f.data.skills.length})`);
+    pass(
+      `stress fixture ${f.id}: ${bullets} bullets, ${f.data.skills.length} skills, long name, mixed RTL/LTR`,
+    );
+  else
+    fail(
+      `stress fixture ${f.id} is not stressful enough (bullets=${bullets}, skills=${f.data.skills.length})`,
+    );
 }
 
 const rtlTemplates = templates.filter((t) => t.supportsRTL);
-if (rtlTemplates.length === templates.length) pass(`all ${templates.length} templates declare RTL support`);
+if (rtlTemplates.length === templates.length)
+  pass(`all ${templates.length} templates declare RTL support`);
 else fail(`${templates.length - rtlTemplates.length} template(s) do not declare RTL support`);
 
 if (/rtl/.test(rendererSrc)) pass("renderer receives a direction flag (rtl)");
@@ -202,7 +208,9 @@ else fail("renderer never sets dir/direction");
 
 const atsCount = templates.filter((t) => t.atsFriendly).length;
 note(`${atsCount} template(s) use Seerati's conservative ATS-friendly declaration.`);
-note("Pixel/overflow rendering is NOT checked here: no headless screenshot infrastructure in this project.");
+note(
+  "Pixel/overflow rendering is NOT checked here: no headless screenshot infrastructure in this project.",
+);
 
 console.log(failed ? `\n${failed} template check(s) failed.` : "\nTemplate smoke checks OK.");
 process.exit(failed ? 1 : 0);

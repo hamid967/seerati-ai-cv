@@ -17,7 +17,8 @@
     "test:resume-diff": "node scripts/resume-diff-fixtures.mjs",
     "test:templates": "node scripts/template-smoke.mjs",
     "check:rtl": "node scripts/validate-rtl.mjs",
-    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run check:rtl"
+    "check:premium-3d": "node scripts/check-premium-3d.mjs",
+    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run check:rtl && npm run check:premium-3d"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",
@@ -49,7 +50,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
-    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle": "^1.1.1",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@supabase/supabase-js": "^2.112.2",
