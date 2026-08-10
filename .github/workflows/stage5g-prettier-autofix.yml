@@ -1,9 +1,7 @@
 name: Stage5G Prettier Autofix
 
 on:
-  push:
-    branches:
-      - stage5g/smart-pagination-page-composer
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,15 +17,14 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - name: Format Stage 5G files
+      - name: Format Stage 5G source files
         run: |
-          bunx prettier --write .github/workflows/ci.yml scripts/check-smart-pagination-composer.mjs src/lib/resume-pagination.ts 'src/routes/resumes.$id.composer.tsx'
-          rm .github/workflows/stage5g-prettier-autofix.yml
-      - name: Commit formatted files
+          bunx prettier --write scripts/check-smart-pagination-composer.mjs src/lib/resume-pagination.ts 'src/routes/resumes.$id.composer.tsx'
+      - name: Commit formatted source files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/ci.yml scripts/check-smart-pagination-composer.mjs src/lib/resume-pagination.ts 'src/routes/resumes.$id.composer.tsx' .github/workflows/stage5g-prettier-autofix.yml
+          git add scripts/check-smart-pagination-composer.mjs src/lib/resume-pagination.ts 'src/routes/resumes.$id.composer.tsx'
           git diff --cached --quiet && exit 0
-          git commit -m "style: format stage5g smart pagination composer"
+          git commit -m "style: format stage5g smart pagination source"
           git push origin HEAD:stage5g/smart-pagination-page-composer
