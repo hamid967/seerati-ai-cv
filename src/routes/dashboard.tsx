@@ -112,13 +112,16 @@ function Dashboard() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const created = createResume({
+                    void (async () => {
+                    const created = await createResume({
                       title: ar ? "سيرة تجريبية" : "Demo resume",
                       templateId: "saudi-professional",
                       language: "ar",
                       seed: true,
                     });
                     if (created) toast.success(ar ? "أضفنا سيرة تجريبية" : "Demo resume added");
+                    else toast.error(t("limit_reached"));
+                    })();
                   }}
                 >
                   {ar ? "جرّب ببيانات تجريبية" : "Try with demo data"}
@@ -159,8 +162,9 @@ function Dashboard() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              const copy = duplicateResume(r.id);
-                              toast[copy ? "success" : "error"](copy ? t("duplicate") : t("limit_reached"));
+                              void duplicateResume(r.id).then((copy) => {
+                                toast[copy ? "success" : "error"](copy ? t("duplicate") : t("limit_reached"));
+                              });
                             }}
                           >
                             <Copy className="size-4" /> {t("duplicate")}
@@ -168,7 +172,7 @@ function Dashboard() {
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => {
-                              deleteResume(r.id);
+                              void deleteResume(r.id);
                               toast.success(ar ? "تم الحذف" : "Deleted");
                             }}
                           >
@@ -222,7 +226,7 @@ function Dashboard() {
             <Button
               onClick={() => {
                 if (renaming) {
-                  updateResume(renaming.id, { title: renaming.title.trim() || renaming.title });
+                  void updateResume(renaming.id, { title: renaming.title.trim() || renaming.title });
                   toast.success(ar ? "تم التحديث" : "Updated");
                 }
                 setRenaming(null);

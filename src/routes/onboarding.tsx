@@ -39,15 +39,15 @@ function Onboarding() {
     if (ready && !user) navigate({ to: "/auth" });
   }, [ready, user, navigate]);
 
-  const finish = () => {
-    updateProfile({ onboarded: true, targetRole, yearsExperience: years, industry });
-    const created = createResume({
+  const finish = async () => {
+    await updateProfile({ onboarded: true, targetRole, yearsExperience: years, industry });
+    const created = await createResume({
       title: targetRole ? (ar ? `سيرة ${targetRole}` : `${targetRole} resume`) : ar ? "سيرتي الذاتية" : "My resume",
       templateId,
       language: lang,
+      jobTitle: targetRole,
     });
     if (created) {
-      created.data.personal.jobTitle = targetRole;
       toast.success(ar ? "أنشأنا لك سيرة ذاتية للبدء" : "We created a resume to get you started");
       navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
     } else {

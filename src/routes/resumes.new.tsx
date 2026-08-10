@@ -105,8 +105,8 @@ function NewResume() {
             <Button
               size="lg"
               className="mt-8"
-              onClick={() => {
-                const created = createResume({ title: title.trim() || "Resume", templateId, language: resumeLang, seed });
+              onClick={async () => {
+                const created = await createResume({ title: title.trim() || "Resume", templateId, language: resumeLang, seed });
                 if (!created) {
                   toast.error(ar ? "تعذّر الإنشاء" : "Could not create");
                   return;

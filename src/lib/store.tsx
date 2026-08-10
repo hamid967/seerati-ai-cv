@@ -87,9 +87,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       fullName: profile?.full_name ?? "",
       role: isAdmin ? "admin" : "user",
       onboarded: profile?.onboarded ?? false,
-      targetRole: profile?.target_role ?? undefined,
-      yearsExperience: profile?.years_experience ?? undefined,
-      industry: profile?.industry ?? undefined,
+      targetRole: profile?.target_role ?? "",
+      yearsExperience: profile?.years_experience ?? "",
+      industry: profile?.industry ?? "",
       createdAt: profile?.created_at ?? new Date().toISOString(),
     });
   }, []);
@@ -245,13 +245,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setResumes((list) =>
           list.map((r) => (r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r)),
         );
-        const payload: Record<string, unknown> = {};
-        if (patch.title !== undefined) payload['title'] = patch.title;
-        if (patch.templateId !== undefined) payload['template_id'] = patch.templateId;
-        if (patch.language !== undefined) payload['language'] = patch.language;
-        if (patch.data !== undefined) payload['data'] = patch.data;
-        if (Object.keys(payload).length === 0) return;
-        await supabase.from("resumes").update(payload).eq("id", id);
+        const current = resumes.find((r) => r.id === id);
+        await supabase
+          .from("resumes")
+          .update({
+            title: patch.title ?? current?.title ?? "",
+            template_id: patch.templateId ?? current?.templateId ?? "classic-ats",
+            language: patch.language ?? current?.language ?? "ar",
+            data: (patch.data ?? current?.data ?? emptyResumeData()) as never,
+          })
+          .eq("id", id);
       },
       duplicateResume: async (id) => {
         const src = resumes.find((r) => r.id === id);
