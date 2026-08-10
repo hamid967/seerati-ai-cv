@@ -55,8 +55,14 @@ const labels = {
   custom: { ar: "قسم مخصص", en: "Custom" },
 } as const;
 
-export function ResumePreview({ resume }: { resume: Resume }) {
-  const tpl = getTemplate(resume.templateId);
+export function ResumePreview({
+  resume,
+  template,
+}: {
+  resume: Resume;
+  template?: TemplateDef;
+}) {
+  const tpl = template ?? getTemplate(resume.templateId);
   const d = resume.data;
   const lang = resume.language;
   const gap = spacingMap[tpl.design.spacing];
