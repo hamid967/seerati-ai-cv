@@ -2,12 +2,25 @@
 import { createMiddleware } from '@tanstack/react-start'
 import { supabase } from './client'
 
+/**
+ * Returns a usable access token for authenticated server functions.
+ * Immediately after sign-up Supabase can emit SIGNED_IN before storage/session
+ * propagation has fully settled. A single refresh closes that short race without
+ * relying on arbitrary UI timers.
+ */
+async function getAccessToken(): Promise<string | undefined> {
+  const { data } = await supabase.auth.getSession()
+  if (data.session?.access_token) return data.session.access_token
+
+  const { data: refreshed } = await supabase.auth.refreshSession()
+  return refreshed.session?.access_token
+}
+
 // Must be registered as a global `functionMiddleware` in `src/start.ts`; otherwise
 // the browser never attaches the bearer token to serverFn RPCs.
 export const attachSupabaseAuth = createMiddleware({ type: 'function' }).client(
   async ({ next }) => {
-    const { data } = await supabase.auth.getSession()
-    const token = data.session?.access_token
+    const token = await getAccessToken()
     return next({
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
