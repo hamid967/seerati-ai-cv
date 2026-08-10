@@ -14,7 +14,7 @@ const src = readFileSync("src/lib/copilot/actions.ts", "utf8");
 const checks = [
   ["actions module declares a zod schema", /z\.(object|discriminatedUnion|union)/],
   ["action type is a closed set", /z\.(discriminatedUnion|union|enum)/],
-  ["actions carry reasoning", /reasoning/],
+  ["actions carry reasoning", /\breason\b/],
   ["actions declare confirmation requirements", /requiresConfirmation|needsConfirmation|confirm/i],
   ["a safe parser is exported", /export (const|function) (parse|safeParse)/],
   ["undo\/redo state is modelled", /undo/i],
