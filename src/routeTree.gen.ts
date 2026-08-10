@@ -21,6 +21,7 @@ import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ImportRouteImport } from './routes/import'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PrivacyCenterRouteImport } from './routes/privacy-center'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -92,6 +93,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyCenterRoute = PrivacyCenterRouteImport.update({
+  id: '/privacy-center',
+  path: '/privacy-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/import': typeof ImportRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
+  '/privacy-center': typeof PrivacyCenterRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/import': typeof ImportRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
+  '/privacy-center': typeof PrivacyCenterRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/import': typeof ImportRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
+  '/privacy-center': typeof PrivacyCenterRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/onboarding'
     | '/privacy'
+    | '/privacy-center'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -273,6 +283,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/onboarding'
     | '/privacy'
+    | '/privacy-center'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/onboarding'
     | '/privacy'
+    | '/privacy-center'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -326,6 +338,7 @@ export interface RootRouteChildren {
   ImportRoute: typeof ImportRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
+  PrivacyCenterRoute: typeof PrivacyCenterRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
   JobsIdRoute: typeof JobsIdRoute
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-center': {
+      id: '/privacy-center'
+      path: '/privacy-center'
+      fullPath: '/privacy-center'
+      preLoaderRoute: typeof PrivacyCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates': {
@@ -539,6 +559,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImportRoute: ImportRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
+  PrivacyCenterRoute: PrivacyCenterRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
   JobsIdRoute: JobsIdRoute,
