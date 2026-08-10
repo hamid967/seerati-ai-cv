@@ -10,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
-import { RESUME_LIMIT } from "@/lib/types";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -84,9 +83,9 @@ function AccountPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              {ar ? "السير الذاتية" : "Resumes"}: {resumes.length}/{RESUME_LIMIT}
+              {ar ? "السير الذاتية" : "Resumes"}: {resumes.length}/{maxResumes}
             </p>
-            <Progress value={(resumes.length / RESUME_LIMIT) * 100} className="mt-3" />
+            <Progress value={(resumes.length / maxResumes) * 100} className="mt-3" />
             <p className="mt-3 text-xs text-muted-foreground">
               {ar
                 ? "الحد مطبّق في الواجهة حالياً، ومحضّر للتطبيق على الخادم عبر قاعدة بيانات مع سياسات RLS."
