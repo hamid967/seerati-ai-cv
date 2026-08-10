@@ -221,6 +221,12 @@ function JobWorkspacePage() {
     void listJobEvents(job.id).then(setEvents);
   }, [job]);
 
+  useEffect(() => {
+    if (!job) return;
+    void listCoverLetters(job.id).then((l) => setLetter(l[0] ?? null));
+  }, [job]);
+
+
   const handleStatusChange = (status: JobWorkspace["status"]) => {
     setForm((f) => ({ ...f, status }));
     persist({ status });
