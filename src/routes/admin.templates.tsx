@@ -53,6 +53,9 @@ function AdminTemplates() {
     templateId: selected.id,
     language: lang,
     data: demoResumeData(),
+    status: "complete",
+    completionScore: 100,
+    atsScore: 86,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

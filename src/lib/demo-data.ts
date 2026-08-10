@@ -72,6 +72,9 @@ export const demoResume = (ownerId: string): Resume => ({
   templateId: "saudi-professional",
   language: "ar",
   data: demoResumeData(),
+  status: "complete",
+  completionScore: 100,
+  atsScore: 86,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 });

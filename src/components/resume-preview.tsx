@@ -396,7 +396,7 @@ export function ResumeThumb({
           transformOrigin: "top left",
         }}
       >
-        <ResumePreview resume={resume} template={template} className="shadow-none" />
+        <ResumePreview resume={resume} {...(template ? { template } : {})} className="shadow-none" />
       </div>
     </div>
   );

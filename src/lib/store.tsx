@@ -55,6 +55,10 @@ type ResumeRow = {
   template_id: string | null;
   language: string;
   data: unknown;
+  status?: string | null;
+  completion_score?: number | null;
+  ats_score?: number | null;
+  last_viewed_at?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -66,6 +70,10 @@ const toResume = (row: ResumeRow): Resume => ({
   templateId: row.template_id ?? "classic-ats",
   language: row.language === "en" ? "en" : "ar",
   data: { ...emptyResumeData(), ...((row.data as ResumeData) ?? {}) },
+  status: (row.status === "complete" ? "complete" : "draft") as Resume["status"],
+  completionScore: row.completion_score ?? 0,
+  atsScore: row.ats_score ?? 0,
+  lastViewedAt: row.last_viewed_at ?? null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
