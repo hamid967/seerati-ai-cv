@@ -521,6 +521,50 @@ export type Database = {
           },
         ]
       }
+      job_application_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          job_id: string
+          metadata: Json
+          notes: string | null
+          occurred_at: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          job_id: string
+          metadata?: Json
+          notes?: string | null
+          occurred_at?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          job_id?: string
+          metadata?: Json
+          notes?: string | null
+          occurred_at?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_application_events_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_workspaces: {
         Row: {
           applied_at: string | null
