@@ -357,6 +357,17 @@ function EditResume() {
             >
               <Redo2 className="size-4" />
             </Button>
+            {user ? (
+              <ResumeVariantSwitcher
+                userId={user.id}
+                resumeId={draft.id}
+                current={draft.data}
+                versions={versions}
+                loading={loadingVersions}
+                onRestored={(data) => patch((r) => ({ ...r, data }))}
+                onChanged={refreshVersions}
+              />
+            ) : null}
             <Badge variant="secondary">
               {ar ? "الاكتمال" : "Complete"} {completion}%
             </Badge>
