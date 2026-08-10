@@ -103,7 +103,7 @@ function JobWorkspacePage() {
   const { id } = useParams({ from: "/jobs/$id" });
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { user, ready, createResume, atLimit } = useStore();
+  const { user, ready, createResume, atLimit, resumes, updateResume } = useStore();
   const navigate = useNavigate();
 
   useAuthGuard();
@@ -113,6 +113,18 @@ function JobWorkspacePage() {
   const [assets, setAssets] = useState<ApplicationAsset[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [preparing, setPreparing] = useState(false);
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [graph, setGraph] = useState<FactGraph>({ facts: [], evidence: [] });
+  const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [branching, setBranching] = useState(false);
+  const [reload, setReload] = useState(0);
+
+  /** The resume this job's variants branch from: its linked one, else the first. */
+  const baseResume =
+    resumes.find((r) => r.id === assets.find((a) => a.assetType === "resume")?.resumeId) ??
+    resumes[0] ??
+    null;
 
   const [form, setForm] = useState({
     jobTitle: "",
@@ -129,7 +141,11 @@ function JobWorkspacePage() {
     if (!user) return;
     let active = true;
     void (async () => {
-      const [loadedJob, loadedTwin] = await Promise.all([getJob(id), loadCareerTwin(user.id)]);
+      const [loadedJob, loadedTwin, loadedGraph] = await Promise.all([
+        getJob(id),
+        loadCareerTwin(user.id),
+        loadFactGraph(user.id),
+      ]);
       if (!active) return;
       if (loadedJob && loadedJob.userId === user.id) {
         setJob(loadedJob);
@@ -143,17 +159,37 @@ function JobWorkspacePage() {
           jobDescription: loadedJob.jobDescription,
           status: loadedJob.status,
         });
-        const list = await listAssets(loadedJob.id);
-        if (active) setAssets(list);
+        const [list, evts] = await Promise.all([
+          listAssets(loadedJob.id),
+          listJobEvents(loadedJob.id),
+        ]);
+        if (active) {
+          setAssets(list);
+          setEvents(evts);
+        }
       } else {
         setJob(null);
       }
+      setGraph(loadedGraph);
       setTwin(loadedTwin);
+      setLoadingEvents(false);
     })();
     return () => {
       active = false;
     };
-  }, [id, user]);
+  }, [id, user, reload]);
+
+  useEffect(() => {
+    if (!baseResume) return;
+    let active = true;
+    void listResumeVersions(baseResume.id).then((v) => {
+      if (active) setVersions(v);
+    });
+    return () => {
+      active = false;
+    };
+  }, [baseResume?.id, reload]);
+
 
   const persist = useCallback(
     (patch: Partial<JobWorkspace>) => {
