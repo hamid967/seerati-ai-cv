@@ -200,23 +200,20 @@ export function ApplicationTimeline({ userId, jobId, events, loading, onChanged 
                             {ar ? "فتح السيرة" : "Open resume"}
                           </Link>
                         ) : null}
-                        {link?.kind === "cover_letter" ? (
-                          <Link
-                            to="/cover-letters"
+                        {link?.kind === "cover_letter" || link?.kind === "interview" ? (
+                          <a
+                            href={link.kind === "cover_letter" ? "#cover-letter" : "#interview-pack"}
                             className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
                           >
                             <ExternalLink className="size-3" />
-                            {ar ? "فتح الخطاب" : "Open letter"}
-                          </Link>
-                        ) : null}
-                        {link?.kind === "interview" ? (
-                          <Link
-                            to="/interview"
-                            className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
-                          >
-                            <ExternalLink className="size-3" />
-                            {ar ? "فتح جلسة المقابلة" : "Open interview session"}
-                          </Link>
+                            {link.kind === "cover_letter"
+                              ? ar
+                                ? "فتح الخطاب"
+                                : "Open letter"
+                              : ar
+                                ? "فتح تحضير المقابلة"
+                                : "Open interview pack"}
+                          </a>
                         ) : null}
                       </div>
                       <Button
