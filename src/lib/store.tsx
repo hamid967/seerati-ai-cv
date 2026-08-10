@@ -79,6 +79,21 @@ const toResume = (row: ResumeRow): Resume => ({
   updatedAt: row.updated_at,
 });
 
+/**
+ * Immediately after sign-up Supabase can expose a React-side user before the
+ * browser client has a usable JWT attached to PostgREST calls. Mirror the
+ * refresh used by auth-attacher.ts so store mutations do not 401.
+ */
+async function ensureSession() {
+  const { data } = await supabase.auth.getSession();
+  if (data.session?.access_token) return data.session;
+  const { data: refreshed, error } = await supabase.auth.refreshSession();
+  if (error || !refreshed.session?.access_token) {
+    throw new Error(error?.message ?? "Not authenticated");
+  }
+  return refreshed.session;
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<Profile | null>(null);
@@ -207,6 +222,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       });
       if (error) return { error: error.message };
       if (data.session?.user) {
+        // Close the post-signup JWT race before the first RLS-backed reads.
+        try {
+          await ensureSession();
+        } catch {
+          // Session was returned by signUp; continue even if refresh is a no-op.
+        }
         await loadProfile(data.session.user.id, data.session.user.email ?? email);
         await loadResumes();
         return { needsConfirmation: false };
@@ -240,8 +261,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       updateProfile: async (patch) => {
         if (!user) return;
+        await ensureSession();
         setUser({ ...user, ...patch });
-        await supabase
+        const { error } = await supabase
           .from("profiles")
           .update({
             full_name: patch.fullName ?? user.fullName,
@@ -251,9 +273,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             onboarded: patch.onboarded ?? user.onboarded,
           })
           .eq("id", user.id);
+        if (error) throw new Error(error.message);
       },
       createResume: async ({ title, templateId, language, seed, jobTitle }) => {
         if (!user || atLimit) return null;
+        await ensureSession();
         const base = seed
           ? demoResumeData()
           : {
@@ -282,6 +306,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return resume;
       },
       updateResume: async (id, patch) => {
+        await ensureSession();
         setResumes((list) =>
           list.map((r) =>
             r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
@@ -306,6 +331,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       duplicateResume: async (id) => {
         const src = resumes.find((r) => r.id === id);
         if (!src || !user || atLimit) return null;
+        await ensureSession();
         const { data, error } = await supabase
           .from("resumes")
           .insert({
@@ -323,8 +349,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return copy;
       },
       deleteResume: async (id) => {
+        await ensureSession();
         setResumes((list) => list.filter((r) => r.id !== id));
-        await supabase.from("resumes").delete().eq("id", id);
+        const { error } = await supabase.from("resumes").delete().eq("id", id);
+        if (error) throw new Error(error.message);
       },
       getResume: (id) => resumes.find((r) => r.id === id),
     };
