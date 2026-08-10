@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ClipboardCopy, Download, FileText, Loader2, Printer, WandSparkles } from "lucide-react";
+import {
+  ClipboardCopy,
+  Download,
+  FileText,
+  Layers3,
+  Loader2,
+  Printer,
+  WandSparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { ProfessionalResumePreview } from "@/components/professional-resume-preview";
 import { getTemplate } from "@/components/resume-preview";
@@ -156,6 +164,12 @@ function PreviewResume() {
             <Link to="/resumes/$id/studio" params={{ id: resume.id }}>
               <WandSparkles className="size-4" />
               {ar ? "استوديو التصميم" : "Design studio"}
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/resumes/$id/composer" params={{ id: resume.id }}>
+              <Layers3 className="size-4" />
+              {ar ? "مؤلف الصفحات" : "Page composer"}
             </Link>
           </Button>
           <Button variant="outline" onClick={downloadTxt}>

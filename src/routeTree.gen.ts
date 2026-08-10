@@ -32,6 +32,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
+import { Route as ResumesIdComposerRouteImport } from './routes/resumes.$id.composer'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
 import { Route as ResumesIdStudioRouteImport } from './routes/resumes.$id.studio'
@@ -151,6 +152,11 @@ const ResumesNewRoute = ResumesNewRouteImport.update({
   path: '/resumes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIdComposerRoute = ResumesIdComposerRouteImport.update({
+  id: '/resumes/$id/composer',
+  path: '/resumes/$id/composer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesIdEditRoute = ResumesIdEditRouteImport.update({
   id: '/resumes/$id/edit',
   path: '/resumes/$id/edit',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
+  '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
   '/resumes/$id/studio': typeof ResumesIdStudioRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/resumes/new': typeof ResumesNewRoute
   '/admin': typeof AdminIndexRoute
   '/jobs': typeof JobsIndexRoute
+  '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
   '/resumes/$id/studio': typeof ResumesIdStudioRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
+  '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
   '/resumes/$id/studio': typeof ResumesIdStudioRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
+    | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
     | '/resumes/$id/studio'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin'
     | '/jobs'
+    | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
     | '/resumes/$id/studio'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
+    | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
     | '/resumes/$id/studio'
@@ -356,6 +368,7 @@ export interface RootRouteChildren {
   JobsIdRoute: typeof JobsIdRoute
   ResumesNewRoute: typeof ResumesNewRoute
   JobsIndexRoute: typeof JobsIndexRoute
+  ResumesIdComposerRoute: typeof ResumesIdComposerRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
   ResumesIdStudioRoute: typeof ResumesIdStudioRoute
@@ -524,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/$id/composer': {
+      id: '/resumes/$id/composer'
+      path: '/resumes/$id/composer'
+      fullPath: '/resumes/$id/composer'
+      preLoaderRoute: typeof ResumesIdComposerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/$id/edit': {
       id: '/resumes/$id/edit'
       path: '/resumes/$id/edit'
@@ -585,6 +605,7 @@ const rootRouteChildren: RootRouteChildren = {
   JobsIdRoute: JobsIdRoute,
   ResumesNewRoute: ResumesNewRoute,
   JobsIndexRoute: JobsIndexRoute,
+  ResumesIdComposerRoute: ResumesIdComposerRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
   ResumesIdStudioRoute: ResumesIdStudioRoute,

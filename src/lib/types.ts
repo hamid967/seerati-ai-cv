@@ -33,6 +33,10 @@ export type ResumeUserDesign = {
   marginMm?: number;
   lineHeight?: number;
   columnWidth?: number;
+  /** Manual page break inserted immediately before these top-level sections. */
+  pageBreakBefore?: SectionKey[];
+  /** Sections the user explicitly prefers to keep together when they fit on one page. */
+  keepTogetherSections?: SectionKey[];
 };
 
 export const ACCENT_PALETTE = [
