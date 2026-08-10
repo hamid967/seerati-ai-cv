@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 
+// Stage 5C guard: keep premium depth screen-only, accessible, and print-safe.
 const css = readFileSync("src/premium-theme.css", "utf8");
 const shell = readFileSync("src/components/app/app-shell.tsx", "utf8");
 const header = readFileSync("src/components/site-header.tsx", "utf8");
