@@ -206,21 +206,88 @@ function Onboarding() {
           </section>
         )}
 
-        <div className="mt-8 flex gap-3">
-          {step > 1 && (
-            <Button variant="outline" onClick={() => setStep((s) => s - 1)}>
-              {ar ? "رجوع" : "Back"}
-            </Button>
-          )}
-          {step < STEPS ? (
-            <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>
-          ) : (
-            <Button onClick={() => void finish()} disabled={saving}>
-              {saving ? (ar ? "جارٍ التهيئة…" : "Setting up…") : ar ? "ابدأ البناء" : "Start building"}
-            </Button>
-          )}
-        </div>
+        {step === 5 && path === "choose" && (
+          <section className="mt-8 space-y-4">
+            <h1 className="text-2xl font-extrabold">{ar ? "كيف تريد أن نبدأ؟" : "How would you like to start?"}</h1>
+            <p className="text-sm text-muted-foreground">
+              {ar
+                ? "اختر الطريقة الأنسب لك — يمكنك تعديل كل شيء لاحقاً في المحرّر."
+                : "Pick whichever suits you — everything stays editable in the builder."}
+            </p>
+            <div className="grid gap-3">
+              <button
+                onClick={() => setPath("interview")}
+                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+              >
+                <p className="font-semibold">{ar ? "أنشئ سيرتي معي" : "Build my resume with me"}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {ar
+                    ? "أسئلة قصيرة يجيب عليها المساعد معك، ونبني الأقسام تدريجياً."
+                    : "A short guided interview that fills your sections step by step."}
+                </p>
+              </button>
+              <button
+                onClick={() => void finish()}
+                className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+              >
+                <p className="font-semibold">{ar ? "سأكتبها بنفسي" : "I’ll write it myself"}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {ar ? "ننشئ مسودة فارغة وتفتح المحرّر مباشرة." : "We create an empty draft and open the builder."}
+                </p>
+              </button>
+              {hasCv === "yes" && (
+                <button
+                  onClick={() => setPath("import")}
+                  className="rounded-xl border border-border p-4 text-start transition-colors hover:bg-secondary/60"
+                >
+                  <p className="font-semibold">{ar ? "استيراد سيرتي السابقة" : "Import my existing resume"}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {ar
+                      ? "الصق نص سيرتك (أو ملف .txt) ونستخرج الأقسام لمراجعتها."
+                      : "Paste your resume text (or a .txt file) and review the extracted sections."}
+                  </p>
+                </button>
+              )}
+            </div>
+          </section>
+        )}
+
+        {step === 5 && path === "interview" && (
+          <div className="mt-8">
+            <ResumeInterview
+              lang={cvLang}
+              templateId={templateId}
+              initial={{ fullName, currentTitle, targetJob: targetRole, years, industry }}
+              onCancel={() => setPath("choose")}
+            />
+          </div>
+        )}
+
+        {step === 5 && path === "import" && (
+          <div className="mt-8">
+            <ResumeImport
+              lang={cvLang}
+              onConfirm={(data) => {
+                setImportedData(data);
+                void finish();
+              }}
+              onSkip={() => setPath("choose")}
+            />
+          </div>
+        )}
+
+        {(step < STEPS || path === "choose") && (
+          <div className="mt-8 flex gap-3">
+            {step > 1 && (
+              <Button variant="outline" onClick={() => setStep((s) => s - 1)}>
+                {ar ? "رجوع" : "Back"}
+              </Button>
+            )}
+            {step < STEPS && <Button onClick={() => setStep((s) => s + 1)}>{ar ? "التالي" : "Next"}</Button>}
+          </div>
+        )}
       </main>
     </div>
   );
 }
+
