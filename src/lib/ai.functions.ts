@@ -19,6 +19,9 @@ export const runAiTask = createServerFn({ method: "POST" })
       await assertWithinRateLimit(supabase, userId);
     } catch (error) {
       if (error instanceof AiRateLimitError) {
+        if (error.scope === "unavailable") {
+          return { ok: false as const, code: "provider_unavailable" };
+        }
         return {
           ok: false as const,
           code: error.scope === "minute" ? "rate_limited" : "quota_exceeded",
