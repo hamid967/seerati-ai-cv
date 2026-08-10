@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -13,6 +14,7 @@ import appCss from "../styles.css?url";
 import { I18nProvider } from "@/lib/i18n";
 import { StoreProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
+import { AppShell } from "@/components/app/app-shell";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -130,6 +132,24 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/** Signed-in product surfaces that get the App Shell instead of site chrome. */
+const APP_PREFIXES = ["/dashboard", "/account", "/career-twin", "/jobs", "/resumes", "/admin"];
+/** Editor-style routes: chrome shrinks into focus mode. */
+const FOCUS_PATTERN = /^\/resumes\/[^/]+\/(edit|preview)$/;
+
+function AppFrame() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isApp = APP_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
+  if (!isApp) return <Outlet />;
+
+  return (
+    <AppShell bare width="full" focus={FOCUS_PATTERN.test(pathname)}>
+      <Outlet />
+    </AppShell>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -138,7 +158,7 @@ function RootComponent() {
       <I18nProvider>
         <StoreProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
+          <AppFrame />
           <Toaster position="top-center" richColors />
         </StoreProvider>
       </I18nProvider>

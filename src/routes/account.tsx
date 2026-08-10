@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +43,6 @@ function AccountPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12">
         <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "حسابي" : "My account"}</h1>
 
@@ -94,7 +91,6 @@ function AccountPage() {
           </CardContent>
         </Card>
       </main>
-      <SiteFooter />
     </div>
   );
 }

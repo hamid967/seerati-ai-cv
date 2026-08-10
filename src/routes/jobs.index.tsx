@@ -3,8 +3,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Plus, Search, Table as TableIcon, LayoutGrid, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -179,7 +177,6 @@ function JobsIndex() {
   if (!ready || !user) {
     return (
       <div className="min-h-screen">
-        <SiteHeader />
         <div className="mx-auto max-w-6xl space-y-4 px-4 py-12">
           <Skeleton className="h-10 w-52" />
           <Skeleton className="h-44 rounded-2xl" />
@@ -273,7 +270,6 @@ function JobsIndex() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -466,7 +462,6 @@ function JobsIndex() {
           </>
         )}
       </main>
-      <SiteFooter />
     </div>
   );
 }

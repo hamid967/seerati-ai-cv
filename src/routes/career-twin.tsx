@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, Circle, Sparkles } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -133,7 +131,6 @@ function CareerTwinPage() {
   if (!ready || !user || loading) {
     return (
       <div className="flex min-h-screen flex-col">
-        <SiteHeader />
         <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-12">
           <Skeleton className="h-10 w-52" />
           <div className="grid gap-4 md:grid-cols-3">
@@ -142,7 +139,6 @@ function CareerTwinPage() {
             ))}
           </div>
         </div>
-        <SiteFooter />
       </div>
     );
   }
@@ -150,18 +146,15 @@ function CareerTwinPage() {
   if (!twin) {
     return (
       <div className="flex min-h-screen flex-col">
-        <SiteHeader />
         <div className="mx-auto w-full max-w-3xl px-4 py-12 text-center text-sm text-muted-foreground">
           {ar ? "تعذّر تحميل ملفك المهني، حاول تحديث الصفحة." : "Could not load your career twin, try refreshing."}
         </div>
-        <SiteFooter />
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -327,7 +320,6 @@ function CareerTwinPage() {
           </aside>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }
