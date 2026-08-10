@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard } from "@/lib/store";
+import { AchievementInterview } from "@/components/achievement-interview";
 import {
   createEvidence,
   createFact,
@@ -291,6 +292,10 @@ function EvidenceVaultPage() {
           {error}
         </p>
       ) : null}
+
+      <div className="mt-6">
+        <AchievementInterview userId={user.id} onSaved={() => void refresh(user.id)} />
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section>
