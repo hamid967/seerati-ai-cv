@@ -1,0 +1,297 @@
+.seerati-gallery-stage {
+  position: relative;
+  isolation: isolate;
+  perspective: 1800px;
+  padding-bottom: 8rem;
+}
+
+.seerati-gallery-stage::before {
+  content: "";
+  position: absolute;
+  inset: 4rem 8% auto;
+  height: 22rem;
+  z-index: -1;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--emerald-accent) 12%, transparent), transparent 68%);
+  filter: blur(36px);
+  pointer-events: none;
+}
+
+.seerati-gallery-toolbar {
+  position: sticky;
+  top: 4.75rem;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--border) 72%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--background) 82%, transparent);
+  box-shadow: 0 18px 48px -36px rgb(15 23 42 / 0.42);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+
+.seerati-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+  transform-style: preserve-3d;
+}
+
+.seerati-template-card {
+  --gallery-rx: 0deg;
+  --gallery-ry: 0deg;
+  --gallery-shine-x: 50%;
+  --gallery-shine-y: 20%;
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--border) 76%, transparent);
+  border-radius: 1.4rem;
+  background: color-mix(in oklab, var(--card) 94%, transparent);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 26px 64px -42px rgb(15 23 42 / 0.34);
+  transform: perspective(1200px) rotateX(var(--gallery-rx)) rotateY(var(--gallery-ry)) translateZ(0);
+  transform-style: preserve-3d;
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.seerati-template-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--gallery-shine-x) var(--gallery-shine-y),
+    rgb(255 255 255 / 0.2),
+    transparent 27%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0.7;
+}
+
+.seerati-template-card-glow {
+  position: absolute;
+  inset: 8% 10% auto;
+  height: 15rem;
+  z-index: 0;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--emerald-accent) 11%, transparent), transparent 72%);
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+.seerati-template-paper-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: 28rem;
+  overflow: hidden;
+  padding: 1.4rem 1.4rem 0;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sand) 42%, transparent), transparent 65%),
+    radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.55), transparent 48%);
+  transform-style: preserve-3d;
+}
+
+.seerati-template-paper {
+  width: 100%;
+  transform: translateZ(32px) rotateX(0.4deg);
+  transform-origin: center top;
+  filter: drop-shadow(0 22px 20px rgb(15 23 42 / 0.12));
+  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.seerati-template-meta {
+  position: relative;
+  z-index: 7;
+  flex: 1;
+  padding: 1.25rem;
+  border-top: 1px solid color-mix(in oklab, var(--border) 72%, transparent);
+  background: color-mix(in oklab, var(--card) 96%, transparent);
+  transform: translateZ(18px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .seerati-template-card:hover {
+    border-color: color-mix(in oklab, var(--emerald-accent) 38%, var(--border));
+    box-shadow:
+      0 10px 24px -18px rgb(15 23 42 / 0.2),
+      0 44px 110px -54px rgb(15 23 42 / 0.48),
+      0 0 72px -32px color-mix(in oklab, var(--emerald-accent) 50%, transparent);
+  }
+
+  .seerati-template-card:hover .seerati-template-paper {
+    transform: translateZ(46px) translateY(-4px) rotateX(0deg);
+  }
+}
+
+.seerati-compare-dock {
+  position: fixed;
+  inset-inline: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  width: min(calc(100% - 2rem), 42rem);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--border) 65%, transparent);
+  border-radius: 1.1rem;
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  box-shadow:
+    0 22px 70px -34px rgb(15 23 42 / 0.5),
+    inset 0 1px 0 rgb(255 255 255 / 0.15);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  transform: translateX(50%) translateZ(48px);
+  animation: seerati-dock-in 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+[dir="ltr"] .seerati-compare-dock {
+  transform: translateX(-50%) translateZ(48px);
+}
+
+@keyframes seerati-dock-in {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+.seerati-cinematic-dialog {
+  perspective: 1800px;
+  background: color-mix(in oklab, var(--card) 97%, transparent);
+  box-shadow:
+    0 42px 120px -38px rgb(2 12 27 / 0.64),
+    0 0 100px -52px color-mix(in oklab, var(--emerald-accent) 48%, transparent);
+}
+
+.seerati-cinematic-preview {
+  position: relative;
+  display: grid;
+  min-height: 34rem;
+  place-items: center;
+  overflow: hidden;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at 20% 10%, color-mix(in oklab, var(--emerald-accent) 20%, transparent), transparent 34%),
+    radial-gradient(circle at 86% 8%, rgb(191 145 70 / 0.13), transparent 30%),
+    linear-gradient(145deg, oklch(0.15 0.035 258), oklch(0.21 0.05 255));
+  transform-style: preserve-3d;
+}
+
+.seerati-cinematic-preview::before {
+  content: "";
+  position: absolute;
+  width: 115%;
+  height: 76%;
+  bottom: -46%;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  transform: rotateX(67deg) translateZ(-80px);
+  mask-image: linear-gradient(to bottom, black, transparent 82%);
+  opacity: 0.7;
+}
+
+.seerati-cinematic-paper {
+  position: relative;
+  z-index: 2;
+  width: min(90%, 34rem);
+  transform: perspective(1400px) rotateY(-4deg) rotateX(1.5deg) translateZ(40px);
+  filter: drop-shadow(0 42px 34px rgb(0 0 0 / 0.35));
+  animation: seerati-cinematic-enter 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[dir="rtl"] .seerati-cinematic-paper {
+  transform: perspective(1400px) rotateY(4deg) rotateX(1.5deg) translateZ(40px);
+}
+
+@keyframes seerati-cinematic-enter {
+  from {
+    opacity: 0;
+    scale: 0.92;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+}
+
+@media (min-width: 640px) {
+  .seerati-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .seerati-gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .seerati-gallery-toolbar {
+    top: 4.25rem;
+  }
+
+  .seerati-template-card {
+    transform: none !important;
+  }
+
+  .seerati-template-paper {
+    transform: translateZ(0);
+  }
+
+  .seerati-cinematic-preview {
+    min-height: 25rem;
+    padding: 1rem;
+  }
+
+  .seerati-cinematic-paper {
+    width: min(92%, 28rem);
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seerati-template-card,
+  .seerati-template-paper,
+  .seerati-cinematic-paper,
+  .seerati-compare-dock {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media print {
+  .seerati-gallery-stage,
+  .seerati-compare-dock,
+  .seerati-cinematic-dialog {
+    display: none !important;
+  }
+}
