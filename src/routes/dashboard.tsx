@@ -67,9 +67,15 @@ function Dashboard() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">{t("dash_title")}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">
+              {ar
+                ? `أهلاً ${user.fullName || "بك"}، جاهز تطوّر سيرتك؟`
+                : `Hi ${user.fullName || "there"}, ready to level up your CV?`}
+            </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              {ar ? `مرحباً ${user.fullName}` : `Welcome, ${user.fullName}`}
+              {ar
+                ? "أكمل الأقسام الناقصة، افحص جاهزية ATS، ثم نزّل نسخة PDF جاهزة للتقديم."
+                : "Fill the missing sections, check ATS readiness, then download a submission-ready PDF."}
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -108,6 +114,9 @@ function Dashboard() {
               <div>
                 <p className="text-lg font-bold">{t("empty_resumes")}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{t("empty_resumes_d")}</p>
+                <p className="mt-2 text-sm font-semibold">
+                  {ar ? "أنشئ سيرتك الأولى بمساعدة الذكاء الاصطناعي" : "Create your first CV with AI help"}
+                </p>
               </div>
               <div className="flex flex-wrap justify-center gap-2">
                 <Button asChild>
@@ -148,6 +157,11 @@ function Dashboard() {
                         <p className="mt-1 text-xs text-muted-foreground">
                           {t("template")}: {tpl.name[lang]} · {r.language.toUpperCase()}
                         </p>
+                        {r.data.targetJob && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {ar ? "الوظيفة المستهدفة" : "Target job"}: {r.data.targetJob}
+                          </p>
+                        )}
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
