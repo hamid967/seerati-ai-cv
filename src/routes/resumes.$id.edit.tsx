@@ -557,7 +557,7 @@ function EditResume() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setData((data) => { data.design = { ...data.design, accent: undefined }; })}
+                      onClick={() => setData((data) => { const { accent: _drop, ...rest } = data.design ?? {}; data.design = rest; })}
                     >
                       {ar ? "لون القالب الأصلي" : "Template default"}
                     </Button>
