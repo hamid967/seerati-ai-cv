@@ -36,8 +36,6 @@ export function CommandPalette() {
     <CommandDialog
       open={paletteOpen}
       onOpenChange={setPaletteOpen}
-      title={ar ? "لوحة الأوامر" : "Command palette"}
-      description={ar ? "ابحث وانتقل بسرعة" : "Search and navigate"}
     >
       <CommandInput placeholder={ar ? "ابحث عن صفحة أو سيرة أو أمر…" : "Search pages, resumes, actions…"} />
       <CommandList>
