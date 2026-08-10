@@ -10,6 +10,7 @@ import {
   CheckSquare,
   ArrowRight,
   ArrowLeft,
+  GitBranch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,19 @@ import {
 } from "@/lib/career";
 import { parseJobDescription, matchTwinToJob, GAP_LABEL } from "@/lib/job-match";
 import { agentsForSurface } from "@/lib/team";
+import { ApplicationTimeline } from "@/components/application-timeline";
+import { CoverLetterPanel } from "@/components/cover-letter-panel";
+import { listCoverLetters, type CoverLetter } from "@/lib/cover-letters";
+import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
+import { NextBestActions } from "@/components/next-best-actions";
+import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
+import { InterviewEvidenceAnswer } from "@/components/interview-evidence-answer";
+import { addJobEvent, listJobEvents, upcomingInterviews, type TimelineEvent } from "@/lib/job-timeline";
+import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
+import { computeNextActions } from "@/lib/next-best-action";
+import { loadFactGraph, type FactGraph } from "@/lib/career-facts";
+import { createJobVariantSnapshot, listResumeVersions, type ResumeVersion } from "@/lib/resume-versions";
+import type { ResumeData } from "@/lib/types";
 
 export const Route = createFileRoute("/jobs/$id")({
   head: () => ({
@@ -92,7 +106,7 @@ function JobWorkspacePage() {
   const { id } = useParams({ from: "/jobs/$id" });
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { user, ready, createResume, atLimit } = useStore();
+  const { user, ready, createResume, atLimit, resumes, updateResume } = useStore();
   const navigate = useNavigate();
 
   useAuthGuard();
@@ -102,6 +116,19 @@ function JobWorkspacePage() {
   const [assets, setAssets] = useState<ApplicationAsset[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [preparing, setPreparing] = useState(false);
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [letter, setLetter] = useState<CoverLetter | null>(null);
+  const [graph, setGraph] = useState<FactGraph>({ facts: [], evidence: [] });
+  const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [branching, setBranching] = useState(false);
+  const [reload, setReload] = useState(0);
+
+  /** The resume this job's variants branch from: its linked one, else the first. */
+  const baseResume =
+    resumes.find((r) => r.id === assets.find((a) => a.assetType === "resume")?.resumeId) ??
+    resumes[0] ??
+    null;
 
   const [form, setForm] = useState({
     jobTitle: "",
@@ -118,7 +145,11 @@ function JobWorkspacePage() {
     if (!user) return;
     let active = true;
     void (async () => {
-      const [loadedJob, loadedTwin] = await Promise.all([getJob(id), loadCareerTwin(user.id)]);
+      const [loadedJob, loadedTwin, loadedGraph] = await Promise.all([
+        getJob(id),
+        loadCareerTwin(user.id),
+        loadFactGraph(user.id),
+      ]);
       if (!active) return;
       if (loadedJob && loadedJob.userId === user.id) {
         setJob(loadedJob);
@@ -132,17 +163,37 @@ function JobWorkspacePage() {
           jobDescription: loadedJob.jobDescription,
           status: loadedJob.status,
         });
-        const list = await listAssets(loadedJob.id);
-        if (active) setAssets(list);
+        const [list, evts] = await Promise.all([
+          listAssets(loadedJob.id),
+          listJobEvents(loadedJob.id),
+        ]);
+        if (active) {
+          setAssets(list);
+          setEvents(evts);
+        }
       } else {
         setJob(null);
       }
+      setGraph(loadedGraph);
       setTwin(loadedTwin);
+      setLoadingEvents(false);
     })();
     return () => {
       active = false;
     };
-  }, [id, user]);
+  }, [id, user, reload]);
+
+  useEffect(() => {
+    if (!baseResume) return;
+    let active = true;
+    void listResumeVersions(baseResume.id).then((v) => {
+      if (active) setVersions(v);
+    });
+    return () => {
+      active = false;
+    };
+  }, [baseResume?.id, reload]);
+
 
   const persist = useCallback(
     (patch: Partial<JobWorkspace>) => {
@@ -165,9 +216,31 @@ function JobWorkspacePage() {
     });
   });
 
+  const refreshEvents = useCallback(() => {
+    if (!job) return;
+    void listJobEvents(job.id).then(setEvents);
+  }, [job]);
+
+  useEffect(() => {
+    if (!job) return;
+    void listCoverLetters(job.id).then((l) => setLetter(l[0] ?? null));
+  }, [job]);
+
+
   const handleStatusChange = (status: JobWorkspace["status"]) => {
     setForm((f) => ({ ...f, status }));
     persist({ status });
+    if (user && job) {
+      // Logged after the status write is issued, describing the real new state.
+      void addJobEvent(user.id, {
+        jobId: job.id,
+        eventType: status === "applied" ? "applied" : "status_change",
+        title: ar
+          ? `الحالة: ${JOB_STATUS_LABEL[status].ar}`
+          : `Status: ${JOB_STATUS_LABEL[status].en}`,
+        metadata: { status },
+      }).then(refreshEvents);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -189,6 +262,15 @@ function JobWorkspacePage() {
         ? `تحليل وصف ${job.jobTitle} — نسبة مطابقة ${matchAnalysis.score}%`
         : `Parsed ${job.jobTitle} — ${matchAnalysis.score}% match`,
     });
+    await addJobEvent(user.id, {
+      jobId: job.id,
+      eventType: "analyzed",
+      title: ar
+        ? `تحليل الوصف — مطابقة ${matchAnalysis.score}%`
+        : `Description analyzed — ${matchAnalysis.score}% match`,
+      metadata: { matchScore: matchAnalysis.score },
+    });
+    refreshEvents();
     setAnalyzing(false);
     toast.success(ar ? "تم تحليل الوصف الوظيفي" : "Job description analyzed");
   };
@@ -257,11 +339,67 @@ function JobWorkspacePage() {
 
       const list = await listAssets(job.id);
       setAssets(list);
+      // Events describe what actually happened, so the resume line is
+      // conditional on a resume having really been created.
+      if (resumeId) {
+        await addJobEvent(user.id, {
+          jobId: job.id,
+          eventType: "resume_variant",
+          title: ar ? `سيرة مخصصة: ${title}` : `Tailored resume: ${title}`,
+          metadata: { resumeId },
+        });
+      }
+      await addJobEvent(user.id, {
+        jobId: job.id,
+        eventType: "cover_letter",
+        title: ar ? "مسودة خطاب تقديم" : "Cover letter draft",
+        metadata: { coverLetterId: job.id },
+      });
+      refreshEvents();
       toast.success(ar ? "تم تجهيز حزمة الطلب" : "Application pack is ready");
     } finally {
       setPreparing(false);
     }
   };
+
+  /** Branch a job-specific variant inside the existing resume (no new resume). */
+  const handleCreateVariant = async () => {
+    if (!job || !user || !baseResume) return;
+    setBranching(true);
+    try {
+      const version = await createJobVariantSnapshot({
+        userId: user.id,
+        resumeId: baseResume.id,
+        snapshot: baseResume.data as ResumeData,
+        jobTitle: job.jobTitle,
+        company: job.company,
+        jobId: job.id,
+        jobDescription: job.jobDescription,
+      });
+      if (!version) {
+        toast.error(ar ? "تعذّر إنشاء النسخة." : "Could not create the variant.");
+        return;
+      }
+      await addJobEvent(user.id, {
+        jobId: job.id,
+        eventType: "resume_variant",
+        title: ar ? `نسخة سيرة: ${version.label}` : `Resume variant: ${version.label}`,
+        metadata: { resumeId: baseResume.id, versionId: version.id },
+      });
+      setVersions(await listResumeVersions(baseResume.id));
+      refreshEvents();
+      toast.success(
+        ar
+          ? "أُنشئت نسخة داخل نفس السيرة — لم تُستهلك من حدّ الثلاث سير."
+          : "A variant was created inside this resume — your 3-resume limit is untouched.",
+      );
+    } catch {
+      toast.error(ar ? "تعذّر إنشاء النسخة." : "Could not create the variant.");
+    } finally {
+      setBranching(false);
+    }
+  };
+
 
   if (!ready || !user || job === undefined) {
     return (
@@ -295,6 +433,29 @@ function JobWorkspacePage() {
     return acc;
   }, {});
 
+  const snapshot = baseResume
+    ? buildRecruiterSnapshot(baseResume, { graph, jobDescription: form.jobDescription })
+    : null;
+
+  const nextActions = computeNextActions({
+    twin,
+    graph,
+    resumes,
+    jobs: [job],
+    upcomingInterviews: upcomingInterviews(events, () => job.jobTitle),
+    jobsWithCoverLetter: assets.some((a) => a.assetType === "cover_letter") ? [job.id] : [],
+    jobsWithVariant: versions.some((v) => v.changeSummary === `variant:${job.id}`) ? [job.id] : [],
+  });
+
+  const interviewQuestions = [
+    ar
+      ? `لماذا تناسب وظيفة ${job.jobTitle} في ${job.company}؟`
+      : `Why are you a fit for ${job.jobTitle} at ${job.company}?`,
+    ...(job.requirements?.hardSkills ?? []).slice(0, 2).map((s) =>
+      ar ? `حدّثني عن تجربتك مع ${s}.` : `Tell me about your experience with ${s}.`,
+    ),
+  ];
+
   const BackIcon = ar ? ArrowRight : ArrowLeft;
 
   return (
@@ -312,19 +473,55 @@ function JobWorkspacePage() {
             <h1 className="text-2xl font-extrabold tracking-tight">{form.jobTitle || (ar ? "وظيفة بلا عنوان" : "Untitled job")}</h1>
             <p className="text-sm text-muted-foreground">{form.company}</p>
           </div>
-          <Select value={form.status} onValueChange={(v) => handleStatusChange(v as JobWorkspace["status"])}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {JOB_STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {JOB_STATUS_LABEL[s][lang]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            {baseResume ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => void handleCreateVariant()}
+                  disabled={branching}
+                >
+                  <GitBranch className="size-4" />
+                  {branching
+                    ? ar
+                      ? "جارِ الإنشاء…"
+                      : "Creating…"
+                    : ar
+                      ? "نسخة لهذه الوظيفة"
+                      : "Variant for this job"}
+                </Button>
+                <ResumeVariantSwitcher
+                  userId={user.id}
+                  resumeId={baseResume.id}
+                  current={baseResume.data as ResumeData}
+                  versions={versions}
+                  onRestored={(data) => void updateResume(baseResume.id, { data })}
+                  onChanged={() => setReload((n) => n + 1)}
+                />
+              </>
+            ) : null}
+            <Select value={form.status} onValueChange={(v) => handleStatusChange(v as JobWorkspace["status"])}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {JOB_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {JOB_STATUS_LABEL[s][lang]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+
+        {nextActions.length ? (
+          <div className="mt-6">
+            <NextBestActions actions={nextActions} />
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_280px]">
           {/* Zone 1: job fields */}
@@ -549,6 +746,107 @@ function JobWorkspacePage() {
             ))}
           </div>
         </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          {snapshot ? (
+            <RecruiterSnapshotCard snapshot={snapshot} />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  {ar ? "نظرة مسؤول التوظيف — ملخص سريع" : "Recruiter Snapshot"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  {ar
+                    ? "أنشئ سيرة أولاً لعرض الملخص السريع."
+                    : "Create a resume first to see the snapshot."}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          <ApplicationTimeline
+            userId={user.id}
+            jobId={job.id}
+            events={events}
+            loading={loadingEvents}
+            onChanged={refreshEvents}
+          />
+        </div>
+
+        <div className="mt-6">
+          <CoverLetterPanel
+            userId={user.id}
+            jobId={job.id}
+            jobTitle={job.jobTitle}
+            company={job.company}
+            jobDescription={form.jobDescription}
+            graph={graph}
+            twin={twin}
+            resumeData={(baseResume?.data as ResumeData | undefined) ?? null}
+            resumeId={baseResume?.id ?? null}
+            existing={letter}
+            onSaved={() => {
+              void listCoverLetters(job.id).then((l) => setLetter(l[0] ?? null));
+              void addJobEvent(user.id, {
+                jobId: job.id,
+                eventType: "cover_letter",
+                title: ar ? "حفظ خطاب التقديم" : "Cover letter saved",
+              }).then(refreshEvents);
+            }}
+          />
+        </div>
+
+
+
+        <section id="interview-pack" className="mt-6 space-y-3">
+          <div>
+            <h2 className="text-lg font-bold">{ar ? "تحضير المقابلة بالأدلة" : "Evidence-based interview prep"}</h2>
+            <p className="text-xs text-muted-foreground">
+              {ar
+                ? "قائمة التحضير: ٣ قصص جاهزة، أسئلة عن الوظيفة، ومهارات ناقصة من الوصف الوظيفي."
+                : "Checklist: 3 ready stories, questions about the job, and skill gaps from the description."}
+            </p>
+          </div>
+
+          <Card>
+            <CardContent className="space-y-2 p-4 text-xs">
+              <p>
+                {ar ? "قصص STAR الجاهزة: " : "Ready STAR stories: "}
+                <span className="font-bold">
+                  {graph.facts.filter((f) => f.type === "star_story").length} / 3
+                </span>
+              </p>
+              <p className="text-muted-foreground">
+                {ar ? "مهارات ناقصة من الوصف: " : "Skill gaps from the description: "}
+                {job.matchAnalysis?.missingSkills.length
+                  ? job.matchAnalysis.missingSkills.slice(0, 6).join(ar ? "، " : ", ")
+                  : ar
+                    ? "لا شيء بعد التحليل"
+                    : "none after analysis"}
+              </p>
+              <p className="text-muted-foreground">
+                {ar
+                  ? "أسئلة تسألها: عن الفريق، معايير النجاح في أول ٩٠ يوماً، وخطوات التوظيف. لا نجلب معلومات سوق أو شركة غير متوفرة لدينا."
+                  : "Questions to ask: about the team, success criteria in the first 90 days, and hiring steps. We do not fetch market or company data we don't have."}
+              </p>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            {interviewQuestions.map((q) => (
+              <InterviewEvidenceAnswer
+                key={q}
+                userId={user.id}
+                question={q}
+                graph={graph}
+                jobDescription={form.jobDescription}
+                onSaved={() => setReload((n) => n + 1)}
+              />
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );

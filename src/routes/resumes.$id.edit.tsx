@@ -34,6 +34,13 @@ import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
 import { analyzeResume, checklist, completeness, keywordCoverage, resumeStatus } from "@/lib/ats";
 import { ACCENT_PALETTE, uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+import {
+  createVersionSnapshot,
+  ensureSessionSnapshot,
+  listResumeVersions,
+  type ResumeVersion,
+} from "@/lib/resume-versions";
+import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 
 
 export const Route = createFileRoute("/resumes/$id/edit")({
@@ -138,12 +145,27 @@ function EditResume() {
   const past = useRef<Resume[]>([]);
   const future = useRef<Resume[]>([]);
   const [, bumpHistory] = useState(0);
+  const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [loadingVersions, setLoadingVersions] = useState(true);
 
   useAuthGuard();
 
   useEffect(() => {
     if (stored && !draft) setDraft(stored);
   }, [stored, draft]);
+
+  const refreshVersions = useCallback(() => {
+    setLoadingVersions(true);
+    void listResumeVersions(id).then((list) => {
+      setVersions(list);
+      setLoadingVersions(false);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    if (user) refreshVersions();
+  }, [user, refreshVersions]);
+
 
   const scheduleSave = useCallback(
     (next: Resume) => {
@@ -224,6 +246,32 @@ function EditResume() {
     (fn: (d: ResumeData) => void) => patch((r) => { fn(r.data); return r; }),
     [patch],
   );
+
+  /**
+   * AI-approved edits rewrite whole blocks, so we keep a restore point first.
+   * ensureSessionSnapshot reuses a recent auto snapshot instead of piling up
+   * one row per suggestion in the same session.
+   */
+  const applyAi = useCallback(
+    (reason: string, fn: (d: ResumeData) => void) => {
+      const current = draft?.data;
+      if (user && current) {
+        void ensureSessionSnapshot({
+          userId: user.id,
+          resumeId: id,
+          current,
+          reason,
+          lang: ar ? "ar" : "en",
+          versions,
+        }).then((v) => {
+          if (v && !versions.some((x) => x.id === v.id)) refreshVersions();
+        });
+      }
+      setData(fn);
+    },
+    [draft, user, id, ar, versions, refreshVersions, setData],
+  );
+
 
   const jobDescription = draft?.data.jobDescription ?? "";
   const setJobDescription = useCallback(
@@ -335,6 +383,17 @@ function EditResume() {
             >
               <Redo2 className="size-4" />
             </Button>
+            {user ? (
+              <ResumeVariantSwitcher
+                userId={user.id}
+                resumeId={draft.id}
+                current={draft.data}
+                versions={versions}
+                loading={loadingVersions}
+                onRestored={(data) => patch((r) => ({ ...r, data }))}
+                onChanged={refreshVersions}
+              />
+            ) : null}
             <Badge variant="secondary">
               {ar ? "الاكتمال" : "Complete"} {completion}%
             </Badge>
@@ -363,9 +422,9 @@ function EditResume() {
                     <AiAssistant
                       resume={draft}
                       section={step}
-                      onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                      onApplySummary={(text) => applyAi("summary", (data) => { data.summary = text; })}
                       onApplyBullets={(bullets) =>
-                        setData((data) => {
+                        applyAi("bullets", (data) => {
                           if (!data.experience.length) data.experience.push({ id: uid(), role: "", company: "", bullets });
                           else data.experience[0]!.bullets = bullets;
                         })
@@ -959,9 +1018,9 @@ function EditResume() {
               <AiAssistant
                 resume={draft}
                 section={step}
-                onApplySummary={(text) => setData((data) => { data.summary = text; })}
+                onApplySummary={(text) => applyAi("summary", (data) => { data.summary = text; })}
                 onApplyBullets={(bullets) =>
-                  setData((data) => {
+                  applyAi("bullets", (data) => {
                     if (!data.experience.length) {
                       data.experience.push({ id: uid(), role: "", company: "", bullets });
                     } else {

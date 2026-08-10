@@ -29,8 +29,12 @@ import {
   twinHealth,
   type AgentActivity,
   type CareerTask,
+  type CareerTwin,
   type JobWorkspace,
 } from "@/lib/career";
+import { emptyFactGraph, loadFactGraph, type FactGraph } from "@/lib/career-facts";
+import { computeNextActions } from "@/lib/next-best-action";
+import { NextBestActions } from "@/components/next-best-actions";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -45,8 +49,6 @@ export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
-type NextAction = { key: string; label: string; href: string; internal?: boolean };
-
 function Dashboard() {
   const t = useT();
   const { lang } = useI18n();
@@ -55,6 +57,8 @@ function Dashboard() {
   const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume, maxResumes } = useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
+  const [twin, setTwin] = useState<CareerTwin | null>(null);
+  const [graph, setGraph] = useState<FactGraph>(() => emptyFactGraph());
   const [twinScore, setTwinScore] = useState<number | null>(null);
   const [jobs, setJobs] = useState<JobWorkspace[]>([]);
   const [tasks, setTasks] = useState<CareerTask[]>([]);
@@ -72,18 +76,22 @@ function Dashboard() {
       listJobs(user.id),
       listTasks(user.id),
       listAgentActivity(user.id, 6),
-    ]).then(([twin, jobList, taskList, activityList]) => {
+      loadFactGraph(user.id),
+    ]).then(([twinData, jobList, taskList, activityList, factGraph]) => {
       if (!active) return;
-      setTwinScore(twinHealth(twin).score);
+      setTwin(twinData);
+      setTwinScore(twinHealth(twinData).score);
       setJobs(jobList);
       setTasks(taskList);
       setActivity(activityList);
+      setGraph(factGraph);
       setLoadingCenter(false);
     });
     return () => {
       active = false;
     };
   }, [user]);
+
 
   if (!ready || !user) {
     return (
@@ -100,43 +108,17 @@ function Dashboard() {
     );
   }
 
-  // Next-best-actions, derived only from real state — no fabricated activity.
-  const nextActions: NextAction[] = [];
-  if (twinScore !== null && twinScore < 70) {
-    nextActions.push({
-      key: "twin",
-      label: ar ? "أكمل ملفك المهني الموحّد" : "Complete your unified career profile",
-      href: "/career-twin",
-    });
-  }
-  const weakResume = resumes.find((r) => analyzeResume(r, getTemplate(r.templateId)).score < 60);
-  if (weakResume) {
-    nextActions.push({
-      key: "ats",
-      label: ar ? `ارفع جاهزية ATS لسيرة «${weakResume.title}»` : `Improve ATS readiness for "${weakResume.title}"`,
-      href: "/resumes/$id/edit",
-      internal: true,
-    });
-  }
-  const openTask = tasks.find((tk) => !tk.done);
-  if (openTask) {
-    nextActions.push({
-      key: "task",
-      label: ar ? `مهمة متابعة: ${openTask.title}` : `Follow-up: ${openTask.title}`,
-      href: "/jobs",
-    });
-  }
-  const staleJob = jobs.find((j) => j.status === "saved" || j.status === "preparing");
-  if (staleJob) {
-    nextActions.push({
-      key: "job",
-      label: ar ? `جهّز مساحة وظيفة «${staleJob.jobTitle}»` : `Prepare the "${staleJob.jobTitle}" job space`,
-      href: "/jobs",
-    });
-  }
-  if (resumes.length === 0) {
-    nextActions.push({ key: "resume", label: ar ? "أنشئ أول سيرة ذاتية" : "Create your first resume", href: "/resumes/new", internal: true });
-  }
+  // Actions come from the deterministic engine, so nothing here is invented.
+  const nextActions = computeNextActions({
+    twin,
+    graph,
+    resumes,
+    jobs,
+    upcomingInterviews: jobs
+      .filter((j) => j.status === "interview" && j.nextActionAt)
+      .map((j) => ({ jobId: j.id, jobTitle: j.jobTitle, occurredAt: j.nextActionAt as string })),
+  });
+
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -168,42 +150,16 @@ function Dashboard() {
 
         {/* Next best actions */}
         <section>
-          <h2 className="text-lg font-bold">{ar ? "الخطوة التالية" : "Next best step"}</h2>
           {loadingCenter ? (
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {[0, 1].map((i) => (
                 <Skeleton key={i} className="h-16 rounded-xl" />
               ))}
             </div>
-          ) : nextActions.length === 0 ? (
-            <p className="mt-3 rounded-xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
-              {ar ? "لا توجد خطوات معلّقة الآن — ملفك ووظائفك في حالة جيدة." : "No pending steps right now — your profile and jobs look in good shape."}
-            </p>
           ) : (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {nextActions.slice(0, 4).map((a) =>
-                a.internal ? (
-                  <Link
-                    key={a.key}
-                    to={a.href as "/resumes/new"}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 text-sm font-medium shadow-soft transition-colors hover:bg-secondary"
-                  >
-                    {a.label}
-                    <ArrowLeft className="size-4 shrink-0 rtl:rotate-0 ltr:rotate-180" />
-                  </Link>
-                ) : (
-                  <a
-                    key={a.key}
-                    href={a.href}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 text-sm font-medium shadow-soft transition-colors hover:bg-secondary"
-                  >
-                    {a.label}
-                    <ArrowLeft className="size-4 shrink-0 rtl:rotate-0 ltr:rotate-180" />
-                  </a>
-                ),
-              )}
-            </div>
+            <NextBestActions actions={nextActions} />
           )}
+
         </section>
 
         {/* Team status strip */}

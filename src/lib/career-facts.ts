@@ -409,6 +409,10 @@ export type FactGraph = {
   evidence: CareerEvidence[];
 };
 
+/** A graph with no stored data — used by public/demo surfaces. */
+export const emptyFactGraph = (): FactGraph => ({ facts: [], evidence: [] });
+
+
 export async function loadFactGraph(userId: string): Promise<FactGraph> {
   const [facts, evidence] = await Promise.all([listFacts(userId), listEvidence(userId)]);
   return { facts, evidence };
@@ -486,6 +490,13 @@ export function buildAiFactContext(
   if (!lines.length) return "NO_VERIFIED_FACTS";
   return lines.join("\n");
 }
+
+/**
+ * Stage 2 name for the same guarantee: the ONLY professional context an AI
+ * feature may see is the user's own verified facts and evidence.
+ */
+export const buildSafeAiEvidenceContext = buildAiFactContext;
+
 
 /**
  * Truth guardrail: any number in AI text that is not backed by a verified
