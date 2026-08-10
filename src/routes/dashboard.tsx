@@ -40,7 +40,7 @@ function Dashboard() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume } = useStore();
+  const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume, maxResumes } = useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   useAuthGuard();

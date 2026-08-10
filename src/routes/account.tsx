@@ -28,7 +28,7 @@ function AccountPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, resumes, updateProfile } = useStore();
+  const { user, ready, resumes, updateProfile, maxResumes } = useStore();
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
 
