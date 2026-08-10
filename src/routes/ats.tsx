@@ -94,8 +94,65 @@ function AtsPage() {
                 )}
               </div>
             )}
-          </div>
         </div>
+
+        <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="font-bold">{ar ? lint.label.ar : lint.label.en}</p>
+              <p className="mt-1 text-xs leading-[1.8] text-muted-foreground">
+                {ar
+                  ? "فحص برمجي صلب بقواعد ثابتة — بلا ذكاء اصطناعي، ونفس السيرة تعطي نفس النتيجة دائماً."
+                  : "A hard, rule-based check — no AI involved, and the same resume always yields the same result."}
+              </p>
+            </div>
+            <p className="text-2xl font-extrabold">{lint.score}/100</p>
+          </div>
+          <Progress value={lint.score} className="mt-4" />
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {lint.categories.map((c) => (
+              <div key={c.category} className="rounded-xl border border-border p-4">
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-sm font-semibold">
+                    {ar ? LINT_CATEGORY_LABEL[c.category].ar : LINT_CATEGORY_LABEL[c.category].en}
+                  </p>
+                  <span className="text-xs font-bold text-muted-foreground">
+                    {c.earned}/{c.max}
+                  </span>
+                </div>
+                <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
+              </div>
+            ))}
+          </div>
+
+          {lint.findings.length ? (
+            <ul className="mt-5 space-y-2 border-t border-border pt-4">
+              {lint.findings.slice(0, 10).map((f) => (
+                <li key={f.id} className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]">
+                  <Badge
+                    variant={f.severity === "error" ? "destructive" : "outline"}
+                    className="mt-0.5 text-[10.5px]"
+                  >
+                    {ar
+                      ? f.severity === "error"
+                        ? "حرج"
+                        : f.severity === "warning"
+                          ? "تحذير"
+                          : "ملاحظة"
+                      : f.severity}
+                  </Badge>
+                  <span className="flex-1">{explainFinding(f, ar ? "ar" : "en")}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-5 border-t border-border pt-4 text-sm text-emerald-accent">
+              {ar ? "لا توجد ملاحظات — بنية السيرة سليمة." : "No findings — the structure looks clean."}
+            </p>
+          )}
+        </section>
+
 
         <Button size="lg" className="mt-8" asChild>
           <Link to="/auth" search={{ mode: "signup" }}>
