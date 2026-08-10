@@ -1,0 +1,94 @@
+name: Seerati CI
+
+on:
+  push:
+    branches: [main, "codex/**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seerati-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Format check
+        run: bunx prettier --check .
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Type check
+        run: bunx tsc --noEmit
+
+      - name: Build
+        run: bun run build
+
+      - name: Static QA
+        run: |
+          bun run qa:ai
+          bun run check:routes-shell
+          bun run test:ai-contract
+          bun run test:resume-diff
+          bun run test:templates
+          bun run check:rtl
+
+  route-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Skip when QA Supabase secrets are unavailable
+        if: ${{ env.VITE_SUPABASE_URL == '' || env.VITE_SUPABASE_PUBLISHABLE_KEY == '' || env.SUPABASE_URL == '' || env.SUPABASE_PUBLISHABLE_KEY == '' }}
+        run: echo "Route smoke skipped because QA Supabase secrets are not configured."
+
+      - name: Install dependencies
+        if: ${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != '' && env.SUPABASE_URL != '' && env.SUPABASE_PUBLISHABLE_KEY != '' }}
+        run: bun install --frozen-lockfile
+
+      - name: Start app
+        if: ${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != '' && env.SUPABASE_URL != '' && env.SUPABASE_PUBLISHABLE_KEY != '' }}
+        run: |
+          bun run dev -- --host 127.0.0.1 --port 8080 > /tmp/seerati-vite.log 2>&1 &
+          echo $! > /tmp/seerati-vite.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8080/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/seerati-vite.log
+          exit 1
+
+      - name: Route smoke tests
+        if: ${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != '' && env.SUPABASE_URL != '' && env.SUPABASE_PUBLISHABLE_KEY != '' }}
+        env:
+          QA_BASE_URL: http://127.0.0.1:8080
+        run: bun run qa:routes
