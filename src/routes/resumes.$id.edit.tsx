@@ -187,13 +187,51 @@ function EditResume() {
             </SelectContent>
           </Select>
 
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-live="polite">
-            {status === "saving" ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5 text-emerald-accent" />}
-            {status === "saving" ? (ar ? "جارٍ الحفظ…" : "Saving…") : ar ? "تم الحفظ" : "Saved"}
+          <span
+            className={`flex items-center gap-1.5 text-xs ${status === "error" ? "text-destructive" : "text-muted-foreground"}`}
+            aria-live="polite"
+          >
+            {status === "saving" ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : status === "error" ? (
+              <AlertTriangle className="size-3.5" />
+            ) : (
+              <Check className="size-3.5 text-emerald-accent" />
+            )}
+            {status === "saving"
+              ? ar
+                ? "جارٍ الحفظ…"
+                : "Saving…"
+              : status === "error"
+                ? ar
+                  ? "تعذّر الحفظ — سنحاول مع تعديلك القادم"
+                  : "Save failed — will retry on next change"
+                : ar
+                  ? "تم الحفظ"
+                  : "Saved"}
           </span>
 
           <div className="ms-auto flex items-center gap-2">
+            <Badge variant="secondary">
+              {ar ? "الاكتمال" : "Complete"} {completion}%
+            </Badge>
             <Badge variant="secondary">ATS {score}/100</Badge>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button size="sm" variant="outline" className="lg:hidden">
+                  <Eye className="size-4" />
+                  {ar ? "معاينة" : "Preview"}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[88vh] overflow-auto">
+                <SheetHeader>
+                  <SheetTitle>{ar ? "معاينة مباشرة" : "Live preview"}</SheetTitle>
+                </SheetHeader>
+                <div className="mt-3">
+                  <ResumePreview resume={draft} />
+                </div>
+              </SheetContent>
+            </Sheet>
             <Button size="sm" variant="outline" asChild>
               <Link to="/resumes/$id/preview" params={{ id: draft.id }}>
                 <Eye className="size-4" />
@@ -204,14 +242,15 @@ function EditResume() {
         </div>
       </div>
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        {/* Form column */}
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-1.5">
+      <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">
+        {/* Section navigation */}
+        <nav aria-label={ar ? "أقسام المحرر" : "Builder sections"} className="lg:sticky lg:top-36 lg:self-start">
+          <div className="flex gap-1.5 overflow-x-auto lg:flex-col">
             {stepDefs.map((s) => (
               <Button
                 key={s.key}
                 size="sm"
+                className="shrink-0 justify-start lg:w-full"
                 variant={step === s.key ? "default" : "outline"}
                 onClick={() => setStep(s.key)}
               >
@@ -219,8 +258,31 @@ function EditResume() {
               </Button>
             ))}
           </div>
+          <div className="mt-4 hidden rounded-xl border border-border bg-card p-3 lg:block">
+            <p className="mb-2 text-xs font-bold">{ar ? "قائمة الاكتمال" : "Completion checklist"}</p>
+            <Progress value={completion} className="mb-2" />
+            <ul className="space-y-1">
+              {items.map((i) => (
+                <li key={i.id}>
+                  <button
+                    onClick={() => setStep(i.step === "design" ? "design" : i.step)}
+                    className="flex w-full items-start gap-1.5 text-start text-[11.5px] hover:underline"
+                  >
+                    <span className={i.done ? "text-emerald-accent" : "text-muted-foreground"}>
+                      {i.done ? "✓" : "○"}
+                    </span>
+                    <span className={i.done ? "text-muted-foreground" : ""}>{i.label[lang]}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
 
+        {/* Form column */}
+        <div className="space-y-4">
           <div className="rounded-2xl border border-border bg-card p-5">
+
             {step === "personal" && (
               <div className="grid gap-4 sm:grid-cols-2">
                 {([
