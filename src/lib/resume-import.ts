@@ -115,7 +115,10 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
   const phones = Array.from(new Set(cleanText.match(PHONE_RE) ?? []))
     .map((p) => p.trim())
     .filter((p) => !looksLikeDate(p));
-  const links = Array.from(new Set(cleanText.match(LINK_RE) ?? [])).filter((l) => !l.includes("@"));
+  // Drop candidates that are just the domain part of an email we already captured.
+  const links = Array.from(new Set(cleanText.match(LINK_RE) ?? [])).filter(
+    (l) => !l.includes("@") && !emails.some((e) => e.endsWith(l)),
+  );
 
   const lines = cleanText.split("\n");
   const sections: Partial<Record<SectionId, string[]>> = {};
