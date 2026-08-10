@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 
 const composer = readFileSync("src/routes/resumes.$id.composer.tsx", "utf8");
+const preview = readFileSync("src/routes/resumes.$id.preview.tsx", "utf8");
 const pagination = readFileSync("src/lib/resume-pagination.ts", "utf8");
 const wrapper = readFileSync("src/components/professional-resume-preview.tsx", "utf8");
 const css = readFileSync("src/resume-layout.css", "utf8");
@@ -24,10 +25,13 @@ requireText(
   "ProfessionalResumePreview",
   "composer must use the shared professional renderer",
 );
+requireText(preview, 'to="/resumes/$id/composer"', "export preview must link to the page composer");
 requireText(pagination, "widow-heading", "widow heading diagnostic missing");
 requireText(pagination, "item-split", "item split diagnostic missing");
 requireText(pagination, "oversized-item", "oversized item diagnostic missing");
-requireText(wrapper, "data-cv-section-key", "renderer must expose section metadata");
+requireText(wrapper, 'dataset["cvSectionKey"]', "renderer must expose section metadata");
+requireText(wrapper, 'dataset["manualBreak"]', "renderer must expose manual-break metadata");
+requireText(wrapper, 'dataset["keepTogether"]', "renderer must expose keep-together metadata");
 requireText(wrapper, "breakBefore", "renderer must apply saved manual page breaks");
 requireText(wrapper, "breakInside", "renderer must apply saved keep-together preference");
 requireText(types, "pageBreakBefore?: SectionKey[]", "page-break design type missing");
@@ -50,6 +54,8 @@ if (failures.length) {
 console.log("PASS  Smart Page Composer route and controls are present");
 console.log("PASS  diagnostics use real rendered DOM measurements");
 console.log("PASS  manual breaks and keep-together preferences persist safely");
+console.log("PASS  renderer exposes strict dataset metadata for pagination analysis");
+console.log("PASS  preview links to the page composer");
 console.log("PASS  widow/item/oversized split diagnostics are deterministic");
 console.log("PASS  composer does not hide, delete, or rewrite resume content");
 console.log("\nSmart Pagination & Page Composer quality guard OK.");
