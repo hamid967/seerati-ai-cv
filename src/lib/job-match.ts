@@ -180,7 +180,8 @@ const STOP_WORDS = new Set([
 const norm = (s: string) =>
   s
     .toLowerCase()
-    .replace(/[\u0640\u064B-\u0652]/g, "")
+    .replace(/\u0640/g, "")
+    .replace(/\p{M}/gu, "")
     .trim();
 
 function bulletLines(text: string): string[] {
