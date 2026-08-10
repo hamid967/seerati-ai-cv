@@ -174,8 +174,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
     });
     if (error) return { error: error.message };
-    return { needsConfirmation: !data.session };
-  }, []);
+    if (data.session?.user) {
+      await loadProfile(data.session.user.id, data.session.user.email ?? email);
+      await loadResumes();
+      return { needsConfirmation: false };
+    }
+    return { needsConfirmation: true };
+  }, [loadProfile, loadResumes]);
 
   const value = useMemo<Ctx>(() => {
     const atLimit = resumes.length >= RESUME_LIMIT;
