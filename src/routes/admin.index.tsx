@@ -5,7 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n";
 import { fetchAdminStats, fetchAuditLog, fetchTemplates } from "@/lib/db";
 
@@ -18,12 +25,14 @@ function AdminOverview() {
   const ar = lang === "ar";
 
   const stats = useQuery({ queryKey: ["admin-stats"], queryFn: fetchAdminStats });
-  const templates = useQuery({ queryKey: ["admin-templates"], queryFn: () => fetchTemplates(true) });
+  const templates = useQuery({
+    queryKey: ["admin-templates"],
+    queryFn: () => fetchTemplates(true),
+  });
   const audit = useQuery({ queryKey: ["admin-audit", 12], queryFn: () => fetchAuditLog(12) });
 
   const s = stats.data;
-  const nameOf = (id: string) =>
-    (templates.data ?? []).find((t) => t.id === id)?.name[lang] ?? id;
+  const nameOf = (id: string) => (templates.data ?? []).find((t) => t.id === id)?.name[lang] ?? id;
 
   const kpis = [
     { label: ar ? "إجمالي المستخدمين" : "Total users", value: s?.totalUsers },
@@ -39,7 +48,9 @@ function AdminOverview() {
       <Card className="border-destructive/40">
         <CardContent className="flex items-center gap-3 py-8 text-sm">
           <AlertTriangle className="size-5 text-destructive" />
-          {ar ? "تعذّر تحميل مؤشرات المنصة. حدّث الصفحة." : "Could not load platform metrics. Please refresh."}
+          {ar
+            ? "تعذّر تحميل مؤشرات المنصة. حدّث الصفحة."
+            : "Could not load platform metrics. Please refresh."}
         </CardContent>
       </Card>
     );
@@ -69,13 +80,17 @@ function AdminOverview() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{ar ? "المسودات مقابل المكتملة" : "Draft vs complete"}</CardTitle>
+            <CardTitle className="text-base">
+              {ar ? "المسودات مقابل المكتملة" : "Draft vs complete"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {stats.isLoading ? (
               <Skeleton className="h-20 w-full" />
             ) : totalStatus === 0 ? (
-              <p className="text-sm text-muted-foreground">{ar ? "لا توجد سير ذاتية بعد." : "No resumes yet."}</p>
+              <p className="text-sm text-muted-foreground">
+                {ar ? "لا توجد سير ذاتية بعد." : "No resumes yet."}
+              </p>
             ) : (
               <>
                 <div>
@@ -99,13 +114,17 @@ function AdminOverview() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{ar ? "ترتيب استخدام القوالب" : "Template usage ranking"}</CardTitle>
+            <CardTitle className="text-base">
+              {ar ? "ترتيب استخدام القوالب" : "Template usage ranking"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {stats.isLoading ? (
               <Skeleton className="h-20 w-full" />
             ) : (s?.templateRanking ?? []).length === 0 ? (
-              <p className="text-sm text-muted-foreground">{ar ? "لا يوجد استخدام بعد." : "No usage yet."}</p>
+              <p className="text-sm text-muted-foreground">
+                {ar ? "لا يوجد استخدام بعد." : "No usage yet."}
+              </p>
             ) : (
               <ul className="space-y-2 text-sm">
                 {(s?.templateRanking ?? []).map((row, i) => (
@@ -148,7 +167,9 @@ function AdminOverview() {
                 {(s?.recentSignups ?? []).map((u) => (
                   <TableRow key={u.id}>
                     <TableCell className="font-medium">{u.fullName || "—"}</TableCell>
-                    <TableCell dir="ltr" className="text-xs">{u.email}</TableCell>
+                    <TableCell dir="ltr" className="text-xs">
+                      {u.email}
+                    </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {new Date(u.createdAt).toLocaleDateString("en-GB")}
                     </TableCell>
@@ -162,7 +183,9 @@ function AdminOverview() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{ar ? "أحدث العمليات الإدارية" : "Recent admin events"}</CardTitle>
+          <CardTitle className="text-base">
+            {ar ? "أحدث العمليات الإدارية" : "Recent admin events"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {audit.isLoading ? (
@@ -175,7 +198,9 @@ function AdminOverview() {
             <ul className="space-y-3">
               {(audit.data ?? []).map((a) => (
                 <li key={a.id} className="flex flex-wrap items-center gap-2 text-sm">
-                  <Badge variant="outline" className="font-mono text-[10.5px]">{a.action}</Badge>
+                  <Badge variant="outline" className="font-mono text-[10.5px]">
+                    {a.action}
+                  </Badge>
                   <span className="text-muted-foreground">{a.actorEmail ?? "—"}</span>
                   <span>→ {a.target ?? "—"}</span>
                   <span className="ms-auto text-xs text-muted-foreground">

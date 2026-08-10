@@ -10,7 +10,14 @@
  * before it is persisted (see `resume-import.tsx`).
  */
 import { uid } from "./types";
-import type { Education, Experience, LanguageItem, ResumeData, SimpleItem, SkillItem } from "./types";
+import type {
+  Education,
+  Experience,
+  LanguageItem,
+  ResumeData,
+  SimpleItem,
+  SkillItem,
+} from "./types";
 
 export type ParsedResume = Partial<ResumeData> & {
   /** Contact details extracted from the free text, kept separately for review. */
@@ -18,13 +25,7 @@ export type ParsedResume = Partial<ResumeData> & {
 };
 
 type SectionId =
-  | "summary"
-  | "experience"
-  | "education"
-  | "skills"
-  | "languages"
-  | "certificates"
-  | "projects";
+  "summary" | "experience" | "education" | "skills" | "languages" | "certificates" | "projects";
 
 // Bilingual heading synonyms, including headings used by LinkedIn/Indeed/Bayt
 // and common resume-builder exports. Matching is case-insensitive.
@@ -103,7 +104,6 @@ function parseEntryHeading(line: string): {
     ...(end ? { end } : {}),
   };
 }
-
 
 /** Removes any line that only contains a heading we matched, keeping section bodies pure. */
 function isHeadingLine(line: string): SectionId | null {
@@ -185,7 +185,10 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
       const looksLikeHeading = !isBullet && (DATES_RE.test(clean) || /[—–|]/.test(clean));
 
       if (looksLikeHeading || groups.length === 0) {
-        groups.push({ ...(looksLikeHeading ? { heading: clean } : {}), bullets: looksLikeHeading ? [] : [clean] });
+        groups.push({
+          ...(looksLikeHeading ? { heading: clean } : {}),
+          bullets: looksLikeHeading ? [] : [clean],
+        });
       } else {
         groups[groups.length - 1]!.bullets.push(clean);
       }
@@ -220,20 +223,27 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
     });
   }
 
-
   if (sections.skills?.length) {
     const raw = sections.skills.join("\n");
-    const items = raw.includes(",") || raw.includes("،")
-      ? raw.split(/[,،]/).map((s) => s.trim()).filter(Boolean)
-      : toBullets(raw);
+    const items =
+      raw.includes(",") || raw.includes("،")
+        ? raw
+            .split(/[,،]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : toBullets(raw);
     result.skills = items.map<SkillItem>((name) => ({ id: uid(), name }));
   }
 
   if (sections.languages?.length) {
     const raw = sections.languages.join("\n");
-    const items = raw.includes(",") || raw.includes("،")
-      ? raw.split(/[,،]/).map((s) => s.trim()).filter(Boolean)
-      : toBullets(raw);
+    const items =
+      raw.includes(",") || raw.includes("،")
+        ? raw
+            .split(/[,،]/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : toBullets(raw);
     result.languages = items.map<LanguageItem>((name) => ({
       id: uid(),
       name,

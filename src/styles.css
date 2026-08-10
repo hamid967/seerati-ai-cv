@@ -73,11 +73,12 @@
   --color-agent-emerald: var(--agent-emerald);
   --color-agent-sand: var(--agent-sand);
   --color-agent-gold: var(--agent-gold);
-  --shadow-editorial: 0 1px 0 oklch(0.22 0.045 258 / 0.05), 0 30px 60px -32px oklch(0.22 0.045 258 / 0.32);
-  --shadow-soft: 0 1px 2px oklch(0.25 0.05 255 / 0.06), 0 8px 24px -12px oklch(0.25 0.05 255 / 0.18);
+  --shadow-editorial:
+    0 1px 0 oklch(0.22 0.045 258 / 0.05), 0 30px 60px -32px oklch(0.22 0.045 258 / 0.32);
+  --shadow-soft:
+    0 1px 2px oklch(0.25 0.05 255 / 0.06), 0 8px 24px -12px oklch(0.25 0.05 255 / 0.18);
   --shadow-lift: 0 20px 60px -30px oklch(0.25 0.06 255 / 0.35);
 }
-
 
 :root {
   --radius: 0.75rem;
@@ -125,9 +126,13 @@
   --agent-emerald: oklch(0.62 0.13 165);
   --agent-sand: oklch(0.64 0.08 78);
   --agent-gold: oklch(0.72 0.13 85);
-  --gradient-ink: linear-gradient(155deg, oklch(0.2 0.04 258) 0%, oklch(0.32 0.08 256) 55%, oklch(0.4 0.1 250) 100%);
+  --gradient-ink: linear-gradient(
+    155deg,
+    oklch(0.2 0.04 258) 0%,
+    oklch(0.32 0.08 256) 55%,
+    oklch(0.4 0.1 250) 100%
+  );
 }
-
 
 .dark {
   --background: oklch(0.129 0.042 264.695);
@@ -174,7 +179,12 @@
   --agent-emerald: oklch(0.72 0.13 165);
   --agent-sand: oklch(0.78 0.05 80);
   --agent-gold: oklch(0.8 0.1 85);
-  --gradient-ink: linear-gradient(155deg, oklch(0.09 0.02 258) 0%, oklch(0.18 0.035 258) 60%, oklch(0.26 0.05 256) 100%);
+  --gradient-ink: linear-gradient(
+    155deg,
+    oklch(0.09 0.02 258) 0%,
+    oklch(0.18 0.035 258) 60%,
+    oklch(0.26 0.05 256) 100%
+  );
 }
 
 @layer base {
@@ -190,7 +200,7 @@
 
 @utility hero-grid {
   background-image:
-    radial-gradient(60% 55% at 50% 0%, oklch(0.35 0.09 256 / 0.10), transparent 70%),
+    radial-gradient(60% 55% at 50% 0%, oklch(0.35 0.09 256 / 0.1), transparent 70%),
     linear-gradient(to bottom, oklch(0.94 0.03 253 / 0.6), transparent 55%);
 }
 
@@ -245,7 +255,6 @@
   }
 }
 
-
 /* Editorial "paper" surfaces used by the Phase 4 studio identity. */
 @utility surface-editorial {
   background-color: var(--color-card);
@@ -274,5 +283,7 @@
 }
 
 @utility agent-ring {
-  box-shadow: 0 0 0 2px var(--color-card), 0 0 0 3.5px var(--agent-accent, var(--color-border));
+  box-shadow:
+    0 0 0 2px var(--color-card),
+    0 0 0 3.5px var(--agent-accent, var(--color-border));
 }

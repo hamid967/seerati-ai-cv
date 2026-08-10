@@ -69,14 +69,30 @@ export const SENIORITY_LABEL: Record<SeniorityLevel, Bi> = {
 /** Title cues only — the level is never guessed from years or salary. */
 const SENIORITY_CUES: Array<{ level: SeniorityLevel; cues: string[] }> = [
   { level: "intern", cues: ["intern", "internship", "trainee", "متدرب", "متدرّب", "تدريب"] },
-  { level: "entry", cues: ["junior", "jr", "graduate", "assistant", "مبتدئ", "مساعد", "حديث التخرج"] },
+  {
+    level: "entry",
+    cues: ["junior", "jr", "graduate", "assistant", "مبتدئ", "مساعد", "حديث التخرج"],
+  },
   { level: "senior", cues: ["senior", "sr", "specialist ii", "أول", "خبير", "كبير"] },
   { level: "lead", cues: ["lead", "principal", "staff", "قائد", "رئيس فريق"] },
   { level: "manager", cues: ["manager", "head of", "supervisor", "مدير", "مشرف", "رئيس قسم"] },
-  { level: "director", cues: ["director", "vp", "vice president", "general manager", "مدير عام", "نائب رئيس"] },
+  {
+    level: "director",
+    cues: ["director", "vp", "vice president", "general manager", "مدير عام", "نائب رئيس"],
+  },
   {
     level: "executive",
-    cues: ["chief", "ceo", "cto", "cfo", "coo", "cio", "president", "الرئيس التنفيذي", "المدير التنفيذي"],
+    cues: [
+      "chief",
+      "ceo",
+      "cto",
+      "cfo",
+      "coo",
+      "cio",
+      "president",
+      "الرئيس التنفيذي",
+      "المدير التنفيذي",
+    ],
   },
 ];
 
@@ -130,7 +146,10 @@ export const JOB_TITLES: JobTitleEntry[] = [
     id: "data-scientist",
     label: { ar: "عالم بيانات", en: "Data Scientist" },
     sector: "technology",
-    aliases: { ar: ["مهندس تعلم آلي", "أخصائي علم بيانات"], en: ["machine learning engineer", "ml engineer"] },
+    aliases: {
+      ar: ["مهندس تعلم آلي", "أخصائي علم بيانات"],
+      en: ["machine learning engineer", "ml engineer"],
+    },
   },
   {
     id: "product-manager",
@@ -151,19 +170,28 @@ export const JOB_TITLES: JobTitleEntry[] = [
     id: "business-analyst",
     label: { ar: "محلل أعمال", en: "Business Analyst" },
     sector: "consulting",
-    aliases: { ar: ["محلل عمليات", "محلل نظم أعمال"], en: ["systems analyst", "process analyst", "ba"] },
+    aliases: {
+      ar: ["محلل عمليات", "محلل نظم أعمال"],
+      en: ["systems analyst", "process analyst", "ba"],
+    },
   },
   {
     id: "accountant",
     label: { ar: "محاسب", en: "Accountant" },
     sector: "banking",
-    aliases: { ar: ["محاسب عام", "محاسب مالي", "مدقق حسابات"], en: ["general accountant", "financial accountant"] },
+    aliases: {
+      ar: ["محاسب عام", "محاسب مالي", "مدقق حسابات"],
+      en: ["general accountant", "financial accountant"],
+    },
   },
   {
     id: "financial-analyst",
     label: { ar: "محلل مالي", en: "Financial Analyst" },
     sector: "banking",
-    aliases: { ar: ["أخصائي تحليل مالي", "محلل استثمار"], en: ["investment analyst", "fp&a analyst"] },
+    aliases: {
+      ar: ["أخصائي تحليل مالي", "محلل استثمار"],
+      en: ["investment analyst", "fp&a analyst"],
+    },
   },
   {
     id: "hr-specialist",
@@ -171,7 +199,12 @@ export const JOB_TITLES: JobTitleEntry[] = [
     sector: "consulting",
     aliases: {
       ar: ["أخصائي شؤون موظفين", "أخصائي توظيف", "مسؤول موارد بشرية"],
-      en: ["human resources specialist", "recruiter", "talent acquisition specialist", "hr officer"],
+      en: [
+        "human resources specialist",
+        "recruiter",
+        "talent acquisition specialist",
+        "hr officer",
+      ],
     },
   },
   {
@@ -187,7 +220,10 @@ export const JOB_TITLES: JobTitleEntry[] = [
     id: "sales-representative",
     label: { ar: "مندوب مبيعات", en: "Sales Representative" },
     sector: "retail",
-    aliases: { ar: ["أخصائي مبيعات", "تنفيذي مبيعات"], en: ["sales executive", "account executive", "sales officer"] },
+    aliases: {
+      ar: ["أخصائي مبيعات", "تنفيذي مبيعات"],
+      en: ["sales executive", "account executive", "sales officer"],
+    },
   },
   {
     id: "customer-service",
@@ -208,19 +244,28 @@ export const JOB_TITLES: JobTitleEntry[] = [
     id: "mechanical-engineer",
     label: { ar: "مهندس ميكانيكي", en: "Mechanical Engineer" },
     sector: "manufacturing",
-    aliases: { ar: ["مهندس صيانة ميكانيكية"], en: ["maintenance engineer", "mechanical maintenance engineer"] },
+    aliases: {
+      ar: ["مهندس صيانة ميكانيكية"],
+      en: ["maintenance engineer", "mechanical maintenance engineer"],
+    },
   },
   {
     id: "electrical-engineer",
     label: { ar: "مهندس كهربائي", en: "Electrical Engineer" },
     sector: "energy",
-    aliases: { ar: ["مهندس كهرباء", "مهندس طاقة"], en: ["power engineer", "electrical maintenance engineer"] },
+    aliases: {
+      ar: ["مهندس كهرباء", "مهندس طاقة"],
+      en: ["power engineer", "electrical maintenance engineer"],
+    },
   },
   {
     id: "process-engineer",
     label: { ar: "مهندس عمليات", en: "Process Engineer" },
     sector: "energy",
-    aliases: { ar: ["مهندس تشغيل", "مهندس إنتاج"], en: ["operations engineer", "production engineer"] },
+    aliases: {
+      ar: ["مهندس تشغيل", "مهندس إنتاج"],
+      en: ["operations engineer", "production engineer"],
+    },
   },
   {
     id: "hse-officer",
@@ -277,7 +322,10 @@ export const JOB_TITLES: JobTitleEntry[] = [
     id: "ux-designer",
     label: { ar: "مصمم تجربة المستخدم", en: "UX Designer" },
     sector: "technology",
-    aliases: { ar: ["مصمم واجهات وتجربة", "مصمم منتج"], en: ["product designer", "ui/ux designer", "ux/ui designer"] },
+    aliases: {
+      ar: ["مصمم واجهات وتجربة", "مصمم منتج"],
+      en: ["product designer", "ui/ux designer", "ux/ui designer"],
+    },
   },
   {
     id: "cybersecurity-specialist",
@@ -292,7 +340,10 @@ export const JOB_TITLES: JobTitleEntry[] = [
     id: "it-support",
     label: { ar: "أخصائي دعم تقني", en: "IT Support Specialist" },
     sector: "technology",
-    aliases: { ar: ["فني دعم فني", "مسؤول دعم تقني"], en: ["helpdesk specialist", "technical support engineer"] },
+    aliases: {
+      ar: ["فني دعم فني", "مسؤول دعم تقني"],
+      en: ["helpdesk specialist", "technical support engineer"],
+    },
   },
 ];
 
@@ -301,23 +352,91 @@ export const JOB_TITLES: JobTitleEntry[] = [
 export type CityEntry = { id: string; label: Bi; region: Bi };
 
 export const SAUDI_CITIES: CityEntry[] = [
-  { id: "riyadh", label: { ar: "الرياض", en: "Riyadh" }, region: { ar: "منطقة الرياض", en: "Riyadh Region" } },
-  { id: "jeddah", label: { ar: "جدة", en: "Jeddah" }, region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" } },
-  { id: "makkah", label: { ar: "مكة المكرمة", en: "Makkah" }, region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" } },
-  { id: "madinah", label: { ar: "المدينة المنورة", en: "Madinah" }, region: { ar: "منطقة المدينة", en: "Madinah Region" } },
-  { id: "dammam", label: { ar: "الدمام", en: "Dammam" }, region: { ar: "المنطقة الشرقية", en: "Eastern Province" } },
-  { id: "khobar", label: { ar: "الخبر", en: "Al Khobar" }, region: { ar: "المنطقة الشرقية", en: "Eastern Province" } },
-  { id: "dhahran", label: { ar: "الظهران", en: "Dhahran" }, region: { ar: "المنطقة الشرقية", en: "Eastern Province" } },
-  { id: "jubail", label: { ar: "الجبيل", en: "Jubail" }, region: { ar: "المنطقة الشرقية", en: "Eastern Province" } },
-  { id: "abha", label: { ar: "أبها", en: "Abha" }, region: { ar: "منطقة عسير", en: "Asir Region" } },
-  { id: "taif", label: { ar: "الطائف", en: "Taif" }, region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" } },
-  { id: "tabuk", label: { ar: "تبوك", en: "Tabuk" }, region: { ar: "منطقة تبوك", en: "Tabuk Region" } },
-  { id: "hail", label: { ar: "حائل", en: "Hail" }, region: { ar: "منطقة حائل", en: "Hail Region" } },
-  { id: "qassim", label: { ar: "بريدة", en: "Buraidah" }, region: { ar: "منطقة القصيم", en: "Qassim Region" } },
-  { id: "najran", label: { ar: "نجران", en: "Najran" }, region: { ar: "منطقة نجران", en: "Najran Region" } },
-  { id: "jazan", label: { ar: "جازان", en: "Jazan" }, region: { ar: "منطقة جازان", en: "Jazan Region" } },
-  { id: "neom", label: { ar: "نيوم", en: "NEOM" }, region: { ar: "منطقة تبوك", en: "Tabuk Region" } },
-  { id: "kaec", label: { ar: "مدينة الملك عبدالله الاقتصادية", en: "King Abdullah Economic City" }, region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" } },
+  {
+    id: "riyadh",
+    label: { ar: "الرياض", en: "Riyadh" },
+    region: { ar: "منطقة الرياض", en: "Riyadh Region" },
+  },
+  {
+    id: "jeddah",
+    label: { ar: "جدة", en: "Jeddah" },
+    region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" },
+  },
+  {
+    id: "makkah",
+    label: { ar: "مكة المكرمة", en: "Makkah" },
+    region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" },
+  },
+  {
+    id: "madinah",
+    label: { ar: "المدينة المنورة", en: "Madinah" },
+    region: { ar: "منطقة المدينة", en: "Madinah Region" },
+  },
+  {
+    id: "dammam",
+    label: { ar: "الدمام", en: "Dammam" },
+    region: { ar: "المنطقة الشرقية", en: "Eastern Province" },
+  },
+  {
+    id: "khobar",
+    label: { ar: "الخبر", en: "Al Khobar" },
+    region: { ar: "المنطقة الشرقية", en: "Eastern Province" },
+  },
+  {
+    id: "dhahran",
+    label: { ar: "الظهران", en: "Dhahran" },
+    region: { ar: "المنطقة الشرقية", en: "Eastern Province" },
+  },
+  {
+    id: "jubail",
+    label: { ar: "الجبيل", en: "Jubail" },
+    region: { ar: "المنطقة الشرقية", en: "Eastern Province" },
+  },
+  {
+    id: "abha",
+    label: { ar: "أبها", en: "Abha" },
+    region: { ar: "منطقة عسير", en: "Asir Region" },
+  },
+  {
+    id: "taif",
+    label: { ar: "الطائف", en: "Taif" },
+    region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" },
+  },
+  {
+    id: "tabuk",
+    label: { ar: "تبوك", en: "Tabuk" },
+    region: { ar: "منطقة تبوك", en: "Tabuk Region" },
+  },
+  {
+    id: "hail",
+    label: { ar: "حائل", en: "Hail" },
+    region: { ar: "منطقة حائل", en: "Hail Region" },
+  },
+  {
+    id: "qassim",
+    label: { ar: "بريدة", en: "Buraidah" },
+    region: { ar: "منطقة القصيم", en: "Qassim Region" },
+  },
+  {
+    id: "najran",
+    label: { ar: "نجران", en: "Najran" },
+    region: { ar: "منطقة نجران", en: "Najran Region" },
+  },
+  {
+    id: "jazan",
+    label: { ar: "جازان", en: "Jazan" },
+    region: { ar: "منطقة جازان", en: "Jazan Region" },
+  },
+  {
+    id: "neom",
+    label: { ar: "نيوم", en: "NEOM" },
+    region: { ar: "منطقة تبوك", en: "Tabuk Region" },
+  },
+  {
+    id: "kaec",
+    label: { ar: "مدينة الملك عبدالله الاقتصادية", en: "King Abdullah Economic City" },
+    region: { ar: "منطقة مكة المكرمة", en: "Makkah Region" },
+  },
 ];
 
 /* ------------------------------ work patterns ----------------------------- */
@@ -336,26 +455,98 @@ export const WORK_PATTERN_LABEL: Record<WorkPattern, Bi> = {
 export type SkillEntry = { id: string; label: Bi; aliases: string[] };
 
 export const SKILL_ALIASES: SkillEntry[] = [
-  { id: "excel", label: { ar: "إكسل", en: "Microsoft Excel" }, aliases: ["excel", "ms excel", "اكسل", "الإكسل", "جدول بيانات"] },
-  { id: "powerpoint", label: { ar: "بوربوينت", en: "Microsoft PowerPoint" }, aliases: ["powerpoint", "ppt", "بوربوينت", "باوربوينت"] },
-  { id: "power-bi", label: { ar: "باور بي آي", en: "Power BI" }, aliases: ["power bi", "powerbi", "باور بي اي", "بور بي آي"] },
-  { id: "sql", label: { ar: "SQL", en: "SQL" }, aliases: ["sql", "mysql", "ms sql", "t-sql", "قواعد بيانات sql"] },
+  {
+    id: "excel",
+    label: { ar: "إكسل", en: "Microsoft Excel" },
+    aliases: ["excel", "ms excel", "اكسل", "الإكسل", "جدول بيانات"],
+  },
+  {
+    id: "powerpoint",
+    label: { ar: "بوربوينت", en: "Microsoft PowerPoint" },
+    aliases: ["powerpoint", "ppt", "بوربوينت", "باوربوينت"],
+  },
+  {
+    id: "power-bi",
+    label: { ar: "باور بي آي", en: "Power BI" },
+    aliases: ["power bi", "powerbi", "باور بي اي", "بور بي آي"],
+  },
+  {
+    id: "sql",
+    label: { ar: "SQL", en: "SQL" },
+    aliases: ["sql", "mysql", "ms sql", "t-sql", "قواعد بيانات sql"],
+  },
   { id: "python", label: { ar: "بايثون", en: "Python" }, aliases: ["python", "بايثون", "بيثون"] },
-  { id: "javascript", label: { ar: "جافاسكربت", en: "JavaScript" }, aliases: ["javascript", "js", "جافا سكربت", "جافاسكريبت"] },
-  { id: "react", label: { ar: "React", en: "React" }, aliases: ["react", "reactjs", "react.js", "رياكت"] },
-  { id: "project-management", label: { ar: "إدارة المشاريع", en: "Project management" }, aliases: ["project management", "pmp", "ادارة مشاريع", "إدارة مشاريع"] },
+  {
+    id: "javascript",
+    label: { ar: "جافاسكربت", en: "JavaScript" },
+    aliases: ["javascript", "js", "جافا سكربت", "جافاسكريبت"],
+  },
+  {
+    id: "react",
+    label: { ar: "React", en: "React" },
+    aliases: ["react", "reactjs", "react.js", "رياكت"],
+  },
+  {
+    id: "project-management",
+    label: { ar: "إدارة المشاريع", en: "Project management" },
+    aliases: ["project management", "pmp", "ادارة مشاريع", "إدارة مشاريع"],
+  },
   { id: "sap", label: { ar: "SAP", en: "SAP" }, aliases: ["sap", "sap erp", "ساب"] },
-  { id: "oracle", label: { ar: "أوراكل", en: "Oracle" }, aliases: ["oracle", "oracle erp", "اوراكل", "أوراكل"] },
-  { id: "autocad", label: { ar: "أوتوكاد", en: "AutoCAD" }, aliases: ["autocad", "auto cad", "اوتوكاد", "أوتوكاد"] },
-  { id: "primavera", label: { ar: "بريمافيرا", en: "Primavera P6" }, aliases: ["primavera", "p6", "بريمافيرا"] },
-  { id: "communication", label: { ar: "مهارات التواصل", en: "Communication" }, aliases: ["communication", "communication skills", "التواصل", "مهارات تواصل"] },
-  { id: "leadership", label: { ar: "القيادة", en: "Leadership" }, aliases: ["leadership", "team leadership", "قيادة", "قيادة فرق"] },
-  { id: "customer-service", label: { ar: "خدمة العملاء", en: "Customer service" }, aliases: ["customer service", "customer care", "خدمة العملاء", "خدمة عملاء"] },
-  { id: "arabic-writing", label: { ar: "الكتابة بالعربية", en: "Arabic writing" }, aliases: ["arabic writing", "كتابة عربية", "تحرير عربي"] },
-  { id: "english", label: { ar: "اللغة الإنجليزية", en: "English" }, aliases: ["english", "english language", "الإنجليزية", "انجليزي"] },
-  { id: "data-analysis", label: { ar: "تحليل البيانات", en: "Data analysis" }, aliases: ["data analysis", "analytics", "تحليل بيانات", "تحليل البيانات"] },
-  { id: "digital-marketing", label: { ar: "التسويق الرقمي", en: "Digital marketing" }, aliases: ["digital marketing", "seo", "sem", "تسويق رقمي", "التسويق الإلكتروني"] },
-  { id: "hse", label: { ar: "السلامة والصحة المهنية", en: "Health & safety (HSE)" }, aliases: ["hse", "nebosh", "iosh", "سلامة", "الصحة والسلامة"] },
+  {
+    id: "oracle",
+    label: { ar: "أوراكل", en: "Oracle" },
+    aliases: ["oracle", "oracle erp", "اوراكل", "أوراكل"],
+  },
+  {
+    id: "autocad",
+    label: { ar: "أوتوكاد", en: "AutoCAD" },
+    aliases: ["autocad", "auto cad", "اوتوكاد", "أوتوكاد"],
+  },
+  {
+    id: "primavera",
+    label: { ar: "بريمافيرا", en: "Primavera P6" },
+    aliases: ["primavera", "p6", "بريمافيرا"],
+  },
+  {
+    id: "communication",
+    label: { ar: "مهارات التواصل", en: "Communication" },
+    aliases: ["communication", "communication skills", "التواصل", "مهارات تواصل"],
+  },
+  {
+    id: "leadership",
+    label: { ar: "القيادة", en: "Leadership" },
+    aliases: ["leadership", "team leadership", "قيادة", "قيادة فرق"],
+  },
+  {
+    id: "customer-service",
+    label: { ar: "خدمة العملاء", en: "Customer service" },
+    aliases: ["customer service", "customer care", "خدمة العملاء", "خدمة عملاء"],
+  },
+  {
+    id: "arabic-writing",
+    label: { ar: "الكتابة بالعربية", en: "Arabic writing" },
+    aliases: ["arabic writing", "كتابة عربية", "تحرير عربي"],
+  },
+  {
+    id: "english",
+    label: { ar: "اللغة الإنجليزية", en: "English" },
+    aliases: ["english", "english language", "الإنجليزية", "انجليزي"],
+  },
+  {
+    id: "data-analysis",
+    label: { ar: "تحليل البيانات", en: "Data analysis" },
+    aliases: ["data analysis", "analytics", "تحليل بيانات", "تحليل البيانات"],
+  },
+  {
+    id: "digital-marketing",
+    label: { ar: "التسويق الرقمي", en: "Digital marketing" },
+    aliases: ["digital marketing", "seo", "sem", "تسويق رقمي", "التسويق الإلكتروني"],
+  },
+  {
+    id: "hse",
+    label: { ar: "السلامة والصحة المهنية", en: "Health & safety (HSE)" },
+    aliases: ["hse", "nebosh", "iosh", "سلامة", "الصحة والسلامة"],
+  },
 ];
 
 /* --------------------------------- helpers -------------------------------- */
@@ -405,12 +596,22 @@ export function normalizeJobTitle(input: string, locale: "ar" | "en" = "ar"): Ti
   // Partial containment: "senior software engineer" → software engineer.
   let best: TitleMatch | null = null;
   for (const entry of JOB_TITLES) {
-    const candidates = [entry.label.ar, entry.label.en, ...entry.aliases.ar, ...entry.aliases.en].map(foldText);
+    const candidates = [
+      entry.label.ar,
+      entry.label.en,
+      ...entry.aliases.ar,
+      ...entry.aliases.en,
+    ].map(foldText);
     for (const c of candidates) {
       if (c.length >= 4 && (q.includes(c) || c.includes(q))) {
         const score = 0.6 * (Math.min(c.length, q.length) / Math.max(c.length, q.length));
         if (!best || score > best.confidence) {
-          best = { entry, canonical: entry.label[locale], confidence: Number(score.toFixed(2)), matchedOn: "partial" };
+          best = {
+            entry,
+            canonical: entry.label[locale],
+            confidence: Number(score.toFixed(2)),
+            matchedOn: "partial",
+          };
         }
       }
     }
@@ -448,7 +649,15 @@ export function inferSeniority(title: string): SeniorityGuess {
   const q = foldText(title);
   if (!q) return { level: "mid", confidence: 0, cue: null };
   // Most specific levels first so "senior manager" reads as manager.
-  const ordered: SeniorityLevel[] = ["executive", "director", "manager", "lead", "senior", "intern", "entry"];
+  const ordered: SeniorityLevel[] = [
+    "executive",
+    "director",
+    "manager",
+    "lead",
+    "senior",
+    "intern",
+    "entry",
+  ];
   for (const level of ordered) {
     const found = SENIORITY_CUES.find((c) => c.level === level);
     if (!found) continue;
@@ -483,7 +692,8 @@ export function searchTaxonomy(query: string, limit = 8): TaxonomySuggestion[] {
 
   for (const t of JOB_TITLES)
     push("title", t.id, t.label, [t.label.ar, t.label.en, ...t.aliases.ar, ...t.aliases.en]);
-  for (const s of SKILL_ALIASES) push("skill", s.id, s.label, [s.label.ar, s.label.en, ...s.aliases]);
+  for (const s of SKILL_ALIASES)
+    push("skill", s.id, s.label, [s.label.ar, s.label.en, ...s.aliases]);
   for (const c of SAUDI_CITIES) push("city", c.id, c.label, [c.label.ar, c.label.en]);
   for (const s of SECTORS) push("sector", s.id, s.label, [s.label.ar, s.label.en]);
 

@@ -11,11 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
-import {
-  ACTION_LABEL,
-  diffOf,
-  type CopilotProtocolAction,
-} from "@/lib/copilot/actions";
+import { ACTION_LABEL, diffOf, type CopilotProtocolAction } from "@/lib/copilot/actions";
 
 export type SuggestionDiffCardProps = {
   action: CopilotProtocolAction;
@@ -46,24 +42,28 @@ export function SuggestionDiffCard({
     if (!text) return;
     const next = structuredClone(action) as CopilotProtocolAction;
     const payload = next.payload as Record<string, unknown>;
-    if ("suggested" in payload) payload['suggested'] = text;
-    else if ("text" in payload) payload['text'] = text;
-    else if ("name" in payload) payload['name'] = text;
-    else if ("title" in payload) payload['title'] = text;
-    else if ("targetJob" in payload) payload['targetJob'] = text;
+    if ("suggested" in payload) payload["suggested"] = text;
+    else if ("text" in payload) payload["text"] = text;
+    else if ("name" in payload) payload["name"] = text;
+    else if ("title" in payload) payload["title"] = text;
+    else if ("targetJob" in payload) payload["targetJob"] = text;
     onApply(next);
   };
 
   return (
     <div className="rounded-2xl border border-border bg-card p-4 text-start shadow-soft">
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="secondary">{ar ? ACTION_LABEL[action.type].ar : ACTION_LABEL[action.type].en}</Badge>
+        <Badge variant="secondary">
+          {ar ? ACTION_LABEL[action.type].ar : ACTION_LABEL[action.type].en}
+        </Badge>
         <Badge variant="outline">{ar ? "بانتظار موافقتك" : "Pending your approval"}</Badge>
       </div>
 
       {original ? (
         <div className="mt-3">
-          <p className="text-xs font-bold text-muted-foreground">{ar ? "النص الحالي" : "Original"}</p>
+          <p className="text-xs font-bold text-muted-foreground">
+            {ar ? "النص الحالي" : "Original"}
+          </p>
           <p className="mt-1 whitespace-pre-wrap rounded-xl bg-muted/50 p-3 text-sm leading-[1.9] line-through decoration-muted-foreground/40">
             {original}
           </p>

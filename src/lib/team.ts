@@ -7,14 +7,7 @@
  */
 
 export type AgentId =
-  | "noura"
-  | "salman"
-  | "reem"
-  | "khaled"
-  | "layan"
-  | "majed"
-  | "sara"
-  | "rashed";
+  "noura" | "salman" | "reem" | "khaled" | "layan" | "majed" | "sara" | "rashed";
 
 export type AgentDef = {
   id: AgentId;
@@ -25,7 +18,9 @@ export type AgentDef = {
   /** Short system role used when this specialist runs an AI task. */
   systemRole: string;
   /** Where in the product this specialist is actually wired in. */
-  surfaces: Array<"career-twin" | "jobs" | "builder" | "ats" | "cover-letter" | "interview" | "dashboard">;
+  surfaces: Array<
+    "career-twin" | "jobs" | "builder" | "ats" | "cover-letter" | "interview" | "dashboard"
+  >;
   initials: string;
   /** Token name used for the avatar ring / accent. */
   accent: "ink" | "emerald" | "sand" | "gold";

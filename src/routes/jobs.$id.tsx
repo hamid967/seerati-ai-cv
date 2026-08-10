@@ -54,18 +54,30 @@ import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
 import { NextBestActions } from "@/components/next-best-actions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 import { InterviewEvidenceAnswer } from "@/components/interview-evidence-answer";
-import { addJobEvent, listJobEvents, upcomingInterviews, type TimelineEvent } from "@/lib/job-timeline";
+import {
+  addJobEvent,
+  listJobEvents,
+  upcomingInterviews,
+  type TimelineEvent,
+} from "@/lib/job-timeline";
 import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
 import { computeNextActions } from "@/lib/next-best-action";
 import { loadFactGraph, type FactGraph } from "@/lib/career-facts";
-import { createJobVariantSnapshot, listResumeVersions, type ResumeVersion } from "@/lib/resume-versions";
+import {
+  createJobVariantSnapshot,
+  listResumeVersions,
+  type ResumeVersion,
+} from "@/lib/resume-versions";
 import type { ResumeData } from "@/lib/types";
 
 export const Route = createFileRoute("/jobs/$id")({
   head: () => ({
     meta: [
       { title: "مساحة الوظيفة | سيرتي — Job Workspace" },
-      { name: "description", content: "حلّل الوصف الوظيفي، قارن مع ملفك المهني، وجهّز حزمة طلبك الكاملة." },
+      {
+        name: "description",
+        content: "حلّل الوصف الوظيفي، قارن مع ملفك المهني، وجهّز حزمة طلبك الكاملة.",
+      },
       { property: "og:title", content: "مساحة الوظيفة | سيرتي" },
       { property: "og:description", content: "تحليل، مطابقة، وحزمة طلب واحدة لكل وظيفة." },
       { name: "robots", content: "noindex" },
@@ -74,10 +86,7 @@ export const Route = createFileRoute("/jobs/$id")({
   component: JobWorkspacePage,
 });
 
-const ASSET_META: Record<
-  string,
-  { icon: typeof FileText; ar: string; en: string }
-> = {
+const ASSET_META: Record<string, { icon: typeof FileText; ar: string; en: string }> = {
   resume: { icon: FileText, ar: "نسخة السيرة", en: "Resume variant" },
   cover_letter: { icon: FileText, ar: "خطاب تقديم", en: "Cover letter" },
   pitch: { icon: Mic, ar: "تلخيص 60 ثانية", en: "60-sec pitch" },
@@ -194,7 +203,6 @@ function JobWorkspacePage() {
     };
   }, [baseResume?.id, reload]);
 
-
   const persist = useCallback(
     (patch: Partial<JobWorkspace>) => {
       if (!job) return;
@@ -225,7 +233,6 @@ function JobWorkspacePage() {
     if (!job) return;
     void listCoverLetters(job.id).then((l) => setLetter(l[0] ?? null));
   }, [job]);
-
 
   const handleStatusChange = (status: JobWorkspace["status"]) => {
     setForm((f) => ({ ...f, status }));
@@ -296,7 +303,13 @@ function JobWorkspacePage() {
         });
         if (resume) {
           resumeId = resume.id;
-          await saveAsset(user.id, job.id, "resume", { title, resumeId: resume.id }, { resumeId: resume.id });
+          await saveAsset(
+            user.id,
+            job.id,
+            "resume",
+            { title, resumeId: resume.id },
+            { resumeId: resume.id },
+          );
         }
       }
 
@@ -307,21 +320,30 @@ function JobWorkspacePage() {
         cta: "/dashboard",
       });
 
-      const topSkills = (twin?.skills ?? []).slice(0, 3).map((s) => s.name).filter(Boolean);
+      const topSkills = (twin?.skills ?? [])
+        .slice(0, 3)
+        .map((s) => s.name)
+        .filter(Boolean);
       await saveAsset(user.id, job.id, "pitch", {
         outline: [
-          ar ? `من أنا: ${twin?.identity.headline || "—"}` : `Who I am: ${twin?.identity.headline || "—"}`,
+          ar
+            ? `من أنا: ${twin?.identity.headline || "—"}`
+            : `Who I am: ${twin?.identity.headline || "—"}`,
           ar
             ? `أبرز مهاراتي: ${topSkills.length ? topSkills.join("، ") : "أضفها في ملفك المهني"}`
             : `Key skills: ${topSkills.length ? topSkills.join(", ") : "add them to your Career Twin"}`,
-          ar ? `لماذا هذه الوظيفة: اربطها بهدفك المهني في الملف` : `Why this job: link it to your career target`,
+          ar
+            ? `لماذا هذه الوظيفة: اربطها بهدفك المهني في الملف`
+            : `Why this job: link it to your career target`,
           ar ? `دعوة للخطوة التالية` : `Call to next step`,
         ],
       });
 
       await saveAsset(user.id, job.id, "interview_pack", {
         outline: [
-          ar ? "أسئلة متوقعة حسب متطلبات الوصف الوظيفي" : "Likely questions based on the job requirements",
+          ar
+            ? "أسئلة متوقعة حسب متطلبات الوصف الوظيفي"
+            : "Likely questions based on the job requirements",
           ar ? "إجابات STAR من بنك قصصك الموثّق" : "STAR answers from your verified story bank",
           ar ? "أسئلة تطرحها أنت على جهة التوظيف" : "Questions you ask the employer",
         ],
@@ -335,7 +357,10 @@ function JobWorkspacePage() {
         ],
       });
 
-      await addTask(user.id, { title: ar ? `متابعة طلب ${job.company}` : `Follow up on ${job.company}`, jobId: job.id });
+      await addTask(user.id, {
+        title: ar ? `متابعة طلب ${job.company}` : `Follow up on ${job.company}`,
+        jobId: job.id,
+      });
 
       const list = await listAssets(job.id);
       setAssets(list);
@@ -400,7 +425,6 @@ function JobWorkspacePage() {
     }
   };
 
-
   if (!ready || !user || job === undefined) {
     return (
       <div className="min-h-screen">
@@ -416,9 +440,13 @@ function JobWorkspacePage() {
     return (
       <div className="flex min-h-screen flex-col">
         <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
-          <p className="text-xl font-bold">{ar ? "لم نجد هذه الوظيفة" : "We couldn't find this job"}</p>
+          <p className="text-xl font-bold">
+            {ar ? "لم نجد هذه الوظيفة" : "We couldn't find this job"}
+          </p>
           <p className="text-sm text-muted-foreground">
-            {ar ? "قد تكون محذوفة أو لا تملك صلاحية الوصول إليها." : "It may be deleted or you don't have access to it."}
+            {ar
+              ? "قد تكون محذوفة أو لا تملك صلاحية الوصول إليها."
+              : "It may be deleted or you don't have access to it."}
           </p>
           <Button asChild>
             <Link to="/jobs">{ar ? "العودة إلى مساحات الوظائف" : "Back to job workspaces"}</Link>
@@ -428,10 +456,13 @@ function JobWorkspacePage() {
     );
   }
 
-  const gapsByKind = (job.matchAnalysis?.gaps ?? []).reduce<Record<string, MatchGap[]>>((acc, g) => {
-    (acc[g.kind] ??= []).push(g);
-    return acc;
-  }, {});
+  const gapsByKind = (job.matchAnalysis?.gaps ?? []).reduce<Record<string, MatchGap[]>>(
+    (acc, g) => {
+      (acc[g.kind] ??= []).push(g);
+      return acc;
+    },
+    {},
+  );
 
   const snapshot = baseResume
     ? buildRecruiterSnapshot(baseResume, { graph, jobDescription: form.jobDescription })
@@ -451,9 +482,9 @@ function JobWorkspacePage() {
     ar
       ? `لماذا تناسب وظيفة ${job.jobTitle} في ${job.company}؟`
       : `Why are you a fit for ${job.jobTitle} at ${job.company}?`,
-    ...(job.requirements?.hardSkills ?? []).slice(0, 2).map((s) =>
-      ar ? `حدّثني عن تجربتك مع ${s}.` : `Tell me about your experience with ${s}.`,
-    ),
+    ...(job.requirements?.hardSkills ?? [])
+      .slice(0, 2)
+      .map((s) => (ar ? `حدّثني عن تجربتك مع ${s}.` : `Tell me about your experience with ${s}.`)),
   ];
 
   const BackIcon = ar ? ArrowRight : ArrowLeft;
@@ -470,7 +501,9 @@ function JobWorkspacePage() {
 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight">{form.jobTitle || (ar ? "وظيفة بلا عنوان" : "Untitled job")}</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight">
+              {form.jobTitle || (ar ? "وظيفة بلا عنوان" : "Untitled job")}
+            </h1>
             <p className="text-sm text-muted-foreground">{form.company}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -502,7 +535,10 @@ function JobWorkspacePage() {
                 />
               </>
             ) : null}
-            <Select value={form.status} onValueChange={(v) => handleStatusChange(v as JobWorkspace["status"])}>
+            <Select
+              value={form.status}
+              onValueChange={(v) => handleStatusChange(v as JobWorkspace["status"])}
+            >
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
@@ -533,29 +569,48 @@ function JobWorkspacePage() {
               <CardContent className="space-y-3">
                 <div className="grid gap-1.5">
                   <Label>{ar ? "المسمى الوظيفي" : "Job title"}</Label>
-                  <Input value={form.jobTitle} onChange={(e) => setForm({ ...form, jobTitle: e.target.value })} />
+                  <Input
+                    value={form.jobTitle}
+                    onChange={(e) => setForm({ ...form, jobTitle: e.target.value })}
+                  />
                 </div>
                 <div className="grid gap-1.5">
                   <Label>{ar ? "الشركة" : "Company"}</Label>
-                  <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                  <Input
+                    value={form.company}
+                    onChange={(e) => setForm({ ...form, company: e.target.value })}
+                  />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="grid gap-1.5">
                     <Label>{ar ? "الموقع" : "Location"}</Label>
-                    <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+                    <Input
+                      value={form.location}
+                      onChange={(e) => setForm({ ...form, location: e.target.value })}
+                    />
                   </div>
                   <div className="grid gap-1.5">
                     <Label>{ar ? "الراتب" : "Salary"}</Label>
-                    <Input value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} />
+                    <Input
+                      value={form.salary}
+                      onChange={(e) => setForm({ ...form, salary: e.target.value })}
+                    />
                   </div>
                 </div>
                 <div className="grid gap-1.5">
                   <Label>{ar ? "رابط الوظيفة" : "Job URL"}</Label>
-                  <Input value={form.jobUrl} onChange={(e) => setForm({ ...form, jobUrl: e.target.value })} />
+                  <Input
+                    value={form.jobUrl}
+                    onChange={(e) => setForm({ ...form, jobUrl: e.target.value })}
+                  />
                 </div>
                 <div className="grid gap-1.5">
                   <Label>{ar ? "ملاحظات" : "Notes"}</Label>
-                  <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+                  <Textarea
+                    rows={3}
+                    value={form.notes}
+                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  />
                 </div>
                 <div className="grid gap-1.5">
                   <Label>{ar ? "الوصف الوظيفي" : "Job description"}</Label>
@@ -565,9 +620,19 @@ function JobWorkspacePage() {
                     onChange={(e) => setForm({ ...form, jobDescription: e.target.value })}
                   />
                 </div>
-                <Button onClick={() => void handleAnalyze()} disabled={analyzing} className="w-full">
+                <Button
+                  onClick={() => void handleAnalyze()}
+                  disabled={analyzing}
+                  className="w-full"
+                >
                   <Sparkles className="size-4" />
-                  {analyzing ? (ar ? "جارِ التحليل..." : "Analyzing...") : ar ? "تحليل الوصف الوظيفي" : "Analyze job description"}
+                  {analyzing
+                    ? ar
+                      ? "جارِ التحليل..."
+                      : "Analyzing..."
+                    : ar
+                      ? "تحليل الوصف الوظيفي"
+                      : "Analyze job description"}
                 </Button>
               </CardContent>
             </Card>
@@ -577,7 +642,9 @@ function JobWorkspacePage() {
           <div className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{ar ? "المتطلبات المستخرجة" : "Extracted requirements"}</CardTitle>
+                <CardTitle className="text-base">
+                  {ar ? "المتطلبات المستخرجة" : "Extracted requirements"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <p className="text-xs text-muted-foreground">
@@ -587,19 +654,47 @@ function JobWorkspacePage() {
                 </p>
                 {job.requirements ? (
                   <>
-                    <ReqRow label={ar ? "المهارات التقنية" : "Hard skills"} items={job.requirements.hardSkills} />
-                    <ReqRow label={ar ? "المهارات الشخصية" : "Soft skills"} items={job.requirements.softSkills} />
-                    <ReqRow label={ar ? "المسؤوليات" : "Responsibilities"} items={job.requirements.responsibilities} />
-                    <ReqRow label={ar ? "كلمات مفتاحية" : "Keywords"} items={job.requirements.keywords} />
+                    <ReqRow
+                      label={ar ? "المهارات التقنية" : "Hard skills"}
+                      items={job.requirements.hardSkills}
+                    />
+                    <ReqRow
+                      label={ar ? "المهارات الشخصية" : "Soft skills"}
+                      items={job.requirements.softSkills}
+                    />
+                    <ReqRow
+                      label={ar ? "المسؤوليات" : "Responsibilities"}
+                      items={job.requirements.responsibilities}
+                    />
+                    <ReqRow
+                      label={ar ? "كلمات مفتاحية" : "Keywords"}
+                      items={job.requirements.keywords}
+                    />
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <p><span className="text-muted-foreground">{ar ? "المستوى" : "Seniority"}: </span>{job.requirements.seniority || "—"}</p>
-                      <p><span className="text-muted-foreground">{ar ? "الخبرة" : "Years"}: </span>{job.requirements.years || "—"}</p>
-                      <p><span className="text-muted-foreground">{ar ? "اللغة" : "Language"}: </span>{job.requirements.language || "—"}</p>
+                      <p>
+                        <span className="text-muted-foreground">
+                          {ar ? "المستوى" : "Seniority"}:{" "}
+                        </span>
+                        {job.requirements.seniority || "—"}
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">{ar ? "الخبرة" : "Years"}: </span>
+                        {job.requirements.years || "—"}
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">{ar ? "اللغة" : "Language"}: </span>
+                        {job.requirements.language || "—"}
+                      </p>
                     </div>
-                    <ReqRow label={ar ? "التعليم" : "Education"} items={job.requirements.education} />
+                    <ReqRow
+                      label={ar ? "التعليم" : "Education"}
+                      items={job.requirements.education}
+                    />
                     {job.requirements.missing.length > 0 && (
                       <div className="rounded-lg border border-dashed border-border p-2">
-                        <p className="mb-1 text-xs font-bold">{ar ? "غير مذكور في النص" : "Not stated in the text"}</p>
+                        <p className="mb-1 text-xs font-bold">
+                          {ar ? "غير مذكور في النص" : "Not stated in the text"}
+                        </p>
                         <ul className="list-inside list-disc text-xs text-muted-foreground">
                           {job.requirements.missing.map((m) => (
                             <li key={m}>{m}</li>
@@ -609,27 +704,39 @@ function JobWorkspacePage() {
                     )}
                   </>
                 ) : (
-                  <p className="text-muted-foreground">{ar ? "لم يتم التحليل بعد." : "Not analyzed yet."}</p>
+                  <p className="text-muted-foreground">
+                    {ar ? "لم يتم التحليل بعد." : "Not analyzed yet."}
+                  </p>
                 )}
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{ar ? "المطابقة مع ملفك" : "Match with your profile"}</CardTitle>
+                <CardTitle className="text-base">
+                  {ar ? "المطابقة مع ملفك" : "Match with your profile"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 {job.matchAnalysis ? (
                   <>
                     <div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">{ar ? "نسبة المطابقة" : "Match score"}</span>
+                        <span className="text-muted-foreground">
+                          {ar ? "نسبة المطابقة" : "Match score"}
+                        </span>
                         <span className="font-bold">{job.matchAnalysis.score}%</span>
                       </div>
                       <Progress value={job.matchAnalysis.score} className="mt-1" />
                     </div>
-                    <ReqRow label={ar ? "مهارات متطابقة" : "Matched skills"} items={job.matchAnalysis.matchedSkills} />
-                    <ReqRow label={ar ? "مهارات غير موجودة" : "Missing skills"} items={job.matchAnalysis.missingSkills} />
+                    <ReqRow
+                      label={ar ? "مهارات متطابقة" : "Matched skills"}
+                      items={job.matchAnalysis.matchedSkills}
+                    />
+                    <ReqRow
+                      label={ar ? "مهارات غير موجودة" : "Missing skills"}
+                      items={job.matchAnalysis.missingSkills}
+                    />
                     <div className="space-y-2">
                       {(Object.keys(GAP_LABEL) as Array<keyof typeof GAP_LABEL>).map((kind) =>
                         gapsByKind[kind]?.length ? (
@@ -638,7 +745,8 @@ function JobWorkspacePage() {
                             <ul className="space-y-1 text-xs text-muted-foreground">
                               {gapsByKind[kind]?.map((g) => (
                                 <li key={g.id}>
-                                  <span className="font-semibold text-foreground">{g.label}</span> — {g.hint}
+                                  <span className="font-semibold text-foreground">{g.label}</span> —{" "}
+                                  {g.hint}
                                 </li>
                               ))}
                             </ul>
@@ -653,7 +761,11 @@ function JobWorkspacePage() {
                     </div>
                   </>
                 ) : (
-                  <p className="text-muted-foreground">{ar ? "حلّل الوصف الوظيفي أولاً لعرض المطابقة." : "Analyze the job description first to see the match."}</p>
+                  <p className="text-muted-foreground">
+                    {ar
+                      ? "حلّل الوصف الوظيفي أولاً لعرض المطابقة."
+                      : "Analyze the job description first to see the match."}
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -663,19 +775,38 @@ function JobWorkspacePage() {
                 <CardTitle className="text-base">{ar ? "حزمة طلبك" : "Application pack"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button onClick={() => void handlePreparePack()} disabled={preparing} className="w-full">
+                <Button
+                  onClick={() => void handlePreparePack()}
+                  disabled={preparing}
+                  className="w-full"
+                >
                   <ClipboardList className="size-4" />
-                  {preparing ? (ar ? "جارِ التجهيز..." : "Preparing...") : ar ? "جهّز طلبي" : "Prepare my application"}
+                  {preparing
+                    ? ar
+                      ? "جارِ التجهيز..."
+                      : "Preparing..."
+                    : ar
+                      ? "جهّز طلبي"
+                      : "Prepare my application"}
                 </Button>
                 {assets.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">{ar ? "لا توجد عناصر بعد." : "No items yet."}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {ar ? "لا توجد عناصر بعد." : "No items yet."}
+                  </p>
                 ) : (
                   <ul className="space-y-2">
                     {assets.map((a) => {
-                      const meta = ASSET_META[a.assetType] ?? { icon: FileText, ar: a.assetType, en: a.assetType };
+                      const meta = ASSET_META[a.assetType] ?? {
+                        icon: FileText,
+                        ar: a.assetType,
+                        en: a.assetType,
+                      };
                       const Icon = meta.icon;
                       return (
-                        <li key={a.id} className="flex items-center justify-between gap-2 rounded-lg border border-border p-2 text-xs">
+                        <li
+                          key={a.id}
+                          className="flex items-center justify-between gap-2 rounded-lg border border-border p-2 text-xs"
+                        >
                           <span className="flex items-center gap-2">
                             <Icon className="size-4 text-muted-foreground" />
                             {meta[lang]}
@@ -716,12 +847,24 @@ function JobWorkspacePage() {
                   </div>
                   <p className="text-xs text-muted-foreground">{agent.blurb[lang]}</p>
                   {agent.id === "layan" && (
-                    <Button size="sm" variant="outline" className="w-full" onClick={() => void handleAnalyze()} disabled={analyzing}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => void handleAnalyze()}
+                      disabled={analyzing}
+                    >
                       {ar ? "حلّل الوصف" : "Analyze"}
                     </Button>
                   )}
                   {agent.id === "salman" && (
-                    <Button size="sm" variant="outline" className="w-full" onClick={() => void handlePreparePack()} disabled={preparing}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => void handlePreparePack()}
+                      disabled={preparing}
+                    >
                       {ar ? "جهّز الحزمة" : "Prepare pack"}
                     </Button>
                   )}
@@ -735,7 +878,9 @@ function JobWorkspacePage() {
                         void addTask(user.id, {
                           title: ar ? `متابعة طلب ${job.company}` : `Follow up on ${job.company}`,
                           jobId: job.id,
-                        }).then(() => toast.success(ar ? "أُضيفت مهمة متابعة" : "Follow-up task added"));
+                        }).then(() =>
+                          toast.success(ar ? "أُضيفت مهمة متابعة" : "Follow-up task added"),
+                        );
                       }}
                     >
                       {ar ? "أضف مهمة متابعة" : "Add follow-up"}
@@ -798,11 +943,11 @@ function JobWorkspacePage() {
           />
         </div>
 
-
-
         <section id="interview-pack" className="mt-6 space-y-3">
           <div>
-            <h2 className="text-lg font-bold">{ar ? "تحضير المقابلة بالأدلة" : "Evidence-based interview prep"}</h2>
+            <h2 className="text-lg font-bold">
+              {ar ? "تحضير المقابلة بالأدلة" : "Evidence-based interview prep"}
+            </h2>
             <p className="text-xs text-muted-foreground">
               {ar
                 ? "قائمة التحضير: ٣ قصص جاهزة، أسئلة عن الوظيفة، ومهارات ناقصة من الوصف الوظيفي."

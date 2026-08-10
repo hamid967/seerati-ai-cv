@@ -42,7 +42,9 @@ export function FieldAi({
   const run = async (task: AiTask) => {
     const input = value.trim() || resume.data.personal.jobTitle;
     if (!input) {
-      toast.error(ar ? "اكتب شيئاً أولاً حتى أستطيع تحسينه" : "Write something first so I can improve it");
+      toast.error(
+        ar ? "اكتب شيئاً أولاً حتى أستطيع تحسينه" : "Write something first so I can improve it",
+      );
       return;
     }
     setBusy(task);
@@ -117,7 +119,12 @@ export function FieldAi({
               <RefreshCw className="size-3.5" />
               {ar ? "توليد بديل" : "Regenerate"}
             </Button>
-            <Button size="sm" variant="ghost" className="h-7 text-[11.5px]" onClick={() => setSuggestion(null)}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-[11.5px]"
+              onClick={() => setSuggestion(null)}
+            >
               {ar ? "تجاهل" : "Dismiss"}
             </Button>
           </div>

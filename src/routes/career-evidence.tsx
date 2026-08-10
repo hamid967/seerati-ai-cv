@@ -158,7 +158,14 @@ function EvidenceVaultPage() {
         verified: false,
       });
       if (created) setEvidence((l) => [created, ...l]);
-      setEvDraft({ ...evDraft, title: "", metricValue: "", metricUnit: "", sourceUrl: "", description: "" });
+      setEvDraft({
+        ...evDraft,
+        title: "",
+        metricValue: "",
+        metricUnit: "",
+        sourceUrl: "",
+        description: "",
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "save_failed");
     } finally {
@@ -294,7 +301,9 @@ function EvidenceVaultPage() {
       ) : null}
 
       <div className="mt-6">
-        {user ? <AchievementInterview userId={user.id} onSaved={() => void refresh(user.id)} /> : null}
+        {user ? (
+          <AchievementInterview userId={user.id} onSaved={() => void refresh(user.id)} />
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -339,7 +348,10 @@ function EvidenceVaultPage() {
                 const linked = evidence.filter((e) => e.factId === f.id);
                 const verified = f.verificationStatus === "verified";
                 return (
-                  <li key={f.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
+                  <li
+                    key={f.id}
+                    className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+                  >
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="secondary">
                         {ar ? FACT_TYPE_LABEL[f.type].ar : FACT_TYPE_LABEL[f.type].en}
@@ -390,7 +402,13 @@ function EvidenceVaultPage() {
                               className="ms-auto h-6 px-2"
                               onClick={() => toggleEvidenceVerified(e)}
                             >
-                              {e.verified ? (ar ? "غير موثّق" : "Mark unverified") : ar ? "موثّق" : "Mark verified"}
+                              {e.verified
+                                ? ar
+                                  ? "غير موثّق"
+                                  : "Mark unverified"
+                                : ar
+                                  ? "موثّق"
+                                  : "Mark verified"}
                             </Button>
                             <Button
                               size="icon"
@@ -406,7 +424,9 @@ function EvidenceVaultPage() {
                       </ul>
                     ) : (
                       <p className="mt-3 border-t border-border pt-3 text-xs text-amber-600 dark:text-amber-400">
-                        {ar ? "لا يوجد دليل مرتبط بهذه الحقيقة." : "No evidence linked to this fact."}
+                        {ar
+                          ? "لا يوجد دليل مرتبط بهذه الحقيقة."
+                          : "No evidence linked to this fact."}
                       </p>
                     )}
                   </li>
@@ -424,13 +444,17 @@ function EvidenceVaultPage() {
                   .map((e) => (
                     <li key={e.id} className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline">
-                        {ar ? EVIDENCE_TYPE_LABEL[e.evidenceType].ar : EVIDENCE_TYPE_LABEL[e.evidenceType].en}
+                        {ar
+                          ? EVIDENCE_TYPE_LABEL[e.evidenceType].ar
+                          : EVIDENCE_TYPE_LABEL[e.evidenceType].en}
                       </Badge>
                       <span>{e.title}</span>
                       <Select
                         value=""
                         onValueChange={(v) => {
-                          setEvidence((l) => l.map((x) => (x.id === e.id ? { ...x, factId: v } : x)));
+                          setEvidence((l) =>
+                            l.map((x) => (x.id === e.id ? { ...x, factId: v } : x)),
+                          );
                           void updateEvidence(e.id, { factId: v });
                         }}
                       >
@@ -504,7 +528,11 @@ function EvidenceVaultPage() {
                   className="mt-1"
                 />
               </div>
-              <Button className="w-full" disabled={busy || !factDraft.title.trim()} onClick={addFact}>
+              <Button
+                className="w-full"
+                disabled={busy || !factDraft.title.trim()}
+                onClick={addFact}
+              >
                 <Plus className="me-1 h-4 w-4" />
                 {ar ? "أضف الحقيقة" : "Add fact"}
               </Button>
@@ -518,7 +546,9 @@ function EvidenceVaultPage() {
                 <Label>{ar ? "النوع" : "Type"}</Label>
                 <Select
                   value={evDraft.evidenceType}
-                  onValueChange={(v) => setEvDraft((d) => ({ ...d, evidenceType: v as EvidenceType }))}
+                  onValueChange={(v) =>
+                    setEvDraft((d) => ({ ...d, evidenceType: v as EvidenceType }))
+                  }
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -565,7 +595,9 @@ function EvidenceVaultPage() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="ev-url">{ar ? "رابط المصدر (اختياري)" : "Source link (optional)"}</Label>
+                <Label htmlFor="ev-url">
+                  {ar ? "رابط المصدر (اختياري)" : "Source link (optional)"}
+                </Label>
                 <Input
                   id="ev-url"
                   value={evDraft.sourceUrl}

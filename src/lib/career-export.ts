@@ -20,28 +20,46 @@ export type CareerExport = {
 };
 
 const rows = async (table: string, userId: string, column = "user_id") => {
-  const { data, error } = await supabase.from(table as never).select("*").eq(column, userId);
+  const { data, error } = await supabase
+    .from(table as never)
+    .select("*")
+    .eq(column, userId);
   if (error) return { error: error.message, rows: [] as unknown[] };
   return { rows: (data as unknown[]) ?? [] };
 };
 
 /** Builds the full export document for the signed-in user. */
-export async function buildCareerExport(user: { id: string; email: string }): Promise<CareerExport> {
-  const [profile, twin, resumes, versions, facts, evidence, terms, jobs, events, assets, tasks, usage] =
-    await Promise.all([
-      rows("profiles", user.id, "id"),
-      rows("career_profiles", user.id),
-      rows("resumes", user.id),
-      rows("resume_versions", user.id),
-      rows("career_facts", user.id),
-      rows("career_evidence", user.id),
-      rows("protected_terms", user.id),
-      rows("job_workspaces", user.id),
-      rows("job_application_events", user.id),
-      rows("application_assets", user.id),
-      rows("career_tasks", user.id),
-      rows("ai_usage", user.id),
-    ]);
+export async function buildCareerExport(user: {
+  id: string;
+  email: string;
+}): Promise<CareerExport> {
+  const [
+    profile,
+    twin,
+    resumes,
+    versions,
+    facts,
+    evidence,
+    terms,
+    jobs,
+    events,
+    assets,
+    tasks,
+    usage,
+  ] = await Promise.all([
+    rows("profiles", user.id, "id"),
+    rows("career_profiles", user.id),
+    rows("resumes", user.id),
+    rows("resume_versions", user.id),
+    rows("career_facts", user.id),
+    rows("career_evidence", user.id),
+    rows("protected_terms", user.id),
+    rows("job_workspaces", user.id),
+    rows("job_application_events", user.id),
+    rows("application_assets", user.id),
+    rows("career_tasks", user.id),
+    rows("ai_usage", user.id),
+  ]);
 
   return {
     schema_version: EXPORT_SCHEMA_VERSION,

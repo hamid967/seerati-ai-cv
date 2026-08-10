@@ -69,7 +69,10 @@ export const Route = createFileRoute("/import")({
           "استورد بياناتك المهنية من LinkedIn أو Indeed أو بيت.كوم أو ملف PDF/DOCX، راجع كل حقل قبل الحفظ، ثم أكمل الناقص بالمحادثة.",
       },
       { property: "og:title", content: "مركز الاستيراد | سيرتي" },
-      { property: "og:description", content: "استيراد آمن لبياناتك المهنية، بمراجعة كاملة قبل الحفظ." },
+      {
+        property: "og:description",
+        content: "استيراد آمن لبياناتك المهنية، بمراجعة كاملة قبل الحفظ.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -201,7 +204,9 @@ function ImportCenterPage() {
                   setError(null);
                 }}
                 className={`rounded-xl border p-4 text-start transition ${
-                  active ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "hover:border-primary/40"
+                  active
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                    : "hover:border-primary/40"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -262,7 +267,9 @@ function ImportCenterPage() {
                 {ar ? "اسحب الملف وأفلته هنا" : "Drag and drop your file here"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {ar ? "أو استخدم الأزرار أدناه — الملف يُقرأ في متصفحك فقط." : "Or use the buttons below — the file is read in your browser only."}
+                {ar
+                  ? "أو استخدم الأزرار أدناه — الملف يُقرأ في متصفحك فقط."
+                  : "Or use the buttons below — the file is read in your browser only."}
               </p>
             </div>
 
@@ -297,7 +304,9 @@ function ImportCenterPage() {
                   placeholder={ar ? "الصق نص سيرتك الذاتية هنا…" : "Paste your resume text here…"}
                 />
                 <Button
-                  onClick={() => void toReview(pasted, connector.id === "other" ? "paste" : connector.sourceType)}
+                  onClick={() =>
+                    void toReview(pasted, connector.id === "other" ? "paste" : connector.sourceType)
+                  }
                   disabled={busy || pasted.trim().length < 40}
                 >
                   {ar ? "تحليل النص" : "Analyse text"}
@@ -326,12 +335,21 @@ function ImportCenterPage() {
         d
           ? {
               ...d,
-              [kind]: (d[kind] as ListCandidate<unknown>[]).map((x) => (x.id === id ? { ...x, include } : x)),
+              [kind]: (d[kind] as ListCandidate<unknown>[]).map((x) =>
+                x.id === id ? { ...x, include } : x,
+              ),
             }
           : d,
       );
 
-    const lists: ListKind[] = ["experience", "education", "skills", "languages", "certificates", "projects"];
+    const lists: ListKind[] = [
+      "experience",
+      "education",
+      "skills",
+      "languages",
+      "certificates",
+      "projects",
+    ];
 
     async function save(next: "gaps" | "only") {
       if (!user || !draft) return;
@@ -357,16 +375,13 @@ function ImportCenterPage() {
         const refreshed = await loadCareerTwin(user.id);
         setTwin(refreshed);
         toast.success(
-          ar ? `تم حفظ ${count} عنصراً في ملفك المهني.` : `Saved ${count} item${count === 1 ? "" : "s"} to your profile.`,
+          ar
+            ? `تم حفظ ${count} عنصراً في ملفك المهني.`
+            : `Saved ${count} item${count === 1 ? "" : "s"} to your profile.`,
         );
-        setRecap(
-          sections.map((s) =>
-            ar ? `تم استيراد قسم: ${s}` : `Imported section: ${s}`,
-          ),
-        );
+        setRecap(sections.map((s) => (ar ? `تم استيراد قسم: ${s}` : `Imported section: ${s}`)));
         if (next === "gaps") setStep("gaps");
         else navigate({ to: "/career-twin" });
-
       } finally {
         setBusy(false);
       }
@@ -375,7 +390,9 @@ function ImportCenterPage() {
     return (
       <div className="mx-auto w-full max-w-4xl space-y-6 p-4 md:p-6">
         <header className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">{ar ? "راجع ما استخرجناه" : "Review what we extracted"}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {ar ? "راجع ما استخرجناه" : "Review what we extracted"}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {ar
               ? "لا شيء يُحفظ قبل موافقتك. الحقول ذات الثقة المنخفضة تحتاج تحققاً منك."
@@ -386,14 +403,20 @@ function ImportCenterPage() {
             {draft.fileName && <span>{draft.fileName}</span>}
             <span>
               {ar ? "لغة المصدر:" : "Source language:"}{" "}
-              {draft.detectedLanguage === "mixed" ? (ar ? "مختلطة" : "Mixed") : draft.detectedLanguage.toUpperCase()}
+              {draft.detectedLanguage === "mixed"
+                ? ar
+                  ? "مختلطة"
+                  : "Mixed"
+                : draft.detectedLanguage.toUpperCase()}
             </span>
           </div>
         </header>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{ar ? "الأقسام المكتشفة" : "Detected sections"}</CardTitle>
+            <CardTitle className="text-base">
+              {ar ? "الأقسام المكتشفة" : "Detected sections"}
+            </CardTitle>
             <CardDescription>
               {ar
                 ? "ثقة نوعية فقط — لا نسب مئوية مضللة."
@@ -401,37 +424,48 @@ function ImportCenterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            {(["experience", "education", "skills", "languages", "certificates", "projects"] as ListKind[]).map(
-              (kind) => {
-                const items = draft[kind] as ListCandidate<Record<string, unknown>>[];
-                if (!items.length) return null;
-                const worst: Confidence = items.some((i) => i.confidence === "low")
-                  ? "low"
-                  : items.some((i) => i.confidence === "medium")
-                    ? "medium"
-                    : "high";
-                return (
-                  <span
-                    key={kind}
-                    className={`rounded-full px-3 py-1 text-xs ${CONFIDENCE_STYLE[worst]}`}
-                  >
-                    {LIST_LABEL[kind][ar ? "ar" : "en"]} · {items.length} ·{" "}
-                    {CONFIDENCE_LABEL[worst][ar ? "ar" : "en"]}
-                  </span>
-                );
-              },
-            )}
+            {(
+              [
+                "experience",
+                "education",
+                "skills",
+                "languages",
+                "certificates",
+                "projects",
+              ] as ListKind[]
+            ).map((kind) => {
+              const items = draft[kind] as ListCandidate<Record<string, unknown>>[];
+              if (!items.length) return null;
+              const worst: Confidence = items.some((i) => i.confidence === "low")
+                ? "low"
+                : items.some((i) => i.confidence === "medium")
+                  ? "medium"
+                  : "high";
+              return (
+                <span
+                  key={kind}
+                  className={`rounded-full px-3 py-1 text-xs ${CONFIDENCE_STYLE[worst]}`}
+                >
+                  {LIST_LABEL[kind][ar ? "ar" : "en"]} · {items.length} ·{" "}
+                  {CONFIDENCE_LABEL[worst][ar ? "ar" : "en"]}
+                </span>
+              );
+            })}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{ar ? "المعلومات الأساسية" : "Core details"}</CardTitle>
+            <CardTitle className="text-base">
+              {ar ? "المعلومات الأساسية" : "Core details"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {draft.fields.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                {ar ? "لم نتعرّف على معلومات أساسية في هذا المصدر." : "No core details were detected in this source."}
+                {ar
+                  ? "لم نتعرّف على معلومات أساسية في هذا المصدر."
+                  : "No core details were detected in this source."}
               </p>
             )}
             {draft.fields.map((field) => (
@@ -458,7 +492,9 @@ function ImportCenterPage() {
                       {field.label[ar ? "ar" : "en"]}
                     </label>
                   </div>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] ${CONFIDENCE_STYLE[field.confidence]}`}>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] ${CONFIDENCE_STYLE[field.confidence]}`}
+                  >
                     {CONFIDENCE_LABEL[field.confidence][ar ? "ar" : "en"]}
                   </span>
                 </div>
@@ -471,7 +507,9 @@ function ImportCenterPage() {
                       d
                         ? {
                             ...d,
-                            fields: d.fields.map((x) => (x.key === field.key ? { ...x, value: e.target.value } : x)),
+                            fields: d.fields.map((x) =>
+                              x.key === field.key ? { ...x, value: e.target.value } : x,
+                            ),
                           }
                         : d,
                     )
@@ -480,7 +518,8 @@ function ImportCenterPage() {
                 {field.existing && (
                   <div className="mt-2 space-y-2 rounded-lg border border-amber-500/40 bg-amber-500/5 p-2">
                     <p className="text-xs text-amber-700 dark:text-amber-500">
-                      {ar ? "تعارض مع ملفك الحالي:" : "Conflict with your current profile:"} {field.existing}
+                      {ar ? "تعارض مع ملفك الحالي:" : "Conflict with your current profile:"}{" "}
+                      {field.existing}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <Button
@@ -529,7 +568,11 @@ function ImportCenterPage() {
                                   ...d,
                                   fields: d.fields.map((x) =>
                                     x.key === field.key
-                                      ? { ...x, include: true, value: `${field.existing} — ${x.value}` }
+                                      ? {
+                                          ...x,
+                                          include: true,
+                                          value: `${field.existing} — ${x.value}`,
+                                        }
                                       : x,
                                   ),
                                 }
@@ -580,7 +623,9 @@ function ImportCenterPage() {
                       />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{title || sub}</p>
-                        {title && sub && <p className="truncate text-xs text-muted-foreground">{sub}</p>}
+                        {title && sub && (
+                          <p className="truncate text-xs text-muted-foreground">{sub}</p>
+                        )}
                         {Boolean(v["start"] || v["end"]) && (
                           <p className="text-xs text-muted-foreground">
                             {String(v["start"] ?? "")} – {String(v["end"] ?? "")}
@@ -588,11 +633,15 @@ function ImportCenterPage() {
                         )}
                         {item.duplicate && (
                           <p className="mt-1 text-xs text-amber-700 dark:text-amber-500">
-                            {ar ? "موجود مسبقاً في ملفك — غير محدد افتراضياً." : "Already on your profile — unticked by default."}
+                            {ar
+                              ? "موجود مسبقاً في ملفك — غير محدد افتراضياً."
+                              : "Already on your profile — unticked by default."}
                           </p>
                         )}
                       </div>
-                      <span className={`rounded-full px-2 py-0.5 text-[11px] ${CONFIDENCE_STYLE[item.confidence]}`}>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] ${CONFIDENCE_STYLE[item.confidence]}`}
+                      >
                         {CONFIDENCE_LABEL[item.confidence][ar ? "ar" : "en"]}
                       </span>
                     </div>
@@ -606,10 +655,17 @@ function ImportCenterPage() {
         {draft.missingSections.length > 0 && (
           <Card className="border-amber-500/30 bg-amber-500/5">
             <CardContent className="p-4 text-sm">
-              <p className="mb-1 font-medium">{ar ? "أقسام لم يحتوِها المصدر" : "Sections this source did not contain"}</p>
+              <p className="mb-1 font-medium">
+                {ar ? "أقسام لم يحتوِها المصدر" : "Sections this source did not contain"}
+              </p>
               <p className="text-muted-foreground">
-                {draft.missingSections.map((k) => LIST_LABEL[k][ar ? "ar" : "en"]).join(ar ? "، " : ", ")} —{" "}
-                {ar ? "سنكملها معك بالمحادثة بعد الحفظ." : "we will fill these with you by chatting after saving."}
+                {draft.missingSections
+                  .map((k) => LIST_LABEL[k][ar ? "ar" : "en"])
+                  .join(ar ? "، " : ", ")}{" "}
+                —{" "}
+                {ar
+                  ? "سنكملها معك بالمحادثة بعد الحفظ."
+                  : "we will fill these with you by chatting after saving."}
               </p>
             </CardContent>
           </Card>
@@ -628,7 +684,6 @@ function ImportCenterPage() {
             {ar ? "رجوع" : "Back"}
           </Button>
         </div>
-
       </div>
     );
   }
@@ -667,7 +722,9 @@ function ImportCenterPage() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 p-4 md:p-6">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">{ar ? "أكمل ملفك المهني" : "Finish your profile"}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {ar ? "أكمل ملفك المهني" : "Finish your profile"}
+        </h1>
         <p className="text-sm text-muted-foreground">
           {ar
             ? `اكتمال ملفك الآن ${health.score}%. أكمل الناقص بالمحادثة، وكل اقتراح يُحفظ بعد موافقتك فقط.`
@@ -689,13 +746,24 @@ function ImportCenterPage() {
           )}
           targetRole={twin?.identity.headline ?? ""}
           currentValue={(key) =>
-            key === "summary" ? (twin?.identity.summary ?? "") : key === "headline" ? (twin?.identity.headline ?? "") : ""
+            key === "summary"
+              ? (twin?.identity.summary ?? "")
+              : key === "headline"
+                ? (twin?.identity.headline ?? "")
+                : ""
           }
           onApply={async (key, value) => {
             if (!user) return;
             if (key === "summary" || key === "headline") {
               const identity = {
-                ...(twin?.identity ?? { fullName: "", headline: "", email: "", phone: "", city: "", summary: "" }),
+                ...(twin?.identity ?? {
+                  fullName: "",
+                  headline: "",
+                  email: "",
+                  phone: "",
+                  city: "",
+                  summary: "",
+                }),
                 [key]: value,
               };
               await saveCareerTwin(user.id, { identity });
@@ -710,14 +778,18 @@ function ImportCenterPage() {
       ) : (
         <Card>
           <CardContent className="p-4 text-sm text-muted-foreground">
-            {ar ? "ملفك المهني يحتوي الأساسيات. تابع إلى السيرة الذاتية." : "Your profile has the essentials. Continue to your resume."}
+            {ar
+              ? "ملفك المهني يحتوي الأساسيات. تابع إلى السيرة الذاتية."
+              : "Your profile has the essentials. Continue to your resume."}
           </CardContent>
         </Card>
       )}
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{ar ? "لغة السيرة الذاتية" : "Resume language"}</CardTitle>
+          <CardTitle className="text-base">
+            {ar ? "لغة السيرة الذاتية" : "Resume language"}
+          </CardTitle>
           <CardDescription>
             {ar
               ? "لغة المحادثة مستقلة عن لغة السيرة. لن نترجم أسماء الشركات أو الشهادات."

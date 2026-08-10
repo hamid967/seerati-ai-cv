@@ -8,7 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { aiService } from "@/lib/ai-service";
 import { fetchAppSettings, logAudit, saveAppSettings, type AppSettings } from "@/lib/db";
@@ -92,7 +98,11 @@ function AdminSettings() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="site">{ar ? "اسم الموقع" : "Site name"}</Label>
-              <Input id="site" value={form.siteName} onChange={(e) => patch({ siteName: e.target.value })} />
+              <Input
+                id="site"
+                value={form.siteName}
+                onChange={(e) => patch({ siteName: e.target.value })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="logo">{ar ? "رابط الشعار" : "Logo URL"}</Label>
@@ -106,8 +116,13 @@ function AdminSettings() {
             </div>
             <div className="space-y-1.5">
               <Label>{ar ? "اللغة الافتراضية" : "Default language"}</Label>
-              <Select value={form.defaultLanguage} onValueChange={(v) => patch({ defaultLanguage: v as "ar" | "en" })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.defaultLanguage}
+                onValueChange={(v) => patch({ defaultLanguage: v as "ar" | "en" })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ar">العربية (RTL)</SelectItem>
                   <SelectItem value="en">English (LTR)</SelectItem>
@@ -119,10 +134,16 @@ function AdminSettings() {
             <div>
               <Label htmlFor="maint">{ar ? "وضع الصيانة" : "Maintenance mode"}</Label>
               <p className="mt-1 text-xs text-muted-foreground">
-                {ar ? "يُستخدم لإظهار تنبيه صيانة عام." : "Used to surface a global maintenance notice."}
+                {ar
+                  ? "يُستخدم لإظهار تنبيه صيانة عام."
+                  : "Used to surface a global maintenance notice."}
               </p>
             </div>
-            <Switch id="maint" checked={form.maintenance} onCheckedChange={(v) => patch({ maintenance: v })} />
+            <Switch
+              id="maint"
+              checked={form.maintenance}
+              onCheckedChange={(v) => patch({ maintenance: v })}
+            />
           </div>
         </CardContent>
       </Card>
@@ -133,7 +154,9 @@ function AdminSettings() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="limit">{ar ? "الحد الأقصى للسير الذاتية لكل مستخدم" : "Max resumes per user"}</Label>
+            <Label htmlFor="limit">
+              {ar ? "الحد الأقصى للسير الذاتية لكل مستخدم" : "Max resumes per user"}
+            </Label>
             <Input
               id="limit"
               type="number"
@@ -153,7 +176,9 @@ function AdminSettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{ar ? "إعدادات الذكاء الاصطناعي" : "AI settings"}</CardTitle>
+          <CardTitle className="text-base">
+            {ar ? "إعدادات الذكاء الاصطناعي" : "AI settings"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2 text-sm">
@@ -164,7 +189,9 @@ function AdminSettings() {
             <div className="space-y-1.5">
               <Label>{ar ? "وضع الذكاء الاصطناعي" : "AI mode"}</Label>
               <Select value={form.aiMode} onValueChange={(v) => patch({ aiMode: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="mock">mock</SelectItem>
                   <SelectItem value="live">live</SelectItem>

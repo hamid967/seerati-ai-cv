@@ -12,18 +12,20 @@ export const runAiTask = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => parseAiRequest(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const {
-      AiRateLimitError,
-      assertWithinRateLimit,
-      recordUsage,
-      runGatewayTask,
-    } = await import("./ai-runtime.server");
+    const { AiRateLimitError, assertWithinRateLimit, recordUsage, runGatewayTask } =
+      await import("./ai-runtime.server");
 
     try {
       await assertWithinRateLimit(supabase, userId);
     } catch (error) {
       if (error instanceof AiRateLimitError) {
-        return { ok: false as const, code: error.scope === "minute" ? "rate_limited" : "quota_exceeded" };
+        if (error.scope === "unavailable") {
+          return { ok: false as const, code: "provider_unavailable" };
+        }
+        return {
+          ok: false as const,
+          code: error.scope === "minute" ? "rate_limited" : "quota_exceeded",
+        };
       }
       throw error;
     }

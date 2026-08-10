@@ -14,9 +14,22 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n";
 import { fetchAdminUsers, logAudit, setUserRole, type AdminUser } from "@/lib/db";
 import { useStore } from "@/lib/store";
@@ -36,7 +49,10 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
   const [detail, setDetail] = useState<AdminUser | null>(null);
 
-  const { data, isLoading, isError } = useQuery({ queryKey: ["admin-users"], queryFn: fetchAdminUsers });
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: fetchAdminUsers,
+  });
 
   const roleMutation = useMutation({
     mutationFn: async ({ id, role }: { id: string; role: "admin" | "user" }) => {
@@ -76,9 +92,15 @@ function AdminUsers() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-[1fr_180px]">
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={ar ? "بريد أو اسم" : "Email or name"} />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={ar ? "بريد أو اسم" : "Email or name"}
+            />
             <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as typeof roleFilter)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{ar ? "كل الأدوار" : "All roles"}</SelectItem>
                 <SelectItem value="admin">admin</SelectItem>
@@ -123,16 +145,24 @@ function AdminUsers() {
                     <TableRow key={u.id}>
                       <TableCell>
                         <p className="font-medium">{u.fullName || "—"}</p>
-                        <p dir="ltr" className="text-xs text-muted-foreground">{u.email}</p>
+                        <p dir="ltr" className="text-xs text-muted-foreground">
+                          {u.email}
+                        </p>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={u.role === "admin" ? "default" : "secondary"}>{u.role}</Badge>
+                        <Badge variant={u.role === "admin" ? "default" : "secondary"}>
+                          {u.role}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         {u.resumeCount}/{maxResumes}
                       </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{dt(u.lastActivity)}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{dt(u.createdAt)}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {dt(u.lastActivity)}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {dt(u.createdAt)}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={u.onboarded ? "outline" : "secondary"}>
                           {u.onboarded ? (ar ? "مكتملة" : "Done") : ar ? "غير مكتملة" : "Pending"}
@@ -172,10 +202,26 @@ function AdminUsers() {
           {detail && (
             <div className="space-y-5 text-sm">
               <div className="grid gap-2 sm:grid-cols-2">
-                <p><span className="text-muted-foreground">{ar ? "البريد" : "Email"}: </span><span dir="ltr">{detail.email}</span></p>
-                <p><span className="text-muted-foreground">{ar ? "الوظيفة المستهدفة" : "Target role"}: </span>{detail.targetRole || "—"}</p>
-                <p><span className="text-muted-foreground">{ar ? "سنوات الخبرة" : "Experience"}: </span>{detail.yearsExperience || "—"}</p>
-                <p><span className="text-muted-foreground">{ar ? "القطاع" : "Industry"}: </span>{detail.industry || "—"}</p>
+                <p>
+                  <span className="text-muted-foreground">{ar ? "البريد" : "Email"}: </span>
+                  <span dir="ltr">{detail.email}</span>
+                </p>
+                <p>
+                  <span className="text-muted-foreground">
+                    {ar ? "الوظيفة المستهدفة" : "Target role"}:{" "}
+                  </span>
+                  {detail.targetRole || "—"}
+                </p>
+                <p>
+                  <span className="text-muted-foreground">
+                    {ar ? "سنوات الخبرة" : "Experience"}:{" "}
+                  </span>
+                  {detail.yearsExperience || "—"}
+                </p>
+                <p>
+                  <span className="text-muted-foreground">{ar ? "القطاع" : "Industry"}: </span>
+                  {detail.industry || "—"}
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -183,16 +229,22 @@ function AdminUsers() {
                 <div className="flex items-center gap-2">
                   <Select
                     value={detail.role}
-                    onValueChange={(v) => roleMutation.mutate({ id: detail.id, role: v as "admin" | "user" })}
+                    onValueChange={(v) =>
+                      roleMutation.mutate({ id: detail.id, role: v as "admin" | "user" })
+                    }
                   >
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="user">user</SelectItem>
                       <SelectItem value="admin">admin</SelectItem>
                     </SelectContent>
                   </Select>
                   {roleMutation.isPending && (
-                    <span className="text-xs text-muted-foreground">{ar ? "جارٍ التحديث…" : "Updating…"}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {ar ? "جارٍ التحديث…" : "Updating…"}
+                    </span>
                   )}
                 </div>
               </div>
@@ -200,14 +252,21 @@ function AdminUsers() {
               <div className="space-y-2">
                 <Label>{ar ? "السير الذاتية (بيانات وصفية)" : "Resumes (metadata)"}</Label>
                 {detail.resumeMeta.length === 0 ? (
-                  <p className="text-muted-foreground">{ar ? "لا توجد سير ذاتية." : "No resumes."}</p>
+                  <p className="text-muted-foreground">
+                    {ar ? "لا توجد سير ذاتية." : "No resumes."}
+                  </p>
                 ) : (
                   <ul className="space-y-2">
                     {detail.resumeMeta.map((r) => (
-                      <li key={r.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs">
+                      <li
+                        key={r.id}
+                        className="flex flex-wrap items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs"
+                      >
                         <span className="font-mono">{r.id.slice(0, 8)}</span>
                         <Badge variant="secondary">{r.status}</Badge>
-                        <span>{ar ? "الاكتمال" : "Completion"} {r.completion}%</span>
+                        <span>
+                          {ar ? "الاكتمال" : "Completion"} {r.completion}%
+                        </span>
                         <span>ATS {r.ats}</span>
                         <span className="ms-auto text-muted-foreground">{dt(r.updatedAt)}</span>
                       </li>

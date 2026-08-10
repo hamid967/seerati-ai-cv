@@ -15,7 +15,11 @@ export const Route = createFileRoute("/resumes/$id/preview")({
   head: () => ({
     meta: [
       { title: "معاينة وتنزيل | سيرتي" },
-      { name: "description", content: "معاينة الطباعة وتنزيل السيرة الذاتية بصيغة PDF أو نسخة نصية متوافقة مع أنظمة التوظيف." },
+      {
+        name: "description",
+        content:
+          "معاينة الطباعة وتنزيل السيرة الذاتية بصيغة PDF أو نسخة نصية متوافقة مع أنظمة التوظيف.",
+      },
       { property: "og:title", content: "معاينة السيرة الذاتية" },
       { property: "og:description", content: "تنزيل PDF أو نسخة نصية ATS." },
       { name: "robots", content: "noindex" },
@@ -49,7 +53,9 @@ function PreviewResume() {
     return (
       <div className="min-h-screen">
         <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-          <p className="text-lg font-bold">{ar ? "لم نجد هذه السيرة الذاتية" : "Resume not found"}</p>
+          <p className="text-lg font-bold">
+            {ar ? "لم نجد هذه السيرة الذاتية" : "Resume not found"}
+          </p>
           <Button className="mt-6" asChild>
             <Link to="/dashboard">{ar ? "العودة إلى لوحتي" : "Back to dashboard"}</Link>
           </Button>
@@ -63,7 +69,12 @@ function PreviewResume() {
 
   const fileBase = (() => {
     const name = (resume.data.personal.fullName || resume.title || "resume").trim();
-    const slug = name.split(/\s+/).filter(Boolean).slice(0, 3).join("-").replace(/[\\/:*?"<>|]/g, "");
+    const slug = name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 3)
+      .join("-")
+      .replace(/[\\/:*?"<>|]/g, "");
     return `${slug || "resume"}-CV`;
   })();
 
@@ -71,7 +82,9 @@ function PreviewResume() {
     const previous = document.title;
     document.title = fileBase;
     window.print();
-    window.setTimeout(() => { document.title = previous; }, 1000);
+    window.setTimeout(() => {
+      document.title = previous;
+    }, 1000);
   };
 
   const downloadImagePdf = async () => {
@@ -118,11 +131,17 @@ function PreviewResume() {
           <h1 className="text-xl font-extrabold">{resume.title}</h1>
           <p className="mt-1 text-xs text-muted-foreground">
             {tpl.name[lang]} · {resume.language.toUpperCase()} · ATS {score}/100
-            {resume.data.targetJob ? ` · ${ar ? "الوظيفة المستهدفة" : "Target"}: ${resume.data.targetJob}` : ""}
+            {resume.data.targetJob
+              ? ` · ${ar ? "الوظيفة المستهدفة" : "Target"}: ${resume.data.targetJob}`
+              : ""}
           </p>
         </div>
         <div className="ms-auto flex flex-wrap gap-2">
-          {tpl.atsFriendly && <Badge variant="secondary" className="self-center">ATS</Badge>}
+          {tpl.atsFriendly && (
+            <Badge variant="secondary" className="self-center">
+              ATS
+            </Badge>
+          )}
           <Button variant="outline" asChild>
             <Link to="/resumes/$id/edit" params={{ id: resume.id }}>
               <FileText className="size-4" />
@@ -142,7 +161,11 @@ function PreviewResume() {
             {ar ? "PDF نصي (طباعة)" : "Print / text PDF"}
           </Button>
           <Button onClick={() => void downloadImagePdf()} disabled={exportingImagePdf}>
-            {exportingImagePdf ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+            {exportingImagePdf ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
             {ar ? "تنزيل PDF (صورة عالية الدقة)" : "Download PDF (high-res image)"}
           </Button>
         </div>

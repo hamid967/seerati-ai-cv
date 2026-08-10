@@ -61,12 +61,7 @@ export const RESUME_LANGUAGE_LABEL: Record<ResumeLanguage, { ar: string; en: str
 /* -------------------------------- actions --------------------------------- */
 
 export type CopilotActionType =
-  | "ask"
-  | "suggest_edit"
-  | "update_field"
-  | "add_item"
-  | "translate"
-  | "analyze";
+  "ask" | "suggest_edit" | "update_field" | "add_item" | "translate" | "analyze";
 
 export type CopilotAction = {
   type: CopilotActionType;
@@ -124,7 +119,10 @@ export const QUICK_ACTIONS: QuickAction[] = [
     id: "professional",
     label: { ar: "اكتبها باحتراف", en: "Make professional" },
     task: "rewrite",
-    reason: { ar: "صياغة مهنية أوضح مع فعل قوي في البداية.", en: "Clearer professional phrasing with a strong opening verb." },
+    reason: {
+      ar: "صياغة مهنية أوضح مع فعل قوي في البداية.",
+      en: "Clearer professional phrasing with a strong opening verb.",
+    },
   },
   {
     id: "shorten",
@@ -136,39 +134,57 @@ export const QUICK_ACTIONS: QuickAction[] = [
     id: "impact",
     label: { ar: "قوّي الأثر", en: "Strengthen impact" },
     task: "improve",
-    reason: { ar: "إبراز الأثر والنتيجة بدل وصف المهام.", en: "Highlights outcome instead of describing duties." },
+    reason: {
+      ar: "إبراز الأثر والنتيجة بدل وصف المهام.",
+      en: "Highlights outcome instead of describing duties.",
+    },
   },
   {
     id: "achievement",
     label: { ar: "حوّلها إلى إنجاز", en: "Turn into achievement" },
     task: "quantify",
-    reason: { ar: "تحويل المهمة إلى إنجاز قابل للقياس.", en: "Turns the duty into a measurable achievement." },
+    reason: {
+      ar: "تحويل المهمة إلى إنجاز قابل للقياس.",
+      en: "Turns the duty into a measurable achievement.",
+    },
   },
   {
     id: "keywords",
     label: { ar: "أضف كلمات الوظيفة", en: "Align to job keywords" },
     task: "ats_keywords",
-    reason: { ar: "مواءمة النص مع كلمات الوصف الوظيفي.", en: "Aligns wording with the job description keywords." },
+    reason: {
+      ar: "مواءمة النص مع كلمات الوصف الوظيفي.",
+      en: "Aligns wording with the job description keywords.",
+    },
   },
   {
     id: "to_ar",
     label: { ar: "ترجمة للعربية", en: "Translate to Arabic" },
     task: "translate",
     forceLang: "ar",
-    reason: { ar: "ترجمة مهنية مع الحفاظ على أسماء الشركات والشهادات.", en: "Professional Arabic, keeping company and certificate names as-is." },
+    reason: {
+      ar: "ترجمة مهنية مع الحفاظ على أسماء الشركات والشهادات.",
+      en: "Professional Arabic, keeping company and certificate names as-is.",
+    },
   },
   {
     id: "to_en",
     label: { ar: "ترجمة للإنجليزية", en: "Translate to English" },
     task: "translate",
     forceLang: "en",
-    reason: { ar: "ترجمة مهنية مع الحفاظ على الأسماء الخاصة.", en: "Professional English, keeping proper nouns as-is." },
+    reason: {
+      ar: "ترجمة مهنية مع الحفاظ على الأسماء الخاصة.",
+      en: "Professional English, keeping proper nouns as-is.",
+    },
   },
   {
     id: "ats",
     label: { ar: "تحقق من ATS", en: "Check ATS" },
     task: "ats_keywords",
-    reason: { ar: "مراجعة توافق النص مع أنظمة التتبع.", en: "Reviews how well the text matches applicant tracking systems." },
+    reason: {
+      ar: "مراجعة توافق النص مع أنظمة التتبع.",
+      en: "Reviews how well the text matches applicant tracking systems.",
+    },
   },
 ];
 
@@ -212,7 +228,9 @@ export function describeProgress(
     );
   }
   if (state.missing.length) {
-    out.push(ar ? `باقي: ${state.missing.join("، ")}.` : `Still to add: ${state.missing.join(", ")}.`);
+    out.push(
+      ar ? `باقي: ${state.missing.join("، ")}.` : `Still to add: ${state.missing.join(", ")}.`,
+    );
   }
   return out;
 }

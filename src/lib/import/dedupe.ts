@@ -36,7 +36,10 @@ export type DuplicateHit<T> = {
 
 const yearOf = (v?: string) => (v ?? "").match(/(19|20)\d{2}/)?.[0] ?? "";
 
-export function matchExperience(incoming: Experience, existing: Experience[]): DuplicateHit<Experience> {
+export function matchExperience(
+  incoming: Experience,
+  existing: Experience[],
+): DuplicateHit<Experience> {
   let best: { item: Experience; score: number } | null = null;
   for (const e of existing) {
     const score =
@@ -45,7 +48,8 @@ export function matchExperience(incoming: Experience, existing: Experience[]): D
     const total = Math.min(1, score + (sameStart ? 0.2 : 0));
     if (!best || total > best.score) best = { item: e, score: total };
   }
-  if (!best || best.score < 0.5) return { incoming, existing: null, kind: "none", score: best?.score ?? 0 };
+  if (!best || best.score < 0.5)
+    return { incoming, existing: null, kind: "none", score: best?.score ?? 0 };
   return {
     incoming,
     existing: best.item,
@@ -54,14 +58,18 @@ export function matchExperience(incoming: Experience, existing: Experience[]): D
   };
 }
 
-export function matchEducation(incoming: Education, existing: Education[]): DuplicateHit<Education> {
+export function matchEducation(
+  incoming: Education,
+  existing: Education[],
+): DuplicateHit<Education> {
   let best: { item: Education; score: number } | null = null;
   for (const e of existing) {
     const score =
       similarity(incoming.school, e.school) * 0.6 + similarity(incoming.degree, e.degree) * 0.4;
     if (!best || score > best.score) best = { item: e, score };
   }
-  if (!best || best.score < 0.5) return { incoming, existing: null, kind: "none", score: best?.score ?? 0 };
+  if (!best || best.score < 0.5)
+    return { incoming, existing: null, kind: "none", score: best?.score ?? 0 };
   return {
     incoming,
     existing: best.item,

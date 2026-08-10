@@ -1,7 +1,6 @@
 import type { Resume, ResumeData, TemplateDef } from "./types";
 import { foldText, keywordAliases } from "./saudi-career-taxonomy";
 
-
 /**
  * ATS Engine V2 — a transparent, rule based readiness estimate.
  * The result is advisory only: no ATS vendor is being queried and no hiring
@@ -9,22 +8,10 @@ import { foldText, keywordAliases } from "./saudi-career-taxonomy";
  */
 
 export type BuilderStep =
-  | "personal"
-  | "summary"
-  | "experience"
-  | "education"
-  | "skills"
-  | "extras"
-  | "design";
+  "personal" | "summary" | "experience" | "education" | "skills" | "extras" | "design";
 
 export type AtsCategoryId =
-  | "contact"
-  | "summary"
-  | "experience"
-  | "skills"
-  | "education"
-  | "keywords";
-
+  "contact" | "summary" | "experience" | "skills" | "education" | "keywords";
 
 export type AtsTip = { ar: string; en: string; step: BuilderStep };
 
@@ -52,10 +39,63 @@ const words = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 const clamp = (n: number, max: number) => Math.max(0, Math.min(max, n));
 
 const STOP_WORDS = new Set([
-  "the","and","for","with","you","our","are","from","that","this","will","have","has","not","all",
-  "your","their","who","what","when","work","role","team","must","able","also","other","more","than",
-  "في","من","على","إلى","عن","مع","التي","الذي","أو","و","ما","لا","هذا","هذه","ذلك","كما","حسب",
-  "العمل","الوظيفة","المهام","القدرة","لدى","يكون","يجب","ضمن","خلال","عبر","بشكل",
+  "the",
+  "and",
+  "for",
+  "with",
+  "you",
+  "our",
+  "are",
+  "from",
+  "that",
+  "this",
+  "will",
+  "have",
+  "has",
+  "not",
+  "all",
+  "your",
+  "their",
+  "who",
+  "what",
+  "when",
+  "work",
+  "role",
+  "team",
+  "must",
+  "able",
+  "also",
+  "other",
+  "more",
+  "than",
+  "في",
+  "من",
+  "على",
+  "إلى",
+  "عن",
+  "مع",
+  "التي",
+  "الذي",
+  "أو",
+  "و",
+  "ما",
+  "لا",
+  "هذا",
+  "هذه",
+  "ذلك",
+  "كما",
+  "حسب",
+  "العمل",
+  "الوظيفة",
+  "المهام",
+  "القدرة",
+  "لدى",
+  "يكون",
+  "يجب",
+  "ضمن",
+  "خلال",
+  "عبر",
+  "بشكل",
 ]);
 
 export function extractKeywords(text: string, limit = 30): string[] {
@@ -79,7 +119,9 @@ export function keywordCoverage(jobDescription: string, data: ResumeData) {
   const raw = JSON.stringify(data).toLowerCase();
   const folded = foldText(raw);
   const hit = (t: string) =>
-    keywordAliases(t).some((alias) => alias.length > 1 && (raw.includes(alias) || folded.includes(alias)));
+    keywordAliases(t).some(
+      (alias) => alias.length > 1 && (raw.includes(alias) || folded.includes(alias)),
+    );
   const matched = tokens.filter(hit);
   const missing = tokens.filter((t) => !hit(t));
   return {
@@ -89,7 +131,6 @@ export function keywordCoverage(jobDescription: string, data: ResumeData) {
     coverage: Math.round((matched.length / tokens.length) * 100),
   };
 }
-
 
 export function analyzeResume(
   resume: Resume,
@@ -211,7 +252,16 @@ export function analyzeResume(
   });
 
   /* ----------------------------- skills — 20 ---------------------------- */
-  let skillScore = d.skills.length >= 10 ? 12 : d.skills.length >= 8 ? 10 : d.skills.length >= 5 ? 7 : d.skills.length >= 3 ? 4 : 0;
+  let skillScore =
+    d.skills.length >= 10
+      ? 12
+      : d.skills.length >= 8
+        ? 10
+        : d.skills.length >= 5
+          ? 7
+          : d.skills.length >= 3
+            ? 4
+            : 0;
   if (d.languages.length >= 1) skillScore += 4;
   if (d.languages.length >= 2) skillScore += 2;
   if (d.certificates.length || d.projects.length) skillScore += 2;
@@ -299,21 +349,76 @@ export function analyzeResume(
 }
 
 /** Content completion percentage shown on cards and the builder checklist. */
-export type ChecklistItem = { id: string; label: { ar: string; en: string }; done: boolean; step: BuilderStep };
+export type ChecklistItem = {
+  id: string;
+  label: { ar: string; en: string };
+  done: boolean;
+  step: BuilderStep;
+};
 
 export function checklist(resume: Resume): ChecklistItem[] {
   const d = resume.data;
   return [
-    { id: "name", label: { ar: "الاسم الكامل", en: "Full name" }, done: Boolean(d.personal.fullName), step: "personal" },
-    { id: "title", label: { ar: "المسمى الوظيفي", en: "Job title" }, done: Boolean(d.personal.jobTitle), step: "personal" },
-    { id: "contact", label: { ar: "البريد والجوال", en: "Email & phone" }, done: Boolean(d.personal.email && d.personal.phone), step: "personal" },
-    { id: "summary", label: { ar: "ملخص مهني", en: "Professional summary" }, done: words(d.summary) >= 30, step: "summary" },
-    { id: "experience", label: { ar: "خبرة عملية", en: "Work experience" }, done: d.experience.length > 0, step: "experience" },
-    { id: "bullets", label: { ar: "٣ نقاط إنجاز", en: "Three achievement bullets" }, done: d.experience.flatMap((e) => e.bullets.filter(Boolean)).length >= 3, step: "experience" },
-    { id: "education", label: { ar: "مؤهل تعليمي", en: "Education entry" }, done: d.education.length > 0, step: "education" },
-    { id: "skills", label: { ar: "٥ مهارات", en: "Five skills" }, done: d.skills.length >= 5, step: "skills" },
-    { id: "languages", label: { ar: "اللغات", en: "Languages" }, done: d.languages.length > 0, step: "skills" },
-    { id: "links", label: { ar: "رابط مهني", en: "Professional link" }, done: d.links.length > 0, step: "extras" },
+    {
+      id: "name",
+      label: { ar: "الاسم الكامل", en: "Full name" },
+      done: Boolean(d.personal.fullName),
+      step: "personal",
+    },
+    {
+      id: "title",
+      label: { ar: "المسمى الوظيفي", en: "Job title" },
+      done: Boolean(d.personal.jobTitle),
+      step: "personal",
+    },
+    {
+      id: "contact",
+      label: { ar: "البريد والجوال", en: "Email & phone" },
+      done: Boolean(d.personal.email && d.personal.phone),
+      step: "personal",
+    },
+    {
+      id: "summary",
+      label: { ar: "ملخص مهني", en: "Professional summary" },
+      done: words(d.summary) >= 30,
+      step: "summary",
+    },
+    {
+      id: "experience",
+      label: { ar: "خبرة عملية", en: "Work experience" },
+      done: d.experience.length > 0,
+      step: "experience",
+    },
+    {
+      id: "bullets",
+      label: { ar: "٣ نقاط إنجاز", en: "Three achievement bullets" },
+      done: d.experience.flatMap((e) => e.bullets.filter(Boolean)).length >= 3,
+      step: "experience",
+    },
+    {
+      id: "education",
+      label: { ar: "مؤهل تعليمي", en: "Education entry" },
+      done: d.education.length > 0,
+      step: "education",
+    },
+    {
+      id: "skills",
+      label: { ar: "٥ مهارات", en: "Five skills" },
+      done: d.skills.length >= 5,
+      step: "skills",
+    },
+    {
+      id: "languages",
+      label: { ar: "اللغات", en: "Languages" },
+      done: d.languages.length > 0,
+      step: "skills",
+    },
+    {
+      id: "links",
+      label: { ar: "رابط مهني", en: "Professional link" },
+      done: d.links.length > 0,
+      step: "extras",
+    },
   ];
 }
 
@@ -334,7 +439,11 @@ export function toPlainText(resume: Resume) {
   L.push(d.personal.fullName || resume.title);
   if (d.personal.jobTitle) L.push(d.personal.jobTitle);
   L.push(
-    [d.personal.email, d.personal.phone, [d.personal.city, d.personal.country].filter(Boolean).join(", ")]
+    [
+      d.personal.email,
+      d.personal.phone,
+      [d.personal.city, d.personal.country].filter(Boolean).join(", "),
+    ]
       .filter(Boolean)
       .join(" | "),
   );
@@ -342,23 +451,30 @@ export function toPlainText(resume: Resume) {
   if (d.experience.length) {
     L.push("", "EXPERIENCE");
     d.experience.forEach((e) => {
-      L.push(`${e.role} — ${e.company} (${e.start || ""} - ${e.current ? "present" : e.end || ""})`);
+      L.push(
+        `${e.role} — ${e.company} (${e.start || ""} - ${e.current ? "present" : e.end || ""})`,
+      );
       e.bullets.filter(Boolean).forEach((b) => L.push(`- ${b}`));
     });
   }
   if (d.education.length) {
     L.push("", "EDUCATION");
-    d.education.forEach((e) => L.push(`${e.degree} — ${e.school} (${e.start || ""} - ${e.end || ""})`));
+    d.education.forEach((e) =>
+      L.push(`${e.degree} — ${e.school} (${e.start || ""} - ${e.end || ""})`),
+    );
   }
   if (d.skills.length) L.push("", "SKILLS", d.skills.map((s) => s.name).join(", "));
-  if (d.languages.length) L.push("", "LANGUAGES", d.languages.map((l) => `${l.name} (${l.level})`).join(", "));
-  (["certificates", "projects", "achievements", "volunteering", "references"] as const).forEach((k) => {
-    const items = d[k];
-    if (items.length) {
-      L.push("", k.toUpperCase());
-      items.forEach((i) => L.push(`- ${i.title}${i.detail ? `: ${i.detail}` : ""}`));
-    }
-  });
+  if (d.languages.length)
+    L.push("", "LANGUAGES", d.languages.map((l) => `${l.name} (${l.level})`).join(", "));
+  (["certificates", "projects", "achievements", "volunteering", "references"] as const).forEach(
+    (k) => {
+      const items = d[k];
+      if (items.length) {
+        L.push("", k.toUpperCase());
+        items.forEach((i) => L.push(`- ${i.title}${i.detail ? `: ${i.detail}` : ""}`));
+      }
+    },
+  );
   if (d.links.length) L.push("", "LINKS", d.links.map((l) => `${l.label}: ${l.url}`).join(" | "));
   d.custom.forEach((c) => {
     L.push("", (c.title || "SECTION").toUpperCase());

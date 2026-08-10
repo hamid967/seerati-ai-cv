@@ -17,7 +17,6 @@ export interface AiProvider {
   run(req: AiRequest): Promise<AiResponse>;
 }
 
-
 export const AI_TASK_LABELS: Record<AiTask, { ar: string; en: string }> = {
   summary: { ar: "اكتب ملخصاً", en: "Write summary" },
   improve: { ar: "تحسين", en: "Improve" },
@@ -66,7 +65,9 @@ const localProvider: AiProvider = {
     await new Promise((r) => setTimeout(r, 450));
     const ar = lang === "ar";
     const role =
-      context?.targetRole || context?.personal?.jobTitle || (ar ? "المسمى المستهدف" : "your target role");
+      context?.targetRole ||
+      context?.personal?.jobTitle ||
+      (ar ? "المسمى المستهدف" : "your target role");
     const years = context?.answers?.["years"] ?? "";
     const lines = input.split("\n").map(stripBullet).filter(Boolean);
 
@@ -106,8 +107,26 @@ const localProvider: AiProvider = {
       }
       case "suggest_skills": {
         const base = ar
-          ? ["إدارة المشاريع", "تحليل البيانات", "التواصل المهني", "Excel المتقدم", "إعداد التقارير", "إدارة أصحاب المصلحة", "تحسين العمليات", "العمل ضمن فريق"]
-          : ["Project management", "Data analysis", "Stakeholder communication", "Advanced Excel", "Reporting", "Process improvement", "Prioritisation", "Teamwork"];
+          ? [
+              "إدارة المشاريع",
+              "تحليل البيانات",
+              "التواصل المهني",
+              "Excel المتقدم",
+              "إعداد التقارير",
+              "إدارة أصحاب المصلحة",
+              "تحسين العمليات",
+              "العمل ضمن فريق",
+            ]
+          : [
+              "Project management",
+              "Data analysis",
+              "Stakeholder communication",
+              "Advanced Excel",
+              "Reporting",
+              "Process improvement",
+              "Prioritisation",
+              "Teamwork",
+            ];
         const fromJd = context?.jobDescription
           ? Array.from(
               new Set(
@@ -130,7 +149,10 @@ const localProvider: AiProvider = {
             .trim(),
         };
       case "shorten": {
-        const s = input.split(/(?<=[.؟!،])\s+/).slice(0, 2).join(" ");
+        const s = input
+          .split(/(?<=[.؟!،])\s+/)
+          .slice(0, 2)
+          .join(" ");
         return { text: tidy(s || input.slice(0, 180)) };
       }
       case "expand":
@@ -229,7 +251,6 @@ export const aiService = {
     }
   },
 };
-
 
 /* --------------------------------- wizard --------------------------------- */
 

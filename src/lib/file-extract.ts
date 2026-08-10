@@ -91,10 +91,10 @@ export function normalizeExtractedText(raw: string): string {
 async function extractDocx(file: File): Promise<string> {
   const mammoth = await import("mammoth/mammoth.browser.js");
   const arrayBuffer = await file.arrayBuffer();
-  const runner = (mammoth as unknown as {
+  const runner = mammoth as unknown as {
     default?: { extractRawText: (o: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }> };
     extractRawText?: (o: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }>;
-  });
+  };
   const extractRawText = runner.extractRawText ?? runner.default?.extractRawText;
   if (!extractRawText) throw new Error("mammoth_unavailable");
   const result = await extractRawText({ arrayBuffer });
@@ -157,7 +157,8 @@ export async function extractFileText(file: File): Promise<ExtractOutcome> {
     return { ok: true, text: clean, kind, fileName, pages };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    if (/password|encrypt/i.test(message)) return { ok: false, reason: "encrypted_pdf", kind, fileName };
+    if (/password|encrypt/i.test(message))
+      return { ok: false, reason: "encrypted_pdf", kind, fileName };
     console.error("[import] extraction failed", kind, message);
     return { ok: false, reason: "parse_failed", kind, fileName };
   }

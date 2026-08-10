@@ -160,14 +160,9 @@ function diffPrimitiveList(
 }
 
 /** Id-matched diff for lists of resume items. */
-function diffItemList(
-  out: FieldDiff[],
-  section: string,
-  before: unknown[],
-  after: unknown[],
-) {
+function diffItemList(out: FieldDiff[], section: string, before: unknown[], after: unknown[]) {
   const keyOf = (item: unknown, index: number) =>
-    isRecord(item) && typeof item['id'] === "string" && item['id'] ? item['id'] : `#${index}`;
+    isRecord(item) && typeof item["id"] === "string" && item["id"] ? item["id"] : `#${index}`;
 
   const beforeMap = new Map(before.map((it, i) => [keyOf(it, i), it]));
   const afterMap = new Map(after.map((it, i) => [keyOf(it, i), it]));
@@ -232,8 +227,8 @@ export function diffResumeData(
     changes,
     "personal",
     "personal",
-    isRecord(b['personal']) ? b['personal'] : {},
-    isRecord(a['personal']) ? a['personal'] : {},
+    isRecord(b["personal"]) ? b["personal"] : {},
+    isRecord(a["personal"]) ? a["personal"] : {},
   );
 
   for (const key of ["summary", "targetJob", "jobDescription"] as const) {
@@ -261,8 +256,8 @@ export function diffResumeData(
     changes,
     "design",
     "design",
-    isRecord(b['design']) ? b['design'] : {},
-    isRecord(a['design']) ? a['design'] : {},
+    isRecord(b["design"]) ? b["design"] : {},
+    isRecord(a["design"]) ? a["design"] : {},
   );
 
   const bySection = new Map<string, FieldDiff[]>();

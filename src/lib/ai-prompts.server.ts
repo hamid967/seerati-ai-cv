@@ -27,7 +27,8 @@ const HOUSE_RULES_EN = [
 function contextBlock(req: AiRequest): string {
   const c = req.context ?? {};
   const bits: string[] = [];
-  if (c.targetRole || c.personal?.jobTitle) bits.push(`Target role: ${c.targetRole || c.personal?.jobTitle}`);
+  if (c.targetRole || c.personal?.jobTitle)
+    bits.push(`Target role: ${c.targetRole || c.personal?.jobTitle}`);
   if (c.answers?.["years"]) bits.push(`Years of experience: ${c.answers["years"]}`);
   if (c.answers?.["industry"]) bits.push(`Industry: ${c.answers["industry"]}`);
   if (c.section) bits.push(`Resume section: ${c.section}`);
@@ -97,7 +98,6 @@ const TASK_INSTRUCTION: Record<AiTask, { ar: string; en: string }> = {
   },
 };
 
-
 export function buildPrompt(req: AiRequest): { system: string; prompt: string } {
   const ar = req.lang === "ar";
   const instruction = TASK_INSTRUCTION[req.task][ar ? "ar" : "en"];
@@ -153,8 +153,12 @@ export function validateAiOutput(task: AiTask, raw: string): AiResponse {
   const parsed = extractJson(text);
   let items: string[] = [];
 
-  if (parsed && typeof parsed === "object" && Array.isArray((parsed as { items?: unknown }).items)) {
-    items = ((parsed as { items: unknown[] }).items)
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    Array.isArray((parsed as { items?: unknown }).items)
+  ) {
+    items = (parsed as { items: unknown[] }).items
       .filter((v): v is string => typeof v === "string")
       .map(cleanItem)
       .filter(Boolean);

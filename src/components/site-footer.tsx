@@ -8,23 +8,53 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-4">
         <div>
           <p className="text-lg font-extrabold">{t("brand")} | Seerati</p>
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{t("tagline")}</p>
+          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            {t("tagline")}
+          </p>
         </div>
         <div>
           <p className="mb-3 text-sm font-semibold">{t("footer_product")}</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/templates" className="hover:text-foreground">{t("nav_templates")}</Link></li>
-            <li><Link to="/features" className="hover:text-foreground">{t("nav_features")}</Link></li>
-            <li><Link to="/ats" className="hover:text-foreground">{t("nav_ats")}</Link></li>
+            <li>
+              <Link to="/templates" className="hover:text-foreground">
+                {t("nav_templates")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/features" className="hover:text-foreground">
+                {t("nav_features")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/ats" className="hover:text-foreground">
+                {t("nav_ats")}
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
           <p className="mb-3 text-sm font-semibold">{t("footer_company")}</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/auth" className="hover:text-foreground">{t("nav_login")}</Link></li>
-            <li><Link to="/dashboard" className="hover:text-foreground">{t("nav_dashboard")}</Link></li>
-            <li><Link to="/privacy" className="hover:text-foreground">{t("brand") === "سيرتي" ? "سياسة الخصوصية" : "Privacy policy"}</Link></li>
-            <li><Link to="/terms" className="hover:text-foreground">{t("brand") === "سيرتي" ? "شروط الاستخدام" : "Terms of use"}</Link></li>
+            <li>
+              <Link to="/auth" className="hover:text-foreground">
+                {t("nav_login")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/dashboard" className="hover:text-foreground">
+                {t("nav_dashboard")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/privacy" className="hover:text-foreground">
+                {t("brand") === "سيرتي" ? "سياسة الخصوصية" : "Privacy policy"}
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="hover:text-foreground">
+                {t("brand") === "سيرتي" ? "شروط الاستخدام" : "Terms of use"}
+              </Link>
+            </li>
           </ul>
         </div>
         <div className="text-sm text-muted-foreground">

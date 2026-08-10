@@ -80,7 +80,9 @@ export function SortableItem({
   handleClassName?: string;
   ar: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -92,7 +94,10 @@ export function SortableItem({
     <div ref={setNodeRef} style={style} className={className}>
       <button
         type="button"
-        className={handleClassName ?? "me-1 shrink-0 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"}
+        className={
+          handleClassName ??
+          "me-1 shrink-0 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+        }
         aria-label={ar ? "اسحب لإعادة الترتيب" : "Drag to reorder"}
         {...attributes}
         {...listeners}

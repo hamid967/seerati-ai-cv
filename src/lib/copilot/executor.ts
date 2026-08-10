@@ -33,22 +33,26 @@ export type ExecutionResult =
   | { ok: false; error: ExecutionError };
 
 export type ExecutionError =
-  | "not_approved"
-  | "not_owner"
-  | "missing_context"
-  | "unsupported_action"
-  | "write_failed";
+  "not_approved" | "not_owner" | "missing_context" | "unsupported_action" | "write_failed";
 
 export const EXECUTION_ERROR_LABEL: Record<ExecutionError, { ar: string; en: string }> = {
   not_approved: { ar: "لم تتم الموافقة على الاقتراح.", en: "The suggestion was not approved." },
-  not_owner: { ar: "لا تملك صلاحية تعديل هذا العنصر.", en: "You are not allowed to edit this item." },
-  missing_context: { ar: "بيانات غير مكتملة لتطبيق الاقتراح.", en: "Not enough context to apply this." },
-  unsupported_action: { ar: "هذا الإجراء يُطبَّق من شاشته الخاصة.", en: "This action is applied from its own screen." },
+  not_owner: {
+    ar: "لا تملك صلاحية تعديل هذا العنصر.",
+    en: "You are not allowed to edit this item.",
+  },
+  missing_context: {
+    ar: "بيانات غير مكتملة لتطبيق الاقتراح.",
+    en: "Not enough context to apply this.",
+  },
+  unsupported_action: {
+    ar: "هذا الإجراء يُطبَّق من شاشته الخاصة.",
+    en: "This action is applied from its own screen.",
+  },
   write_failed: { ar: "تعذّر الحفظ، حاول مرة أخرى.", en: "Saving failed, please try again." },
 };
 
-const ownsResume = (ctx: ExecutorContext) =>
-  !ctx.resumeOwnerId || ctx.resumeOwnerId === ctx.userId;
+const ownsResume = (ctx: ExecutorContext) => !ctx.resumeOwnerId || ctx.resumeOwnerId === ctx.userId;
 
 /** Apply one approved action. Returns an undo closure whenever reversible. */
 export async function executeCopilotAction(
@@ -122,16 +126,14 @@ export async function executeCopilotAction(
 }
 
 /** Pure draft transforms — no I/O, so undo is just restoring the old draft. */
-export function applyToDraft(
-  action: CopilotProtocolAction,
-  draft: ResumeData,
-): ResumeData | null {
+export function applyToDraft(action: CopilotProtocolAction, draft: ResumeData): ResumeData | null {
   switch (action.type) {
     case "update_summary":
       return { ...draft, summary: action.payload.suggested };
     case "add_skill": {
       const name = action.payload.name.trim();
-      if (draft.skills.some((s) => s.name.trim().toLowerCase() === name.toLowerCase())) return draft;
+      if (draft.skills.some((s) => s.name.trim().toLowerCase() === name.toLowerCase()))
+        return draft;
       return {
         ...draft,
         skills: [...draft.skills, { id: `sk_${Date.now().toString(36)}`, name }],

@@ -111,7 +111,12 @@ export function ApplicationTimeline({ userId, jobId, events, loading, onChanged 
               : "Events are recorded only after an action actually succeeds."}
           </p>
         </div>
-        <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setAdding((v) => !v)}>
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={() => setAdding((v) => !v)}
+        >
           <Plus className="size-4" />
           {ar ? "إضافة" : "Add"}
         </Button>
@@ -202,7 +207,9 @@ export function ApplicationTimeline({ userId, jobId, events, loading, onChanged 
                         ) : null}
                         {link?.kind === "cover_letter" || link?.kind === "interview" ? (
                           <a
-                            href={link.kind === "cover_letter" ? "#cover-letter" : "#interview-pack"}
+                            href={
+                              link.kind === "cover_letter" ? "#cover-letter" : "#interview-pack"
+                            }
                             className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
                           >
                             <ExternalLink className="size-3" />

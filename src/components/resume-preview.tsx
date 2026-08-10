@@ -44,7 +44,10 @@ function SectionTitle({ children, design }: { children: React.ReactNode; design:
   if (design.sectionStyle === "bar")
     return (
       <h3 className="mb-2 flex items-center gap-2 text-[13px] font-bold" style={base}>
-        <span style={{ background: design.accent }} className="inline-block h-3.5 w-1.5 rounded-full" />
+        <span
+          style={{ background: design.accent }}
+          className="inline-block h-3.5 w-1.5 rounded-full"
+        />
         {children}
       </h3>
     );
@@ -86,7 +89,9 @@ export function ResumePreview({
     accent: user.accent || tpl.design.accent,
     spacing: user.density || tpl.design.spacing,
   };
-  const showPhoto = Boolean(design.supportsPhoto && (user.showPhoto ?? true) && d.personal.photoUrl);
+  const showPhoto = Boolean(
+    design.supportsPhoto && (user.showPhoto ?? true) && d.personal.photoUrl,
+  );
   const lang = resume.language;
   const rtl = lang === "ar";
   const gap = spacingMap[design.spacing];
@@ -143,7 +148,11 @@ export function ResumePreview({
     education: d.education.length ? (
       <div className="space-y-2">
         {d.education.map((e) => (
-          <div key={e.id} data-cv-item className="flex flex-wrap items-baseline justify-between gap-1">
+          <div
+            key={e.id}
+            data-cv-item
+            className="flex flex-wrap items-baseline justify-between gap-1"
+          >
             <div>
               <p className="text-[12.5px] font-bold">{e.degree}</p>
               <p className="text-[12px] text-[#4b5768]">
@@ -196,7 +205,8 @@ export function ResumePreview({
       <ul className="space-y-1">
         {d.links.map((l) => (
           <li key={l.id} className="break-all text-[11.5px]">
-            <span className="font-semibold">{l.label}:</span> <span className="text-[#4b5768]">{l.url}</span>
+            <span className="font-semibold">{l.label}:</span>{" "}
+            <span className="text-[#4b5768]">{l.url}</span>
           </li>
         ))}
       </ul>
@@ -223,7 +233,8 @@ export function ResumePreview({
     keys.map((k) => {
       const node = sections[k];
       if (!node) return null;
-      const title = k === "custom" && d.custom.length === 1 ? d.custom[0]!.title : L(k as keyof typeof labels);
+      const title =
+        k === "custom" && d.custom.length === 1 ? d.custom[0]!.title : L(k as keyof typeof labels);
       return (
         <section key={k} data-cv-section style={{ marginBottom: gap }}>
           <SectionTitle design={design}>{title}</SectionTitle>
@@ -257,13 +268,18 @@ export function ResumePreview({
   const header = () => {
     if (design.header === "banner")
       return (
-        <header className="-mx-8 -mt-8 mb-5 flex items-center gap-4 px-8 py-6" style={{ background: design.accent }}>
+        <header
+          className="-mx-8 -mt-8 mb-5 flex items-center gap-4 px-8 py-6"
+          style={{ background: design.accent }}
+        >
           <Photo />
           <div className="min-w-0 text-white">
             <h1 className="text-[26px] font-extrabold leading-tight" style={nameStyle}>
               {name}
             </h1>
-            {d.personal.jobTitle && <p className="mt-0.5 text-[13px] opacity-90">{d.personal.jobTitle}</p>}
+            {d.personal.jobTitle && (
+              <p className="mt-0.5 text-[13px] opacity-90">{d.personal.jobTitle}</p>
+            )}
             <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] opacity-85">
               {contactBits.map((x, i) => (
                 <span key={i}>{x}</span>
@@ -275,11 +291,16 @@ export function ResumePreview({
     if (design.header === "centered")
       return (
         <header className="mb-6 text-center">
-          <h1 className="text-[27px] font-semibold tracking-tight" style={{ ...nameStyle, color: "#101828" }}>
+          <h1
+            className="text-[27px] font-semibold tracking-tight"
+            style={{ ...nameStyle, color: "#101828" }}
+          >
             {name}
           </h1>
           {d.personal.jobTitle && (
-            <p className="mt-1 text-[12.5px] uppercase tracking-[0.24em] text-[#5a6779]">{d.personal.jobTitle}</p>
+            <p className="mt-1 text-[12.5px] uppercase tracking-[0.24em] text-[#5a6779]">
+              {d.personal.jobTitle}
+            </p>
           )}
           <p className="mt-2 flex flex-wrap justify-center gap-x-3 text-[11px] text-[#5a6779]">
             {contactBits.map((x, i) => (
@@ -295,7 +316,10 @@ export function ResumePreview({
           style={{ borderBottom: `2.5px solid ${design.accent}` }}
         >
           <div>
-            <h1 className="text-[26px] font-bold leading-tight" style={{ ...nameStyle, color: "#0f1b2d" }}>
+            <h1
+              className="text-[26px] font-bold leading-tight"
+              style={{ ...nameStyle, color: "#0f1b2d" }}
+            >
               {name}
             </h1>
             {d.personal.jobTitle && (
@@ -304,7 +328,9 @@ export function ResumePreview({
               </p>
             )}
           </div>
-          <div className={`text-[11px] leading-[1.7] text-[#5a6779] ${rtl ? "text-left" : "text-right"}`}>
+          <div
+            className={`text-[11px] leading-[1.7] text-[#5a6779] ${rtl ? "text-left" : "text-right"}`}
+          >
             {contactBits.map((x, i) => (
               <div key={i}>{x}</div>
             ))}
@@ -315,10 +341,15 @@ export function ResumePreview({
       <header className="mb-5 flex items-start gap-4">
         <Photo />
         <div className="min-w-0">
-          <h1 className="text-[25px] font-extrabold leading-tight" style={{ ...nameStyle, color: design.accent }}>
+          <h1
+            className="text-[25px] font-extrabold leading-tight"
+            style={{ ...nameStyle, color: design.accent }}
+          >
             {name}
           </h1>
-          {d.personal.jobTitle && <p className="mt-0.5 text-[13px] font-medium text-[#3d4b5e]">{d.personal.jobTitle}</p>}
+          {d.personal.jobTitle && (
+            <p className="mt-0.5 text-[13px] font-medium text-[#3d4b5e]">{d.personal.jobTitle}</p>
+          )}
           <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#5a6779]">
             {contactBits.map((x, i) => (
               <span key={i}>{x}</span>
@@ -406,7 +437,11 @@ export function ResumeThumb({
         className="absolute top-0"
         style={{ left: 0, width: 794, transform: `scale(${scale})`, transformOrigin: "top left" }}
       >
-        <ResumePreview resume={resume} {...(template ? { template } : {})} className="shadow-none" />
+        <ResumePreview
+          resume={resume}
+          {...(template ? { template } : {})}
+          className="shadow-none"
+        />
       </div>
     </div>
   );

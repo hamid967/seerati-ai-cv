@@ -15,8 +15,14 @@ export const RATE_LIMIT_PER_DAY = 300;
 export type AiRunResult = AiResponse & { provider: "gateway"; runId?: string };
 
 export class AiRateLimitError extends Error {
-  constructor(public scope: "minute" | "day") {
-    super(scope === "minute" ? "rate_limited_minute" : "rate_limited_day");
+  constructor(public scope: "minute" | "day" | "unavailable") {
+    super(
+      scope === "minute"
+        ? "rate_limited_minute"
+        : scope === "day"
+          ? "rate_limited_day"
+          : "usage_counter_unavailable",
+    );
   }
 }
 
@@ -27,7 +33,14 @@ async function countUsage(supabase: SupabaseClient, userId: string, sinceIso: st
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId)
     .gte("created_at", sinceIso);
-  if (error) return 0; // never block the feature because of a counting failure
+
+  // Quotas are a server-side abuse boundary. If the counter cannot be read,
+  // fail safely instead of silently treating the user as having zero usage.
+  if (error) {
+    console.error("[ai] usage counter unavailable", error.message);
+    throw new AiRateLimitError("unavailable");
+  }
+
   return count ?? 0;
 }
 

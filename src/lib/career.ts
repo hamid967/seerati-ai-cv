@@ -88,9 +88,9 @@ export const emptyIdentity = (): CareerIdentity => ({
   summary: "",
 });
 
-const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
-const obj = <T,>(v: unknown, fallback: T): T =>
-  v && typeof v === "object" && !Array.isArray(v) ? ({ ...fallback, ...(v as T) }) : fallback;
+const arr = <T>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+const obj = <T>(v: unknown, fallback: T): T =>
+  v && typeof v === "object" && !Array.isArray(v) ? { ...fallback, ...(v as T) } : fallback;
 
 type TwinRow = {
   id: string;
@@ -136,7 +136,11 @@ const toTwin = (row: TwinRow): CareerTwin => ({
 
 /** Reads the signed-in user's Career Twin, creating an empty one on first use. */
 export async function loadCareerTwin(userId: string): Promise<CareerTwin | null> {
-  const { data } = await supabase.from("career_profiles").select("*").eq("user_id", userId).maybeSingle();
+  const { data } = await supabase
+    .from("career_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
   if (data) return toTwin(data as unknown as TwinRow);
   const { data: created } = await supabase
     .from("career_profiles")
@@ -173,18 +177,63 @@ export async function saveCareerTwin(userId: string, patch: TwinPatch): Promise<
 }
 
 /** Section-by-section health of the Career Twin. Descriptive, not predictive. */
-export type TwinSectionHealth = { key: string; label: { ar: string; en: string }; done: boolean; weight: number };
+export type TwinSectionHealth = {
+  key: string;
+  label: { ar: string; en: string };
+  done: boolean;
+  weight: number;
+};
 
 export function twinHealth(t: CareerTwin | null): { score: number; sections: TwinSectionHealth[] } {
   const sections: TwinSectionHealth[] = [
-    { key: "identity", label: { ar: "الهوية ومعلومات الاتصال", en: "Identity & contact" }, weight: 15, done: !!(t?.identity.fullName && t?.identity.email) },
-    { key: "summary", label: { ar: "الملخص المهني", en: "Professional summary" }, weight: 12, done: (t?.identity.summary?.length ?? 0) > 80 },
-    { key: "targets", label: { ar: "الهدف المهني", en: "Career target" }, weight: 12, done: (t?.targets.length ?? 0) > 0 },
-    { key: "work", label: { ar: "الخبرات العملية", en: "Work history" }, weight: 20, done: (t?.workHistory.length ?? 0) > 0 },
-    { key: "achievements", label: { ar: "الإنجازات والأدلة", en: "Achievements & evidence" }, weight: 13, done: (t?.achievements.length ?? 0) > 1 },
-    { key: "skills", label: { ar: "المهارات", en: "Skills" }, weight: 10, done: (t?.skills.length ?? 0) >= 4 },
-    { key: "education", label: { ar: "التعليم", en: "Education" }, weight: 8, done: (t?.education.length ?? 0) > 0 },
-    { key: "stories", label: { ar: "بنك قصص STAR", en: "STAR story bank" }, weight: 10, done: (t?.storyBank.length ?? 0) > 0 },
+    {
+      key: "identity",
+      label: { ar: "الهوية ومعلومات الاتصال", en: "Identity & contact" },
+      weight: 15,
+      done: !!(t?.identity.fullName && t?.identity.email),
+    },
+    {
+      key: "summary",
+      label: { ar: "الملخص المهني", en: "Professional summary" },
+      weight: 12,
+      done: (t?.identity.summary?.length ?? 0) > 80,
+    },
+    {
+      key: "targets",
+      label: { ar: "الهدف المهني", en: "Career target" },
+      weight: 12,
+      done: (t?.targets.length ?? 0) > 0,
+    },
+    {
+      key: "work",
+      label: { ar: "الخبرات العملية", en: "Work history" },
+      weight: 20,
+      done: (t?.workHistory.length ?? 0) > 0,
+    },
+    {
+      key: "achievements",
+      label: { ar: "الإنجازات والأدلة", en: "Achievements & evidence" },
+      weight: 13,
+      done: (t?.achievements.length ?? 0) > 1,
+    },
+    {
+      key: "skills",
+      label: { ar: "المهارات", en: "Skills" },
+      weight: 10,
+      done: (t?.skills.length ?? 0) >= 4,
+    },
+    {
+      key: "education",
+      label: { ar: "التعليم", en: "Education" },
+      weight: 8,
+      done: (t?.education.length ?? 0) > 0,
+    },
+    {
+      key: "stories",
+      label: { ar: "بنك قصص STAR", en: "STAR story bank" },
+      weight: 10,
+      done: (t?.storyBank.length ?? 0) > 0,
+    },
   ];
   const score = sections.reduce((s, x) => s + (x.done ? x.weight : 0), 0);
   return { score: Math.min(100, score), sections };
@@ -296,7 +345,9 @@ const toJob = (row: JobRow): JobWorkspace => ({
   jobDescription: row.job_description ?? "",
   salary: row.salary,
   notes: row.notes,
-  status: (JOB_STATUSES as readonly string[]).includes(row.status) ? (row.status as JobStatus) : "saved",
+  status: (JOB_STATUSES as readonly string[]).includes(row.status)
+    ? (row.status as JobStatus)
+    : "saved",
   requirements: hasKeys(row.requirements) ? (row.requirements as JobRequirements) : null,
   matchAnalysis: hasKeys(row.match_analysis) ? (row.match_analysis as MatchAnalysis) : null,
   matchScore: row.match_score ?? 0,
@@ -385,7 +436,8 @@ export async function updateJob(
     if (patch.status === "applied") row.applied_at = new Date().toISOString();
   }
   if (patch.requirements !== undefined) row.requirements = patch.requirements as unknown as Json;
-  if (patch.matchAnalysis !== undefined) row.match_analysis = patch.matchAnalysis as unknown as Json;
+  if (patch.matchAnalysis !== undefined)
+    row.match_analysis = patch.matchAnalysis as unknown as Json;
   if (patch.matchScore !== undefined) row.match_score = patch.matchScore;
   if (patch.appliedAt !== undefined) row.applied_at = patch.appliedAt;
   if (patch.nextActionAt !== undefined) row.next_action_at = patch.nextActionAt;
@@ -508,7 +560,14 @@ export type AgentActivity = {
 /** Stores only a short, safe summary — never the raw prompt or answer. */
 export async function logAgentActivity(
   userId: string,
-  entry: { agentId: AgentId; task: string; status?: string; provider?: string; summary?: string; jobId?: string },
+  entry: {
+    agentId: AgentId;
+    task: string;
+    status?: string;
+    provider?: string;
+    summary?: string;
+    jobId?: string;
+  },
 ): Promise<void> {
   await supabase.from("agent_activity").insert({
     user_id: userId,

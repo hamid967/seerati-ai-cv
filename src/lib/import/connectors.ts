@@ -28,8 +28,7 @@ export const ACCEPTED_MIME = [
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 export type FileGate =
-  | { ok: true; kind: "txt" | "md" | "docx" | "pdf" }
-  | { ok: false; reason: "size" | "type" };
+  { ok: true; kind: "txt" | "md" | "docx" | "pdf" } | { ok: false; reason: "size" | "type" };
 
 /** Validate a picked file by extension, MIME and size before any parsing. */
 export function gateFile(file: { name: string; type: string; size: number }): FileGate {

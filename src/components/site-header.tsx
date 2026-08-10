@@ -1,5 +1,14 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { Briefcase, FileText, Globe, LayoutDashboard, LogOut, Menu, Shield, UserSquare2 } from "lucide-react";
+import {
+  Briefcase,
+  FileText,
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Shield,
+  UserSquare2,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,7 +71,10 @@ export function SiteHeader() {
               key={l.to}
               to={l.to}
               className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              activeProps={{ className: "rounded-md px-3 py-2 text-sm font-semibold text-foreground bg-secondary" }}
+              activeProps={{
+                className:
+                  "rounded-md px-3 py-2 text-sm font-semibold text-foreground bg-secondary",
+              }}
             >
               {l.label}
             </Link>
@@ -86,10 +98,18 @@ export function SiteHeader() {
                 <DropdownMenuItem onClick={() => router.navigate({ to: "/dashboard" })}>
                   <LayoutDashboard className="size-4" /> {t("nav_dashboard")}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { window.location.href = "/career-twin"; }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    window.location.href = "/career-twin";
+                  }}
+                >
                   <UserSquare2 className="size-4" /> {t("nav_career_twin")}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { window.location.href = "/jobs"; }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    window.location.href = "/jobs";
+                  }}
+                >
                   <Briefcase className="size-4" /> {t("nav_jobs")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.navigate({ to: "/account" })}>
@@ -156,10 +176,18 @@ export function SiteHeader() {
                 <div className="my-2 border-t border-border" />
                 {user ? (
                   <>
-                    <Link to="/dashboard" onClick={() => setOpen(false)} className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                    >
                       {t("nav_dashboard")}
                     </Link>
-                    <Link to="/account" onClick={() => setOpen(false)} className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                    <Link
+                      to="/account"
+                      onClick={() => setOpen(false)}
+                      className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                    >
                       {t("nav_account")}
                     </Link>
                     <button
@@ -175,7 +203,11 @@ export function SiteHeader() {
                   </>
                 ) : (
                   <>
-                    <Link to="/auth" onClick={() => setOpen(false)} className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                    <Link
+                      to="/auth"
+                      onClick={() => setOpen(false)}
+                      className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                    >
                       {t("nav_login")}
                     </Link>
                     <Link

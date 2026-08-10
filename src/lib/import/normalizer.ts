@@ -20,7 +20,7 @@ const PUNCT_MAP: Record<string, string> = {
   "،": ",",
   "؛": ";",
   "٪": "%",
-  "ـ": "",
+  ـ: "",
   "–": "-",
   "—": "-",
   "‐": "-",
@@ -59,9 +59,33 @@ export function normalizeText(raw: string): string {
 export function normalizeDate(raw: string): string {
   const v = toLatinDigits(raw).trim();
   const MONTHS: Record<string, number> = {
-    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
-    يناير: 1, فبراير: 2, مارس: 3, أبريل: 4, ابريل: 4, مايو: 5, يونيو: 6, يوليو: 7, أغسطس: 8, اغسطس: 8,
-    سبتمبر: 9, أكتوبر: 10, اكتوبر: 10, نوفمبر: 11, ديسمبر: 12,
+    jan: 1,
+    feb: 2,
+    mar: 3,
+    apr: 4,
+    may: 5,
+    jun: 6,
+    jul: 7,
+    aug: 8,
+    sep: 9,
+    oct: 10,
+    nov: 11,
+    dec: 12,
+    يناير: 1,
+    فبراير: 2,
+    مارس: 3,
+    أبريل: 4,
+    ابريل: 4,
+    مايو: 5,
+    يونيو: 6,
+    يوليو: 7,
+    أغسطس: 8,
+    اغسطس: 8,
+    سبتمبر: 9,
+    أكتوبر: 10,
+    اكتوبر: 10,
+    نوفمبر: 11,
+    ديسمبر: 12,
   };
   const iso = v.match(/(\d{4})[-/](\d{1,2})/);
   if (iso) return `${iso[1]}-${String(Number(iso[2])).padStart(2, "0")}`;
@@ -95,7 +119,11 @@ export function normalizeDocument(raw: string): NormalizedText {
   const text = normalizeText(raw);
   const emails = Array.from(new Set(text.match(EMAIL_RE) ?? []));
   const phones = Array.from(
-    new Set((text.match(PHONE_RE) ?? []).map(normalizePhone).filter((p) => p.replace(/\D/g, "").length >= 8)),
+    new Set(
+      (text.match(PHONE_RE) ?? [])
+        .map(normalizePhone)
+        .filter((p) => p.replace(/\D/g, "").length >= 8),
+    ),
   );
   const links = Array.from(new Set(text.match(LINK_RE) ?? []))
     .filter((l) => !l.includes("@") && !emails.some((e) => e.endsWith(l)))

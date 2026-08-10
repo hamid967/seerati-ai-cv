@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Copy, FileText, MoreVertical, Pencil, Plus, Trash2, Eye, Sparkles, ArrowLeft } from "lucide-react";
+import {
+  Copy,
+  FileText,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Trash2,
+  Eye,
+  Sparkles,
+  ArrowLeft,
+} from "lucide-react";
 import { toast } from "sonner";
 import { getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
@@ -15,7 +25,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useI18n, useT } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { analyzeResume, completeness, resumeStatus } from "@/lib/ats";
@@ -40,7 +56,11 @@ export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "لوحتي | سيرتي — Seerati Dashboard" },
-      { name: "description", content: "مركز قيادة مسارك المهني: ملفك المهني، وظائفك، سيرك الذاتية، وخطوتك التالية في مكان واحد." },
+      {
+        name: "description",
+        content:
+          "مركز قيادة مسارك المهني: ملفك المهني، وظائفك، سيرك الذاتية، وخطوتك التالية في مكان واحد.",
+      },
       { property: "og:title", content: "لوحة التحكم | سيرتي" },
       { property: "og:description", content: "كل مسارك المهني في مكان واحد." },
       { name: "robots", content: "noindex" },
@@ -54,7 +74,17 @@ function Dashboard() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, createResume, maxResumes } = useStore();
+  const {
+    user,
+    ready,
+    resumes,
+    atLimit,
+    duplicateResume,
+    deleteResume,
+    updateResume,
+    createResume,
+    maxResumes,
+  } = useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   const [twin, setTwin] = useState<CareerTwin | null>(null);
@@ -92,7 +122,6 @@ function Dashboard() {
     };
   }, [user]);
 
-
   if (!ready || !user) {
     return (
       <div className="min-h-screen">
@@ -121,7 +150,6 @@ function Dashboard() {
       .map((j) => ({ jobId: j.id, jobTitle: j.jobTitle, occurredAt: j.nextActionAt as string })),
   });
 
-
   return (
     <div className="flex min-h-screen flex-col">
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-10 px-4 py-10">
@@ -137,7 +165,10 @@ function Dashboard() {
                 : "Your career command center: profile, jobs and resumes in one place."}
             </p>
           </div>
-          <a href="/career-twin" className="w-full max-w-xs rounded-2xl border border-border bg-card p-4 shadow-soft sm:w-64">
+          <a
+            href="/career-twin"
+            className="w-full max-w-xs rounded-2xl border border-border bg-card p-4 shadow-soft sm:w-64"
+          >
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>{ar ? "اكتمال الملف المهني" : "Career profile completeness"}</span>
               <span className="font-semibold text-foreground">{twinScore ?? "—"}%</span>
@@ -179,7 +210,9 @@ function Dashboard() {
             <p className="text-sm font-bold">{ar ? "إجراءات سريعة" : "Quick actions"}</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <Button asChild variant="outline" className="justify-start">
-                <Link to="/import">{ar ? "استيراد سيرة أو ملف مهني" : "Import a resume or profile"}</Link>
+                <Link to="/import">
+                  {ar ? "استيراد سيرة أو ملف مهني" : "Import a resume or profile"}
+                </Link>
               </Button>
               <Button asChild variant="outline" className="justify-start">
                 <Link to="/career-evidence">{ar ? "إضافة دليل جديد" : "Add new evidence"}</Link>
@@ -209,7 +242,6 @@ function Dashboard() {
           </div>
         </section>
 
-
         <section>
           {loadingCenter ? (
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -220,15 +252,19 @@ function Dashboard() {
           ) : (
             <NextBestActions actions={nextActions} />
           )}
-
         </section>
 
         {/* Team status strip */}
         <section>
-          <h2 className="text-lg font-bold">{ar ? "فريقك جاهز للمساعدة" : "Your team is ready to help"}</h2>
+          <h2 className="text-lg font-bold">
+            {ar ? "فريقك جاهز للمساعدة" : "Your team is ready to help"}
+          </h2>
           <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
             {TEAM.map((agent) => (
-              <div key={agent.id} className="flex min-w-[220px] shrink-0 items-start gap-3 rounded-xl border border-border bg-card p-3.5 shadow-soft">
+              <div
+                key={agent.id}
+                className="flex min-w-[220px] shrink-0 items-start gap-3 rounded-xl border border-border bg-card p-3.5 shadow-soft"
+              >
                 <span
                   className="grid size-9 shrink-0 place-items-center rounded-full text-xs font-bold text-ink-foreground"
                   style={{ backgroundColor: `var(--agent-${agent.accent})` }}
@@ -237,7 +273,9 @@ function Dashboard() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-bold">{agent.name[lang]}</p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{agent.blurb[lang]}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                    {agent.blurb[lang]}
+                  </p>
                 </div>
               </div>
             ))}
@@ -272,7 +310,9 @@ function Dashboard() {
           </div>
 
           {atLimit && (
-            <p className="mt-4 rounded-lg border border-border bg-secondary px-4 py-3 text-sm">{t("limit_reached")}</p>
+            <p className="mt-4 rounded-lg border border-border bg-secondary px-4 py-3 text-sm">
+              {t("limit_reached")}
+            </p>
           )}
 
           {resumes.length === 0 ? (
@@ -285,7 +325,9 @@ function Dashboard() {
                   <p className="text-lg font-bold">{t("empty_resumes")}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{t("empty_resumes_d")}</p>
                   <p className="mt-2 text-sm font-semibold">
-                    {ar ? "أنشئ سيرتك الأولى بمساعدة الذكاء الاصطناعي" : "Create your first CV with AI help"}
+                    {ar
+                      ? "أنشئ سيرتك الأولى بمساعدة الذكاء الاصطناعي"
+                      : "Create your first CV with AI help"}
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
@@ -335,24 +377,40 @@ function Dashboard() {
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" aria-label={ar ? "خيارات" : "Options"}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={ar ? "خيارات" : "Options"}
+                            >
                               <MoreVertical className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => navigate({ to: "/resumes/$id/edit", params: { id: r.id } })}>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                navigate({ to: "/resumes/$id/edit", params: { id: r.id } })
+                              }
+                            >
                               <Pencil className="size-4" /> {t("edit")}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate({ to: "/resumes/$id/preview", params: { id: r.id } })}>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                navigate({ to: "/resumes/$id/preview", params: { id: r.id } })
+                              }
+                            >
                               <Eye className="size-4" /> {t("preview")}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setRenaming({ id: r.id, title: r.title })}>
+                            <DropdownMenuItem
+                              onClick={() => setRenaming({ id: r.id, title: r.title })}
+                            >
                               {t("rename")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
                                 void duplicateResume(r.id).then((copy) => {
-                                  toast[copy ? "success" : "error"](copy ? t("duplicate") : t("limit_reached"));
+                                  toast[copy ? "success" : "error"](
+                                    copy ? t("duplicate") : t("limit_reached"),
+                                  );
                                 });
                               }}
                             >
@@ -385,7 +443,8 @@ function Dashboard() {
                         </Badge>
                         <Badge variant="secondary">ATS {score}/100</Badge>
                         <span className="text-xs text-muted-foreground">
-                          {t("updated")}: {new Date(r.updatedAt).toLocaleDateString(ar ? "ar-SA" : "en-GB")}
+                          {t("updated")}:{" "}
+                          {new Date(r.updatedAt).toLocaleDateString(ar ? "ar-SA" : "en-GB")}
                         </span>
                       </div>
 
@@ -417,7 +476,9 @@ function Dashboard() {
         {/* Active job workspaces */}
         <section>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold">{ar ? "مساحات الوظائف النشطة" : "Active job spaces"}</h2>
+            <h2 className="text-lg font-bold">
+              {ar ? "مساحات الوظائف النشطة" : "Active job spaces"}
+            </h2>
             <a href="/jobs" className="text-xs font-semibold text-emerald-accent">
               {ar ? "عرض الكل" : "View all"}
             </a>
@@ -461,7 +522,9 @@ function Dashboard() {
               <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
                 <Sparkles className="size-5 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
-                  {ar ? "لا يوجد نشاط مسجّل بعد — سيظهر هنا عند استخدام أدوات الفريق." : "No activity yet — it will appear here once you use the team's tools."}
+                  {ar
+                    ? "لا يوجد نشاط مسجّل بعد — سيظهر هنا عند استخدام أدوات الفريق."
+                    : "No activity yet — it will appear here once you use the team's tools."}
                 </p>
               </CardContent>
             </Card>
@@ -470,7 +533,10 @@ function Dashboard() {
               {activity.map((a) => {
                 const agent = TEAM.find((x) => x.id === a.agentId);
                 return (
-                  <li key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-sm">
+                  <li
+                    key={a.id}
+                    className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-sm"
+                  >
                     <span className="font-medium">
                       {agent ? agent.name[lang] : a.agentId} — {a.task}
                     </span>
@@ -498,7 +564,9 @@ function Dashboard() {
             <Button
               onClick={() => {
                 if (renaming) {
-                  void updateResume(renaming.id, { title: renaming.title.trim() || renaming.title });
+                  void updateResume(renaming.id, {
+                    title: renaming.title.trim() || renaming.title,
+                  });
                   toast.success(ar ? "تم التحديث" : "Updated");
                 }
                 setRenaming(null);
@@ -509,7 +577,6 @@ function Dashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

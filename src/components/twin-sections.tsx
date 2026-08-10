@@ -5,12 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
-import type {
-  CareerTwin,
-  CareerTarget,
-  Achievement,
-  CareerSkill,
-} from "@/lib/career";
+import type { CareerTwin, CareerTarget, Achievement, CareerSkill } from "@/lib/career";
 import type { Experience, Education, LanguageItem, LinkItem } from "@/lib/types";
 import { TaxonomyInput } from "@/components/taxonomy-input";
 import {
@@ -21,7 +16,6 @@ import {
   normalizeJobTitle,
   titleOptions,
 } from "@/lib/saudi-career-taxonomy";
-
 
 type WorkMode = "onsite" | "hybrid" | "remote";
 const WORK_MODES: WorkMode[] = ["onsite", "hybrid", "remote"];
@@ -63,7 +57,11 @@ export function IdentityCard({
           <Input value={id.headline} onChange={(e) => onChange({ headline: e.target.value })} />
         </Field>
         <Field label={ar ? "البريد الإلكتروني" : "Email"}>
-          <Input type="email" value={id.email} onChange={(e) => onChange({ email: e.target.value })} />
+          <Input
+            type="email"
+            value={id.email}
+            onChange={(e) => onChange({ email: e.target.value })}
+          />
         </Field>
         <Field label={ar ? "الجوال" : "Phone"}>
           <Input value={id.phone} onChange={(e) => onChange({ phone: e.target.value })} />
@@ -72,14 +70,26 @@ export function IdentityCard({
           <Input value={id.city} onChange={(e) => onChange({ city: e.target.value })} />
         </Field>
         <Field label={ar ? "الملخص المهني" : "Professional summary"} full>
-          <Textarea rows={4} value={id.summary} onChange={(e) => onChange({ summary: e.target.value })} />
+          <Textarea
+            rows={4}
+            value={id.summary}
+            onChange={(e) => onChange({ summary: e.target.value })}
+          />
         </Field>
       </CardContent>
     </Card>
   );
 }
 
-function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
+function Field({
+  label,
+  children,
+  full,
+}: {
+  label: string;
+  children: React.ReactNode;
+  full?: boolean;
+}) {
   return (
     <label className={`block space-y-1.5 text-sm ${full ? "sm:col-span-2" : ""}`}>
       <span className="text-muted-foreground">{label}</span>
@@ -88,7 +98,15 @@ function Field({ label, children, full }: { label: string; children: React.React
   );
 }
 
-function RowShell({ children, onRemove, ar }: { children: React.ReactNode; onRemove: () => void; ar: Ar }) {
+function RowShell({
+  children,
+  onRemove,
+  ar,
+}: {
+  children: React.ReactNode;
+  onRemove: () => void;
+  ar: Ar;
+}) {
   return (
     <div className="rounded-xl border border-border p-3">
       <div className="flex items-start gap-3">
@@ -328,7 +346,10 @@ export function AchievementsCard({
                 onChange={(e) => update(i, { metric: e.target.value })}
               />
               <label className="flex items-center gap-2 text-sm">
-                <Checkbox checked={!!x.verified} onCheckedChange={(v) => update(i, { verified: v === true })} />
+                <Checkbox
+                  checked={!!x.verified}
+                  onCheckedChange={(v) => update(i, { verified: v === true })}
+                />
                 {ar ? "أكّدت هذا الرقم" : "I verified this figure"}
               </label>
             </div>
@@ -431,7 +452,11 @@ export function SimpleListCard({
         {items.map((x, i) => (
           <RowShell key={x.id} ar={ar} onRemove={() => remove(i)}>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Input placeholder={titlePlaceholder} value={x.title} onChange={(e) => update(i, { title: e.target.value })} />
+              <Input
+                placeholder={titlePlaceholder}
+                value={x.title}
+                onChange={(e) => update(i, { title: e.target.value })}
+              />
               <Input
                 placeholder={detailPlaceholder}
                 value={x.detail ?? ""}
@@ -473,7 +498,11 @@ export function SkillsCard({
         {items.map((x, i) => (
           <RowShell key={x.id} ar={ar} onRemove={() => remove(i)}>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Input placeholder={ar ? "المهارة" : "Skill"} value={x.name} onChange={(e) => update(i, { name: e.target.value })} />
+              <Input
+                placeholder={ar ? "المهارة" : "Skill"}
+                value={x.name}
+                onChange={(e) => update(i, { name: e.target.value })}
+              />
               <Input
                 placeholder={ar ? "دليل (مشروع/نتيجة)" : "Evidence"}
                 value={x.evidence ?? ""}
@@ -481,7 +510,10 @@ export function SkillsCard({
               />
             </div>
             <label className="flex items-center gap-2 text-sm">
-              <Checkbox checked={!!x.verified} onCheckedChange={(v) => update(i, { verified: v === true })} />
+              <Checkbox
+                checked={!!x.verified}
+                onCheckedChange={(v) => update(i, { verified: v === true })}
+              />
               {ar ? "مؤكدة" : "Verified"}
             </label>
           </RowShell>
@@ -519,8 +551,16 @@ export function LanguagesCard({
         {items.map((x, i) => (
           <RowShell key={x.id} ar={ar} onRemove={() => remove(i)}>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Input placeholder={ar ? "اللغة" : "Language"} value={x.name} onChange={(e) => update(i, { name: e.target.value })} />
-              <Input placeholder={ar ? "المستوى" : "Level"} value={x.level} onChange={(e) => update(i, { level: e.target.value })} />
+              <Input
+                placeholder={ar ? "اللغة" : "Language"}
+                value={x.name}
+                onChange={(e) => update(i, { name: e.target.value })}
+              />
+              <Input
+                placeholder={ar ? "المستوى" : "Level"}
+                value={x.level}
+                onChange={(e) => update(i, { level: e.target.value })}
+              />
             </div>
           </RowShell>
         ))}
@@ -557,8 +597,16 @@ export function LinksCard({
         {items.map((x, i) => (
           <RowShell key={x.id} ar={ar} onRemove={() => remove(i)}>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Input placeholder={ar ? "التسمية" : "Label"} value={x.label} onChange={(e) => update(i, { label: e.target.value })} />
-              <Input placeholder="https://" value={x.url} onChange={(e) => update(i, { url: e.target.value })} />
+              <Input
+                placeholder={ar ? "التسمية" : "Label"}
+                value={x.label}
+                onChange={(e) => update(i, { label: e.target.value })}
+              />
+              <Input
+                placeholder="https://"
+                value={x.url}
+                onChange={(e) => update(i, { url: e.target.value })}
+              />
             </div>
           </RowShell>
         ))}
@@ -589,7 +637,10 @@ export function PreferencesCard({
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
         <Field label={ar ? "المدن" : "Cities"}>
-          <Input value={prefs.cities ?? ""} onChange={(e) => onChange({ cities: e.target.value })} />
+          <Input
+            value={prefs.cities ?? ""}
+            onChange={(e) => onChange({ cities: e.target.value })}
+          />
         </Field>
         <Field label={ar ? "نمط العمل" : "Work mode"}>
           <Input
@@ -605,13 +656,22 @@ export function PreferencesCard({
           />
         </Field>
         <Field label={ar ? "الصناعات" : "Industries"}>
-          <Input value={prefs.industries ?? ""} onChange={(e) => onChange({ industries: e.target.value })} />
+          <Input
+            value={prefs.industries ?? ""}
+            onChange={(e) => onChange({ industries: e.target.value })}
+          />
         </Field>
         <Field label={ar ? "المستوى الوظيفي" : "Seniority"}>
-          <Input value={prefs.seniority ?? ""} onChange={(e) => onChange({ seniority: e.target.value })} />
+          <Input
+            value={prefs.seniority ?? ""}
+            onChange={(e) => onChange({ seniority: e.target.value })}
+          />
         </Field>
         <Field label={ar ? "فترة الإشعار" : "Notice period"}>
-          <Input value={prefs.noticePeriod ?? ""} onChange={(e) => onChange({ noticePeriod: e.target.value })} />
+          <Input
+            value={prefs.noticePeriod ?? ""}
+            onChange={(e) => onChange({ noticePeriod: e.target.value })}
+          />
         </Field>
       </CardContent>
     </Card>

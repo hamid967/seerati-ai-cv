@@ -15,10 +15,14 @@ export const Route = createFileRoute("/templates")({
       { title: "القوالب | سيرتي — Seerati Templates" },
       {
         name: "description",
-        content: "ستة قوالب سير ذاتية تدعم العربية والإنجليزية، منها قوالب متوافقة مع أنظمة التوظيف ATS وأخرى عصرية وإبداعية.",
+        content:
+          "ستة قوالب سير ذاتية تدعم العربية والإنجليزية، منها قوالب متوافقة مع أنظمة التوظيف ATS وأخرى عصرية وإبداعية.",
       },
       { property: "og:title", content: "قوالب السير الذاتية | سيرتي" },
-      { property: "og:description", content: "قوالب ATS وعصرية وتنفيذية ومبسطة وسعودية مهنية وإبداعية." },
+      {
+        property: "og:description",
+        content: "قوالب ATS وعصرية وتنفيذية ومبسطة وسعودية مهنية وإبداعية.",
+      },
     ],
   }),
   component: TemplatesPage,
@@ -53,7 +57,9 @@ function TemplatesPage() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12">
-        <h1 className="text-3xl font-extrabold tracking-tight">{ar ? "معرض القوالب" : "Template gallery"}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {ar ? "معرض القوالب" : "Template gallery"}
+        </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           {ar
             ? "كل قالب مبني كمكوّن مستقل، ويمكن تبديله في أي وقت دون فقدان بياناتك."
@@ -85,7 +91,11 @@ function TemplatesPage() {
             <div key={tpl.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
               <div className="mb-4">
                 <ResumeThumb
-                  resume={{ ...sample, templateId: tpl.id, language: filter === "english" ? "en" : sample.language }}
+                  resume={{
+                    ...sample,
+                    templateId: tpl.id,
+                    language: filter === "english" ? "en" : sample.language,
+                  }}
                   template={tpl}
                   scale={0.3}
                 />
@@ -108,7 +118,9 @@ function TemplatesPage() {
                   </Badge>
                 </div>
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{tpl.description[lang]}</p>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                {tpl.description[lang]}
+              </p>
               <Button className="mt-4 w-full" size="sm" asChild>
                 <Link to="/resumes/new" search={{ template: tpl.id }}>
                   {ar ? "استخدم هذا القالب" : "Use this template"}

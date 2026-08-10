@@ -37,10 +37,30 @@ type Props = {
 };
 
 const STAR_FIELDS = [
-  { key: "situation", ar: "الموقف", en: "Situation", ph: { ar: "ما كان السياق؟", en: "What was the context?" } },
-  { key: "task", ar: "المهمة", en: "Task", ph: { ar: "ما كانت مسؤوليتك؟", en: "What was your responsibility?" } },
-  { key: "action", ar: "الإجراء", en: "Action", ph: { ar: "ماذا فعلت تحديداً؟", en: "What exactly did you do?" } },
-  { key: "result", ar: "النتيجة", en: "Result", ph: { ar: "ما النتيجة؟ رقم إن توفّر", en: "What was the result? A number if you have one" } },
+  {
+    key: "situation",
+    ar: "الموقف",
+    en: "Situation",
+    ph: { ar: "ما كان السياق؟", en: "What was the context?" },
+  },
+  {
+    key: "task",
+    ar: "المهمة",
+    en: "Task",
+    ph: { ar: "ما كانت مسؤوليتك؟", en: "What was your responsibility?" },
+  },
+  {
+    key: "action",
+    ar: "الإجراء",
+    en: "Action",
+    ph: { ar: "ماذا فعلت تحديداً؟", en: "What exactly did you do?" },
+  },
+  {
+    key: "result",
+    ar: "النتيجة",
+    en: "Result",
+    ph: { ar: "ما النتيجة؟ رقم إن توفّر", en: "What was the result? A number if you have one" },
+  },
 ] as const;
 
 type StarKey = (typeof STAR_FIELDS)[number]["key"];
@@ -69,7 +89,13 @@ function relevantFacts(graph: FactGraph, question: string, jobDescription?: stri
     .map((s) => s.f);
 }
 
-export function InterviewEvidenceAnswer({ userId, question, graph, jobDescription, onSaved }: Props) {
+export function InterviewEvidenceAnswer({
+  userId,
+  question,
+  graph,
+  jobDescription,
+  onSaved,
+}: Props) {
   const { lang, dir } = useI18n();
   const ar = lang === "ar";
   const [answer, setAnswer] = useState("");
@@ -132,9 +158,7 @@ export function InterviewEvidenceAnswer({ userId, question, graph, jobDescriptio
     setSaving(true);
     try {
       const title = question.slice(0, 120);
-      const value = STAR_FIELDS.map(
-        (f) => `${ar ? f.ar : f.en}: ${star[f.key].trim()}`,
-      ).join("\n");
+      const value = STAR_FIELDS.map((f) => `${ar ? f.ar : f.en}: ${star[f.key].trim()}`).join("\n");
       const fact = await createFact(userId, {
         type: "star_story",
         title,
@@ -181,8 +205,18 @@ export function InterviewEvidenceAnswer({ userId, question, graph, jobDescriptio
       <CardContent className="space-y-4">
         {hasStory ? (
           <>
-            <Button size="sm" variant="outline" className="gap-1.5" onClick={draft} disabled={drafting}>
-              {drafting ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5"
+              onClick={draft}
+              disabled={drafting}
+            >
+              {drafting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Sparkles className="size-4" />
+              )}
               {ar ? "اصنع إجابة من أدلتي" : "Draft from my evidence"}
             </Button>
 
@@ -275,7 +309,12 @@ export function InterviewEvidenceAnswer({ userId, question, graph, jobDescriptio
               />
             </div>
           </div>
-          <Button size="sm" className="gap-1.5" onClick={saveStory} disabled={saving || !starComplete}>
+          <Button
+            size="sm"
+            className="gap-1.5"
+            onClick={saveStory}
+            disabled={saving || !starComplete}
+          >
             {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
             {ar ? "احفظ القصة كحقيقة موثّقة" : "Save story as a verified fact"}
           </Button>

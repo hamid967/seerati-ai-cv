@@ -20,13 +20,7 @@ export const CONFIDENCE_LABEL: Record<Confidence, { ar: string; en: string }> = 
   low: { ar: "تحقق مطلوب", en: "Needs review" },
 };
 
-export type FieldKey =
-  | "fullName"
-  | "headline"
-  | "email"
-  | "phone"
-  | "city"
-  | "summary";
+export type FieldKey = "fullName" | "headline" | "email" | "phone" | "city" | "summary";
 
 export type FieldCandidate = {
   key: FieldKey;
@@ -38,7 +32,8 @@ export type FieldCandidate = {
   include: boolean;
 };
 
-export type ListKind = "experience" | "education" | "skills" | "languages" | "certificates" | "projects";
+export type ListKind =
+  "experience" | "education" | "skills" | "languages" | "certificates" | "projects";
 
 export type ListCandidate<T> = {
   id: string;
@@ -92,7 +87,12 @@ function eduConfidence(item: Education): Confidence {
   return "low";
 }
 
-function listCandidate<T>(kind: ListKind, value: T, confidence: Confidence, duplicate: boolean): ListCandidate<T> {
+function listCandidate<T>(
+  kind: ListKind,
+  value: T,
+  confidence: Confidence,
+  duplicate: boolean,
+): ListCandidate<T> {
   return { id: uid(), kind, value, confidence, duplicate, include: !duplicate };
 }
 
@@ -117,12 +117,36 @@ export function buildImportDraft(args: {
   const phones = parsed.contact.phones;
 
   const rawFields: Array<{ key: FieldKey; value: string; confidence: Confidence }> = [
-    { key: "fullName", value: parsed.personal?.fullName ?? "", confidence: parsed.personal?.fullName ? "medium" : "low" },
-    { key: "headline", value: parsed.personal?.jobTitle ?? "", confidence: parsed.personal?.jobTitle ? "medium" : "low" },
-    { key: "email", value: emails[0] ?? "", confidence: emails.length === 1 ? "high" : emails.length ? "medium" : "low" },
-    { key: "phone", value: phones[0] ?? "", confidence: phones.length === 1 ? "high" : phones.length ? "medium" : "low" },
-    { key: "city", value: parsed.personal?.city ?? "", confidence: parsed.personal?.city ? "medium" : "low" },
-    { key: "summary", value: parsed.summary ?? "", confidence: (parsed.summary?.length ?? 0) > 80 ? "high" : "medium" },
+    {
+      key: "fullName",
+      value: parsed.personal?.fullName ?? "",
+      confidence: parsed.personal?.fullName ? "medium" : "low",
+    },
+    {
+      key: "headline",
+      value: parsed.personal?.jobTitle ?? "",
+      confidence: parsed.personal?.jobTitle ? "medium" : "low",
+    },
+    {
+      key: "email",
+      value: emails[0] ?? "",
+      confidence: emails.length === 1 ? "high" : emails.length ? "medium" : "low",
+    },
+    {
+      key: "phone",
+      value: phones[0] ?? "",
+      confidence: phones.length === 1 ? "high" : phones.length ? "medium" : "low",
+    },
+    {
+      key: "city",
+      value: parsed.personal?.city ?? "",
+      confidence: parsed.personal?.city ? "medium" : "low",
+    },
+    {
+      key: "summary",
+      value: parsed.summary ?? "",
+      confidence: (parsed.summary?.length ?? 0) > 80 ? "high" : "medium",
+    },
   ];
 
   const fields: FieldCandidate[] = rawFields
@@ -141,19 +165,38 @@ export function buildImportDraft(args: {
       };
     });
 
-  const existingExp = new Set((args.twin?.workHistory ?? []).map((e) => norm(`${e.company}|${e.role}`)));
+  const existingExp = new Set(
+    (args.twin?.workHistory ?? []).map((e) => norm(`${e.company}|${e.role}`)),
+  );
   const experience = (parsed.experience ?? []).map((item) =>
-    listCandidate<Experience>("experience", item, expConfidence(item), existingExp.has(norm(`${item.company}|${item.role}`))),
+    listCandidate<Experience>(
+      "experience",
+      item,
+      expConfidence(item),
+      existingExp.has(norm(`${item.company}|${item.role}`)),
+    ),
   );
 
-  const existingEdu = new Set((args.twin?.education ?? []).map((e) => norm(`${e.school}|${e.degree}`)));
+  const existingEdu = new Set(
+    (args.twin?.education ?? []).map((e) => norm(`${e.school}|${e.degree}`)),
+  );
   const education = (parsed.education ?? []).map((item) =>
-    listCandidate<Education>("education", item, eduConfidence(item), existingEdu.has(norm(`${item.school}|${item.degree}`))),
+    listCandidate<Education>(
+      "education",
+      item,
+      eduConfidence(item),
+      existingEdu.has(norm(`${item.school}|${item.degree}`)),
+    ),
   );
 
   const existingSkills = new Set((args.twin?.skills ?? []).map((s) => norm(s.name)));
   const skills = (parsed.skills ?? []).map((item) =>
-    listCandidate<SkillItem>("skills", item, item.name.length > 1 ? "high" : "low", existingSkills.has(norm(item.name))),
+    listCandidate<SkillItem>(
+      "skills",
+      item,
+      item.name.length > 1 ? "high" : "low",
+      existingSkills.has(norm(item.name)),
+    ),
   );
 
   const existingLangs = new Set((args.twin?.languages ?? []).map((l) => norm(l.name)));
@@ -217,7 +260,16 @@ export function draftToTwinPatch(draft: ImportDraft, twin: CareerTwin | null): A
 
   const chosenFields = draft.fields.filter((f) => f.include && f.value.trim());
   if (chosenFields.length) {
-    const identity = { ...(twin?.identity ?? { fullName: "", headline: "", email: "", phone: "", city: "", summary: "" }) };
+    const identity = {
+      ...(twin?.identity ?? {
+        fullName: "",
+        headline: "",
+        email: "",
+        phone: "",
+        city: "",
+        summary: "",
+      }),
+    };
     for (const field of chosenFields) {
       identity[field.key] = field.value.trim();
       count += 1;
@@ -226,7 +278,7 @@ export function draftToTwinPatch(draft: ImportDraft, twin: CareerTwin | null): A
     sections.push("identity");
   }
 
-  const pick = <T,>(list: ListCandidate<T>[]) => list.filter((x) => x.include).map((x) => x.value);
+  const pick = <T>(list: ListCandidate<T>[]) => list.filter((x) => x.include).map((x) => x.value);
 
   const exp = pick(draft.experience);
   if (exp.length) {

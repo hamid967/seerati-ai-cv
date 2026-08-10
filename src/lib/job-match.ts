@@ -11,24 +11,125 @@ import type { CareerTwin, JobRequirements, MatchAnalysis, MatchGap } from "./car
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 const SKILL_DICTIONARY = [
-  "excel","power bi","tableau","sql","python","r","sas","spss","java","javascript","typescript","react","node",
-  "azure","aws","gcp","docker","kubernetes","git","figma","photoshop","illustrator","autocad","revit","sap",
-  "oracle","erp","crm","salesforce","hubspot","seo","sem","google analytics","jira","confluence","scrum","agile",
-  "pmp","prince2","six sigma","lean","ifrs","gaap","cpa","cma","cfa","budgeting","forecasting","reconciliation",
-  "audit","risk","compliance","aml","kyc","payroll","recruitment","onboarding","training","okr","kpi",
-  "محاسبة","تدقيق","ميزانية","مبيعات","تسويق","موارد بشرية","مشتريات","لوجستيات","سلسلة الإمداد","خدمة العملاء",
-  "إدارة مشاريع","تحليل بيانات","جودة","سلامة","صيانة","تخطيط","تدريب","تطوير أعمال","علاقات حكومية","توظيف",
+  "excel",
+  "power bi",
+  "tableau",
+  "sql",
+  "python",
+  "r",
+  "sas",
+  "spss",
+  "java",
+  "javascript",
+  "typescript",
+  "react",
+  "node",
+  "azure",
+  "aws",
+  "gcp",
+  "docker",
+  "kubernetes",
+  "git",
+  "figma",
+  "photoshop",
+  "illustrator",
+  "autocad",
+  "revit",
+  "sap",
+  "oracle",
+  "erp",
+  "crm",
+  "salesforce",
+  "hubspot",
+  "seo",
+  "sem",
+  "google analytics",
+  "jira",
+  "confluence",
+  "scrum",
+  "agile",
+  "pmp",
+  "prince2",
+  "six sigma",
+  "lean",
+  "ifrs",
+  "gaap",
+  "cpa",
+  "cma",
+  "cfa",
+  "budgeting",
+  "forecasting",
+  "reconciliation",
+  "audit",
+  "risk",
+  "compliance",
+  "aml",
+  "kyc",
+  "payroll",
+  "recruitment",
+  "onboarding",
+  "training",
+  "okr",
+  "kpi",
+  "محاسبة",
+  "تدقيق",
+  "ميزانية",
+  "مبيعات",
+  "تسويق",
+  "موارد بشرية",
+  "مشتريات",
+  "لوجستيات",
+  "سلسلة الإمداد",
+  "خدمة العملاء",
+  "إدارة مشاريع",
+  "تحليل بيانات",
+  "جودة",
+  "سلامة",
+  "صيانة",
+  "تخطيط",
+  "تدريب",
+  "تطوير أعمال",
+  "علاقات حكومية",
+  "توظيف",
 ];
 
 const SOFT_DICTIONARY = [
-  "communication","leadership","teamwork","problem solving","time management","negotiation","presentation",
-  "attention to detail","stakeholder management","ownership","adaptability",
-  "تواصل","قيادة","عمل جماعي","حل المشكلات","إدارة الوقت","تفاوض","عرض تقديمي","دقة","مبادرة","مرونة","تنظيم",
+  "communication",
+  "leadership",
+  "teamwork",
+  "problem solving",
+  "time management",
+  "negotiation",
+  "presentation",
+  "attention to detail",
+  "stakeholder management",
+  "ownership",
+  "adaptability",
+  "تواصل",
+  "قيادة",
+  "عمل جماعي",
+  "حل المشكلات",
+  "إدارة الوقت",
+  "تفاوض",
+  "عرض تقديمي",
+  "دقة",
+  "مبادرة",
+  "مرونة",
+  "تنظيم",
 ];
 
 const EDU_HINTS = [
-  "bachelor","master","mba","diploma","degree","phd",
-  "بكالوريوس","ماجستير","دبلوم","دكتوراه","شهادة",
+  "bachelor",
+  "master",
+  "mba",
+  "diploma",
+  "degree",
+  "phd",
+  "بكالوريوس",
+  "ماجستير",
+  "دبلوم",
+  "دكتوراه",
+  "شهادة",
 ];
 
 const SENIORITY = [
@@ -40,15 +141,48 @@ const SENIORITY = [
   { re: /\b(director|head of|مدير عام|رئيس)\b/i, ar: "مدير تنفيذي", en: "Director" },
 ];
 
-const YEARS_RE =
-  /(\d{1,2})\s*(?:\+|\s*-\s*\d{1,2})?\s*(?:years?|yrs?|سنة|سنوات|أعوام)/i;
+const YEARS_RE = /(\d{1,2})\s*(?:\+|\s*-\s*\d{1,2})?\s*(?:years?|yrs?|سنة|سنوات|أعوام)/i;
 
 const STOP_WORDS = new Set([
-  "the","and","for","with","from","this","that","will","you","your","are","our","have","has","must","should",
-  "في","من","على","إلى","عن","مع","التي","الذي","هذا","هذه","يجب","لدى","أو","ما","كل",
+  "the",
+  "and",
+  "for",
+  "with",
+  "from",
+  "this",
+  "that",
+  "will",
+  "you",
+  "your",
+  "are",
+  "our",
+  "have",
+  "has",
+  "must",
+  "should",
+  "في",
+  "من",
+  "على",
+  "إلى",
+  "عن",
+  "مع",
+  "التي",
+  "الذي",
+  "هذا",
+  "هذه",
+  "يجب",
+  "لدى",
+  "أو",
+  "ما",
+  "كل",
 ]);
 
-const norm = (s: string) => s.toLowerCase().replace(/[\u0640\u064B-\u0652]/g, "").trim();
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/\u0640/g, "")
+    .replace(/\p{M}/gu, "")
+    .trim();
 
 function bulletLines(text: string): string[] {
   return text
@@ -82,7 +216,11 @@ export function parseJobDescription(text: string): JobRequirements {
   const education = EDU_HINTS.filter((e) => t.includes(norm(e)));
 
   const responsibilities = lines
-    .filter((l) => /^(?:manage|lead|develop|build|support|prepare|analy|coordinate|إدارة|تطوير|إعداد|تحليل|متابعة|تنسيق|دعم)/i.test(l))
+    .filter((l) =>
+      /^(?:manage|lead|develop|build|support|prepare|analy|coordinate|إدارة|تطوير|إعداد|تحليل|متابعة|تنسيق|دعم)/i.test(
+        l,
+      ),
+    )
     .slice(0, 10);
 
   const freq = new Map<string, number>();
@@ -193,7 +331,12 @@ export function matchTwinToJob(twin: CareerTwin | null, req: JobRequirements): M
     });
   }
   for (const m of req.missing.slice(0, 3)) {
-    gaps.push({ id: uid(), kind: "info", label: m, hint: "أضف المعلومة يدوياً إن عرفتها من مصدر آخر." });
+    gaps.push({
+      id: uid(),
+      kind: "info",
+      label: m,
+      hint: "أضف المعلومة يدوياً إن عرفتها من مصدر آخر.",
+    });
   }
 
   // Weighted, and honest about what it measures.
@@ -201,10 +344,15 @@ export function matchTwinToJob(twin: CareerTwin | null, req: JobRequirements): M
     ? (matchedSkills.length / req.hardSkills.length) * 55
     : 30;
   const softPart = req.softSkills.length ? (matchedSoft.length / req.softSkills.length) * 15 : 10;
-  const keywordPart = req.keywords.length ? (matchedKeywords.length / req.keywords.length) * 20 : 10;
+  const keywordPart = req.keywords.length
+    ? (matchedKeywords.length / req.keywords.length) * 20
+    : 10;
   const evidencePart = Math.min(10, bulletsWithNumbers * 3);
 
-  const score = Math.max(0, Math.min(100, Math.round(skillPart + softPart + keywordPart + evidencePart)));
+  const score = Math.max(
+    0,
+    Math.min(100, Math.round(skillPart + softPart + keywordPart + evidencePart)),
+  );
 
   return { score, matchedSkills, missingSkills, gaps, limitations };
 }

@@ -42,7 +42,14 @@ export const demoResumeData = (): ResumeData => ({
     },
   ],
   education: [
-    { id: uid(), degree: "بكالوريوس نظم معلومات إدارية", school: "جامعة الملك سعود", start: "2015", end: "2019", note: "تقدير ممتاز" },
+    {
+      id: uid(),
+      degree: "بكالوريوس نظم معلومات إدارية",
+      school: "جامعة الملك سعود",
+      start: "2015",
+      end: "2019",
+      note: "تقدير ممتاز",
+    },
   ],
   skills: [
     { id: uid(), name: "SQL", level: 5 },
@@ -57,9 +64,13 @@ export const demoResumeData = (): ResumeData => ({
     { id: uid(), name: "الإنجليزية", level: "متقدم" },
   ],
   certificates: [{ id: uid(), title: "Microsoft Power BI Data Analyst", detail: "2023" }],
-  projects: [{ id: uid(), title: "لوحة مؤشرات المخزون", detail: "نموذج بيانات موحّد لفروع المنطقة الوسطى." }],
+  projects: [
+    { id: uid(), title: "لوحة مؤشرات المخزون", detail: "نموذج بيانات موحّد لفروع المنطقة الوسطى." },
+  ],
   achievements: [{ id: uid(), title: "جائزة أفضل تحسين تشغيلي", detail: "2023" }],
-  volunteering: [{ id: uid(), title: "متطوعة في مبادرة تعليم البيانات", detail: "٤٠ ساعة تدريب مجاني." }],
+  volunteering: [
+    { id: uid(), title: "متطوعة في مبادرة تعليم البيانات", detail: "٤٠ ساعة تدريب مجاني." },
+  ],
   links: [{ id: uid(), label: "LinkedIn", url: "linkedin.com/in/example" }],
   references: [],
   custom: [],
@@ -80,14 +91,60 @@ export const demoResume = (ownerId: string): Resume => ({
 });
 
 export const demoUsers = [
-  { id: "u_demo", email: "demo@seerati.sa", fullName: "نورة العتيبي", role: "user" as const, resumes: 2, joined: "2026-05-02" },
-  { id: "u_2", email: "salem@example.com", fullName: "سالم القحطاني", role: "user" as const, resumes: 3, joined: "2026-06-11" },
-  { id: "u_3", email: "huda@example.com", fullName: "هدى الزهراني", role: "user" as const, resumes: 1, joined: "2026-07-01" },
-  { id: "u_admin", email: "admin@seerati.sa", fullName: "مسؤول النظام", role: "admin" as const, resumes: 0, joined: "2026-01-15" },
+  {
+    id: "u_demo",
+    email: "demo@seerati.sa",
+    fullName: "نورة العتيبي",
+    role: "user" as const,
+    resumes: 2,
+    joined: "2026-05-02",
+  },
+  {
+    id: "u_2",
+    email: "salem@example.com",
+    fullName: "سالم القحطاني",
+    role: "user" as const,
+    resumes: 3,
+    joined: "2026-06-11",
+  },
+  {
+    id: "u_3",
+    email: "huda@example.com",
+    fullName: "هدى الزهراني",
+    role: "user" as const,
+    resumes: 1,
+    joined: "2026-07-01",
+  },
+  {
+    id: "u_admin",
+    email: "admin@seerati.sa",
+    fullName: "مسؤول النظام",
+    role: "admin" as const,
+    resumes: 0,
+    joined: "2026-01-15",
+  },
 ];
 
 export const auditLog = [
-  { id: "a1", at: "2026-08-09 21:14", actor: "admin@seerati.sa", action: "template.update", target: "modern" },
-  { id: "a2", at: "2026-08-09 18:02", actor: "admin@seerati.sa", action: "user.role.view", target: "salem@example.com" },
-  { id: "a3", at: "2026-08-08 12:40", actor: "admin@seerati.sa", action: "settings.update", target: "usage_limits" },
+  {
+    id: "a1",
+    at: "2026-08-09 21:14",
+    actor: "admin@seerati.sa",
+    action: "template.update",
+    target: "modern",
+  },
+  {
+    id: "a2",
+    at: "2026-08-09 18:02",
+    actor: "admin@seerati.sa",
+    action: "user.role.view",
+    target: "salem@example.com",
+  },
+  {
+    id: "a3",
+    at: "2026-08-08 12:40",
+    actor: "admin@seerati.sa",
+    action: "settings.update",
+    target: "usage_limits",
+  },
 ];

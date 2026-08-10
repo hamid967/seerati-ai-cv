@@ -38,7 +38,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "سيرتي | Seerati — استوديو مهني رقمي" },
       {
         property: "og:description",
-        content: "فريق متخصص يعمل معك: من الملف المهني الموحّد إلى حزمة التقديم وفحص ATS وتصدير PDF عربي.",
+        content:
+          "فريق متخصص يعمل معك: من الملف المهني الموحّد إلى حزمة التقديم وفحص ATS وتصدير PDF عربي.",
       },
     ],
   }),
@@ -51,16 +52,34 @@ function Landing() {
 
   const steps = ar
     ? [
-        { t: "ابنِ ملفك المهني الموحّد", d: "أدخل خبراتك وإنجازاتك ومهاراتك مرة واحدة — تُستخدم في كل سيرة ومهمة لاحقاً." },
-        { t: "افتح مساحة لكل وظيفة", d: "احفظ وصف الوظيفة، وتابع حالتها من محفوظة إلى مقابلة أو عرض." },
+        {
+          t: "ابنِ ملفك المهني الموحّد",
+          d: "أدخل خبراتك وإنجازاتك ومهاراتك مرة واحدة — تُستخدم في كل سيرة ومهمة لاحقاً.",
+        },
+        {
+          t: "افتح مساحة لكل وظيفة",
+          d: "احفظ وصف الوظيفة، وتابع حالتها من محفوظة إلى مقابلة أو عرض.",
+        },
         { t: "طابق وجهّز", d: "قارن ملفك مع متطلبات الوظيفة، واعرف الفجوات الحقيقية قبل التقديم." },
         { t: "صدّر حزمة التقديم", d: "سيرة مخصصة، فحص ATS، ونسخة PDF عربية جاهزة للإرسال." },
       ]
     : [
-        { t: "Build your unified career profile", d: "Add your experience, achievements and skills once — reused across every resume and task." },
-        { t: "Open a workspace per job", d: "Save the job description and track its status from saved to interview or offer." },
-        { t: "Match & prepare", d: "Compare your profile against the role's requirements and see the real gaps first." },
-        { t: "Export your application pack", d: "A tailored resume, an ATS check, and a submission-ready Arabic PDF." },
+        {
+          t: "Build your unified career profile",
+          d: "Add your experience, achievements and skills once — reused across every resume and task.",
+        },
+        {
+          t: "Open a workspace per job",
+          d: "Save the job description and track its status from saved to interview or offer.",
+        },
+        {
+          t: "Match & prepare",
+          d: "Compare your profile against the role's requirements and see the real gaps first.",
+        },
+        {
+          t: "Export your application pack",
+          d: "A tailored resume, an ATS check, and a submission-ready Arabic PDF.",
+        },
       ];
 
   const capabilities = [
@@ -110,18 +129,48 @@ function Landing() {
 
   const faq = ar
     ? [
-        { q: "من هو فريق سيرتي؟", a: "ثمانية مختصين افتراضيين — من استشارية المسار المهني إلى مدير الطلبات — يعملون كأدوار متخصصة فوق مساعد كتابة واحد، كل منهم مسؤول عن جزء واضح من رحلتك." },
-        { q: "هل القوالب متوافقة مع أنظمة التوظيف؟", a: "خمسة من القوالب الستة مبنية بعمود واحد وعناوين نصية واضحة، وهي الأنسب للتقديم الإلكتروني. القالب الإبداعي مخصص للتقديم المباشر أو ملف الأعمال." },
-        { q: "كيف يعمل فحص ATS؟", a: "الفحص أولي ويعتمد على قواعد واضحة: اكتمال معلومات الاتصال، طول الملخص، وجود الأقسام الأساسية، عدد نقاط الإنجاز، ووجود أرقام قابلة للقياس. النتيجة إرشادية وليست وعداً بالقبول." },
-        { q: "هل مطابقة الوصف الوظيفي تضمن القبول؟", a: "لا. المطابقة تقارن النص فقط وتوضح لك الفجوات الظاهرة؛ القرار النهائي دائماً لجهة التوظيف." },
-        { q: "ما حد السير الذاتية؟", a: "٣ سير ذاتية لكل حساب في هذه المرحلة، مع إمكانية الاستنساخ والتعديل داخل الحد." },
+        {
+          q: "من هو فريق سيرتي؟",
+          a: "ثمانية مختصين افتراضيين — من استشارية المسار المهني إلى مدير الطلبات — يعملون كأدوار متخصصة فوق مساعد كتابة واحد، كل منهم مسؤول عن جزء واضح من رحلتك.",
+        },
+        {
+          q: "هل القوالب متوافقة مع أنظمة التوظيف؟",
+          a: "خمسة من القوالب الستة مبنية بعمود واحد وعناوين نصية واضحة، وهي الأنسب للتقديم الإلكتروني. القالب الإبداعي مخصص للتقديم المباشر أو ملف الأعمال.",
+        },
+        {
+          q: "كيف يعمل فحص ATS؟",
+          a: "الفحص أولي ويعتمد على قواعد واضحة: اكتمال معلومات الاتصال، طول الملخص، وجود الأقسام الأساسية، عدد نقاط الإنجاز، ووجود أرقام قابلة للقياس. النتيجة إرشادية وليست وعداً بالقبول.",
+        },
+        {
+          q: "هل مطابقة الوصف الوظيفي تضمن القبول؟",
+          a: "لا. المطابقة تقارن النص فقط وتوضح لك الفجوات الظاهرة؛ القرار النهائي دائماً لجهة التوظيف.",
+        },
+        {
+          q: "ما حد السير الذاتية؟",
+          a: "٣ سير ذاتية لكل حساب في هذه المرحلة، مع إمكانية الاستنساخ والتعديل داخل الحد.",
+        },
       ]
     : [
-        { q: "Who is the Seerati team?", a: "Eight virtual specialists — from a career strategist to an application manager — running as focused roles on one writing assistant, each owning a clear part of your journey." },
-        { q: "Are the templates ATS friendly?", a: "Five of the six templates use a single column with plain text headings, which suits online applications. The creative template is meant for direct sharing or a portfolio." },
-        { q: "How does the ATS check work?", a: "It is a rule-based check: contact completeness, summary length, core sections, bullet count and measurable figures. The score is guidance, not a guarantee." },
-        { q: "Does job matching guarantee an offer?", a: "No. Matching compares text only and highlights visible gaps; the hiring decision always sits with the employer." },
-        { q: "What is the resume limit?", a: "3 resumes per account at this stage, including duplicates." },
+        {
+          q: "Who is the Seerati team?",
+          a: "Eight virtual specialists — from a career strategist to an application manager — running as focused roles on one writing assistant, each owning a clear part of your journey.",
+        },
+        {
+          q: "Are the templates ATS friendly?",
+          a: "Five of the six templates use a single column with plain text headings, which suits online applications. The creative template is meant for direct sharing or a portfolio.",
+        },
+        {
+          q: "How does the ATS check work?",
+          a: "It is a rule-based check: contact completeness, summary length, core sections, bullet count and measurable figures. The score is guidance, not a guarantee.",
+        },
+        {
+          q: "Does job matching guarantee an offer?",
+          a: "No. Matching compares text only and highlights visible gaps; the hiring decision always sits with the employer.",
+        },
+        {
+          q: "What is the resume limit?",
+          a: "3 resumes per account at this stage, including duplicates.",
+        },
       ];
 
   return (
@@ -139,7 +188,10 @@ function Landing() {
             }}
           />
           <div className="relative mx-auto max-w-4xl px-4 py-20 text-center md:py-28">
-            <Badge variant="secondary" className="mb-6 gap-1.5 rounded-full border-none bg-white/10 px-3 py-1 text-[12px] text-ink-foreground">
+            <Badge
+              variant="secondary"
+              className="mb-6 gap-1.5 rounded-full border-none bg-white/10 px-3 py-1 text-[12px] text-ink-foreground"
+            >
               <Sparkles className="size-3.5" />
               {ar ? "استوديو مهني رقمي" : "A digital career studio"}
             </Badge>
@@ -159,12 +211,19 @@ function Landing() {
                   <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
                 </Link>
               </Button>
-              <Button size="lg" variant="secondary" className="border-none bg-white/10 text-ink-foreground hover:bg-white/20" asChild>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="border-none bg-white/10 text-ink-foreground hover:bg-white/20"
+                asChild
+              >
                 <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
               </Button>
             </div>
             <p className="mt-5 text-xs text-ink-foreground/60">
-              {ar ? "تدعم العربية والإنجليزية · حتى ٣ سير ذاتية لكل حساب" : "Arabic & English · up to 3 resumes per account"}
+              {ar
+                ? "تدعم العربية والإنجليزية · حتى ٣ سير ذاتية لكل حساب"
+                : "Arabic & English · up to 3 resumes per account"}
             </p>
           </div>
         </section>
@@ -172,7 +231,9 @@ function Landing() {
         {/* The team */}
         <section className="section-y mx-auto max-w-6xl px-4">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight">{ar ? "فريق سيرتي" : "The Seerati team"}</h2>
+            <h2 className="text-3xl font-extrabold tracking-tight">
+              {ar ? "فريق سيرتي" : "The Seerati team"}
+            </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {ar
                 ? "ثمانية أدوار متخصصة فوق مساعد كتابة واحد، كل دور مسؤول عن جزء واضح من رحلتك المهنية."
@@ -191,7 +252,9 @@ function Landing() {
                   </span>
                   <h3 className="mt-4 font-bold">{agent.name[lang]}</h3>
                   <p className="text-xs font-semibold text-emerald-accent">{agent.role[lang]}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{agent.blurb[lang]}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {agent.blurb[lang]}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -201,7 +264,9 @@ function Landing() {
         {/* How it works */}
         <section className="bg-secondary/40 section-y">
           <div className="mx-auto max-w-6xl px-4">
-            <h2 className="text-center text-3xl font-extrabold tracking-tight">{ar ? "كيف يعمل" : "How it works"}</h2>
+            <h2 className="text-center text-3xl font-extrabold tracking-tight">
+              {ar ? "كيف يعمل" : "How it works"}
+            </h2>
             <div className="mt-10 grid gap-5 md:grid-cols-4">
               {steps.map((s, i) => (
                 <Card key={s.t} className="border-border/80 shadow-soft">
@@ -220,7 +285,9 @@ function Landing() {
 
         {/* Capabilities */}
         <section className="section-y mx-auto max-w-6xl px-4">
-          <h2 className="text-3xl font-extrabold tracking-tight">{ar ? "قدرات المنصة" : "Platform capabilities"}</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight">
+            {ar ? "قدرات المنصة" : "Platform capabilities"}
+          </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             {ar
               ? "كل قدرة مبنية لتخدم خطوة حقيقية في رحلة التقديم على وظيفة."
@@ -245,7 +312,9 @@ function Landing() {
         <section className="bg-secondary/40 section-y">
           <div className="mx-auto max-w-6xl px-4">
             <div className="text-center">
-              <h2 className="text-3xl font-extrabold tracking-tight">{ar ? "قوالب مصممة بعناية" : "Carefully crafted templates"}</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight">
+                {ar ? "قوالب مصممة بعناية" : "Carefully crafted templates"}
+              </h2>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                 {ar
                   ? "كل قالب يدعم العربية والإنجليزية ويمكن تبديله في أي وقت."
@@ -274,7 +343,9 @@ function Landing() {
                       </Badge>
                     )}
                   </div>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{tpl.description[lang]}</p>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                    {tpl.description[lang]}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -288,7 +359,9 @@ function Landing() {
               <span className="mb-3 inline-flex size-10 items-center justify-center rounded-xl bg-primary-foreground/10">
                 <Bot className="size-5" />
               </span>
-              <h2 className="text-3xl font-extrabold tracking-tight">{ar ? "مساعد كتابة في كل خطوة" : "A writing assistant at every step"}</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight">
+                {ar ? "مساعد كتابة في كل خطوة" : "A writing assistant at every step"}
+              </h2>
               <p className="mt-4 text-sm leading-[1.9] opacity-85">
                 {ar
                   ? "يقترح صياغة الملخص والإنجازات، ويربط عملك بأثر قابل للقياس، دون اختراع أرقام لم تذكرها."
@@ -326,12 +399,18 @@ function Landing() {
 
         {/* FAQ */}
         <section className="section-y mx-auto max-w-3xl px-4">
-          <h2 className="text-center text-3xl font-extrabold tracking-tight">{ar ? "الأسئلة الشائعة" : "FAQ"}</h2>
+          <h2 className="text-center text-3xl font-extrabold tracking-tight">
+            {ar ? "الأسئلة الشائعة" : "FAQ"}
+          </h2>
           <Accordion type="single" collapsible className="mt-8">
             {faq.map((f, i) => (
               <AccordionItem key={i} value={`i${i}`}>
-                <AccordionTrigger className="text-start text-[15px] font-semibold">{f.q}</AccordionTrigger>
-                <AccordionContent className="text-sm leading-[1.9] text-muted-foreground">{f.a}</AccordionContent>
+                <AccordionTrigger className="text-start text-[15px] font-semibold">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-[1.9] text-muted-foreground">
+                  {f.a}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -344,7 +423,9 @@ function Landing() {
               {ar ? "ابدأ استوديوك المهني اليوم" : "Start your career studio today"}
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-ink-foreground/75">
-              {ar ? "أنشئ حساباً وابنِ ملفك المهني الموحّد خلال دقائق." : "Create an account and build your unified career profile in minutes."}
+              {ar
+                ? "أنشئ حساباً وابنِ ملفك المهني الموحّد خلال دقائق."
+                : "Create an account and build your unified career profile in minutes."}
             </p>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/auth" search={{ mode: "signup" }}>
