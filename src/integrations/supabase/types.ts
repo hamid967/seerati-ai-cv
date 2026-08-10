@@ -41,6 +41,50 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_activity: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          job_id: string | null
+          provider: string | null
+          status: string
+          summary: string | null
+          task: string
+          user_id: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          provider?: string | null
+          status?: string
+          summary?: string | null
+          task: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          provider?: string | null
+          status?: string
+          summary?: string | null
+          task?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_activity_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_usage: {
         Row: {
           created_at: string
@@ -101,6 +145,335 @@ export type Database = {
           max_resumes?: number
           site_name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      application_assets: {
+        Row: {
+          asset_type: string
+          content: Json
+          cover_letter_id: string | null
+          created_at: string
+          id: string
+          job_id: string
+          resume_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asset_type: string
+          content?: Json
+          cover_letter_id?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          resume_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asset_type?: string
+          content?: Json
+          cover_letter_id?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          resume_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_assets_cover_letter_id_fkey"
+            columns: ["cover_letter_id"]
+            isOneToOne: false
+            referencedRelation: "cover_letters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_assets_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_assets_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      career_profiles: {
+        Row: {
+          achievements: Json
+          certifications: Json
+          completion_score: number
+          created_at: string
+          education: Json
+          id: string
+          identity: Json
+          languages: Json
+          links: Json
+          preferences: Json
+          projects: Json
+          skills: Json
+          story_bank: Json
+          targets: Json
+          updated_at: string
+          user_id: string
+          verified_facts: Json
+          work_history: Json
+        }
+        Insert: {
+          achievements?: Json
+          certifications?: Json
+          completion_score?: number
+          created_at?: string
+          education?: Json
+          id?: string
+          identity?: Json
+          languages?: Json
+          links?: Json
+          preferences?: Json
+          projects?: Json
+          skills?: Json
+          story_bank?: Json
+          targets?: Json
+          updated_at?: string
+          user_id: string
+          verified_facts?: Json
+          work_history?: Json
+        }
+        Update: {
+          achievements?: Json
+          certifications?: Json
+          completion_score?: number
+          created_at?: string
+          education?: Json
+          id?: string
+          identity?: Json
+          languages?: Json
+          links?: Json
+          preferences?: Json
+          projects?: Json
+          skills?: Json
+          story_bank?: Json
+          targets?: Json
+          updated_at?: string
+          user_id?: string
+          verified_facts?: Json
+          work_history?: Json
+        }
+        Relationships: []
+      }
+      career_tasks: {
+        Row: {
+          created_at: string
+          done: boolean
+          due_at: string | null
+          id: string
+          job_id: string | null
+          notes: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          due_at?: string | null
+          id?: string
+          job_id?: string | null
+          notes?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          due_at?: string | null
+          id?: string
+          job_id?: string | null
+          notes?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "career_tasks_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cover_letters: {
+        Row: {
+          body: string
+          closing: string
+          created_at: string
+          id: string
+          job_id: string | null
+          language: string
+          opening: string
+          resume_id: string | null
+          title: string
+          tone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          closing?: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          language?: string
+          opening?: string
+          resume_id?: string | null
+          title?: string
+          tone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          closing?: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          language?: string
+          opening?: string
+          resume_id?: string | null
+          title?: string
+          tone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cover_letters_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cover_letters_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_sessions: {
+        Row: {
+          answers: Json
+          created_at: string
+          feedback: Json
+          id: string
+          job_id: string | null
+          mode: string
+          questions: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          feedback?: Json
+          id?: string
+          job_id?: string | null
+          mode?: string
+          questions?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          feedback?: Json
+          id?: string
+          job_id?: string | null
+          mode?: string
+          questions?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_sessions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_workspaces: {
+        Row: {
+          applied_at: string | null
+          company: string
+          created_at: string
+          id: string
+          job_description: string
+          job_title: string
+          job_url: string | null
+          location: string | null
+          match_analysis: Json
+          match_score: number
+          next_action_at: string | null
+          notes: string | null
+          requirements: Json
+          salary: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string | null
+          company?: string
+          created_at?: string
+          id?: string
+          job_description?: string
+          job_title?: string
+          job_url?: string | null
+          location?: string | null
+          match_analysis?: Json
+          match_score?: number
+          next_action_at?: string | null
+          notes?: string | null
+          requirements?: Json
+          salary?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string | null
+          company?: string
+          created_at?: string
+          id?: string
+          job_description?: string
+          job_title?: string
+          job_url?: string | null
+          location?: string | null
+          match_analysis?: Json
+          match_score?: number
+          next_action_at?: string | null
+          notes?: string | null
+          requirements?: Json
+          salary?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

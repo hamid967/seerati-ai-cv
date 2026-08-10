@@ -14,6 +14,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CareerTwinRouteImport } from './routes/career-twin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -25,6 +26,8 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as JobsIndexRouteImport } from './routes/jobs.index'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
@@ -52,6 +55,11 @@ const AtsRoute = AtsRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerTwinRoute = CareerTwinRouteImport.update({
+  id: '/career-twin',
+  path: '/career-twin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -109,6 +117,16 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const JobsIndexRoute = JobsIndexRouteImport.update({
+  id: '/jobs/',
+  path: '/jobs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesNewRoute = ResumesNewRouteImport.update({
   id: '/resumes/new',
   path: '/resumes/new',
@@ -131,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
@@ -141,8 +160,10 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
+  '/jobs/': typeof JobsIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
@@ -151,6 +172,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
@@ -161,8 +183,10 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin': typeof AdminIndexRoute
+  '/jobs': typeof JobsIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
@@ -173,6 +197,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
+  '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/onboarding': typeof OnboardingRoute
@@ -183,8 +208,10 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
+  '/jobs/$id': typeof JobsIdRoute
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
+  '/jobs/': typeof JobsIndexRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
 }
@@ -196,6 +223,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ats'
     | '/auth'
+    | '/career-twin'
     | '/dashboard'
     | '/features'
     | '/onboarding'
@@ -206,8 +234,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
+    | '/jobs/$id'
     | '/resumes/new'
     | '/admin/'
+    | '/jobs/'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -216,6 +246,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/ats'
     | '/auth'
+    | '/career-twin'
     | '/dashboard'
     | '/features'
     | '/onboarding'
@@ -226,8 +257,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
+    | '/jobs/$id'
     | '/resumes/new'
     | '/admin'
+    | '/jobs'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
   id:
@@ -237,6 +270,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ats'
     | '/auth'
+    | '/career-twin'
     | '/dashboard'
     | '/features'
     | '/onboarding'
@@ -247,8 +281,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/templates'
     | '/admin/users'
+    | '/jobs/$id'
     | '/resumes/new'
     | '/admin/'
+    | '/jobs/'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
   fileRoutesById: FileRoutesById
@@ -259,13 +295,16 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
+  CareerTwinRoute: typeof CareerTwinRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
+  JobsIdRoute: typeof JobsIdRoute
   ResumesNewRoute: typeof ResumesNewRoute
+  JobsIndexRoute: typeof JobsIndexRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
 }
@@ -305,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career-twin': {
+      id: '/career-twin'
+      path: '/career-twin'
+      fullPath: '/career-twin'
+      preLoaderRoute: typeof CareerTwinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -384,6 +430,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/jobs/': {
+      id: '/jobs/'
+      path: '/jobs'
+      fullPath: '/jobs/'
+      preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/new': {
       id: '/resumes/new'
       path: '/resumes/new'
@@ -432,13 +492,16 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
+  CareerTwinRoute: CareerTwinRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
+  JobsIdRoute: JobsIdRoute,
   ResumesNewRoute: ResumesNewRoute,
+  JobsIndexRoute: JobsIndexRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
 }

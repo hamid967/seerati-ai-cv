@@ -21,6 +21,8 @@ export const dict: Dict = {
   nav_features: { ar: "المزايا", en: "Features" },
   nav_ats: { ar: "فحص ATS", en: "ATS Check" },
   nav_dashboard: { ar: "لوحتي", en: "Dashboard" },
+  nav_career_twin: { ar: "ملفي المهني", en: "My Career Profile" },
+  nav_jobs: { ar: "مساحات الوظائف", en: "Job Spaces" },
   nav_login: { ar: "تسجيل الدخول", en: "Sign in" },
   nav_start: { ar: "ابدأ الآن", en: "Get started" },
   nav_logout: { ar: "خروج", en: "Sign out" },

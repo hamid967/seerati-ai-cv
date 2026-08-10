@@ -1,5 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { FileText, Globe, LayoutDashboard, LogOut, Shield } from "lucide-react";
+import { Briefcase, FileText, Globe, LayoutDashboard, LogOut, Menu, Shield, UserSquare2 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useI18n, useT } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 
@@ -15,11 +17,19 @@ export function SiteHeader() {
   const { lang, toggle } = useI18n();
   const { user, signOut } = useStore();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const links = [
     { to: "/templates", label: t("nav_templates") },
     { to: "/features", label: t("nav_features") },
     { to: "/ats", label: t("nav_ats") },
+  ] as const;
+
+  // /career-twin and /jobs are new surfaces still being wired up by another
+  // workstream, so they are plain links (not typed router Links) for now.
+  const memberLinks = [
+    { href: "/career-twin", label: t("nav_career_twin"), icon: UserSquare2 },
+    { href: "/jobs", label: t("nav_jobs"), icon: Briefcase },
   ] as const;
 
   return (
@@ -36,6 +46,17 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
+          {user &&
+            memberLinks.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              >
+                <l.icon className="size-4" />
+                {l.label}
+              </a>
+            ))}
           {links.map((l) => (
             <Link
               key={l.to}
@@ -57,13 +78,19 @@ export function SiteHeader() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="hidden sm:inline-flex">
                   {user.fullName}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => router.navigate({ to: "/dashboard" })}>
                   <LayoutDashboard className="size-4" /> {t("nav_dashboard")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { window.location.href = "/career-twin"; }}>
+                  <UserSquare2 className="size-4" /> {t("nav_career_twin")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { window.location.href = "/jobs"; }}>
+                  <Briefcase className="size-4" /> {t("nav_jobs")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.navigate({ to: "/account" })}>
                   {t("nav_account")}
@@ -84,7 +111,7 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <>
+            <div className="hidden items-center gap-2 sm:flex">
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/auth">{t("nav_login")}</Link>
               </Button>
@@ -93,8 +120,77 @@ export function SiteHeader() {
                   {t("nav_start")}
                 </Link>
               </Button>
-            </>
+            </div>
           )}
+
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
+                <Menu className="size-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side={lang === "ar" ? "left" : "right"} className="w-72">
+              <nav className="mt-10 flex flex-col gap-1">
+                {user &&
+                  memberLinks.map((l) => (
+                    <a
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-semibold hover:bg-secondary"
+                    >
+                      <l.icon className="size-4" />
+                      {l.label}
+                    </a>
+                  ))}
+                {links.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={() => setOpen(false)}
+                    className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+                <div className="my-2 border-t border-border" />
+                {user ? (
+                  <>
+                    <Link to="/dashboard" onClick={() => setOpen(false)} className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                      {t("nav_dashboard")}
+                    </Link>
+                    <Link to="/account" onClick={() => setOpen(false)} className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                      {t("nav_account")}
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setOpen(false);
+                        void signOut();
+                        router.navigate({ to: "/" });
+                      }}
+                      className="rounded-md px-3 py-2.5 text-start text-sm font-medium text-destructive hover:bg-secondary"
+                    >
+                      {t("nav_logout")}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" onClick={() => setOpen(false)} className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary">
+                      {t("nav_login")}
+                    </Link>
+                    <Link
+                      to="/auth"
+                      search={{ mode: "signup" }}
+                      onClick={() => setOpen(false)}
+                      className="rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
+                    >
+                      {t("nav_start")}
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
