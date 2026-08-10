@@ -26,6 +26,7 @@ import {
   type LanguageMode,
   type QuickAction,
 } from "@/lib/ai-actions";
+import { parseCopilotAction, type CopilotProtocolAction } from "@/lib/copilot/actions";
 
 export type CopilotGap = {
   /** Field the question targets, e.g. "summary" or "skills". */
@@ -43,6 +44,8 @@ type Turn =
       gapKey: string;
       before: string;
       action: CopilotAction;
+      /** Structured protocol form of the same change, when one exists. */
+      protocol?: CopilotProtocolAction;
       editing?: boolean;
       resolved?: "applied" | "kept";
     };
@@ -144,9 +147,32 @@ export function ResumeCopilot({
         setError(ar ? "لم يصل اقتراح صالح. أعد المحاولة." : "No valid suggestion came back. Please retry.");
         return;
       }
+      // Field edits also travel as a structured protocol action, so the same
+      // Zod contract that guards writes elsewhere guards this one too.
+      const before = currentValue(activeKey);
+      const protocolCandidate =
+        activeKey === "summary"
+          ? {
+              type: "update_summary",
+              reason:
+                replyLang === "ar"
+                  ? "صياغة مبنية على ما ذكرته فقط."
+                  : "Wording based only on what you provided.",
+              evidenceUsed: [],
+              payload: { original: before, suggested: text },
+            }
+          : null;
+      const protocolParsed = protocolCandidate ? parseCopilotAction(protocolCandidate) : null;
       setTurns((prev) => [
         ...prev,
-        { id: rid(), role: "proposal", gapKey: activeKey, before: currentValue(activeKey), action },
+        {
+          id: rid(),
+          role: "proposal",
+          gapKey: activeKey,
+          before,
+          action,
+          ...(protocolParsed?.ok ? { protocol: protocolParsed.action } : {}),
+        },
       ]);
     } catch (e) {
       setError(
@@ -185,6 +211,18 @@ export function ResumeCopilot({
     if (!turn || turn.role !== "proposal") return;
     setTurns((prev) => prev.map((t) => (t.id === turnId ? { ...t, resolved: decision, editing: false } : t)));
     if (decision === "applied") {
+      // The user pressing Apply is the approval gate; re-validate the protocol
+      // action so an edited suggestion can never bypass the contract.
+      if (turn.protocol) {
+        const recheck = parseCopilotAction({
+          ...turn.protocol,
+          payload: { ...turn.protocol.payload, suggested: turn.action.payload.text.trim() },
+        });
+        if (!recheck.ok) {
+          setError(ar ? "الاقتراح غير صالح للتطبيق." : "This suggestion is not valid to apply.");
+          return;
+        }
+      }
       await onApply(turn.gapKey, turn.action.payload.text.trim());
     }
     setIndex((i) => Math.min(gaps.length, i + 1));
