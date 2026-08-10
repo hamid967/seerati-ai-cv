@@ -163,7 +163,7 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
       email: emails[0] ?? "",
       phone: phones[0] ?? "",
       city: "",
-      links: [],
+      country: "",
     };
     result.personal = personal;
   }
