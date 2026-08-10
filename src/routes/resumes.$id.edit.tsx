@@ -25,8 +25,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
-import { atsScore, keywordGaps, runAtsChecks } from "@/lib/ats";
-import { uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+import { analyzeResume, checklist, completeness, keywordCoverage, resumeStatus } from "@/lib/ats";
+import { ACCENT_PALETTE, uid, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+
 
 export const Route = createFileRoute("/resumes/$id/edit")({
   head: () => ({
