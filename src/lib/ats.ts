@@ -72,9 +72,14 @@ export function extractKeywords(text: string, limit = 30): string[] {
 export function keywordCoverage(jobDescription: string, data: ResumeData) {
   const tokens = extractKeywords(jobDescription);
   if (!tokens.length) return null;
-  const haystack = JSON.stringify(data).toLowerCase();
-  const matched = tokens.filter((t) => haystack.includes(t));
-  const missing = tokens.filter((t) => !haystack.includes(t));
+  // Normalised haystack so "PowerBI" in the ad still matches "Power BI" in the
+  // resume, and Arabic spelling variants of the same skill count as one.
+  const raw = JSON.stringify(data).toLowerCase();
+  const folded = foldText(raw);
+  const hit = (t: string) =>
+    keywordAliases(t).some((alias) => alias.length > 1 && (raw.includes(alias) || folded.includes(alias)));
+  const matched = tokens.filter(hit);
+  const missing = tokens.filter((t) => !hit(t));
   return {
     total: tokens.length,
     matched,
@@ -82,6 +87,7 @@ export function keywordCoverage(jobDescription: string, data: ResumeData) {
     coverage: Math.round((matched.length / tokens.length) * 100),
   };
 }
+
 
 export function analyzeResume(
   resume: Resume,
