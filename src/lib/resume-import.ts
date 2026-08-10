@@ -112,8 +112,10 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
   const cleanText = text.replace(/\r\n/g, "\n").trim();
 
   const emails = Array.from(new Set(cleanText.match(EMAIL_RE) ?? []));
-  const phones = Array.from(new Set(cleanText.match(PHONE_RE) ?? [])).map((p) => p.trim());
-  const links = Array.from(new Set(cleanText.match(LINK_RE) ?? []));
+  const phones = Array.from(new Set(cleanText.match(PHONE_RE) ?? []))
+    .map((p) => p.trim())
+    .filter((p) => !looksLikeDate(p));
+  const links = Array.from(new Set(cleanText.match(LINK_RE) ?? [])).filter((l) => !l.includes("@"));
 
   const lines = cleanText.split("\n");
   const sections: Partial<Record<SectionId, string[]>> = {};
@@ -139,31 +141,53 @@ export function parseResumeText(text: string, lang: "ar" | "en"): ParsedResume {
   }
 
   if (sections.experience?.length) {
-    // We cannot reliably split raw text into company/role/dates, so each
-    // non-empty paragraph becomes one experience entry the user can edit,
-    // with its lines kept as responsibility bullets.
-    const paragraphs = sections.experience
-      .join("\n")
-      .split(/\n\s*\n/)
-      .map((p) => toBullets(p))
-      .filter((p) => p.length);
-    result.experience = (paragraphs.length ? paragraphs : [toBullets(sections.experience.join("\n"))])
-      .filter((p) => p.length)
-      .map<Experience>((p) => ({
-        id: uid(),
-        role: "",
-        company: "",
-        bullets: p,
-      }));
+    // Entry heading = a non-bullet line that carries a date range or a
+    // "company — role" separator. Everything after it, until the next heading,
+    // becomes that entry's bullets. Nothing is invented: unmatched parts stay empty.
+    const raw = sections.experience.filter((l) => l.trim().length > 0);
+    const groups: { heading?: string; bullets: string[] }[] = [];
+
+    for (const line of raw) {
+      const isBullet = /^\s*[-•*\u2022▪◦·]/.test(line);
+      const clean = line.replace(/^\s*[-•*\u2022▪◦·]\s*/, "").trim();
+      const looksLikeHeading = !isBullet && (DATES_RE.test(clean) || /[—–|]/.test(clean));
+
+      if (looksLikeHeading || groups.length === 0) {
+        groups.push({ ...(looksLikeHeading ? { heading: clean } : {}), bullets: looksLikeHeading ? [] : [clean] });
+      } else {
+        groups[groups.length - 1]!.bullets.push(clean);
+      }
+    }
+
+    result.experience = groups
+      .filter((g) => g.heading || g.bullets.length)
+      .map<Experience>((g) => {
+        if (!g.heading) return { id: uid(), role: "", company: "", bullets: g.bullets };
+        const { left, right, start, end } = parseEntryHeading(g.heading);
+        return {
+          id: uid(),
+          company: left,
+          role: right,
+          ...(start ? { start } : {}),
+          ...(end ? { end } : {}),
+          bullets: g.bullets,
+        };
+      });
   }
 
   if (sections.education?.length) {
-    result.education = toBullets(sections.education.join("\n")).map<Education>((line) => ({
-      id: uid(),
-      degree: line,
-      school: "",
-    }));
+    result.education = toBullets(sections.education.join("\n")).map<Education>((line) => {
+      const { left, right, start, end } = parseEntryHeading(line);
+      return {
+        id: uid(),
+        degree: left,
+        school: right,
+        ...(start ? { start } : {}),
+        ...(end ? { end } : {}),
+      };
+    });
   }
+
 
   if (sections.skills?.length) {
     const raw = sections.skills.join("\n");
