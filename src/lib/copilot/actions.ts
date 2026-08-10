@@ -129,6 +129,9 @@ export function parseCopilotAction(input: unknown): ParseResult {
     }
   }
   if (!candidate || typeof candidate !== "object") return { ok: false, error: "not_an_object" };
+  // The model is never allowed to opt out of human confirmation.
+  const declared = (candidate as { requiresConfirmation?: unknown }).requiresConfirmation;
+  if (declared === false) return { ok: false, error: "confirmation_required" };
   const type = (candidate as { type?: unknown }).type;
   if (typeof type !== "string" || !COPILOT_ACTION_TYPES.includes(type as CopilotProtocolActionType)) {
     return { ok: false, error: "unknown_action" };
