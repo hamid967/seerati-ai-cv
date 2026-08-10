@@ -536,7 +536,87 @@ function EditResume() {
               </div>
             )}
 
+            {step === "design" && (
+              <div className="space-y-6">
+                <div>
+                  <Label className="mb-2 block">{ar ? "لون التمييز" : "Accent colour"}</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {ACCENT_PALETTE.map((c) => {
+                      const active = (d.design?.accent ?? tpl?.design.accent) === c;
+                      return (
+                        <button
+                          key={c}
+                          aria-label={c}
+                          aria-pressed={active}
+                          onClick={() => setData((data) => { data.design = { ...data.design, accent: c }; })}
+                          className={`size-8 rounded-full border-2 ${active ? "border-foreground" : "border-transparent"}`}
+                          style={{ background: c }}
+                        />
+                      );
+                    })}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setData((data) => { data.design = { ...data.design, accent: undefined }; })}
+                    >
+                      {ar ? "لون القالب الأصلي" : "Template default"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{ar ? "كثافة النص والمسافات" : "Text & spacing density"}</Label>
+                  <Select
+                    value={d.design?.density ?? tpl?.design.spacing ?? "normal"}
+                    onValueChange={(v) =>
+                      setData((data) => { data.design = { ...data.design, density: v as "compact" | "normal" | "airy" }; })
+                    }
+                  >
+                    <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="compact">{ar ? "مضغوط" : "Compact"}</SelectItem>
+                      <SelectItem value="normal">{ar ? "معتاد" : "Normal"}</SelectItem>
+                      <SelectItem value="airy">{ar ? "واسع" : "Airy"}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {tpl?.design.supportsPhoto ? (
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={d.design?.showPhoto ?? true}
+                        onCheckedChange={(v) => setData((data) => { data.design = { ...data.design, showPhoto: Boolean(v) }; })}
+                      />
+                      {ar ? "إظهار الصورة الشخصية" : "Show profile photo"}
+                    </label>
+                    <Input
+                      dir="ltr"
+                      placeholder="https://…"
+                      value={d.personal.photoUrl ?? ""}
+                      onChange={(e) => setData((data) => { data.personal.photoUrl = e.target.value; })}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {ar
+                      ? "القالب الحالي لا يعرض صورة شخصية — وهو الخيار الأنسب للتقديم عبر أنظمة ATS."
+                      : "The current template has no photo slot, which suits ATS submissions."}
+                  </p>
+                )}
+
+                {tpl && !tpl.atsFriendly && (
+                  <p className="rounded-lg bg-secondary p-3 text-xs text-muted-foreground">
+                    {ar
+                      ? "هذا القالب إبداعي وقد تقرأه بعض أنظمة ATS بشكل ناقص. استخدم «كلاسيكي ATS» أو «مبسّط» للتقديم الإلكتروني."
+                      : "This creative template may be parsed imperfectly by some ATS. Use Classic ATS or Minimal for online applications."}
+                  </p>
+                )}
+              </div>
+            )}
+
             {step === "order" && (
+
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
                   {ar ? "رتّب أقسام السيرة الذاتية. الأقسام الفارغة لا تظهر في المعاينة." : "Reorder sections. Empty sections are hidden in the preview."}
