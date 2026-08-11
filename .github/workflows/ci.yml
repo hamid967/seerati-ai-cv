@@ -3,7 +3,7 @@ name: Seerati CI
 on:
   push:
     branches:
-      [main, "codex/**", "stage5c/**", "stage5d/**", "stage5e/**", "stage5f/**", "stage5g/**"]
+      [main, "codex/**", "stage5c/**", "stage5d/**", "stage5e/**", "stage5f/**", "stage5g/**", "stage5i/**"]
   pull_request:
     branches: [main]
 
@@ -49,6 +49,7 @@ jobs:
           node scripts/check-professional-layout-engine.mjs
           node scripts/check-smart-pagination-composer.mjs
           node scripts/check-resume-design-intelligence.mjs
+          node scripts/check-recruiter-ten-second-scan.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
