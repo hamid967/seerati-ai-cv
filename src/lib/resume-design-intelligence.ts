@@ -1,5 +1,10 @@
 import { normalizeResumeDesign } from "@/lib/resume-layout";
-import type { Resume, ResumeUserDesign, SectionKey, TemplateDef } from "@/lib/types";
+import type {
+  Resume,
+  ResumeUserDesign,
+  SectionKey,
+  TemplateDef,
+} from "@/lib/types";
 
 export type DesignRoleFamily =
   | "executive"
@@ -199,19 +204,17 @@ function pickTemplates(
 ): TemplateDef[] {
   const active = activeTemplates(templates);
   const byId = new Map(active.map((template) => [template.id, template]));
-  const ranked = preferences
-    .map((id) => byId.get(id))
-    .filter((item): item is TemplateDef => !!item);
+  const ranked = preferences.map((id) => byId.get(id)).filter((item): item is TemplateDef => !!item);
   const remaining = active.filter((template) => !ranked.some((item) => item.id === template.id));
   const pool = [...ranked, ...remaining];
   if (!atsPriority) return pool;
-  return [
-    ...pool.filter((template) => template.atsFriendly),
-    ...pool.filter((template) => !template.atsFriendly),
-  ];
+  return [...pool.filter((template) => template.atsFriendly), ...pool.filter((template) => !template.atsFriendly)];
 }
 
-function preferredSectionOrder(family: DesignRoleFamily, band: DesignCareerBand): SectionKey[] {
+function preferredSectionOrder(
+  family: DesignRoleFamily,
+  band: DesignCareerBand,
+): SectionKey[] {
   if (band === "early") {
     return [
       "summary",
@@ -341,8 +344,7 @@ function proposedLayout(
   const current = normalizeResumeDesign(resume.data.design);
   const compact = targetPages === 1 || load === "dense";
   const executive = band === "executive-style" || band === "leadership";
-
-  return {
+  const design: ResumeUserDesign = {
     ...resume.data.design,
     pageSize: marketPageSize(resume),
     accent: template.design.accent,
@@ -352,10 +354,20 @@ function proposedLayout(
     lineHeight: compact ? (load === "dense" ? 1.42 : 1.5) : executive ? 1.62 : 1.58,
     columnWidth:
       template.design.layout === "single" ? current.columnWidth : load === "dense" ? 30 : 28,
-    showPhoto: template.design.supportsPhoto ? resume.data.design?.showPhoto : false,
-    pageBreakBefore: resume.data.design?.pageBreakBefore,
-    keepTogetherSections: resume.data.design?.keepTogetherSections,
   };
+
+  if (!template.design.supportsPhoto) design.showPhoto = false;
+  else if (resume.data.design?.showPhoto !== undefined) {
+    design.showPhoto = resume.data.design.showPhoto;
+  }
+  if (resume.data.design?.pageBreakBefore !== undefined) {
+    design.pageBreakBefore = resume.data.design.pageBreakBefore;
+  }
+  if (resume.data.design?.keepTogetherSections !== undefined) {
+    design.keepTogetherSections = resume.data.design.keepTogetherSections;
+  }
+
+  return design;
 }
 
 function formatSectionOrder(order: SectionKey[]) {
