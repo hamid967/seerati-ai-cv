@@ -1,11 +1,15 @@
-import { CheckCircle2, CircleAlert, FileCheck2, FileQuestion, ShieldCheck, Target } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleAlert,
+  FileCheck2,
+  FileQuestion,
+  ShieldCheck,
+  Target,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import {
-  buildApplicationReadiness,
-  type RequirementStatus,
-} from "@/lib/application-readiness";
+import { buildApplicationReadiness, type RequirementStatus } from "@/lib/application-readiness";
 import type { FactGraph } from "@/lib/career-facts";
 import type { Resume } from "@/lib/types";
 
@@ -120,7 +124,9 @@ export function ApplicationReadinessPanel({
                   <Icon className="size-3.5" />
                   {meta[lang]}
                 </div>
-                <p className="mt-1 text-xl font-black tabular-nums">{report.requirementCounts[status]}</p>
+                <p className="mt-1 text-xl font-black tabular-nums">
+                  {report.requirementCounts[status]}
+                </p>
               </div>
             );
           })}
@@ -135,7 +141,8 @@ export function ApplicationReadinessPanel({
                 </p>
                 <p className="mt-0.5 font-extrabold">{best.title}</p>
                 <p className="mt-0.5 text-[10px] text-muted-foreground">
-                  {best.templateName[lang]} · {best.atsFriendly ? "ATS" : ar ? "قالب بصري" : "Visual template"}
+                  {best.templateName[lang]} ·{" "}
+                  {best.atsFriendly ? "ATS" : ar ? "قالب بصري" : "Visual template"}
                 </p>
               </div>
               <div className="text-end">
@@ -150,18 +157,25 @@ export function ApplicationReadinessPanel({
               <Metric label={ar ? "الدور" : "Role"} value={best.roleAlignmentScore} />
               <Metric label="ATS" value={best.atsScore} />
               <Metric label={ar ? "الأدلة" : "Evidence"} value={best.evidenceScore} />
-              <Metric label={ar ? "اكتمال السيرة" : "Completeness"} value={best.completenessScore} />
+              <Metric
+                label={ar ? "اكتمال السيرة" : "Completeness"}
+                value={best.completenessScore}
+              />
             </div>
           </div>
         ) : (
           <p className="text-xs text-muted-foreground">
-            {ar ? "أنشئ سيرة واحدة على الأقل لبدء مقارنة النسخ." : "Create at least one resume to compare variants."}
+            {ar
+              ? "أنشئ سيرة واحدة على الأقل لبدء مقارنة النسخ."
+              : "Create at least one resume to compare variants."}
           </p>
         )}
 
         {report.variants.length > 1 ? (
           <div>
-            <p className="mb-2 text-xs font-bold">{ar ? "مقارنة نسخ السيرة" : "Resume comparison"}</p>
+            <p className="mb-2 text-xs font-bold">
+              {ar ? "مقارنة نسخ السيرة" : "Resume comparison"}
+            </p>
             <div className="space-y-2">
               {report.variants.map((variant, index) => (
                 <div
@@ -174,8 +188,9 @@ export function ApplicationReadinessPanel({
                       <p className="truncate text-xs font-bold">{variant.title}</p>
                     </div>
                     <p className="mt-0.5 text-[10px] text-muted-foreground">
-                      {variant.statusCounts.matched} {ar ? "متطابق" : "matched"} · {variant.statusCounts.unverified}{" "}
-                      {ar ? "غير موثّق" : "unverified"} · {variant.statusCounts.missing} {ar ? "مفقود" : "missing"}
+                      {variant.statusCounts.matched} {ar ? "متطابق" : "matched"} ·{" "}
+                      {variant.statusCounts.unverified} {ar ? "غير موثّق" : "unverified"} ·{" "}
+                      {variant.statusCounts.missing} {ar ? "مفقود" : "missing"}
                     </p>
                   </div>
                   <strong className="tabular-nums">{variant.score}%</strong>
@@ -208,13 +223,17 @@ export function ApplicationReadinessPanel({
                       <div className="mt-2 space-y-1 text-[9px] text-muted-foreground">
                         {requirement.resumeEvidence[0] ? (
                           <p>
-                            <strong className="text-foreground">{ar ? "في السيرة:" : "Resume:"}</strong>{" "}
+                            <strong className="text-foreground">
+                              {ar ? "في السيرة:" : "Resume:"}
+                            </strong>{" "}
                             {requirement.resumeEvidence[0]}
                           </p>
                         ) : null}
                         {requirement.graphEvidence[0] ? (
                           <p>
-                            <strong className="text-foreground">{ar ? "في الأدلة:" : "Evidence:"}</strong>{" "}
+                            <strong className="text-foreground">
+                              {ar ? "في الأدلة:" : "Evidence:"}
+                            </strong>{" "}
                             {requirement.graphEvidence[0]}
                           </p>
                         ) : null}

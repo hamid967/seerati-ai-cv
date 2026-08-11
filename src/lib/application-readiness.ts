@@ -60,7 +60,10 @@ const norm = (value: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-const tokens = (value: string) => norm(value).split(" ").filter((item) => item.length >= 2);
+const tokens = (value: string) =>
+  norm(value)
+    .split(" ")
+    .filter((item) => item.length >= 2);
 
 const unique = <T>(items: T[]) => [...new Set(items)];
 
@@ -84,7 +87,9 @@ function resumeCorpus(resume: Resume) {
 
 function graphCorpora(graph: FactGraph) {
   const verifiedFactIds = new Set(
-    graph.evidence.filter((item) => item.verified && item.factId).map((item) => item.factId as string),
+    graph.evidence
+      .filter((item) => item.verified && item.factId)
+      .map((item) => item.factId as string),
   );
   const verified = graph.facts
     .filter((fact) => fact.verificationStatus === "verified" || verifiedFactIds.has(fact.id))
@@ -242,7 +247,8 @@ function variantReadiness(
     ? Math.round((weighted / requirements.length) * 100)
     : 50;
   const roleAlignmentScore = roleAlignment(resume, jobTitle);
-  const template = defaultTemplates.find((item) => item.id === resume.templateId) ?? defaultTemplates[0]!;
+  const template =
+    defaultTemplates.find((item) => item.id === resume.templateId) ?? defaultTemplates[0]!;
   const atsScore = template.atsFriendly ? 100 : 55;
   const verifiedCount = requirements.filter((item) => item.status === "matched").length;
   const claimCount = requirements.filter(
@@ -259,7 +265,10 @@ function variantReadiness(
   );
   const statuses: RequirementStatus[] = ["matched", "partial", "missing", "unverified"];
   const statusCounts = Object.fromEntries(
-    statuses.map((status) => [status, requirements.filter((item) => item.status === status).length]),
+    statuses.map((status) => [
+      status,
+      requirements.filter((item) => item.status === status).length,
+    ]),
   ) as Record<RequirementStatus, number>;
 
   const strengths: LocalizedText[] = [];
@@ -271,10 +280,16 @@ function variantReadiness(
     });
   }
   if (roleAlignmentScore >= 70) {
-    strengths.push({ ar: "المسمى/الهدف المهني قريب من الدور المستهدف.", en: "The resume target/title aligns well with the role." });
+    strengths.push({
+      ar: "المسمى/الهدف المهني قريب من الدور المستهدف.",
+      en: "The resume target/title aligns well with the role.",
+    });
   }
   if (template.atsFriendly) {
-    strengths.push({ ar: "القالب الحالي من الخيارات المحافظة المتوافقة مع ATS داخل سيرتي.", en: "The current template is one of Seerati's conservative ATS-friendly options." });
+    strengths.push({
+      ar: "القالب الحالي من الخيارات المحافظة المتوافقة مع ATS داخل سيرتي.",
+      en: "The current template is one of Seerati's conservative ATS-friendly options.",
+    });
   }
   if (statusCounts.missing > 0) {
     priorities.push({
@@ -289,7 +304,10 @@ function variantReadiness(
     });
   }
   if (roleAlignmentScore < 60) {
-    priorities.push({ ar: "وضّح المسمى أو الهدف المهني بما يعكس الدور الحقيقي الذي تستهدفه.", en: "Clarify the target/title so it reflects the actual role you are pursuing." });
+    priorities.push({
+      ar: "وضّح المسمى أو الهدف المهني بما يعكس الدور الحقيقي الذي تستهدفه.",
+      en: "Clarify the target/title so it reflects the actual role you are pursuing.",
+    });
   }
 
   return {
@@ -325,7 +343,10 @@ export function buildApplicationReadiness(args: {
   const requirements = best?.requirements ?? [];
   const statuses: RequirementStatus[] = ["matched", "partial", "missing", "unverified"];
   const requirementCounts = Object.fromEntries(
-    statuses.map((status) => [status, requirements.filter((item) => item.status === status).length]),
+    statuses.map((status) => [
+      status,
+      requirements.filter((item) => item.status === status).length,
+    ]),
   ) as Record<RequirementStatus, number>;
   const score = best?.score ?? 0;
   const band: ReadinessBand = score >= 82 ? "ready" : score >= 62 ? "improve-first" : "not-ready";

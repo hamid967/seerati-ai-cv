@@ -40,7 +40,8 @@ for (const marker of forbiddenMutations) {
 const forbiddenClaims = ["chance of getting hired", "hiring probability:", "guaranteed interview"];
 const combined = `${engine}\n${panel}`.toLowerCase();
 for (const claim of forbiddenClaims) {
-  if (combined.includes(claim)) throw new Error(`Unsupported application-readiness claim: ${claim}`);
+  if (combined.includes(claim))
+    throw new Error(`Unsupported application-readiness claim: ${claim}`);
 }
 
 console.log("Stage 6B Job Match & Application Readiness guard passed");
