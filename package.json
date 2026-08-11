@@ -18,7 +18,8 @@
     "test:templates": "node scripts/template-smoke.mjs",
     "check:rtl": "node scripts/validate-rtl.mjs",
     "check:premium-3d": "node scripts/check-premium-3d.mjs",
-    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run check:rtl && npm run check:premium-3d"
+    "check:client-env": "node scripts/check-client-env.mjs",
+    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run check:rtl && npm run check:premium-3d && npm run check:client-env"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",
