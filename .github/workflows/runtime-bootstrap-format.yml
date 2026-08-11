@@ -1,0 +1,30 @@
+name: Runtime Bootstrap Format
+
+on:
+  push:
+    branches:
+      - hotfix/runtime-supabase-bootstrap
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: hotfix/runtime-supabase-bootstrap
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx prettier --write src/lib/public-runtime-config.functions.ts
+      - name: Commit formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/public-runtime-config.functions.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "style: format runtime Supabase bootstrap"
+          git push origin HEAD:hotfix/runtime-supabase-bootstrap
