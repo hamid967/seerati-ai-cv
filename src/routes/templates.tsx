@@ -22,7 +22,11 @@ export const Route = createFileRoute("/templates")({
         content:
           "استعرض وقارن قوالب السيرة الذاتية بالعربية والإنجليزية قبل اختيار القالب المناسب لمسارك.",
       },
+      { property: "og:url", content: "https://hrhbs.com/templates" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://hrhbs.com/templates" }],
   }),
   component: TemplatesPage,
 });
