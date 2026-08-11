@@ -76,6 +76,4 @@ if (failures.length) {
 }
 
 console.log("\nStage 8 release-operations static guard passed.");
-console.log(
-  "NOTE: Operational documentation is not evidence that production gates were executed.",
-);
+console.log("NOTE: Operational documentation is not evidence that production gates were executed.");
