@@ -950,6 +950,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_app_settings: {
+        Args: never
+        Returns: {
+          ai_mode: string
+          ai_provider: string | null
+          created_at: string
+          default_language: string
+          id: string
+          logo_url: string | null
+          maintenance: boolean
+          max_resumes: number
+          site_name: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "app_settings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_set_user_role: {
         Args: {
           new_role: Database["public"]["Enums"]["app_role"]
