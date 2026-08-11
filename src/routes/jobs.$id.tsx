@@ -54,6 +54,7 @@ import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
 import { NextBestActions } from "@/components/next-best-actions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 import { InterviewEvidenceAnswer } from "@/components/interview-evidence-answer";
+import { ApplicationReadinessPanel } from "@/components/application-readiness-panel";
 import {
   addJobEvent,
   listJobEvents,
