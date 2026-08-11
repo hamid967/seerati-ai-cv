@@ -1,0 +1,35 @@
+name: Stage5H Studio Hardening
+
+on:
+  push:
+    branches:
+      - stage5h/resume-design-intelligence
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage5h/resume-design-intelligence
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Apply hardening patch
+        run: |
+          node scripts/stage5h-studio-hardening.mjs
+          bunx prettier --write 'src/routes/resumes.$id.studio.tsx' scripts/check-resume-design-intelligence.mjs
+          node scripts/check-resume-design-intelligence.mjs
+          rm scripts/stage5h-studio-hardening.mjs
+      - name: Commit hardening
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 'src/routes/resumes.$id.studio.tsx' scripts/check-resume-design-intelligence.mjs scripts/stage5h-studio-hardening.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: harden Stage 5H Studio integration"
+          git push origin HEAD:stage5h/resume-design-intelligence
