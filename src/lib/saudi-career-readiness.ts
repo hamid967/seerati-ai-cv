@@ -15,7 +15,7 @@ export type SaudiReadinessCheck = {
   maxPoints: number;
   title: BiText;
   detail: BiText;
-  action?: BiText;
+  action?: BiText | undefined;
 };
 
 export type SaudiCareerReadiness = {
