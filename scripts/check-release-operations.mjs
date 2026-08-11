@@ -52,7 +52,9 @@ check(
 );
 
 check(
-  ops.includes("cross-tenant") && ops.includes("RLS") && manifest.includes("user-owned through RLS"),
+  ops.includes("cross-tenant") &&
+    ops.includes("RLS") &&
+    manifest.includes("user-owned through RLS"),
   "operations process treats tenant isolation as a hard trust boundary",
 );
 
@@ -63,7 +65,10 @@ check(
   "commercial launch remains gated on legal review while legal pages are placeholders",
 );
 
-check(ci.includes("check-production-launch-readiness.mjs"), "Stage 7 readiness guard remains in CI");
+check(
+  ci.includes("check-production-launch-readiness.mjs"),
+  "Stage 7 readiness guard remains in CI",
+);
 
 if (failures.length) {
   console.error(`\nStage 8 release-operations guard failed (${failures.length} check(s)).`);
@@ -71,4 +76,6 @@ if (failures.length) {
 }
 
 console.log("\nStage 8 release-operations static guard passed.");
-console.log("NOTE: Operational documentation is not evidence that production gates were executed.");
+console.log(
+  "NOTE: Operational documentation is not evidence that production gates were executed.",
+);
