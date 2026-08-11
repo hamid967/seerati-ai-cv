@@ -1,0 +1,56 @@
+name: Stage6A Type Fix
+
+on:
+  push:
+    branches:
+      - stage6/saudi-market-leadership
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage6/saudi-market-leadership
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Fix exact optional action
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/lib/saudi-career-readiness.ts')
+          s = p.read_text()
+          old = '''      action: sensitiveSignals.length
+        ? {
+            ar: "احذف البيانات التي لا يحتاجها صاحب العمل من نسخة السيرة المرسلة.",
+            en: "Remove personal data that is not necessary for the application.",
+          }
+        : undefined,
+'''
+          new = '''      ...(sensitiveSignals.length
+        ? {
+            action: {
+              ar: "احذف البيانات التي لا يحتاجها صاحب العمل من نسخة السيرة المرسلة.",
+              en: "Remove personal data that is not necessary for the application.",
+            },
+          }
+        : {}),
+'''
+          if old not in s:
+              raise SystemExit('target snippet not found')
+          p.write_text(s.replace(old, new))
+          PY
+          bunx prettier --write src/lib/saudi-career-readiness.ts
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/saudi-career-readiness.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: satisfy strict optional typing in Saudi readiness"
+          git push origin HEAD:stage6/saudi-market-leadership
