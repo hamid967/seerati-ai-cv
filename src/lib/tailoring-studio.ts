@@ -53,7 +53,9 @@ const tokens = (value: string) =>
     .filter((token) => token.length >= 2);
 
 function requirementTerms(requirements: RequirementMatch[]) {
-  return [...new Set(requirements.filter((item) => item.status !== "missing").map((item) => item.label))];
+  return [
+    ...new Set(requirements.filter((item) => item.status !== "missing").map((item) => item.label)),
+  ];
 }
 
 function relevance(text: string, terms: string[]) {
@@ -82,7 +84,12 @@ function sameOrder<T>(a: T[], b: T[], key: (item: T) => string) {
 function professionalText(data: ResumeData) {
   return [
     data.summary,
-    ...data.experience.flatMap((item) => [item.role, item.company, item.location ?? "", ...item.bullets]),
+    ...data.experience.flatMap((item) => [
+      item.role,
+      item.company,
+      item.location ?? "",
+      ...item.bullets,
+    ]),
     ...data.education.flatMap((item) => [item.degree, item.school, item.note ?? ""]),
     ...data.skills.map((item) => item.name),
     ...data.certificates.flatMap((item) => [item.title, item.detail ?? ""]),
@@ -152,7 +159,8 @@ export function buildTailoringProposal(args: {
   const resume = args.resumes.find((item) => item.id === bestId) ?? args.resumes[0] ?? null;
   if (!resume || !args.jobTitle.trim() || !args.jobDescription.trim()) return null;
 
-  const variant = readiness.variants.find((item) => item.resumeId === resume.id) ?? readiness.variants[0];
+  const variant =
+    readiness.variants.find((item) => item.resumeId === resume.id) ?? readiness.variants[0];
   const requirements = variant?.requirements ?? [];
   const terms = requirementTerms(requirements);
   const changes: TailoringChange[] = [];
@@ -220,7 +228,9 @@ export function buildTailoringProposal(args: {
     });
   }
 
-  const existingSections = resume.data.sectionOrder.filter((key) => preferredSectionOrder.includes(key));
+  const existingSections = resume.data.sectionOrder.filter((key) =>
+    preferredSectionOrder.includes(key),
+  );
   const remaining = resume.data.sectionOrder.filter((key) => !preferredSectionOrder.includes(key));
   const sortedSections = [
     ...preferredSectionOrder.filter((key) => existingSections.includes(key)),
@@ -243,7 +253,7 @@ export function buildTailoringProposal(args: {
   const currentTemplate = defaultTemplates.find((item) => item.id === resume.templateId);
   const recommendedTemplate = currentTemplate?.atsFriendly
     ? currentTemplate
-    : defaultTemplates.find((item) => item.id === "classic-ats") ?? defaultTemplates[0]!;
+    : (defaultTemplates.find((item) => item.id === "classic-ats") ?? defaultTemplates[0]!);
   if (recommendedTemplate.id !== resume.templateId) {
     changes.push({
       id: "template",

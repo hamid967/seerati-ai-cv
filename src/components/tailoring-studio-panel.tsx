@@ -197,11 +197,15 @@ export function TailoringStudioPanel({
           </div>
           <div className="flex gap-2">
             <Badge variant="secondary">
-              {ar ? `${proposal.matchedRequirements} متطابق` : `${proposal.matchedRequirements} matched`}
+              {ar
+                ? `${proposal.matchedRequirements} متطابق`
+                : `${proposal.matchedRequirements} matched`}
             </Badge>
             {proposal.missingRequirements ? (
               <Badge variant="outline">
-                {ar ? `${proposal.missingRequirements} مفقود` : `${proposal.missingRequirements} missing`}
+                {ar
+                  ? `${proposal.missingRequirements} مفقود`
+                  : `${proposal.missingRequirements} missing`}
               </Badge>
             ) : null}
           </div>

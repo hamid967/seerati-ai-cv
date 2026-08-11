@@ -6,10 +6,16 @@ const route = fs.readFileSync("src/routes/jobs.$id.tsx", "utf8");
 
 const checks = [
   [engine.includes("assertNumbersPreserved"), "numeric integrity guard is present"],
-  [engine.includes('status !== "missing"'), "missing requirements are excluded from tailoring terms"],
+  [
+    engine.includes('status !== "missing"'),
+    "missing requirements are excluded from tailoring terms",
+  ],
   [engine.includes("stableSortByRelevance"), "tailoring is deterministic and reorder-based"],
   [engine.includes('selected.has("template")'), "template changes require explicit selection"],
-  [panel.includes("Before tailoring") && panel.includes("قبل تخصيص"), "pre-change snapshot is created"],
+  [
+    panel.includes("Before tailoring") && panel.includes("قبل تخصيص"),
+    "pre-change snapshot is created",
+  ],
   [panel.includes("undoLast"), "immediate undo is present"],
   [panel.includes("Checkbox"), "per-change approval controls are present"],
   [route.includes("<TailoringStudioPanel"), "Tailoring Studio is wired into Job Workspace"],
