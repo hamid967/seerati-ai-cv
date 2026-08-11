@@ -63,7 +63,11 @@ function languageRatio(text: string) {
 }
 
 function mixedScriptNoise(text: string) {
-  const chunks = text.split(/[\s،,;:()\[\]{}]+/).filter(Boolean);
+  const chunks = text
+    .replaceAll("[", " ")
+    .replaceAll("]", " ")
+    .split(/[\s،,;:(){}]+/)
+    .filter(Boolean);
   return chunks.filter((chunk) => ARABIC_RE.test(chunk) && LATIN_RE.test(chunk));
 }
 
@@ -81,27 +85,20 @@ function hasMetric(text: string) {
   return /\d|%|٪|ريال|sar|مليون|ألف|k\b|m\b/i.test(text);
 }
 
-export function analyzeArabicCareer(args: {
-  twin: CareerTwin | null;
-  resumes: Resume[];
-}): ArabicCareerReport {
+export function analyzeArabicCareer(args: { twin: CareerTwin | null; resumes: Resume[] }): ArabicCareerReport {
   const { twin, resumes } = args;
   const issues: ArabicCareerIssue[] = [];
   const strengths: ArabicCareerReport["strengths"] = [];
   const primaryResume = resumes.find((resume) => resume.language === "ar") ?? resumes[0] ?? null;
   const headline = twin?.identity.headline || primaryResume?.data.personal.jobTitle || "";
   const summary = twin?.identity.summary || primaryResume?.data.summary || "";
-  const experience = twin?.workHistory.length
-    ? twin.workHistory
-    : (primaryResume?.data.experience ?? []);
+  const experience = twin?.workHistory.length ? twin.workHistory : primaryResume?.data.experience ?? [];
   const achievements = [
     ...(twin?.achievements.map((item) => item.text) ?? []),
     ...experience.flatMap((item) => item.bullets),
   ];
   const skills =
-    twin?.skills.map((item) => item.name) ??
-    primaryResume?.data.skills.map((item) => item.name) ??
-    [];
+    twin?.skills.map((item) => item.name) ?? primaryResume?.data.skills.map((item) => item.name) ?? [];
   const corpus = [headline, summary, ...achievements, ...skills].filter(Boolean).join(" \n ");
   const arabicRatio = languageRatio(corpus);
 
@@ -193,10 +190,7 @@ export function analyzeArabicCareer(args: {
       id: "mixed-script-noise",
       level: "info",
       area: "bilingual",
-      title: {
-        ar: "مزج عربي/إنجليزي داخل بعض الكلمات",
-        en: "Mixed Arabic/English inside some tokens",
-      },
+      title: { ar: "مزج عربي/إنجليزي داخل بعض الكلمات", en: "Mixed Arabic/English inside some tokens" },
       detail: {
         ar: "راجع الكلمات المختلطة حرفيًا. أسماء التقنيات والمنتجات الإنجليزية طبيعية، لكن الدمج داخل الكلمة قد يسبب تشوهًا بصريًا.",
         en: "Review mixed-script tokens. English product and technology names are normal, but mixing scripts inside one token can hurt readability.",
@@ -207,8 +201,7 @@ export function analyzeArabicCareer(args: {
 
   const duplicatedSkills = skills.filter(
     (skill, index) =>
-      skills.findIndex((other) => other.trim().toLowerCase() === skill.trim().toLowerCase()) !==
-      index,
+      skills.findIndex((other) => other.trim().toLowerCase() === skill.trim().toLowerCase()) !== index,
   );
   if (duplicatedSkills.length) {
     issues.push({
@@ -234,10 +227,7 @@ export function analyzeArabicCareer(args: {
       id: "arabic-ratio",
       level: "info",
       area: "bilingual",
-      title: {
-        ar: "النسخة العربية تحتوي إنجليزية كثيرة",
-        en: "Arabic resume contains substantial English text",
-      },
+      title: { ar: "النسخة العربية تحتوي إنجليزية كثيرة", en: "Arabic resume contains substantial English text" },
       detail: {
         ar: "هذا ليس خطأ بحد ذاته، خصوصًا للمصطلحات التقنية، لكن راجع الاتساق اللغوي للعناوين والجمل الوصفية.",
         en: "This is not inherently wrong, especially for technical terms, but review language consistency in headings and descriptive sentences.",
