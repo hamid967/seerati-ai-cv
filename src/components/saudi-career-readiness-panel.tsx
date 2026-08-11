@@ -60,7 +60,9 @@ export function SaudiCareerReadinessPanel({
         <div className="mt-2 flex items-center justify-between gap-2 text-[11px]">
           <strong>{bandLabel}</strong>
           <span className="text-muted-foreground">
-            {ar ? `${readiness.priorities.length} أولوية حالية` : `${readiness.priorities.length} current priorities`}
+            {ar
+              ? `${readiness.priorities.length} أولوية حالية`
+              : `${readiness.priorities.length} current priorities`}
           </span>
         </div>
       </div>
@@ -74,7 +76,10 @@ export function SaudiCareerReadinessPanel({
             </div>
             <div className="mt-2 space-y-1.5">
               {readiness.strengths.slice(0, 3).map((item) => (
-                <div key={item.id} className="rounded-lg border border-border/60 bg-background/55 p-2.5">
+                <div
+                  key={item.id}
+                  className="rounded-lg border border-border/60 bg-background/55 p-2.5"
+                >
                   <p className="text-xs font-semibold">{item.title[lang]}</p>
                   <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
                     {item.detail[lang]}
@@ -120,7 +125,9 @@ export function SaudiCareerReadinessPanel({
             </div>
           ) : (
             <p className="mt-2 text-xs text-muted-foreground">
-              {ar ? "لا توجد أولوية كبيرة في هذا الفحص." : "No major priority was found in this check."}
+              {ar
+                ? "لا توجد أولوية كبيرة في هذا الفحص."
+                : "No major priority was found in this check."}
             </p>
           )}
         </div>

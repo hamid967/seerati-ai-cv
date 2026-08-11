@@ -9,6 +9,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 ## Team of 100
 
 ### Squad 01 — Product, Program & Administration (10)
+
 1. General Program Director
 2. Principal Product Manager
 3. Senior Product Manager — Resume Studio
@@ -23,6 +24,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** product strategy, roadmap, sequencing, acceptance criteria, decision logs, risk register, release governance, market-fit metrics.
 
 ### Squad 02 — Frontend & Design System Engineering (10)
+
 1. Principal Frontend Architect
 2. Staff React/TanStack Engineer
 3. Senior TypeScript Engineer
@@ -37,6 +39,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** app shell, route quality, RTL/LTR, design tokens, keyboard UX, responsive behavior, performance budgets, reusable components.
 
 ### Squad 03 — Backend, Data & Platform Engineering (10)
+
 1. Principal Backend Architect
 2. Staff Supabase/Postgres Engineer
 3. Senior API Engineer
@@ -51,6 +54,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** schemas, RLS, RPCs, ownership constraints, API contracts, database migrations, integrations, idempotency and data durability.
 
 ### Squad 04 — Resume Document & Rendering Engine (10)
+
 1. Principal Document Systems Engineer
 2. PDF/Print Engineer
 3. Typography Engineer
@@ -65,6 +69,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** A4/Letter, PDF/print parity, pagination, layout safety, template registry, import/export, document accessibility, deterministic rendering.
 
 ### Squad 05 — AI & Career Intelligence (10)
+
 1. Principal AI Architect
 2. Applied LLM Engineer
 3. AI Safety Engineer
@@ -79,6 +84,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** AI task contracts, evidence-aware generation, no-hallucination rules, job matching, recruiter scan, design intelligence, bilingual evaluation and cost controls.
 
 ### Squad 06 — Saudi Career Market & Localization (10)
+
 1. Saudi Labour-Market Product Specialist
 2. Arabic Career Content Lead
 3. English Career Content Lead
@@ -93,6 +99,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** Saudi terminology, role/sector taxonomy, Arabic-first flows, application readiness guidance, local career conventions, content accuracy. No direct government integration is claimed without an actual supported interface.
 
 ### Squad 07 — Product Design, UX & Research (10)
+
 1. Principal Product Designer
 2. Senior UX Architect
 3. Senior UI Designer
@@ -107,6 +114,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** information architecture, premium visual system, user journeys, research, usability, resume template aesthetics, reduced motion and inclusive design.
 
 ### Squad 08 — Quality, Security, Privacy & Compliance (10)
+
 1. Head of Quality Engineering
 2. Automation QA Engineer
 3. E2E Engineer
@@ -121,6 +129,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** CI gates, security/privacy reviews, PDPL-aware product patterns, accessibility regression, release criteria, incident readiness and data-minimization checks.
 
 ### Squad 09 — Content, SEO, Education & Growth (10)
+
 1. Head of Content
 2. Arabic UX Writer
 3. English UX Writer
@@ -135,6 +144,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 **Owns:** product copy, learning center, landing pages, SEO architecture, career education, lifecycle communication, editorial voice, localized trust content.
 
 ### Squad 10 — SRE, Analytics, Support & Operations (10)
+
 1. SRE Lead
 2. Cloud/Deployment Engineer
 3. Observability Engineer
@@ -170,6 +180,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 ## Transformation roadmap
 
 ### Stage 6A — Saudi Market Leadership Foundation
+
 - Team operating model and engineering standards.
 - Saudi Career Readiness engine.
 - Privacy-sensitive-data warnings for resumes.
@@ -178,6 +189,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 - Permanent CI guard.
 
 ### Stage 6B — Job Match Intelligence & Application Readiness
+
 - Explainable requirement extraction.
 - Must-have / partial / missing / unverified map.
 - Evidence-backed requirement matching.
@@ -185,6 +197,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 - Unified readiness score combining ATS, recruiter scan, evidence and job alignment without predicting hiring outcomes.
 
 ### Stage 6C — Tailoring Studio
+
 - Before/after proposals.
 - Approve/reject per change.
 - Preserve every factual claim and number.
@@ -192,12 +205,14 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 - Role-specific ordering and keyword placement without keyword stuffing.
 
 ### Stage 6D — Saudi Career Passport
+
 - Reusable structured professional profile.
 - Copy-ready field groups for external application journeys.
 - Arabic/English identity, education, experience and certification normalization.
 - Export bundles; no credential scraping and no password collection.
 
 ### Stage 6E — Arabic Career Intelligence
+
 - Broader Saudi/Gulf title and sector taxonomy.
 - Arabic skill normalization and protected terms.
 - Arabic achievement quality checks.
@@ -205,6 +220,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 - Saudi graduate and executive guidance modes.
 
 ### Stage 6F — Trust, Security & PDPL Hardening
+
 - Remove unnecessary admin raw-read paths from career evidence/facts.
 - Safe aggregate admin analytics instead of raw career content.
 - Account export/delete lifecycle review.
@@ -212,6 +228,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 - Security headers, rate limits, abuse controls, dependency/security review.
 
 ### Stage 6G — Accessibility, Performance & Mobile Excellence
+
 - WCAG 2.2 audit.
 - Screen-reader and keyboard regression suite.
 - Performance budgets and code splitting.
@@ -219,6 +236,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 - PWA/mobile ergonomics where technically appropriate.
 
 ### Stage 6H — Content, SEO, Analytics & Commercial Readiness
+
 - Saudi career knowledge center.
 - Structured SEO and localized landing architecture.
 - Funnel/activation analytics with privacy-aware event taxonomy.
@@ -230,6 +248,7 @@ The team operates as 10 squads of 10 people. Every squad owns production code, m
 ## Definition of market-leadership quality
 
 A feature is not complete because it looks polished. It is complete only when:
+
 - Arabic and English paths both work.
 - RTL and keyboard navigation work.
 - It passes TypeScript, production build and static domain guards.
