@@ -24,7 +24,6 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          # Landing: derive template claims from live template metadata.
           p = Path('src/routes/index.tsx')
           s = p.read_text()
           marker = '  const ar = lang === "ar";\n'
@@ -41,7 +40,6 @@ jobs:
           s = s.replace(old_ar, new_ar, 1).replace(old_en, new_en, 1)
           p.write_text(s)
 
-          # Dashboard: remove demo-data insertion from authenticated empty state.
           p = Path('src/routes/dashboard.tsx')
           s = p.read_text()
           s = s.replace('    createResume,\n', '', 1)
@@ -51,7 +49,6 @@ jobs:
           s = s.replace(demo, '', 1)
           p.write_text(s)
 
-          # Preview: distinguish text PDF from image PDF for ATS trust.
           p = Path('src/routes/resumes.$id.preview.tsx')
           s = p.read_text()
           s = s.replace(
@@ -71,10 +68,8 @@ jobs:
           s = s.replace(old_note, new_note, 1)
           p.write_text(s)
 
-          # Robots: explicitly block all authenticated/private route groups.
           Path('public/robots.txt').write_text('''User-agent: *\nAllow: /\nDisallow: /auth\nDisallow: /dashboard\nDisallow: /admin\nDisallow: /account\nDisallow: /onboarding\nDisallow: /resumes\nDisallow: /career-twin\nDisallow: /career-evidence\nDisallow: /career-passport\nDisallow: /arabic-intelligence\nDisallow: /privacy-center\nDisallow: /import\nDisallow: /jobs\n\nSitemap: https://hrhbs.com/sitemap.xml\n''')
 
-          # Route QA: cover newly added public/private surfaces when runtime QA secrets exist.
           p = Path('scripts/qa-routes.mjs')
           s = p.read_text()
           old = '''  "/career-evidence",\n  "/import",\n  "/jobs",'''
@@ -83,7 +78,6 @@ jobs:
               raise SystemExit('route QA marker missing')
           p.write_text(s.replace(old, new, 1))
 
-          # CI: run Stage 7 guard and branch push checks.
           p = Path('.github/workflows/ci.yml')
           s = p.read_text()
           s = s.replace('        "stage6d-h/**",\n', '        "stage6d-h/**",\n        "stage7/**",\n', 1)
@@ -94,14 +88,14 @@ jobs:
           p.write_text(s)
           PY
       - name: Format touched files
-        run: >-
-          bunx prettier --write
-          src/routes/index.tsx
-          src/routes/dashboard.tsx
-          src/routes/resumes.$id.preview.tsx
-          scripts/qa-routes.mjs
-          scripts/check-production-launch-readiness.mjs
-          .github/workflows/ci.yml
+        run: |
+          bunx prettier --write \
+            src/routes/index.tsx \
+            src/routes/dashboard.tsx \
+            'src/routes/resumes.$id.preview.tsx' \
+            scripts/qa-routes.mjs \
+            scripts/check-production-launch-readiness.mjs \
+            .github/workflows/ci.yml
       - name: Run launch static guard
         run: node scripts/check-production-launch-readiness.mjs
       - name: Commit hardening and remove workflow
