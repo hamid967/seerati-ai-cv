@@ -13,6 +13,7 @@ on:
         "stage5g/**",
         "stage5i/**",
         "stage6/**",
+        "stage6b/**",
       ]
   pull_request:
     branches: [main]
@@ -61,6 +62,7 @@ jobs:
           node scripts/check-resume-design-intelligence.mjs
           node scripts/check-recruiter-ten-second-scan.mjs
           node scripts/check-saudi-market-leadership.mjs
+          node scripts/check-job-application-readiness.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
