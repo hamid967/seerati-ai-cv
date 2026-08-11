@@ -308,8 +308,12 @@ export type AppSettings = {
 };
 
 export async function fetchAppSettings(): Promise<AppSettings | null> {
-  const { data } = await supabase.from("app_settings").select("*").limit(1).maybeSingle();
+  // Full configuration (including internal AI/maintenance fields) is admin-only and
+  // guarded server-side; regular users may only read the public columns.
+  const { data: rows } = await supabase.rpc("admin_get_app_settings");
+  const data = (rows as AppSettingsRow[] | null)?.[0];
   if (!data) return null;
+
   return {
     id: data.id,
     siteName: data.site_name,
