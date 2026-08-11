@@ -29,10 +29,13 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 }
 
 function createSupabaseClient() {
-  // Dot access is intentional: Vite replaces VITE_* values in the browser bundle at build time.
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  // Vite requires direct import.meta.env.VITE_* dot access for reliable production replacement.
+  // The project's strict noPropertyAccessFromIndexSignature rule conflicts with that Vite contract.
+  // @ts-expect-error -- direct Vite env access is intentionally required for build-time replacement.
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env["SUPABASE_URL"];
+  // @ts-expect-error -- direct Vite env access is intentionally required for build-time replacement.
   const SUPABASE_PUBLISHABLE_KEY =
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env["SUPABASE_PUBLISHABLE_KEY"];
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [
