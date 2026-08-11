@@ -48,6 +48,7 @@ jobs:
           node scripts/check-resume-studio-ultra.mjs
           node scripts/check-professional-layout-engine.mjs
           node scripts/check-smart-pagination-composer.mjs
+          node scripts/check-resume-design-intelligence.mjs
 
   route-smoke:
     runs-on: ubuntu-latest

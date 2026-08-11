@@ -325,7 +325,6 @@ export async function fetchAppSettings(): Promise<AppSettings | null> {
   const data = (rows as AppSettingsRow[] | null)?.[0];
   if (!data) return null;
 
-
   return {
     id: data.id,
     siteName: data.site_name,
