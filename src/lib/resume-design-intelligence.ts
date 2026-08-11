@@ -1,10 +1,5 @@
 import { normalizeResumeDesign } from "@/lib/resume-layout";
-import type {
-  Resume,
-  ResumeUserDesign,
-  SectionKey,
-  TemplateDef,
-} from "@/lib/types";
+import type { Resume, ResumeUserDesign, SectionKey, TemplateDef } from "@/lib/types";
 
 export type DesignRoleFamily =
   | "executive"
@@ -204,17 +199,19 @@ function pickTemplates(
 ): TemplateDef[] {
   const active = activeTemplates(templates);
   const byId = new Map(active.map((template) => [template.id, template]));
-  const ranked = preferences.map((id) => byId.get(id)).filter((item): item is TemplateDef => !!item);
+  const ranked = preferences
+    .map((id) => byId.get(id))
+    .filter((item): item is TemplateDef => !!item);
   const remaining = active.filter((template) => !ranked.some((item) => item.id === template.id));
   const pool = [...ranked, ...remaining];
   if (!atsPriority) return pool;
-  return [...pool.filter((template) => template.atsFriendly), ...pool.filter((template) => !template.atsFriendly)];
+  return [
+    ...pool.filter((template) => template.atsFriendly),
+    ...pool.filter((template) => !template.atsFriendly),
+  ];
 }
 
-function preferredSectionOrder(
-  family: DesignRoleFamily,
-  band: DesignCareerBand,
-): SectionKey[] {
+function preferredSectionOrder(family: DesignRoleFamily, band: DesignCareerBand): SectionKey[] {
   if (band === "early") {
     return [
       "summary",
@@ -378,12 +375,7 @@ function buildChanges(
     if (from !== to) changes.push({ key, label, before: from, after: to });
   };
 
-  push(
-    "template",
-    { ar: "القالب", en: "Template" },
-    resume.templateId,
-    template.id,
-  );
+  push("template", { ar: "القالب", en: "Template" }, resume.templateId, template.id);
   push("page-size", { ar: "حجم الصفحة", en: "Page size" }, before.pageSize, after.pageSize);
   push(
     "density",

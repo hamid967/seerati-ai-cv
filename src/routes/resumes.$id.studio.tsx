@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Expand, FileText, Gauge, Minus, Plus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { ProfessionalResumePreview } from "@/components/professional-resume-preview";
+import { ResumeAutoDesignPanel } from "@/components/resume-auto-design-panel";
 import { getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ import {
   type FitTarget,
 } from "@/lib/resume-layout";
 import type { ResumeUserDesign } from "@/lib/types";
+import type { ResumeDesignProposal } from "@/lib/resume-design-intelligence";
 
 export const Route = createFileRoute("/resumes/$id/studio")({
   head: () => ({
@@ -50,6 +52,12 @@ function ResumeStudioUltra() {
   const [fitting, setFitting] = useState<FitTarget | null>(null);
   const [layout, setLayout] = useState<ResumeUserDesign>({});
   const [pageCount, setPageCount] = useState(1);
+  const [designPreview, setDesignPreview] = useState<ResumeDesignProposal | null>(null);
+  const [autoDesignUndo, setAutoDesignUndo] = useState<{
+    templateId: string;
+    design: ResumeUserDesign | undefined;
+    sectionOrder: typeof resume.data.sectionOrder;
+  } | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   useAuthGuard();
@@ -63,10 +71,19 @@ function ResumeStudioUltra() {
       resume
         ? {
             ...resume,
-            data: { ...resume.data, design: { ...resume.data.design, ...layout } },
+            templateId: designPreview?.templateId ?? resume.templateId,
+            data: {
+              ...resume.data,
+              sectionOrder: designPreview?.sectionOrder ?? resume.data.sectionOrder,
+              design: {
+                ...resume.data.design,
+                ...layout,
+                ...(designPreview?.design ?? {}),
+              },
+            },
           }
         : null,
-    [resume, layout],
+    [resume, layout, designPreview],
   );
 
   const advice = useMemo(
@@ -80,7 +97,12 @@ function ResumeStudioUltra() {
     const paper = root.querySelector(".paper") as HTMLElement | null;
     if (!paper) return;
     const measure = () =>
-      setPageCount(pageCountFromHeight(paper.scrollHeight, normalizeResumeDesign(layout).pageSize));
+      setPageCount(
+        pageCountFromHeight(
+          paper.scrollHeight,
+          normalizeResumeDesign(workingResume.data.design).pageSize,
+        ),
+      );
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(paper);
@@ -103,6 +125,7 @@ function ResumeStudioUltra() {
   const metrics = getPageMetrics(normalized.pageSize);
 
   const saveLayout = async (next: ResumeUserDesign) => {
+    setDesignPreview(null);
     const normalizedNext = normalizeResumeDesign(next);
     setLayout(normalizedNext);
     await updateResume(resume.id, {
@@ -115,6 +138,7 @@ function ResumeStudioUltra() {
   };
 
   const applyTemplate = async (templateId: string) => {
+    setDesignPreview(null);
     await updateResume(resume.id, { templateId });
   };
 
@@ -166,7 +190,43 @@ function ResumeStudioUltra() {
     }
   };
 
-  const currentTemplate = getTemplate(resume.templateId);
+  const applyAutoDesign = async (proposal: ResumeDesignProposal) => {
+    setAutoDesignUndo({
+      templateId: resume.templateId,
+      design: resume.data.design,
+      sectionOrder: [...resume.data.sectionOrder],
+    });
+    const nextDesign = normalizeResumeDesign(proposal.design);
+    setLayout(nextDesign);
+    setDesignPreview(null);
+    await updateResume(resume.id, {
+      templateId: proposal.templateId,
+      data: {
+        ...resume.data,
+        sectionOrder: proposal.sectionOrder,
+        design: { ...resume.data.design, ...proposal.design },
+      },
+    });
+    toast.success(ar ? "تم اعتماد التصميم الذكي" : "Smart design applied");
+  };
+
+  const undoAutoDesign = async () => {
+    if (!autoDesignUndo) return;
+    setDesignPreview(null);
+    setLayout(normalizeResumeDesign(autoDesignUndo.design));
+    await updateResume(resume.id, {
+      templateId: autoDesignUndo.templateId,
+      data: {
+        ...resume.data,
+        sectionOrder: autoDesignUndo.sectionOrder,
+        design: autoDesignUndo.design,
+      },
+    });
+    setAutoDesignUndo(null);
+    toast.success(ar ? "تم التراجع عن آخر تصميم ذكي" : "Last smart design reverted");
+  };
+
+  const currentTemplate = getTemplate(designPreview?.templateId ?? resume.templateId);
 
   return (
     <div
@@ -237,6 +297,18 @@ function ResumeStudioUltra() {
 
       <main className="mx-auto grid max-w-[1600px] gap-5 px-4 py-5 xl:grid-cols-[330px_minmax(0,1fr)_170px]">
         <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+          <ResumeAutoDesignPanel
+            resume={resume}
+            measuredPages={pageCount}
+            lang={lang}
+            previewing={designPreview !== null}
+            canUndo={autoDesignUndo !== null}
+            onPreview={setDesignPreview}
+            onCancelPreview={() => setDesignPreview(null)}
+            onApply={(proposal) => void applyAutoDesign(proposal)}
+            onUndo={() => void undoAutoDesign()}
+          />
+
           <section className="seerati-panel p-4">
             <div className="flex items-center gap-2">
               <Gauge className="size-4 text-emerald-accent" />

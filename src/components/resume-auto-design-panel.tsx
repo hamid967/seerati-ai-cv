@@ -80,9 +80,7 @@ export function ResumeAutoDesignPanel({
           <p className="mt-1 text-sm font-extrabold">
             {template?.name[lang] ?? proposal.templateId}
           </p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {template?.description[lang]}
-          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">{template?.description[lang]}</p>
         </div>
 
         <div className="space-y-2">
@@ -110,7 +108,9 @@ export function ResumeAutoDesignPanel({
             </div>
           ) : (
             <p className="mt-2 text-[11px] text-muted-foreground">
-              {ar ? "الإعداد الحالي قريب بالفعل من الاقتراح." : "The current design already closely matches the proposal."}
+              {ar
+                ? "الإعداد الحالي قريب بالفعل من الاقتراح."
+                : "The current design already closely matches the proposal."}
             </p>
           )}
         </div>
