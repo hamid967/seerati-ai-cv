@@ -41,7 +41,11 @@ export const Route = createFileRoute("/")({
         content:
           "فريق متخصص يعمل معك: من الملف المهني الموحّد إلى حزمة التقديم وفحص ATS وتصدير PDF عربي.",
       },
+      { property: "og:url", content: "https://hrhbs.com/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://hrhbs.com/" }],
   }),
   component: Landing,
 });

@@ -29,7 +29,11 @@ export const Route = createFileRoute("/features")({
         property: "og:description",
         content: "كل ما تحتاجه لبناء سيرة ذاتية احترافية بالعربية والإنجليزية.",
       },
+      { property: "og:url", content: "https://hrhbs.com/features" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://hrhbs.com/features" }],
   }),
   component: FeaturesPage,
 });
