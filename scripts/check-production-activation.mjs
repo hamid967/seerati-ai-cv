@@ -21,9 +21,15 @@ const check = (condition, label) => {
 };
 
 check(
-  migration.includes("revoke execute on function public.admin_career_privacy_metrics() from public") &&
-    migration.includes("revoke execute on function public.admin_career_privacy_metrics() from anon") &&
-    migration.includes("grant execute on function public.admin_career_privacy_metrics() to authenticated"),
+  migration.includes(
+    "revoke execute on function public.admin_career_privacy_metrics() from public",
+  ) &&
+    migration.includes(
+      "revoke execute on function public.admin_career_privacy_metrics() from anon",
+    ) &&
+    migration.includes(
+      "grant execute on function public.admin_career_privacy_metrics() to authenticated",
+    ),
   "anonymous execution of privacy metrics is explicitly revoked",
 );
 
