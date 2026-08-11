@@ -1,0 +1,619 @@
+.seerati-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(16, 185, 129, 0.16), transparent 30rem),
+    radial-gradient(circle at 80% 5%, rgba(217, 164, 65, 0.14), transparent 28rem),
+    linear-gradient(145deg, #07111f 0%, #0d1f36 52%, #081725 100%);
+  color: #f8fafc;
+}
+.seerati-intro__aurora {
+  position: absolute;
+  inset: -30%;
+  background: conic-gradient(
+    from 190deg at 50% 50%,
+    transparent 0 18%,
+    rgba(52, 211, 153, 0.12) 28%,
+    transparent 42% 58%,
+    rgba(250, 204, 21, 0.08) 70%,
+    transparent 82%
+  );
+  filter: blur(55px);
+  animation: seerati-intro-orbit 10s linear infinite;
+}
+.seerati-intro__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(circle at center, #000 5%, transparent 72%);
+  opacity: 0.8;
+}
+.seerati-intro__skip {
+  position: absolute;
+  top: clamp(18px, 4vw, 36px);
+  inset-inline-end: clamp(18px, 4vw, 42px);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 0.65rem 0.95rem;
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  backdrop-filter: blur(14px);
+  transition: 0.2s ease;
+}
+.seerati-intro__skip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+.seerati-intro__brand {
+  position: absolute;
+  top: clamp(18px, 4vw, 36px);
+  inset-inline-start: clamp(18px, 4vw, 42px);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.72);
+}
+.seerati-intro__mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.7rem;
+  background: linear-gradient(145deg, #0f766e, #065f46);
+  box-shadow: 0 15px 35px -18px rgba(52, 211, 153, 0.9);
+  font-family: serif;
+  font-size: 1.2rem;
+  color: white;
+}
+.seerati-intro__stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  min-height: 100%;
+  grid-template-columns: minmax(280px, 1fr) minmax(300px, 620px);
+  align-items: center;
+  gap: clamp(2rem, 7vw, 7rem);
+  width: min(1180px, calc(100% - 48px));
+  margin: auto;
+}
+.seerati-intro__orbit {
+  position: relative;
+  width: min(34vw, 390px);
+  aspect-ratio: 1;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  perspective: 1200px;
+}
+.seerati-intro__orbit:before,
+.seerati-intro__orbit:after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  inset: 4%;
+  animation: seerati-ring 7s linear infinite;
+}
+.seerati-intro__orbit:after {
+  inset: -8%;
+  border-color: rgba(52, 211, 153, 0.16);
+  animation-direction: reverse;
+  animation-duration: 10s;
+}
+.seerati-intro__document {
+  position: relative;
+  width: 47%;
+  aspect-ratio: 0.71;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.055));
+  box-shadow:
+    0 44px 100px -42px rgba(0, 0, 0, 0.9),
+    0 0 60px -24px rgba(52, 211, 153, 0.7);
+  backdrop-filter: blur(18px);
+  transform: rotateY(-12deg) rotateX(6deg);
+  animation: seerati-doc-float 4s ease-in-out infinite alternate;
+  padding: 18% 13%;
+}
+.seerati-intro__document span {
+  display: block;
+  height: 5px;
+  margin-bottom: 12%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.seerati-intro__document .short {
+  width: 62%;
+}
+.seerati-intro__document-head {
+  height: 12% !important;
+  width: 44% !important;
+  margin-bottom: 20% !important;
+  background: linear-gradient(90deg, #34d399, #a7f3d0) !important;
+}
+.seerati-intro__orb {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 25px rgba(52, 211, 153, 0.8);
+}
+.seerati-intro__orb--one {
+  top: 3%;
+  left: 24%;
+  animation: seerati-orb-one 6s ease-in-out infinite;
+}
+.seerati-intro__orb--two {
+  right: 1%;
+  bottom: 23%;
+  width: 8px;
+  height: 8px;
+  background: #facc15;
+  box-shadow: 0 0 24px rgba(250, 204, 21, 0.65);
+  animation: seerati-orb-two 7s ease-in-out infinite;
+}
+.seerati-intro__orb--three {
+  left: 4%;
+  bottom: 13%;
+  width: 6px;
+  height: 6px;
+  opacity: 0.7;
+  animation: seerati-orb-three 5s ease-in-out infinite;
+}
+.seerati-intro__copy {
+  max-width: 610px;
+  animation: seerati-copy-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.seerati-intro__copy p {
+  margin: 0 0 1rem;
+  color: #6ee7b7;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.seerati-intro__copy h2 {
+  margin: 0;
+  max-width: 13ch;
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  font-weight: 900;
+}
+.seerati-intro__copy span {
+  display: block;
+  max-width: 54ch;
+  margin-top: 1.45rem;
+  color: rgba(226, 232, 240, 0.72);
+  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+  line-height: 1.9;
+}
+.seerati-intro__footer {
+  position: absolute;
+  z-index: 4;
+  inset-inline: clamp(18px, 4vw, 42px);
+  bottom: clamp(20px, 4vw, 34px);
+  display: grid;
+  grid-template-columns: auto minmax(100px, 260px) auto;
+  align-items: center;
+  gap: 1rem;
+}
+.seerati-intro__footer p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.42);
+  font-size: 0.68rem;
+}
+.seerati-intro__dots {
+  display: flex;
+  gap: 0.4rem;
+}
+.seerati-intro__dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: 0.25s ease;
+}
+.seerati-intro__dots .is-active {
+  width: 22px;
+  border-radius: 999px;
+  background: #34d399;
+}
+.seerati-intro__progress {
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.seerati-intro__progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left;
+  background: linear-gradient(90deg, #34d399, #f8d274);
+  animation: seerati-intro-progress 8.6s linear forwards;
+}
+.seerati-career-visual {
+  position: relative;
+  width: min(1120px, calc(100% - 28px));
+  margin: 4rem auto -5rem;
+  padding: 0 1rem;
+  perspective: 1500px;
+  z-index: 3;
+}
+.seerati-career-visual__glow {
+  position: absolute;
+  inset: 15% 8% -10%;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.22), transparent 58%);
+  filter: blur(50px);
+  z-index: -1;
+}
+.seerati-career-visual__frame {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045));
+  box-shadow:
+    0 50px 110px -50px rgba(0, 0, 0, 0.78),
+    inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  backdrop-filter: blur(20px);
+  transform: rotateX(4deg);
+  transform-origin: center bottom;
+}
+.seerati-career-visual__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 1rem 1.2rem;
+}
+.seerati-career-visual__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.seerati-career-visual__identity strong,
+.seerati-career-visual__identity small {
+  display: block;
+}
+.seerati-career-visual__identity strong {
+  font-size: 0.82rem;
+}
+.seerati-career-visual__identity small {
+  margin-top: 0.15rem;
+  color: rgba(226, 232, 240, 0.45);
+  font-size: 0.66rem;
+}
+.seerati-career-visual__mini-logo {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: linear-gradient(145deg, #10b981, #047857);
+  font-weight: 900;
+}
+.seerati-career-visual__status {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 0.42rem 0.65rem;
+  color: #a7f3d0;
+  font-size: 0.67rem;
+}
+.seerati-career-visual__content {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 1rem;
+  padding: 1.2rem;
+}
+.seerati-career-visual__resume {
+  min-height: 340px;
+  border-radius: 20px;
+  background: #f8fafc;
+  padding: 2rem;
+  color: #0f172a;
+  box-shadow: 0 30px 65px -38px rgba(0, 0, 0, 0.7);
+}
+.seerati-career-visual__resume-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.seerati-career-visual__avatar {
+  display: grid;
+  width: 3.1rem;
+  height: 3.1rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #0f766e;
+  color: white;
+  font-weight: 900;
+}
+.seerati-career-visual__resume-head > div {
+  flex: 1;
+}
+.seerati-career-visual__line {
+  display: block;
+  height: 7px;
+  margin: 0.45rem 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+.seerati-career-visual__line.wide {
+  width: 95%;
+}
+.seerati-career-visual__line.medium {
+  width: 64%;
+}
+.seerati-career-visual__line.short {
+  width: 46%;
+}
+.seerati-career-visual__section {
+  margin-top: 2rem;
+}
+.seerati-career-visual__label {
+  display: block;
+  width: 26%;
+  height: 8px;
+  margin-bottom: 0.7rem;
+  border-radius: 999px;
+  background: #0f766e;
+}
+.seerati-career-visual__skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 2rem;
+}
+.seerati-career-visual__skills span {
+  width: 21%;
+  height: 19px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+.seerati-career-visual__rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.seerati-career-visual__role,
+.seerati-career-visual__metric,
+.seerati-career-visual__export {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: rgba(6, 20, 36, 0.44);
+  padding: 0.9rem;
+}
+.seerati-career-visual__role span,
+.seerati-career-visual__role small,
+.seerati-career-visual__metric small {
+  display: block;
+  color: rgba(226, 232, 240, 0.5);
+  font-size: 0.63rem;
+}
+.seerati-career-visual__role strong {
+  display: block;
+  margin: 0.3rem 0;
+  font-size: 0.82rem;
+}
+.seerati-career-visual__metric {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.seerati-career-visual__metric > div {
+  flex: 1;
+}
+.seerati-career-visual__metric strong {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 0.8rem;
+}
+.seerati-career-visual__metric-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+}
+.seerati-career-visual__export {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #a7f3d0;
+  font-size: 0.72rem;
+}
+.seerati-career-visual__float {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(8, 23, 37, 0.85);
+  padding: 0.65rem 0.8rem;
+  color: #e2e8f0;
+  font-size: 0.68rem;
+  box-shadow: 0 18px 44px -22px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(14px);
+}
+.seerati-career-visual__float--ai {
+  top: 25%;
+  inset-inline-start: -1.5rem;
+  animation: seerati-float-chip 5s ease-in-out infinite alternate;
+}
+.seerati-career-visual__float--doc {
+  right: -0.8rem;
+  bottom: 23%;
+  animation: seerati-float-chip 6s ease-in-out infinite alternate-reverse;
+}
+@keyframes seerati-intro-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes seerati-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes seerati-doc-float {
+  to {
+    transform: translateY(-14px) rotateY(-6deg) rotateX(2deg);
+  }
+}
+@keyframes seerati-orb-one {
+  50% {
+    transform: translate(48px, 28px);
+  }
+}
+@keyframes seerati-orb-two {
+  50% {
+    transform: translate(-38px, -30px);
+  }
+}
+@keyframes seerati-orb-three {
+  50% {
+    transform: translate(28px, -20px);
+  }
+}
+@keyframes seerati-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes seerati-intro-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes seerati-float-chip {
+  to {
+    transform: translateY(-9px);
+  }
+}
+@media (max-width: 800px) {
+  .seerati-intro__stage {
+    grid-template-columns: 1fr;
+    align-content: center;
+    text-align: center;
+  }
+  .seerati-intro__orbit {
+    width: min(54vw, 260px);
+    order: 1;
+  }
+  .seerati-intro__copy {
+    order: 2;
+    margin: auto;
+  }
+  .seerati-intro__copy h2 {
+    max-width: 14ch;
+    margin: auto;
+    font-size: clamp(2.1rem, 10vw, 3.6rem);
+  }
+  .seerati-intro__copy span {
+    margin: 1rem auto 0;
+    max-width: 35ch;
+  }
+  .seerati-intro__footer {
+    grid-template-columns: auto 1fr;
+  }
+  .seerati-intro__footer p {
+    display: none;
+  }
+  .seerati-career-visual {
+    margin-top: 2.5rem;
+    margin-bottom: -2.5rem;
+  }
+  .seerati-career-visual__content {
+    grid-template-columns: 1fr;
+  }
+  .seerati-career-visual__rail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .seerati-career-visual__role,
+  .seerati-career-visual__export {
+    grid-column: 1/-1;
+  }
+  .seerati-career-visual__float {
+    display: none;
+  }
+}
+@media (max-width: 520px) {
+  .seerati-intro__stage {
+    width: calc(100% - 28px);
+    gap: 1.4rem;
+  }
+  .seerati-intro__orbit {
+    width: 48vw;
+  }
+  .seerati-intro__copy p {
+    font-size: 0.65rem;
+  }
+  .seerati-intro__copy span {
+    font-size: 0.88rem;
+    line-height: 1.75;
+  }
+  .seerati-career-visual {
+    padding: 0;
+    margin-inline: auto;
+  }
+  .seerati-career-visual__frame {
+    border-radius: 20px;
+  }
+  .seerati-career-visual__resume {
+    min-height: 270px;
+    padding: 1.2rem;
+  }
+  .seerati-career-visual__rail {
+    grid-template-columns: 1fr;
+  }
+  .seerati-career-visual__role,
+  .seerati-career-visual__export {
+    grid-column: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seerati-intro,
+  .seerati-intro *,
+  .seerati-career-visual * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .seerati-career-visual__frame {
+    transform: none;
+  }
+}
