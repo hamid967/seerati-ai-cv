@@ -1,0 +1,30 @@
+name: Stage9 Format
+
+on:
+  push:
+    branches:
+      - stage9/production-activation
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage9/production-activation
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx prettier --write scripts/check-production-activation.mjs
+      - name: Commit formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/check-production-activation.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "style: format Stage 9 activation guard"
+          git push origin HEAD:stage9/production-activation
