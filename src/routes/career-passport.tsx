@@ -10,11 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { loadCareerTwin, type CareerTwin } from "@/lib/career";
-import {
-  buildCareerPassport,
-  passportExport,
-  passportGroupText,
-} from "@/lib/career-passport";
+import { buildCareerPassport, passportExport, passportGroupText } from "@/lib/career-passport";
 
 export const Route = createFileRoute("/career-passport")({
   head: () => ({
@@ -22,7 +18,8 @@ export const Route = createFileRoute("/career-passport")({
       { title: "جوازي المهني | سيرتي — Saudi Career Passport" },
       {
         name: "description",
-        content: "بياناتك المهنية المنظمة والجاهزة للنسخ وإعادة الاستخدام في رحلات التقديم الوظيفي.",
+        content:
+          "بياناتك المهنية المنظمة والجاهزة للنسخ وإعادة الاستخدام في رحلات التقديم الوظيفي.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -94,7 +91,9 @@ function CareerPassportPage() {
   if (!twin || !passport) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-14 text-center">
-        <p className="font-bold">{ar ? "تعذر تحميل جوازك المهني." : "Could not load your career passport."}</p>
+        <p className="font-bold">
+          {ar ? "تعذر تحميل جوازك المهني." : "Could not load your career passport."}
+        </p>
         <Button asChild variant="outline" className="mt-4">
           <Link to="/career-twin">{ar ? "فتح ملفي المهني" : "Open Career Twin"}</Link>
         </Button>
@@ -135,7 +134,9 @@ function CareerPassportPage() {
       <Card className="mt-6">
         <CardContent className="grid gap-5 p-5 md:grid-cols-[180px_1fr] md:items-center">
           <div>
-            <p className="text-xs text-muted-foreground">{ar ? "اكتمال الجواز" : "Passport completeness"}</p>
+            <p className="text-xs text-muted-foreground">
+              {ar ? "اكتمال الجواز" : "Passport completeness"}
+            </p>
             <p className="mt-1 text-3xl font-extrabold">{passport.completeness}%</p>
             <Progress className="mt-2" value={passport.completeness} />
           </div>
@@ -155,7 +156,10 @@ function CareerPassportPage() {
       {passport.warnings.length ? (
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {passport.warnings.map((warning) => (
-            <div key={warning.en} className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-3 text-xs">
+            <div
+              key={warning.en}
+              className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-3 text-xs"
+            >
               {warning[lang]}
             </div>
           ))}
@@ -175,8 +179,18 @@ function CareerPassportPage() {
                   disabled={!group.fields.length}
                   onClick={() => void copyGroup(group.id, text)}
                 >
-                  {copied === group.id ? <Check className="size-4" /> : <ClipboardCopy className="size-4" />}
-                  {copied === group.id ? (ar ? "نُسخ" : "Copied") : ar ? "نسخ المجموعة" : "Copy group"}
+                  {copied === group.id ? (
+                    <Check className="size-4" />
+                  ) : (
+                    <ClipboardCopy className="size-4" />
+                  )}
+                  {copied === group.id
+                    ? ar
+                      ? "نُسخ"
+                      : "Copied"
+                    : ar
+                      ? "نسخ المجموعة"
+                      : "Copy group"}
                 </Button>
               </CardHeader>
               <CardContent>
@@ -196,7 +210,9 @@ function CareerPassportPage() {
                             </Badge>
                           ) : null}
                         </dt>
-                        <dd className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{item.value}</dd>
+                        <dd className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">
+                          {item.value}
+                        </dd>
                       </div>
                     ))}
                   </dl>

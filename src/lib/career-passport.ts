@@ -8,7 +8,15 @@ export type PassportField = {
 };
 
 export type PassportGroup = {
-  id: "identity" | "targets" | "experience" | "education" | "certifications" | "skills" | "languages" | "links";
+  id:
+    | "identity"
+    | "targets"
+    | "experience"
+    | "education"
+    | "certifications"
+    | "skills"
+    | "languages"
+    | "links";
   label: { ar: string; en: string };
   fields: PassportField[];
 };
@@ -38,7 +46,9 @@ function field(
   sensitive = false,
 ): PassportField | null {
   const normalized = clean(value);
-  return normalized ? { key, label: { ar, en }, value: normalized, ...(sensitive ? { sensitive } : {}) } : null;
+  return normalized
+    ? { key, label: { ar, en }, value: normalized, ...(sensitive ? { sensitive } : {}) }
+    : null;
 }
 
 const compact = <T>(items: Array<T | null | undefined>): T[] => items.filter(Boolean) as T[];
@@ -79,8 +89,18 @@ export function buildCareerPassport(twin: CareerTwin): CareerPassport {
         field(`experience.${index}.role`, `المسمى ${index + 1}`, `Role ${index + 1}`, item.role),
         field(`experience.${index}.company`, "الجهة", "Company", item.company),
         field(`experience.${index}.location`, "الموقع", "Location", item.location),
-        field(`experience.${index}.dates`, "الفترة", "Period", [item.start, item.end || (item.current ? "Present" : "")].filter(Boolean).join(" — ")),
-        field(`experience.${index}.bullets`, "الإنجازات/المهام", "Achievements / responsibilities", item.bullets.join("\n")),
+        field(
+          `experience.${index}.dates`,
+          "الفترة",
+          "Period",
+          [item.start, item.end || (item.current ? "Present" : "")].filter(Boolean).join(" — "),
+        ),
+        field(
+          `experience.${index}.bullets`,
+          "الإنجازات/المهام",
+          "Achievements / responsibilities",
+          item.bullets.join("\n"),
+        ),
       ]),
     ),
   };
@@ -90,9 +110,19 @@ export function buildCareerPassport(twin: CareerTwin): CareerPassport {
     label: { ar: "التعليم", en: "Education" },
     fields: twin.education.flatMap((item, index) =>
       compact([
-        field(`education.${index}.degree`, `المؤهل ${index + 1}`, `Degree ${index + 1}`, item.degree),
+        field(
+          `education.${index}.degree`,
+          `المؤهل ${index + 1}`,
+          `Degree ${index + 1}`,
+          item.degree,
+        ),
         field(`education.${index}.school`, "الجهة التعليمية", "Institution", item.school),
-        field(`education.${index}.dates`, "الفترة", "Period", [item.start, item.end].filter(Boolean).join(" — ")),
+        field(
+          `education.${index}.dates`,
+          "الفترة",
+          "Period",
+          [item.start, item.end].filter(Boolean).join(" — "),
+        ),
         field(`education.${index}.note`, "ملاحظات", "Notes", item.note),
       ]),
     ),
@@ -103,7 +133,12 @@ export function buildCareerPassport(twin: CareerTwin): CareerPassport {
     label: { ar: "الشهادات المهنية", en: "Certifications" },
     fields: twin.certifications.flatMap((item, index) =>
       compact([
-        field(`certification.${index}.title`, `الشهادة ${index + 1}`, `Certification ${index + 1}`, item.title),
+        field(
+          `certification.${index}.title`,
+          `الشهادة ${index + 1}`,
+          `Certification ${index + 1}`,
+          item.title,
+        ),
         field(`certification.${index}.detail`, "التفاصيل", "Details", item.detail),
       ]),
     ),
@@ -139,7 +174,16 @@ export function buildCareerPassport(twin: CareerTwin): CareerPassport {
     })),
   };
 
-  const groups = [identity, targets, experience, education, certifications, skills, languages, links];
+  const groups = [
+    identity,
+    targets,
+    experience,
+    education,
+    certifications,
+    skills,
+    languages,
+    links,
+  ];
   const important = [
     !!twin.identity.fullName,
     !!twin.identity.email,
@@ -157,13 +201,22 @@ export function buildCareerPassport(twin: CareerTwin): CareerPassport {
   const completeness = Math.round((important.filter(Boolean).length / important.length) * 100);
   const warnings: CareerPassport["warnings"] = [];
   if (!twin.identity.phone) {
-    warnings.push({ ar: "أضف رقم جوال مهني قبل استخدام جوازك في طلبات التوظيف.", en: "Add a professional mobile number before using the passport for applications." });
+    warnings.push({
+      ar: "أضف رقم جوال مهني قبل استخدام جوازك في طلبات التوظيف.",
+      en: "Add a professional mobile number before using the passport for applications.",
+    });
   }
   if (!twin.identity.city) {
-    warnings.push({ ar: "أضف المدينة لتسهيل تعبئة نماذج التوظيف المحلية.", en: "Add your city to make local application forms easier to complete." });
+    warnings.push({
+      ar: "أضف المدينة لتسهيل تعبئة نماذج التوظيف المحلية.",
+      en: "Add your city to make local application forms easier to complete.",
+    });
   }
   if (!twin.targets.length) {
-    warnings.push({ ar: "حدد هدفًا مهنيًا واحدًا على الأقل.", en: "Add at least one career target." });
+    warnings.push({
+      ar: "حدد هدفًا مهنيًا واحدًا على الأقل.",
+      en: "Add at least one career target.",
+    });
   }
 
   return { generatedAt: new Date().toISOString(), completeness, groups, warnings };

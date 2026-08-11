@@ -17,7 +17,8 @@ export const Route = createFileRoute("/arabic-intelligence")({
       { title: "ذكاء السيرة العربية | سيرتي" },
       {
         name: "description",
-        content: "مراجعة جودة الصياغة المهنية العربية والاتساق الثنائي والإنجازات بدون اختلاق بيانات.",
+        content:
+          "مراجعة جودة الصياغة المهنية العربية والاتساق الثنائي والإنجازات بدون اختلاق بيانات.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -82,17 +83,23 @@ function ArabicIntelligencePage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Card>
           <CardContent className="p-5">
-            <p className="text-xs text-muted-foreground">{ar ? "جودة الصياغة" : "Writing quality"}</p>
+            <p className="text-xs text-muted-foreground">
+              {ar ? "جودة الصياغة" : "Writing quality"}
+            </p>
             <p className="mt-1 text-4xl font-extrabold">{report.score}</p>
             <Progress value={report.score} className="mt-3" />
             <p className="mt-2 text-xs text-muted-foreground">
-              {ar ? "مؤشر تحريري داخلي، وليس تقييم توظيف." : "An internal editorial indicator, not a hiring score."}
+              {ar
+                ? "مؤشر تحريري داخلي، وليس تقييم توظيف."
+                : "An internal editorial indicator, not a hiring score."}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-5">
-            <p className="text-xs text-muted-foreground">{ar ? "نسبة الحروف العربية" : "Arabic character share"}</p>
+            <p className="text-xs text-muted-foreground">
+              {ar ? "نسبة الحروف العربية" : "Arabic character share"}
+            </p>
             <p className="mt-1 text-4xl font-extrabold">{report.arabicRatio}%</p>
             <Progress value={report.arabicRatio} className="mt-3" />
             <p className="mt-2 text-xs text-muted-foreground">
@@ -107,13 +114,17 @@ function ArabicIntelligencePage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_.75fr]">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{ar ? "نقاط تحتاج مراجعة" : "Review points"}</CardTitle>
+            <CardTitle className="text-base">
+              {ar ? "نقاط تحتاج مراجعة" : "Review points"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {!report.issues.length ? (
               <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm">
                 <CheckCircle2 className="size-5 text-emerald-700" />
-                {ar ? "لم نجد ملاحظات تحريرية أساسية حاليًا." : "No major editorial issues found right now."}
+                {ar
+                  ? "لم نجد ملاحظات تحريرية أساسية حاليًا."
+                  : "No major editorial issues found right now."}
               </div>
             ) : (
               report.issues.map((issue) => (
@@ -139,7 +150,9 @@ function ArabicIntelligencePage() {
                             : "Note"}
                     </Badge>
                   </div>
-                  <p className="mt-2 text-xs leading-6 text-muted-foreground">{issue.detail[lang]}</p>
+                  <p className="mt-2 text-xs leading-6 text-muted-foreground">
+                    {issue.detail[lang]}
+                  </p>
                   {issue.sample ? (
                     <p className="mt-2 rounded-lg bg-muted/60 p-2 text-xs">{issue.sample}</p>
                   ) : null}
@@ -156,14 +169,19 @@ function ArabicIntelligencePage() {
           <CardContent className="space-y-2">
             {report.strengths.length ? (
               report.strengths.map((strength) => (
-                <div key={strength.en} className="flex items-start gap-2 rounded-xl border p-3 text-xs leading-5">
+                <div
+                  key={strength.en}
+                  className="flex items-start gap-2 rounded-xl border p-3 text-xs leading-5"
+                >
                   <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-700" />
                   <span>{strength[lang]}</span>
                 </div>
               ))
             ) : (
               <p className="text-xs text-muted-foreground">
-                {ar ? "أضف بيانات أكثر لإظهار نقاط القوة التحريرية." : "Add more data to surface editorial strengths."}
+                {ar
+                  ? "أضف بيانات أكثر لإظهار نقاط القوة التحريرية."
+                  : "Add more data to surface editorial strengths."}
               </p>
             )}
           </CardContent>

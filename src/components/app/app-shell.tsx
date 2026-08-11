@@ -95,7 +95,9 @@ export function AppShell({
           href="#app-main-content"
           className="seerati-skip-link"
           onClick={() => {
-            window.requestAnimationFrame(() => document.getElementById("app-main-content")?.focus());
+            window.requestAnimationFrame(() =>
+              document.getElementById("app-main-content")?.focus(),
+            );
           }}
         >
           تخطَّ إلى المحتوى / Skip to content

@@ -15,7 +15,8 @@ export type ProductEventName = (typeof PRODUCT_EVENTS)[number];
 export type SafeAnalyticsValue = string | number | boolean | null;
 export type SafeAnalyticsProperties = Record<string, SafeAnalyticsValue>;
 
-const FORBIDDEN_KEYS = /(?:name|email|phone|mobile|summary|description|resume|bullet|experience|company|jobtitle|job_title|url|link|evidence|fact|text|content|message)/i;
+const FORBIDDEN_KEYS =
+  /(?:name|email|phone|mobile|summary|description|resume|bullet|experience|company|jobtitle|job_title|url|link|evidence|fact|text|content|message)/i;
 const MAX_VALUE_LENGTH = 80;
 
 /**

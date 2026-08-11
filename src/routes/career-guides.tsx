@@ -96,7 +96,9 @@ function CareerGuidesPage() {
                 {ar ? "مركز المعرفة المهنية" : "Career knowledge center"}
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
-                {ar ? "ابنِ سيرة أوضح، لا سيرة أعلى ضجيجًا" : "Build a clearer resume, not a louder one"}
+                {ar
+                  ? "ابنِ سيرة أوضح، لا سيرة أعلى ضجيجًا"
+                  : "Build a clearer resume, not a louder one"}
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-muted-foreground">
                 {ar
@@ -134,10 +136,16 @@ function CareerGuidesPage() {
                 <h2 className="font-extrabold">{ar ? "قاعدة سيرتي" : "The Seerati rule"}</h2>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {[
-                    ar ? "لا نخترع خبرة أو مهارة أو رقمًا." : "Never invent experience, skills or metrics.",
-                    ar ? "التقييمات تشرح جودة المستند، لا احتمال التوظيف." : "Scores describe document quality, not hiring probability.",
+                    ar
+                      ? "لا نخترع خبرة أو مهارة أو رقمًا."
+                      : "Never invent experience, skills or metrics.",
+                    ar
+                      ? "التقييمات تشرح جودة المستند، لا احتمال التوظيف."
+                      : "Scores describe document quality, not hiring probability.",
                     ar ? "التخصيص يحتاج مراجعة المستخدم." : "Tailoring stays under user review.",
-                    ar ? "الخصوصية جزء من المنتج وليست صفحة قانونية فقط." : "Privacy is a product behavior, not just a legal page.",
+                    ar
+                      ? "الخصوصية جزء من المنتج وليست صفحة قانونية فقط."
+                      : "Privacy is a product behavior, not just a legal page.",
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2 text-sm">
                       <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-700" />
