@@ -1,0 +1,31 @@
+name: Stage6B Prettier
+
+on:
+  push:
+    branches:
+      - stage6b/job-match-readiness
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage6b/job-match-readiness
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Format Stage 6B files
+        run: bunx prettier --write scripts/check-job-application-readiness.mjs src/components/application-readiness-panel.tsx src/lib/application-readiness.ts
+      - name: Commit formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/check-job-application-readiness.mjs src/components/application-readiness-panel.tsx src/lib/application-readiness.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "style: format Stage 6B readiness files"
+          git push origin HEAD:stage6b/job-match-readiness
