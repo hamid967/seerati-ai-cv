@@ -6,4 +6,4 @@ Disallow: /account
 Disallow: /onboarding
 Disallow: /resumes
 
-Sitemap: /sitemap.xml
+Sitemap: https://hrhbs.com/sitemap.xml
