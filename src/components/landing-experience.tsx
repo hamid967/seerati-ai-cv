@@ -109,7 +109,13 @@ export function LandingIntro({ ar }: { ar: boolean }) {
   if (!visible) return null;
 
   return (
-    <div className="seerati-intro" role="dialog" aria-modal="true" aria-label={ar ? "مقدمة تعريفية عن سيرتي" : "Introduction to Seerati"} dir={ar ? "rtl" : "ltr"}>
+    <div
+      className="seerati-intro"
+      role="dialog"
+      aria-modal="true"
+      aria-label={ar ? "مقدمة تعريفية عن سيرتي" : "Introduction to Seerati"}
+      dir={ar ? "rtl" : "ltr"}
+    >
       <div className="seerati-intro__aurora" aria-hidden="true" />
       <div className="seerati-intro__grid" aria-hidden="true" />
       <button className="seerati-intro__skip" type="button" onClick={closeIntro}>
@@ -127,7 +133,11 @@ export function LandingIntro({ ar }: { ar: boolean }) {
           <span className="seerati-intro__orb seerati-intro__orb--three" />
           <div className="seerati-intro__document">
             <span className="seerati-intro__document-head" />
-            <span /><span /><span className="short" /><span /><span className="short" />
+            <span />
+            <span />
+            <span className="short" />
+            <span />
+            <span className="short" />
           </div>
         </div>
         <div className="seerati-intro__copy" key={scene}>
@@ -138,9 +148,13 @@ export function LandingIntro({ ar }: { ar: boolean }) {
       </div>
       <div className="seerati-intro__footer">
         <div className="seerati-intro__dots" aria-label={`${scene + 1} / ${copy.length}`}>
-          {copy.map((_, index) => <span key={index} className={index === scene ? "is-active" : ""} />)}
+          {copy.map((_, index) => (
+            <span key={index} className={index === scene ? "is-active" : ""} />
+          ))}
         </div>
-        <div className="seerati-intro__progress" aria-hidden="true"><span /></div>
+        <div className="seerati-intro__progress" aria-hidden="true">
+          <span />
+        </div>
         <p>{ar ? "اضغط ESC للتخطي" : "Press ESC to skip"}</p>
       </div>
     </div>
@@ -161,32 +175,91 @@ export function LandingCareerVisual({ ar }: { ar: boolean }) {
       ];
 
   return (
-    <div className="seerati-career-visual" aria-label={ar ? "مثال توضيحي لواجهة سيرتي" : "Illustrative Seerati interface example"}>
+    <div
+      className="seerati-career-visual"
+      aria-label={ar ? "مثال توضيحي لواجهة سيرتي" : "Illustrative Seerati interface example"}
+    >
       <div className="seerati-career-visual__glow" aria-hidden="true" />
       <div className="seerati-career-visual__frame">
         <div className="seerati-career-visual__topbar">
           <div className="seerati-career-visual__identity">
             <span className="seerati-career-visual__mini-logo">س</span>
-            <div><strong>{ar ? "مساحة مسارك المهني" : "Your career workspace"}</strong><small>{ar ? "مثال توضيحي" : "Illustrative preview"}</small></div>
+            <div>
+              <strong>{ar ? "مساحة مسارك المهني" : "Your career workspace"}</strong>
+              <small>{ar ? "مثال توضيحي" : "Illustrative preview"}</small>
+            </div>
           </div>
-          <span className="seerati-career-visual__status"><BadgeCheck className="size-3.5" />{ar ? "جاهز للعمل" : "Ready"}</span>
+          <span className="seerati-career-visual__status">
+            <BadgeCheck className="size-3.5" />
+            {ar ? "جاهز للعمل" : "Ready"}
+          </span>
         </div>
         <div className="seerati-career-visual__content">
           <div className="seerati-career-visual__resume">
-            <div className="seerati-career-visual__resume-head"><span className="seerati-career-visual__avatar">س</span><div><span className="seerati-career-visual__line wide" /><span className="seerati-career-visual__line medium" /></div></div>
-            <div className="seerati-career-visual__section"><span className="seerati-career-visual__label" /><span className="seerati-career-visual__line wide" /><span className="seerati-career-visual__line wide" /><span className="seerati-career-visual__line medium" /></div>
-            <div className="seerati-career-visual__section"><span className="seerati-career-visual__label" /><span className="seerati-career-visual__line wide" /><span className="seerati-career-visual__line short" /></div>
-            <div className="seerati-career-visual__skills"><span /><span /><span /><span /></div>
+            <div className="seerati-career-visual__resume-head">
+              <span className="seerati-career-visual__avatar">س</span>
+              <div>
+                <span className="seerati-career-visual__line wide" />
+                <span className="seerati-career-visual__line medium" />
+              </div>
+            </div>
+            <div className="seerati-career-visual__section">
+              <span className="seerati-career-visual__label" />
+              <span className="seerati-career-visual__line wide" />
+              <span className="seerati-career-visual__line wide" />
+              <span className="seerati-career-visual__line medium" />
+            </div>
+            <div className="seerati-career-visual__section">
+              <span className="seerati-career-visual__label" />
+              <span className="seerati-career-visual__line wide" />
+              <span className="seerati-career-visual__line short" />
+            </div>
+            <div className="seerati-career-visual__skills">
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
           </div>
           <div className="seerati-career-visual__rail">
-            <div className="seerati-career-visual__role"><span>{ar ? "الوظيفة المستهدفة" : "Target role"}</span><strong>{ar ? "مثال: مهندس برمجيات" : "Example: Software Engineer"}</strong><small>{ar ? "يُستخدم للمطابقة فقط" : "Used for matching only"}</small></div>
-            {stages.map(({ label, value, icon: Icon }) => <div className="seerati-career-visual__metric" key={label}><span className="seerati-career-visual__metric-icon"><Icon className="size-4" /></span><div><small>{label}</small><strong>{value}</strong></div><ArrowUpRight className="size-4 opacity-45 rtl:-scale-x-100" /></div>)}
-            <div className="seerati-career-visual__export"><FileCheck2 className="size-4" /><span>{ar ? "PDF نصي للتقديم" : "Text PDF for applications"}</span></div>
+            <div className="seerati-career-visual__role">
+              <span>{ar ? "الوظيفة المستهدفة" : "Target role"}</span>
+              <strong>{ar ? "مثال: مهندس برمجيات" : "Example: Software Engineer"}</strong>
+              <small>{ar ? "يُستخدم للمطابقة فقط" : "Used for matching only"}</small>
+            </div>
+            {stages.map(({ label, value, icon: Icon }) => (
+              <div className="seerati-career-visual__metric" key={label}>
+                <span className="seerati-career-visual__metric-icon">
+                  <Icon className="size-4" />
+                </span>
+                <div>
+                  <small>{label}</small>
+                  <strong>{value}</strong>
+                </div>
+                <ArrowUpRight className="size-4 opacity-45 rtl:-scale-x-100" />
+              </div>
+            ))}
+            <div className="seerati-career-visual__export">
+              <FileCheck2 className="size-4" />
+              <span>{ar ? "PDF نصي للتقديم" : "Text PDF for applications"}</span>
+            </div>
           </div>
         </div>
       </div>
-      <div className="seerati-career-visual__float seerati-career-visual__float--ai" aria-hidden="true"><Sparkles className="size-4" /><span>{ar ? "مساعد سيرتي" : "Seerati copilot"}</span></div>
-      <div className="seerati-career-visual__float seerati-career-visual__float--doc" aria-hidden="true"><FileText className="size-4" /><span>{ar ? "سيرة قابلة للتخصيص" : "Tailorable resume"}</span></div>
+      <div
+        className="seerati-career-visual__float seerati-career-visual__float--ai"
+        aria-hidden="true"
+      >
+        <Sparkles className="size-4" />
+        <span>{ar ? "مساعد سيرتي" : "Seerati copilot"}</span>
+      </div>
+      <div
+        className="seerati-career-visual__float seerati-career-visual__float--doc"
+        aria-hidden="true"
+      >
+        <FileText className="size-4" />
+        <span>{ar ? "سيرة قابلة للتخصيص" : "Tailorable resume"}</span>
+      </div>
     </div>
   );
 }

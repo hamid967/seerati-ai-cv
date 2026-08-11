@@ -25,6 +25,7 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import { TEAM } from "@/lib/team";
+import { LandingCareerVisual, LandingIntro } from "@/components/landing-experience";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -181,6 +182,7 @@ function Landing() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <LandingIntro ar={ar} />
       <SiteHeader />
 
       <main className="flex-1">
@@ -232,6 +234,7 @@ function Landing() {
                 : "Arabic & English · up to 3 resumes per account"}
             </p>
           </div>
+          <LandingCareerVisual ar={ar} />
         </section>
 
         {/* The team */}
