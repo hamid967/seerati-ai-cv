@@ -1,9 +1,17 @@
 User-agent: *
 Allow: /
+Disallow: /auth
 Disallow: /dashboard
 Disallow: /admin
 Disallow: /account
 Disallow: /onboarding
 Disallow: /resumes
+Disallow: /career-twin
+Disallow: /career-evidence
+Disallow: /career-passport
+Disallow: /arabic-intelligence
+Disallow: /privacy-center
+Disallow: /import
+Disallow: /jobs
 
 Sitemap: https://hrhbs.com/sitemap.xml

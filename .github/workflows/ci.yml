@@ -16,6 +16,7 @@ on:
         "stage6b/**",
         "stage6c/**",
         "stage6d-h/**",
+        "stage7/**",
       ]
   pull_request:
     branches: [main]
@@ -67,6 +68,7 @@ jobs:
           node scripts/check-job-application-readiness.mjs
           node scripts/check-tailoring-studio.mjs
           node scripts/check-stage6d-h-market-leadership.mjs
+          node scripts/check-production-launch-readiness.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
