@@ -182,7 +182,7 @@ function PreviewResume() {
           </Button>
           <Button variant="outline" onClick={printPdf}>
             <Printer className="size-4" />
-            {ar ? "PDF نصي (طباعة)" : "Print / text PDF"}
+            {ar ? "PDF نصي للتقديم وATS" : "Text PDF for applications / ATS"}
           </Button>
           <Button onClick={() => void downloadImagePdf()} disabled={exportingImagePdf}>
             {exportingImagePdf ? (
@@ -190,15 +190,15 @@ function PreviewResume() {
             ) : (
               <Download className="size-4" />
             )}
-            {ar ? "تنزيل PDF عالي الدقة" : "Download high-res PDF"}
+            {ar ? "PDF بصري (صورة)" : "Visual image PDF"}
           </Button>
         </div>
       </div>
 
       <p className="mx-auto max-w-6xl px-4 pb-4 text-xs text-muted-foreground">
         {ar
-          ? `حجم الورق الفعلي: ${page.label} (${page.widthMm} × ${page.heightMm} مم). الطباعة وPDF عالي الدقة يستخدمان نفس إعدادات Studio المحفوظة.`
-          : `Actual paper size: ${page.label} (${page.widthMm} × ${page.heightMm} mm). Print and high-resolution PDF use the same saved Studio settings.`}
+          ? `حجم الورق الفعلي: ${page.label} (${page.widthMm} × ${page.heightMm} مم). استخدم PDF النصي أو النسخة النصية للتقديم الإلكتروني. PDF البصري مبني كصورة للمشاركة أو الأرشفة وقد لا يُقرأ جيداً في أنظمة الفرز.`
+          : `Actual paper size: ${page.label} (${page.widthMm} × ${page.heightMm} mm). Use the text PDF or plain-text copy for online applications. The visual PDF is image-based for sharing or archiving and may not parse reliably in screening systems.`}
       </p>
 
       <div className="mx-auto max-w-6xl overflow-auto px-4 pb-16">

@@ -53,6 +53,8 @@ export const Route = createFileRoute("/")({
 function Landing() {
   const { lang } = useI18n();
   const ar = lang === "ar";
+  const templateCount = defaultTemplates.length;
+  const atsTemplateCount = defaultTemplates.filter((template) => template.atsFriendly).length;
 
   const steps = ar
     ? [
@@ -139,7 +141,7 @@ function Landing() {
         },
         {
           q: "هل القوالب متوافقة مع أنظمة التوظيف؟",
-          a: "خمسة من القوالب الستة مبنية بعمود واحد وعناوين نصية واضحة، وهي الأنسب للتقديم الإلكتروني. القالب الإبداعي مخصص للتقديم المباشر أو ملف الأعمال.",
+          a: `${atsTemplateCount} من أصل ${templateCount} قالباً مميزة داخل النظام كقوالب ATS محافظة وفق قواعد سيرتي. اختر القالب المناسب للوظيفة، والنتيجة تبقى إرشادية وليست ضماناً لقبول نظام جهة التوظيف.`,
         },
         {
           q: "كيف يعمل فحص ATS؟",
@@ -161,7 +163,7 @@ function Landing() {
         },
         {
           q: "Are the templates ATS friendly?",
-          a: "Five of the six templates use a single column with plain text headings, which suits online applications. The creative template is meant for direct sharing or a portfolio.",
+          a: `${atsTemplateCount} of ${templateCount} templates are marked as conservative ATS-oriented templates under Seerati rules. Choose the layout for the role; this remains guidance, not a guarantee of an employer system result.`,
         },
         {
           q: "How does the ATS check work?",

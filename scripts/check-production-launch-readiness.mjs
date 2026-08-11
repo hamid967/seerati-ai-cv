@@ -30,7 +30,9 @@ requireCheck(
   "landing has no stale six-template claim",
 );
 requireCheck(
-  landing.includes("defaultTemplates.filter") && landing.includes("atsFriendly") && landing.includes("templateCount"),
+  landing.includes("defaultTemplates.filter") &&
+    landing.includes("atsFriendly") &&
+    landing.includes("templateCount"),
   "landing derives template counts from template metadata",
 );
 
@@ -55,7 +57,8 @@ requireCheck(
   "preview identifies the high-resolution export as image-based",
 );
 requireCheck(
-  preview.includes("قد لا يُقرأ جيداً في أنظمة الفرز") && preview.includes("may not parse reliably in screening systems"),
+  preview.includes("قد لا يُقرأ جيداً في أنظمة الفرز") &&
+    preview.includes("may not parse reliably in screening systems"),
   "preview explains the ATS limitation of the image PDF",
 );
 
