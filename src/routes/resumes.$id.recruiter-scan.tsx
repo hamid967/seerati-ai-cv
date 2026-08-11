@@ -10,10 +10,7 @@ import { useAuthGuard, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/resumes/$id/recruiter-scan")({
   head: () => ({
-    meta: [
-      { title: "Recruiter 10-Second Scan | سيرتي" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Recruiter 10-Second Scan | سيرتي" }, { name: "robots", content: "noindex" }],
   }),
   component: RecruiterScanPage,
 });

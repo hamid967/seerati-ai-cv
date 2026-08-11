@@ -83,17 +83,27 @@ export function RecruiterTenSecondPanel({ scan }: { scan: RecruiterTenSecondScan
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{ar ? "Attention Map تقديري" : "Estimated attention map"}</CardTitle>
+          <CardTitle className="text-base">
+            {ar ? "Attention Map تقديري" : "Estimated attention map"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {scan.attentionMap.slice(0, 8).map((item) => (
-            <div key={item.section} className="grid gap-2 md:grid-cols-[180px_1fr_70px] md:items-center">
+            <div
+              key={item.section}
+              className="grid gap-2 md:grid-cols-[180px_1fr_70px] md:items-center"
+            >
               <div className="text-sm font-semibold">{ar ? item.label.ar : item.label.en}</div>
               <div>
                 <Progress value={item.score} className="h-2" />
-                <p className="mt-1 text-[11px] text-muted-foreground">{ar ? item.reason.ar : item.reason.en}</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {ar ? item.reason.ar : item.reason.en}
+                </p>
               </div>
-              <Badge variant={item.level === "high" ? "default" : "outline"} className="justify-center">
+              <Badge
+                variant={item.level === "high" ? "default" : "outline"}
+                className="justify-center"
+              >
                 {item.score}
               </Badge>
             </div>
@@ -112,11 +122,15 @@ export function RecruiterTenSecondPanel({ scan }: { scan: RecruiterTenSecondScan
             {scan.strongestSignals.length ? (
               <ul className="space-y-2 text-sm">
                 {scan.strongestSignals.map((signal, index) => (
-                  <li key={index} className="rounded-xl bg-muted/50 p-3">{ar ? signal.ar : signal.en}</li>
+                  <li key={index} className="rounded-xl bg-muted/50 p-3">
+                    {ar ? signal.ar : signal.en}
+                  </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground">{ar ? "لا توجد إشارات قوية كافية بعد." : "Not enough strong signals yet."}</p>
+              <p className="text-sm text-muted-foreground">
+                {ar ? "لا توجد إشارات قوية كافية بعد." : "Not enough strong signals yet."}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -124,18 +138,25 @@ export function RecruiterTenSecondPanel({ scan }: { scan: RecruiterTenSecondScan
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <AlertTriangle className="size-4" /> {ar ? "النقاط التي قد تُفقد الانتباه" : "Likely blind spots"}
+              <AlertTriangle className="size-4" />{" "}
+              {ar ? "النقاط التي قد تُفقد الانتباه" : "Likely blind spots"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {scan.blindSpots.length ? (
               <ul className="space-y-2 text-sm">
                 {scan.blindSpots.map((spot, index) => (
-                  <li key={index} className="rounded-xl border border-border p-3">{ar ? spot.ar : spot.en}</li>
+                  <li key={index} className="rounded-xl border border-border p-3">
+                    {ar ? spot.ar : spot.en}
+                  </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground">{ar ? "لا توجد فجوات بارزة وفق القواعد الحالية." : "No major blind spots under the current rules."}</p>
+              <p className="text-sm text-muted-foreground">
+                {ar
+                  ? "لا توجد فجوات بارزة وفق القواعد الحالية."
+                  : "No major blind spots under the current rules."}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -144,7 +165,8 @@ export function RecruiterTenSecondPanel({ scan }: { scan: RecruiterTenSecondScan
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Sparkles className="size-4" /> {ar ? "أفضل خطوات التحسين" : "Highest-value improvements"}
+            <Sparkles className="size-4" />{" "}
+            {ar ? "أفضل خطوات التحسين" : "Highest-value improvements"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -153,7 +175,9 @@ export function RecruiterTenSecondPanel({ scan }: { scan: RecruiterTenSecondScan
               <Badge variant="secondary">P{action.priority}</Badge>
               <div>
                 <p className="text-sm font-bold">{ar ? action.title.ar : action.title.en}</p>
-                <p className="mt-1 text-xs leading-6 text-muted-foreground">{ar ? action.detail.ar : action.detail.en}</p>
+                <p className="mt-1 text-xs leading-6 text-muted-foreground">
+                  {ar ? action.detail.ar : action.detail.en}
+                </p>
               </div>
             </div>
           ))}

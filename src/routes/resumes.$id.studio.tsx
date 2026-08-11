@@ -248,6 +248,12 @@ function ResumeStudioUltra() {
             <p className="text-xs text-muted-foreground">{resume.title}</p>
           </div>
 
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/resumes/$id/recruiter-scan" params={{ id: resume.id }}>
+              {ar ? "فحص 10 ثوانٍ" : "10-second scan"}
+            </Link>
+          </Button>
+
           <Select
             value={normalized.pageSize}
             onValueChange={(v) => patchLayout({ pageSize: v as "a4" | "letter" })}

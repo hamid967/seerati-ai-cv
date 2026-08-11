@@ -145,8 +145,14 @@ function buildAttentionMap(resume: Resume): RecruiterAttentionItem[] {
       score,
       level: attention(score),
       reason: {
-        ar: index <= 2 ? "موقع القسم مبكر في ترتيب السيرة ويرفع احتمال ملاحظته." : "القسم يظهر متأخرًا نسبيًا في مسار القراءة.",
-        en: index <= 2 ? "The section appears early in the resume order, increasing its scan prominence." : "The section appears later in the likely scan path.",
+        ar:
+          index <= 2
+            ? "موقع القسم مبكر في ترتيب السيرة ويرفع احتمال ملاحظته."
+            : "القسم يظهر متأخرًا نسبيًا في مسار القراءة.",
+        en:
+          index <= 2
+            ? "The section appears early in the resume order, increasing its scan prominence."
+            : "The section appears later in the likely scan path.",
       },
     });
   });
@@ -210,92 +216,250 @@ export function buildRecruiterTenSecondScan(
       label: { ar: "وضوح الهوية", en: "Identity clarity" },
       score: clamp(identity, 25),
       max: 25,
-      explanation: { ar: "هل يعرف المراجع بسرعة من أنت وما الدور الذي تستهدفه؟", en: "Can a reviewer quickly tell who you are and what role you target?" },
+      explanation: {
+        ar: "هل يعرف المراجع بسرعة من أنت وما الدور الذي تستهدفه؟",
+        en: "Can a reviewer quickly tell who you are and what role you target?",
+      },
     },
     {
       id: "proof",
       label: { ar: "قوة الدليل", en: "Proof strength" },
       score: clamp(proof, 25),
       max: 25,
-      explanation: { ar: "خبرة وإنجازات وأرقام وحقائق موثقة بدل الادعاءات العامة.", en: "Experience, outcomes, figures and verified facts instead of broad claims." },
+      explanation: {
+        ar: "خبرة وإنجازات وأرقام وحقائق موثقة بدل الادعاءات العامة.",
+        en: "Experience, outcomes, figures and verified facts instead of broad claims.",
+      },
     },
     {
       id: "relevance",
       label: { ar: "صلة السيرة بالدور", en: "Role relevance" },
       score: relevance,
       max: 20,
-      explanation: { ar: "مدى ظهور المهارات والمسمى والكلمات ذات الصلة بالدور المستهدف.", en: "How visibly the title, skills and job-relevant terms align with the target role." },
+      explanation: {
+        ar: "مدى ظهور المهارات والمسمى والكلمات ذات الصلة بالدور المستهدف.",
+        en: "How visibly the title, skills and job-relevant terms align with the target role.",
+      },
     },
     {
       id: "scanability",
       label: { ar: "قابلية المسح", en: "Scanability" },
       score: scanability,
       max: 20,
-      explanation: { ar: "ترتيب واضح وقالب قابل للقراءة مع تقليل عوائق المسح البصري.", en: "Clear ordering and readable presentation with fewer scan barriers." },
+      explanation: {
+        ar: "ترتيب واضح وقالب قابل للقراءة مع تقليل عوائق المسح البصري.",
+        en: "Clear ordering and readable presentation with fewer scan barriers.",
+      },
     },
     {
       id: "trust",
       label: { ar: "الثقة والاتساق", en: "Trust & consistency" },
       score: clamp(trust, 10),
       max: 10,
-      explanation: { ar: "تواريخ واتصال وأدلة وعبارات محددة قابلة للتحقق.", en: "Dates, contact details, evidence and specific claims that can be checked." },
+      explanation: {
+        ar: "تواريخ واتصال وأدلة وعبارات محددة قابلة للتحقق.",
+        en: "Dates, contact details, evidence and specific claims that can be checked.",
+      },
     },
   ];
 
   const score = clamp(categories.reduce((sum, category) => sum + category.score, 0));
   const band: RecruiterScanBand = score >= 80 ? "strong" : score >= 60 ? "workable" : "weak";
   const strongestSignals: LocalizedText[] = [];
-  if (title) strongestSignals.push({ ar: `المسمى المهني واضح: ${title}`, en: `Professional title is clear: ${title}` });
-  if (firstRole?.role.trim()) strongestSignals.push({ ar: `أول خبرة تظهر دور «${firstRole.role}»${firstRole.company ? ` لدى ${firstRole.company}` : ""}.`, en: `The first role shows “${firstRole.role}”${firstRole.company ? ` at ${firstRole.company}` : ""}.` });
-  if (quantified) strongestSignals.push({ ar: `${quantified} نقطة خبرة تحتوي أرقامًا/نتائج قابلة للملاحظة.`, en: `${quantified} experience bullet${quantified === 1 ? "" : "s"} include observable figures/results.` });
-  if (verified.length) strongestSignals.push({ ar: `${verified.length} حقيقة مهنية موثقة متاحة في خزانة الأدلة.`, en: `${verified.length} verified career fact${verified.length === 1 ? "" : "s"} are available in the evidence vault.` });
-  if (jd && ats.keywords) strongestSignals.push({ ar: `تغطية كلمات الوصف الوظيفي الحالية ${ats.keywords.coverage}٪.`, en: `Current job-description keyword coverage is ${ats.keywords.coverage}%.` });
+  if (title)
+    strongestSignals.push({
+      ar: `المسمى المهني واضح: ${title}`,
+      en: `Professional title is clear: ${title}`,
+    });
+  if (firstRole?.role.trim())
+    strongestSignals.push({
+      ar: `أول خبرة تظهر دور «${firstRole.role}»${firstRole.company ? ` لدى ${firstRole.company}` : ""}.`,
+      en: `The first role shows “${firstRole.role}”${firstRole.company ? ` at ${firstRole.company}` : ""}.`,
+    });
+  if (quantified)
+    strongestSignals.push({
+      ar: `${quantified} نقطة خبرة تحتوي أرقامًا/نتائج قابلة للملاحظة.`,
+      en: `${quantified} experience bullet${quantified === 1 ? "" : "s"} include observable figures/results.`,
+    });
+  if (verified.length)
+    strongestSignals.push({
+      ar: `${verified.length} حقيقة مهنية موثقة متاحة في خزانة الأدلة.`,
+      en: `${verified.length} verified career fact${verified.length === 1 ? "" : "s"} are available in the evidence vault.`,
+    });
+  if (jd && ats.keywords)
+    strongestSignals.push({
+      ar: `تغطية كلمات الوصف الوظيفي الحالية ${ats.keywords.coverage}٪.`,
+      en: `Current job-description keyword coverage is ${ats.keywords.coverage}%.`,
+    });
 
   const blindSpots: LocalizedText[] = [];
-  if (!title) blindSpots.push({ ar: "لا يوجد مسمى مهني/دور مستهدف واضح في أول نظرة.", en: "No clear professional title/target role is visible at first glance." });
-  if (!d.summary.trim()) blindSpots.push({ ar: "الملخص المهني مفقود، فيفقد المراجع سياق القيمة بسرعة.", en: "The professional summary is missing, so the reviewer gets less context quickly." });
-  if (!quantified && bullets.length) blindSpots.push({ ar: "نقاط الخبرة موجودة لكنها لا تعرض نتائج رقمية واضحة.", en: "Experience bullets exist but do not show clear quantified outcomes." });
-  if (!verified.length) blindSpots.push({ ar: "لا توجد حقائق مهنية موثقة في خزانة الأدلة حتى الآن.", en: "There are no verified career facts in the evidence vault yet." });
-  if (jd && ats.keywords && ats.keywords.coverage < 55) blindSpots.push({ ar: "صلة الكلمات المفتاحية بالوصف الوظيفي منخفضة نسبيًا؛ لا تضف كلمة إلا إذا كانت صحيحة عن خبرتك.", en: "Keyword relevance to the job description is relatively low; only add terms that are true of your experience." });
-  if (snapshot.vaguest) blindSpots.push({ ar: `هناك عبارة عامة تحتاج تحديدًا: «${snapshot.vaguest.text}».`, en: `One broad statement needs more specificity: “${snapshot.vaguest.text}”.` });
+  if (!title)
+    blindSpots.push({
+      ar: "لا يوجد مسمى مهني/دور مستهدف واضح في أول نظرة.",
+      en: "No clear professional title/target role is visible at first glance.",
+    });
+  if (!d.summary.trim())
+    blindSpots.push({
+      ar: "الملخص المهني مفقود، فيفقد المراجع سياق القيمة بسرعة.",
+      en: "The professional summary is missing, so the reviewer gets less context quickly.",
+    });
+  if (!quantified && bullets.length)
+    blindSpots.push({
+      ar: "نقاط الخبرة موجودة لكنها لا تعرض نتائج رقمية واضحة.",
+      en: "Experience bullets exist but do not show clear quantified outcomes.",
+    });
+  if (!verified.length)
+    blindSpots.push({
+      ar: "لا توجد حقائق مهنية موثقة في خزانة الأدلة حتى الآن.",
+      en: "There are no verified career facts in the evidence vault yet.",
+    });
+  if (jd && ats.keywords && ats.keywords.coverage < 55)
+    blindSpots.push({
+      ar: "صلة الكلمات المفتاحية بالوصف الوظيفي منخفضة نسبيًا؛ لا تضف كلمة إلا إذا كانت صحيحة عن خبرتك.",
+      en: "Keyword relevance to the job description is relatively low; only add terms that are true of your experience.",
+    });
+  if (snapshot.vaguest)
+    blindSpots.push({
+      ar: `هناك عبارة عامة تحتاج تحديدًا: «${snapshot.vaguest.text}».`,
+      en: `One broad statement needs more specificity: “${snapshot.vaguest.text}”.`,
+    });
 
   const actions: RecruiterScanAction[] = [];
-  if (!title) actions.push({ id: "title", priority: 1, step: "personal", title: { ar: "ثبّت المسمى المستهدف أعلى السيرة", en: "Make the target title explicit at the top" }, detail: { ar: "استخدم المسمى الحقيقي الذي تستهدفه دون تضخيم المستوى الوظيفي.", en: "Use the real role you target without inflating seniority." } });
-  if (!d.summary.trim() || summaryWords < 25) actions.push({ id: "summary", priority: 1, step: "summary", title: { ar: "قوِّ أول 3 أسطر", en: "Strengthen the first three lines" }, detail: { ar: "اكتب ملخصًا قصيرًا يوضح التخصص والقيمة وخبرة مثبتة فقط.", en: "Write a concise summary showing specialization, value and only supported experience." } });
-  if (bullets.length && quantified / Math.max(1, bullets.length) < 0.35) actions.push({ id: "metrics", priority: 2, step: "experience", title: { ar: "حوّل المهام إلى أثر قابل للملاحظة", en: "Turn duties into observable impact" }, detail: { ar: "أضف أرقامًا فقط عندما تكون حقيقية ويمكنك تأكيدها؛ وإلا استخدم نتيجة وصفية محددة.", en: "Add figures only when true and confirmable; otherwise use a specific qualitative outcome." } });
-  if (!verified.length) actions.push({ id: "evidence", priority: 2, step: "evidence", title: { ar: "وثّق أقوى إنجاز", en: "Verify your strongest achievement" }, detail: { ar: "أضف حقيقة واحدة على الأقل مع دليل أو مرجع داخل خزانة الأدلة.", en: "Add at least one career fact with evidence or a reference in the evidence vault." } });
-  if (jd && ats.keywords && ats.keywords.coverage < 55) actions.push({ id: "relevance", priority: 2, step: "skills", title: { ar: "راجع فجوة وصف الوظيفة", en: "Review the job-description gap" }, detail: { ar: "قارن المهارات المطلوبة بخبرتك الفعلية وأظهر المطابق منها فقط.", en: "Compare requested skills with your actual experience and surface only genuine matches." } });
-  if (scanFlags >= 2 || (options.template && !options.template.atsFriendly)) actions.push({ id: "design", priority: 3, step: "design", title: { ar: "بسّط مسار القراءة", en: "Simplify the scan path" }, detail: { ar: "استخدم ترتيبًا مبكرًا للملخص والخبرة والمهارات وقالبًا آمنًا عند التقديم الإلكتروني.", en: "Prioritize summary, experience and skills early and use an ATS-safe template for online applications." } });
+  if (!title)
+    actions.push({
+      id: "title",
+      priority: 1,
+      step: "personal",
+      title: {
+        ar: "ثبّت المسمى المستهدف أعلى السيرة",
+        en: "Make the target title explicit at the top",
+      },
+      detail: {
+        ar: "استخدم المسمى الحقيقي الذي تستهدفه دون تضخيم المستوى الوظيفي.",
+        en: "Use the real role you target without inflating seniority.",
+      },
+    });
+  if (!d.summary.trim() || summaryWords < 25)
+    actions.push({
+      id: "summary",
+      priority: 1,
+      step: "summary",
+      title: { ar: "قوِّ أول 3 أسطر", en: "Strengthen the first three lines" },
+      detail: {
+        ar: "اكتب ملخصًا قصيرًا يوضح التخصص والقيمة وخبرة مثبتة فقط.",
+        en: "Write a concise summary showing specialization, value and only supported experience.",
+      },
+    });
+  if (bullets.length && quantified / Math.max(1, bullets.length) < 0.35)
+    actions.push({
+      id: "metrics",
+      priority: 2,
+      step: "experience",
+      title: { ar: "حوّل المهام إلى أثر قابل للملاحظة", en: "Turn duties into observable impact" },
+      detail: {
+        ar: "أضف أرقامًا فقط عندما تكون حقيقية ويمكنك تأكيدها؛ وإلا استخدم نتيجة وصفية محددة.",
+        en: "Add figures only when true and confirmable; otherwise use a specific qualitative outcome.",
+      },
+    });
+  if (!verified.length)
+    actions.push({
+      id: "evidence",
+      priority: 2,
+      step: "evidence",
+      title: { ar: "وثّق أقوى إنجاز", en: "Verify your strongest achievement" },
+      detail: {
+        ar: "أضف حقيقة واحدة على الأقل مع دليل أو مرجع داخل خزانة الأدلة.",
+        en: "Add at least one career fact with evidence or a reference in the evidence vault.",
+      },
+    });
+  if (jd && ats.keywords && ats.keywords.coverage < 55)
+    actions.push({
+      id: "relevance",
+      priority: 2,
+      step: "skills",
+      title: { ar: "راجع فجوة وصف الوظيفة", en: "Review the job-description gap" },
+      detail: {
+        ar: "قارن المهارات المطلوبة بخبرتك الفعلية وأظهر المطابق منها فقط.",
+        en: "Compare requested skills with your actual experience and surface only genuine matches.",
+      },
+    });
+  if (scanFlags >= 2 || (options.template && !options.template.atsFriendly))
+    actions.push({
+      id: "design",
+      priority: 3,
+      step: "design",
+      title: { ar: "بسّط مسار القراءة", en: "Simplify the scan path" },
+      detail: {
+        ar: "استخدم ترتيبًا مبكرًا للملخص والخبرة والمهارات وقالبًا آمنًا عند التقديم الإلكتروني.",
+        en: "Prioritize summary, experience and skills early and use an ATS-safe template for online applications.",
+      },
+    });
 
   const timeline: RecruiterTimelineMoment[] = [
     {
       window: "0–2s",
       title: { ar: "من أنت؟", en: "Who are you?" },
       notices: [
-        title ? { ar: `يلتقط المسمى: ${title}`, en: `Picks up the title: ${title}` } : { ar: "لا يلتقط مسمى مستهدفًا واضحًا.", en: "No clear target title is picked up." },
-        snapshot.contact.complete ? { ar: "بيانات التواصل مكتملة بصريًا.", en: "Contact details are visually complete." } : { ar: "هناك نقص في بيانات التواصل الأساسية.", en: "Some core contact details are missing." },
+        title
+          ? { ar: `يلتقط المسمى: ${title}`, en: `Picks up the title: ${title}` }
+          : { ar: "لا يلتقط مسمى مستهدفًا واضحًا.", en: "No clear target title is picked up." },
+        snapshot.contact.complete
+          ? { ar: "بيانات التواصل مكتملة بصريًا.", en: "Contact details are visually complete." }
+          : {
+              ar: "هناك نقص في بيانات التواصل الأساسية.",
+              en: "Some core contact details are missing.",
+            },
       ],
     },
     {
       window: "2–5s",
       title: { ar: "هل لديك دليل؟", en: "Where is the proof?" },
       notices: [
-        firstRole ? { ar: `أول خبرة: ${firstRole.role || "دور غير مسمى"}${firstRole.company ? ` — ${firstRole.company}` : ""}`, en: `First role: ${firstRole.role || "Untitled role"}${firstRole.company ? ` — ${firstRole.company}` : ""}` } : { ar: "لا تظهر خبرة عملية في هذه المرحلة.", en: "No work experience is visible at this stage." },
-        quantified ? { ar: `يرى ${quantified} إشارة رقمية داخل نقاط الخبرة.`, en: `Sees ${quantified} numeric signal${quantified === 1 ? "" : "s"} in experience bullets.` } : { ar: "لا توجد نتائج رقمية ظاهرة في نقاط الخبرة.", en: "No quantified outcomes are visible in experience bullets." },
+        firstRole
+          ? {
+              ar: `أول خبرة: ${firstRole.role || "دور غير مسمى"}${firstRole.company ? ` — ${firstRole.company}` : ""}`,
+              en: `First role: ${firstRole.role || "Untitled role"}${firstRole.company ? ` — ${firstRole.company}` : ""}`,
+            }
+          : {
+              ar: "لا تظهر خبرة عملية في هذه المرحلة.",
+              en: "No work experience is visible at this stage.",
+            },
+        quantified
+          ? {
+              ar: `يرى ${quantified} إشارة رقمية داخل نقاط الخبرة.`,
+              en: `Sees ${quantified} numeric signal${quantified === 1 ? "" : "s"} in experience bullets.`,
+            }
+          : {
+              ar: "لا توجد نتائج رقمية ظاهرة في نقاط الخبرة.",
+              en: "No quantified outcomes are visible in experience bullets.",
+            },
       ],
     },
     {
       window: "5–10s",
       title: { ar: "هل تناسب الدور؟", en: "Do you fit the role?" },
-      notices: jd && ats.keywords
-        ? [
-            { ar: `تغطية الكلمات المرتبطة بالوصف: ${ats.keywords.coverage}٪.`, en: `Job-description term coverage: ${ats.keywords.coverage}%.` },
-            { ar: `${d.skills.length} مهارة مسجلة في السيرة.`, en: `${d.skills.length} skills are listed in the resume.` },
-          ]
-        : [
-            { ar: `${d.skills.length} مهارة ظاهرة بدون وصف وظيفة للمقارنة.`, en: `${d.skills.length} skills are visible without a job description to compare against.` },
-            { ar: "النتيجة هنا تقيس وضوح السيرة لا احتمال القبول.", en: "This measures resume clarity, not hiring probability." },
-          ],
+      notices:
+        jd && ats.keywords
+          ? [
+              {
+                ar: `تغطية الكلمات المرتبطة بالوصف: ${ats.keywords.coverage}٪.`,
+                en: `Job-description term coverage: ${ats.keywords.coverage}%.`,
+              },
+              {
+                ar: `${d.skills.length} مهارة مسجلة في السيرة.`,
+                en: `${d.skills.length} skills are listed in the resume.`,
+              },
+            ]
+          : [
+              {
+                ar: `${d.skills.length} مهارة ظاهرة بدون وصف وظيفة للمقارنة.`,
+                en: `${d.skills.length} skills are visible without a job description to compare against.`,
+              },
+              {
+                ar: "النتيجة هنا تقيس وضوح السيرة لا احتمال القبول.",
+                en: "This measures resume clarity, not hiring probability.",
+              },
+            ],
     },
   ];
 
