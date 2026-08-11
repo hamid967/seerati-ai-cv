@@ -1,0 +1,45 @@
+name: Stage6DH Route Generation
+
+on:
+  push:
+    branches:
+      - stage6d-h/market-leadership-completion
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage6d-h/market-leadership-completion
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Fix exact optional field
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/lib/arabic-career-intelligence.ts')
+          s = p.read_text()
+          old = '  sample?: string;'
+          new = '  sample?: string | undefined;'
+          if old not in s:
+              raise SystemExit('sample type marker missing')
+          p.write_text(s.replace(old, new, 1))
+          PY
+      - name: Generate TanStack route tree
+        run: bun run build
+      - name: Format generated changes
+        run: bunx prettier --write src/lib/arabic-career-intelligence.ts src/routeTree.gen.ts
+      - name: Commit route generation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/arabic-career-intelligence.ts src/routeTree.gen.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: register Stage 6D-H routes and optional issue sample"
+          git push origin HEAD:stage6d-h/market-leadership-completion
