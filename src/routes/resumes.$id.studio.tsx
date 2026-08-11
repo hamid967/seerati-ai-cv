@@ -26,7 +26,7 @@ import {
   pageCountFromHeight,
   type FitTarget,
 } from "@/lib/resume-layout";
-import type { ResumeUserDesign } from "@/lib/types";
+import type { ResumeUserDesign, SectionKey } from "@/lib/types";
 import type { ResumeDesignProposal } from "@/lib/resume-design-intelligence";
 
 export const Route = createFileRoute("/resumes/$id/studio")({
@@ -56,7 +56,7 @@ function ResumeStudioUltra() {
   const [autoDesignUndo, setAutoDesignUndo] = useState<{
     templateId: string;
     design: ResumeUserDesign | undefined;
-    sectionOrder: typeof resume.data.sectionOrder;
+    sectionOrder: SectionKey[];
   } | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
@@ -121,7 +121,7 @@ function ResumeStudioUltra() {
     );
   }
 
-  const normalized = normalizeResumeDesign(layout);
+  const normalized = normalizeResumeDesign(workingResume.data.design);
   const metrics = getPageMetrics(normalized.pageSize);
 
   const saveLayout = async (next: ResumeUserDesign) => {
@@ -145,10 +145,14 @@ function ResumeStudioUltra() {
   const measurePages = () => {
     const paper = previewRef.current?.querySelector(".paper") as HTMLElement | null;
     if (!paper) return Number.POSITIVE_INFINITY;
-    return pageCountFromHeight(paper.scrollHeight, normalizeResumeDesign(layout).pageSize);
+    return pageCountFromHeight(
+      paper.scrollHeight,
+      normalizeResumeDesign(workingResume.data.design).pageSize,
+    );
   };
 
   const fitToPages = async (target: FitTarget) => {
+    setDesignPreview(null);
     setFitting(target);
     let selected: ResumeUserDesign | null = null;
     try {
