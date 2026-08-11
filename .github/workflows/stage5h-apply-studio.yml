@@ -22,13 +22,13 @@ jobs:
       - name: Apply Studio patch
         run: |
           node scripts/apply-stage5h-studio-patch.mjs
-          bunx prettier --write src/routes/resumes.$id.studio.tsx src/components/resume-auto-design-panel.tsx src/lib/resume-design-intelligence.ts
+          bunx prettier --write 'src/routes/resumes.$id.studio.tsx' src/components/resume-auto-design-panel.tsx src/lib/resume-design-intelligence.ts
           rm scripts/apply-stage5h-studio-patch.mjs
       - name: Commit integration
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/routes/resumes.$id.studio.tsx src/components/resume-auto-design-panel.tsx src/lib/resume-design-intelligence.ts scripts/apply-stage5h-studio-patch.mjs
+          git add 'src/routes/resumes.$id.studio.tsx' src/components/resume-auto-design-panel.tsx src/lib/resume-design-intelligence.ts scripts/apply-stage5h-studio-patch.mjs
           git diff --cached --quiet && exit 0
           git commit -m "feat: integrate resume design intelligence into Studio"
           git push origin HEAD:stage5h/resume-design-intelligence
