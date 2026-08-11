@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ArabicIntelligenceRouteImport } from './routes/arabic-intelligence'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareerEvidenceRouteImport } from './routes/career-evidence'
+import { Route as CareerGuidesRouteImport } from './routes/career-guides'
+import { Route as CareerPassportRouteImport } from './routes/career-passport'
 import { Route as CareerTwinRouteImport } from './routes/career-twin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
@@ -54,6 +57,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArabicIntelligenceRoute = ArabicIntelligenceRouteImport.update({
+  id: '/arabic-intelligence',
+  path: '/arabic-intelligence',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AtsRoute = AtsRouteImport.update({
   id: '/ats',
   path: '/ats',
@@ -67,6 +75,16 @@ const AuthRoute = AuthRouteImport.update({
 const CareerEvidenceRoute = CareerEvidenceRouteImport.update({
   id: '/career-evidence',
   path: '/career-evidence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerGuidesRoute = CareerGuidesRouteImport.update({
+  id: '/career-guides',
+  path: '/career-guides',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerPassportRoute = CareerPassportRouteImport.update({
+  id: '/career-passport',
+  path: '/career-passport',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CareerTwinRoute = CareerTwinRouteImport.update({
@@ -189,9 +207,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/arabic-intelligence': typeof ArabicIntelligenceRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
+  '/career-guides': typeof CareerGuidesRoute
+  '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
@@ -219,9 +240,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/arabic-intelligence': typeof ArabicIntelligenceRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
+  '/career-guides': typeof CareerGuidesRoute
+  '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
@@ -251,9 +275,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/arabic-intelligence': typeof ArabicIntelligenceRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
+  '/career-guides': typeof CareerGuidesRoute
+  '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
@@ -284,9 +311,12 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/arabic-intelligence'
     | '/ats'
     | '/auth'
     | '/career-evidence'
+    | '/career-guides'
+    | '/career-passport'
     | '/career-twin'
     | '/dashboard'
     | '/features'
@@ -314,9 +344,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/arabic-intelligence'
     | '/ats'
     | '/auth'
     | '/career-evidence'
+    | '/career-guides'
+    | '/career-passport'
     | '/career-twin'
     | '/dashboard'
     | '/features'
@@ -345,9 +378,12 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/arabic-intelligence'
     | '/ats'
     | '/auth'
     | '/career-evidence'
+    | '/career-guides'
+    | '/career-passport'
     | '/career-twin'
     | '/dashboard'
     | '/features'
@@ -377,9 +413,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ArabicIntelligenceRoute: typeof ArabicIntelligenceRoute
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
   CareerEvidenceRoute: typeof CareerEvidenceRoute
+  CareerGuidesRoute: typeof CareerGuidesRoute
+  CareerPassportRoute: typeof CareerPassportRoute
   CareerTwinRoute: typeof CareerTwinRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
@@ -423,6 +462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/arabic-intelligence': {
+      id: '/arabic-intelligence'
+      path: '/arabic-intelligence'
+      fullPath: '/arabic-intelligence'
+      preLoaderRoute: typeof ArabicIntelligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ats': {
       id: '/ats'
       path: '/ats'
@@ -442,6 +488,20 @@ declare module '@tanstack/react-router' {
       path: '/career-evidence'
       fullPath: '/career-evidence'
       preLoaderRoute: typeof CareerEvidenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career-guides': {
+      id: '/career-guides'
+      path: '/career-guides'
+      fullPath: '/career-guides'
+      preLoaderRoute: typeof CareerGuidesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career-passport': {
+      id: '/career-passport'
+      path: '/career-passport'
+      fullPath: '/career-passport'
+      preLoaderRoute: typeof CareerPassportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/career-twin': {
@@ -630,9 +690,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
+  ArabicIntelligenceRoute: ArabicIntelligenceRoute,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
   CareerEvidenceRoute: CareerEvidenceRoute,
+  CareerGuidesRoute: CareerGuidesRoute,
+  CareerPassportRoute: CareerPassportRoute,
   CareerTwinRoute: CareerTwinRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,

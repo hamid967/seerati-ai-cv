@@ -9,7 +9,7 @@ export type ArabicCareerIssue = {
   area: "headline" | "summary" | "experience" | "achievement" | "skills" | "bilingual";
   title: { ar: string; en: string };
   detail: { ar: string; en: string };
-  sample?: string;
+  sample?: string | undefined;
 };
 
 export type ArabicCareerReport = {
