@@ -22,6 +22,7 @@ import { Route as ImportRouteImport } from './routes/import'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrivacyCenterRouteImport } from './routes/privacy-center'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -100,6 +101,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PrivacyCenterRoute = PrivacyCenterRouteImport.update({
   id: '/privacy-center',
   path: '/privacy-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
+    | '/sitemap.xml'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
+    | '/sitemap.xml'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
+    | '/sitemap.xml'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -363,6 +375,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   PrivacyCenterRoute: typeof PrivacyCenterRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
   JobsIdRoute: typeof JobsIdRoute
@@ -465,6 +478,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy-center'
       fullPath: '/privacy-center'
       preLoaderRoute: typeof PrivacyCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates': {
@@ -600,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   PrivacyCenterRoute: PrivacyCenterRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
   JobsIdRoute: JobsIdRoute,
@@ -613,13 +634,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
