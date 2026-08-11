@@ -12,6 +12,7 @@ on:
         "stage5f/**",
         "stage5g/**",
         "stage5i/**",
+        "stage6/**",
       ]
   pull_request:
     branches: [main]
@@ -59,6 +60,7 @@ jobs:
           node scripts/check-smart-pagination-composer.mjs
           node scripts/check-resume-design-intelligence.mjs
           node scripts/check-recruiter-ten-second-scan.mjs
+          node scripts/check-saudi-market-leadership.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
