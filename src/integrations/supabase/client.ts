@@ -33,8 +33,8 @@ function createSupabaseClient() {
   // The project's strict noPropertyAccessFromIndexSignature rule conflicts with that Vite contract.
   // @ts-expect-error -- direct Vite env access is intentionally required for build-time replacement.
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env["SUPABASE_URL"];
-  // @ts-expect-error -- direct Vite env access is intentionally required for build-time replacement.
   const SUPABASE_PUBLISHABLE_KEY =
+    // @ts-expect-error -- direct Vite env access is intentionally required for build-time replacement.
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env["SUPABASE_PUBLISHABLE_KEY"];
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
