@@ -14,7 +14,7 @@ const requiredEngine = [
   "blindSpots",
   "actions",
   "not real eye tracking",
-  "not a hiring prediction",
+  "not hiring probability",
 ];
 
 for (const marker of requiredEngine) {
