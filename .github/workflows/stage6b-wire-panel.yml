@@ -1,0 +1,33 @@
+name: Stage6B Wire Panel
+
+on:
+  push:
+    branches:
+      - stage6b/job-match-readiness
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage6b/job-match-readiness
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Wire readiness panel
+        run: |
+          node scripts/patch-stage6b-wire-panel.mjs
+          bunx prettier --write 'src/routes/jobs.$id.tsx'
+      - name: Commit integration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 'src/routes/jobs.$id.tsx'
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: wire application readiness panel into job workspace"
+          git push origin HEAD:stage6b/job-match-readiness
