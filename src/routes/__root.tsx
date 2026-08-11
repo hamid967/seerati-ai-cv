@@ -16,6 +16,8 @@ import { StoreProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/app/app-shell";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { getPublicRuntimeConfig } from "@/lib/public-runtime-config.functions";
+import { setSupabaseRuntimeConfig } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -78,6 +80,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: () => getPublicRuntimeConfig(),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -163,6 +166,11 @@ function AppFrame() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const runtimeConfig = Route.useLoaderData();
+
+  // The Supabase proxy is lazy; set browser-safe runtime config before StoreProvider
+  // effects access the client during hydration.
+  setSupabaseRuntimeConfig(runtimeConfig);
 
   return (
     <QueryClientProvider client={queryClient}>
