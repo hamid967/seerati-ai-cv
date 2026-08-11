@@ -1,0 +1,27 @@
+name: Stage6A Strict Type Fix
+
+on:
+  push:
+    branches:
+      - stage6/saudi-market-leadership
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage6/saudi-market-leadership
+      - name: Fix optional action type
+        run: perl -0pi -e 's/action\?: BiText;/action?: BiText | undefined;/' src/lib/saudi-career-readiness.ts
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/saudi-career-readiness.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: support optional Saudi readiness actions under strict typing"
+          git push origin HEAD:stage6/saudi-market-leadership
