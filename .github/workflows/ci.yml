@@ -18,6 +18,7 @@ on:
         "stage6d-h/**",
         "stage7/**",
         "stage8/**",
+        "stage9/**",
       ]
   pull_request:
     branches: [main]
@@ -71,6 +72,7 @@ jobs:
           node scripts/check-stage6d-h-market-leadership.mjs
           node scripts/check-production-launch-readiness.mjs
           node scripts/check-release-operations.mjs
+          node scripts/check-production-activation.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
