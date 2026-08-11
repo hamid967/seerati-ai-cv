@@ -771,6 +771,14 @@ function JobWorkspacePage() {
               </CardContent>
             </Card>
 
+            <ApplicationReadinessPanel
+              jobTitle={form.jobTitle}
+              jobDescription={form.jobDescription}
+              resumes={resumes}
+              graph={graph}
+              lang={lang}
+            />
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">{ar ? "حزمة طلبك" : "Application pack"}</CardTitle>
