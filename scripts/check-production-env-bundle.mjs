@@ -53,7 +53,10 @@ const bundleFiles = walk(DIST).filter((file) => /\.(?:js|mjs|cjs|html)$/.test(fi
 const bundled = bundleFiles.map(read).join("\n");
 
 check(bundleFiles.length > 0, "production build output exists");
-check(bundled.includes(SENTINEL_URL), "production bundle contains injected VITE_SUPABASE_URL sentinel");
+check(
+  bundled.includes(SENTINEL_URL),
+  "production bundle contains injected VITE_SUPABASE_URL sentinel",
+);
 check(
   bundled.includes(SENTINEL_KEY),
   "production bundle contains injected VITE_SUPABASE_PUBLISHABLE_KEY sentinel",
