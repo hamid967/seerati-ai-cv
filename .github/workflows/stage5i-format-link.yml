@@ -22,13 +22,13 @@ jobs:
       - name: Integrate and format
         run: |
           node scripts/apply-stage5i-studio-link.mjs
-          bunx prettier --write .github/workflows/ci.yml src/components/recruiter-ten-second-panel.tsx src/lib/recruiter-ten-second-scan.ts 'src/routes/resumes.$id.recruiter-scan.tsx' 'src/routes/resumes.$id.studio.tsx' scripts/check-recruiter-ten-second-scan.mjs
+          bunx prettier --write src/components/recruiter-ten-second-panel.tsx src/lib/recruiter-ten-second-scan.ts 'src/routes/resumes.$id.recruiter-scan.tsx' 'src/routes/resumes.$id.studio.tsx' scripts/check-recruiter-ten-second-scan.mjs
           rm scripts/apply-stage5i-studio-link.mjs
       - name: Commit integration
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/ci.yml src/components/recruiter-ten-second-panel.tsx src/lib/recruiter-ten-second-scan.ts 'src/routes/resumes.$id.recruiter-scan.tsx' 'src/routes/resumes.$id.studio.tsx' scripts/check-recruiter-ten-second-scan.mjs scripts/apply-stage5i-studio-link.mjs
+          git add src/components/recruiter-ten-second-panel.tsx src/lib/recruiter-ten-second-scan.ts 'src/routes/resumes.$id.recruiter-scan.tsx' 'src/routes/resumes.$id.studio.tsx' scripts/check-recruiter-ten-second-scan.mjs scripts/apply-stage5i-studio-link.mjs
           git diff --cached --quiet && exit 0
           git commit -m "feat: integrate Stage 5I recruiter scan into Studio"
           git push origin HEAD:stage5i/recruiter-10s-scan
