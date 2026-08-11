@@ -4,7 +4,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const CLIENT = path.join(ROOT, "src/integrations/supabase/client.ts");
 const VITE = path.join(ROOT, "vite.config.ts");
-const DIST = path.join(ROOT, "dist");
+const BUILD_OUTPUT = path.join(ROOT, ".output", "public");
 
 const SENTINEL_URL = "https://ci-supabase.invalid";
 const SENTINEL_KEY = "sb_publishable_ci_bundle_guard";
@@ -49,22 +49,22 @@ check(
   "obsolete bracket-access rewrite plugin is removed",
 );
 
-const bundleFiles = walk(DIST).filter((file) => /\.(?:js|mjs|cjs|html)$/.test(file));
+const bundleFiles = walk(BUILD_OUTPUT).filter((file) => /\.(?:js|mjs|cjs|html)$/.test(file));
 const bundled = bundleFiles.map(read).join("\n");
 
-check(bundleFiles.length > 0, "production build output exists");
+check(bundleFiles.length > 0, "Nitro production client build output exists");
 check(
   bundled.includes(SENTINEL_URL),
-  "production bundle contains injected VITE_SUPABASE_URL sentinel",
+  "production client bundle contains injected VITE_SUPABASE_URL sentinel",
 );
 check(
   bundled.includes(SENTINEL_KEY),
-  "production bundle contains injected VITE_SUPABASE_PUBLISHABLE_KEY sentinel",
+  "production client bundle contains injected VITE_SUPABASE_PUBLISHABLE_KEY sentinel",
 );
 check(
   !bundled.includes('import.meta.env["VITE_SUPABASE_') &&
     !bundled.includes("import.meta.env['VITE_SUPABASE_"),
-  "production bundle contains no unresolved bracket-access Supabase env reads",
+  "production client bundle contains no unresolved bracket-access Supabase env reads",
 );
 
 if (failures.length) {
