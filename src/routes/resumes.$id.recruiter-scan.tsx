@@ -53,7 +53,7 @@ function RecruiterScanPage() {
       resume
         ? buildRecruiterTenSecondScan(resume, {
             graph,
-            jobDescription: resume.data.jobDescription,
+            ...(resume.data.jobDescription ? { jobDescription: resume.data.jobDescription } : {}),
             template: getTemplate(resume.templateId),
           })
         : null,

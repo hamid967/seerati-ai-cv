@@ -36,6 +36,7 @@ import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as ResumesIdComposerRouteImport } from './routes/resumes.$id.composer'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
+import { Route as ResumesIdRecruiterScanRouteImport } from './routes/resumes.$id.recruiter-scan'
 import { Route as ResumesIdStudioRouteImport } from './routes/resumes.$id.studio'
 
 const IndexRoute = IndexRouteImport.update({
@@ -173,6 +174,11 @@ const ResumesIdPreviewRoute = ResumesIdPreviewRouteImport.update({
   path: '/resumes/$id/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIdRecruiterScanRoute = ResumesIdRecruiterScanRouteImport.update({
+  id: '/resumes/$id/recruiter-scan',
+  path: '/resumes/$id/recruiter-scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesIdStudioRoute = ResumesIdStudioRouteImport.update({
   id: '/resumes/$id/studio',
   path: '/resumes/$id/studio',
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/recruiter-scan': typeof ResumesIdRecruiterScanRoute
   '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRoutesByTo {
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/recruiter-scan': typeof ResumesIdRecruiterScanRoute
   '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRoutesById {
@@ -267,6 +275,7 @@ export interface FileRoutesById {
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/recruiter-scan': typeof ResumesIdRecruiterScanRoute
   '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRouteTypes {
@@ -299,6 +308,7 @@ export interface FileRouteTypes {
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/recruiter-scan'
     | '/resumes/$id/studio'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/recruiter-scan'
     | '/resumes/$id/studio'
   id:
     | '__root__'
@@ -358,6 +369,7 @@ export interface FileRouteTypes {
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/recruiter-scan'
     | '/resumes/$id/studio'
   fileRoutesById: FileRoutesById
 }
@@ -384,6 +396,7 @@ export interface RootRouteChildren {
   ResumesIdComposerRoute: typeof ResumesIdComposerRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
+  ResumesIdRecruiterScanRoute: typeof ResumesIdRecruiterScanRoute
   ResumesIdStudioRoute: typeof ResumesIdStudioRoute
 }
 
@@ -578,6 +591,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesIdPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/$id/recruiter-scan': {
+      id: '/resumes/$id/recruiter-scan'
+      path: '/resumes/$id/recruiter-scan'
+      fullPath: '/resumes/$id/recruiter-scan'
+      preLoaderRoute: typeof ResumesIdRecruiterScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/$id/studio': {
       id: '/resumes/$id/studio'
       path: '/resumes/$id/studio'
@@ -629,8 +649,19 @@ const rootRouteChildren: RootRouteChildren = {
   ResumesIdComposerRoute: ResumesIdComposerRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
+  ResumesIdRecruiterScanRoute: ResumesIdRecruiterScanRoute,
   ResumesIdStudioRoute: ResumesIdStudioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
