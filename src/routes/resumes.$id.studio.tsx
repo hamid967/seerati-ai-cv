@@ -218,13 +218,18 @@ function ResumeStudioUltra() {
     if (!autoDesignUndo) return;
     setDesignPreview(null);
     setLayout(normalizeResumeDesign(autoDesignUndo.design));
+    const { design: _currentDesign, ...dataWithoutDesign } = resume.data;
+    const restoredData =
+      autoDesignUndo.design === undefined
+        ? { ...dataWithoutDesign, sectionOrder: autoDesignUndo.sectionOrder }
+        : {
+            ...resume.data,
+            sectionOrder: autoDesignUndo.sectionOrder,
+            design: autoDesignUndo.design,
+          };
     await updateResume(resume.id, {
       templateId: autoDesignUndo.templateId,
-      data: {
-        ...resume.data,
-        sectionOrder: autoDesignUndo.sectionOrder,
-        design: autoDesignUndo.design,
-      },
+      data: restoredData,
     });
     setAutoDesignUndo(null);
     toast.success(ar ? "تم التراجع عن آخر تصميم ذكي" : "Last smart design reverted");
