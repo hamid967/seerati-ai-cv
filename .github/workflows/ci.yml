@@ -3,7 +3,16 @@ name: Seerati CI
 on:
   push:
     branches:
-      [main, "codex/**", "stage5c/**", "stage5d/**", "stage5e/**", "stage5f/**", "stage5g/**", "stage5i/**"]
+      [
+        main,
+        "codex/**",
+        "stage5c/**",
+        "stage5d/**",
+        "stage5e/**",
+        "stage5f/**",
+        "stage5g/**",
+        "stage5i/**",
+      ]
   pull_request:
     branches: [main]
 
