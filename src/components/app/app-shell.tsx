@@ -4,6 +4,7 @@ import { AppSidebar } from "./app-sidebar";
 import { AppTopbar } from "./app-topbar";
 import { CommandPalette } from "./command-palette";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { ProductAnalyticsBridge } from "./product-analytics-bridge";
 
 const STORAGE_KEY = "seerati.sidebar.collapsed";
 
@@ -88,6 +89,7 @@ export function AppShell({
 
   return (
     <AppChromeContext.Provider value={chrome}>
+      <ProductAnalyticsBridge />
       <div className="seerati-app-3d flex min-h-dvh w-full bg-sand text-foreground">
         <a
           href="#app-main-content"
