@@ -19,6 +19,7 @@ on:
         "stage7/**",
         "stage8/**",
         "stage9/**",
+        "hotfix/**",
       ]
   pull_request:
     branches: [main]
@@ -50,6 +51,11 @@ jobs:
       - name: Type check
         run: bunx tsc --noEmit
       - name: Build
+        env:
+          VITE_SUPABASE_URL: https://ci-supabase.invalid
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_bundle_guard
+          SUPABASE_URL: https://ci-supabase.invalid
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_bundle_guard
         run: bun run build
       - name: Static QA
         run: |
@@ -73,6 +79,7 @@ jobs:
           node scripts/check-production-launch-readiness.mjs
           node scripts/check-release-operations.mjs
           node scripts/check-production-activation.mjs
+          node scripts/check-production-env-bundle.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
