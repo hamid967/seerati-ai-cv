@@ -449,6 +449,17 @@ function AuthPage() {
               </div>
             </form>
 
+            <div className="mt-6 rounded-xl border border-border bg-secondary/50 p-4 text-center">
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {ar
+                  ? "التسجيل اختياري في سيرتي — يمكنك بناء سيرتك وتحميلها PDF بدون حساب."
+                  : "Signing up is optional — you can build and download your CV as a PDF without an account."}
+              </p>
+              <Button variant="outline" size="sm" className="mt-3" asChild>
+                <Link to="/resumes/new">{ar ? "المتابعة كزائر" : "Continue as guest"}</Link>
+              </Button>
+            </div>
+
             <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground lg:hidden">
               {t("auth_secure_note")}
             </p>

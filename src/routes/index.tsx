@@ -214,8 +214,8 @@ function Landing() {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button size="lg" asChild>
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  {ar ? "ابدأ مجاناً" : "Start for free"}
+                <Link to="/resumes/new">
+                  {ar ? "أنشئ سيرتك بدون تسجيل" : "Build your CV — no signup"}
                   <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
                 </Link>
               </Button>
@@ -225,13 +225,23 @@ function Landing() {
                 className="border-none bg-white/10 text-ink-foreground hover:bg-white/20"
                 asChild
               >
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  {ar ? "إنشاء حساب مجاني" : "Create a free account"}
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="ghost"
+                className="text-ink-foreground hover:bg-white/10"
+                asChild
+              >
                 <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
               </Button>
             </div>
             <p className="mt-5 text-xs text-ink-foreground/60">
               {ar
-                ? "تدعم العربية والإنجليزية · حتى ٣ سير ذاتية لكل حساب"
-                : "Arabic & English · up to 3 resumes per account"}
+                ? "التسجيل اختياري · ابدأ الآن وحمّل PDF بدون حساب · سجّل لاحقاً للحفظ حتى ٣ سير"
+                : "Signup is optional · start now and download a PDF · register later to save up to 3 resumes"}
             </p>
           </div>
           <LandingCareerVisual ar={ar} />
@@ -433,14 +443,19 @@ function Landing() {
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-ink-foreground/75">
               {ar
-                ? "أنشئ حساباً وابنِ ملفك المهني الموحّد خلال دقائق."
-                : "Create an account and build your unified career profile in minutes."}
+                ? "ابدأ فوراً بدون حساب، والتسجيل يبقى اختيارياً للحفظ والمزامنة."
+                : "Start instantly without an account — signing up stays optional for saving and syncing."}
             </p>
-            <Button size="lg" className="mt-6" asChild>
-              <Link to="/auth" search={{ mode: "signup" }}>
-                {ar ? "ابدأ مجاناً" : "Start for free"}
-              </Link>
-            </Button>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button size="lg" asChild>
+                <Link to="/resumes/new">{ar ? "ابدأ بدون تسجيل" : "Start without signup"}</Link>
+              </Button>
+              <Button size="lg" variant="secondary" asChild>
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  {ar ? "إنشاء حساب" : "Create account"}
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>

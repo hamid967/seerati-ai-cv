@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { GuestNotice } from "@/components/guest-notice";
 import { useI18n } from "@/lib/i18n";
+
 import { useAuthGuard, useStore } from "@/lib/store";
 import { defaultTemplates } from "@/lib/templates";
 
@@ -30,14 +32,14 @@ function NewResume() {
   const ar = lang === "ar";
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const { user, ready, atLimit, createResume } = useStore();
+  const { atLimit, isGuest, createResume } = useStore();
 
   const [title, setTitle] = useState(ar ? "سيرتي الذاتية" : "My resume");
   const [templateId, setTemplateId] = useState(search.template ?? "classic-ats");
   const [resumeLang, setResumeLang] = useState<"ar" | "en">(lang);
   const [seed, setSeed] = useState(false);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   return (
     <div className="min-h-screen bg-background">
@@ -46,11 +48,17 @@ function NewResume() {
           {ar ? "سيرة ذاتية جديدة" : "New resume"}
         </h1>
 
+        <GuestNotice className="mt-5" />
+
         {atLimit ? (
           <p className="mt-6 rounded-lg border border-border bg-secondary px-4 py-3 text-sm">
-            {ar
-              ? "وصلت الحد الأقصى (٣ سير ذاتية). احذف واحدة للمتابعة."
-              : "You reached the 3-resume limit. Delete one to continue."}
+            {isGuest
+              ? ar
+                ? "كزائر يمكنك العمل على سيرة واحدة. أنشئ حساباً مجانياً للوصول إلى ٣ سير ذاتية."
+                : "As a guest you can keep one resume. Create a free account for up to 3 resumes."
+              : ar
+                ? "وصلت الحد الأقصى (٣ سير ذاتية). احذف واحدة للمتابعة."
+                : "You reached the 3-resume limit. Delete one to continue."}
           </p>
         ) : (
           <>

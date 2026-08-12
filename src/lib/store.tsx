@@ -11,6 +11,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { emptyResumeData, RESUME_LIMIT, type Profile, type Resume, type ResumeData } from "./types";
 import { demoResumeData } from "./demo-data";
+import {
+  clearGuestResumes,
+  GUEST_RESUME_LIMIT,
+  isGuestResumeId,
+  makeGuestResume,
+  readGuestResumes,
+  writeGuestResumes,
+} from "./guest-store";
+
 
 /**
  * Data layer backed by Lovable Cloud (profiles / resumes / user_roles).
@@ -45,6 +54,9 @@ type Ctx = {
   getResume: (id: string) => Resume | undefined;
   atLimit: boolean;
   maxResumes: number;
+  /** True when the visitor has no account and is working on a local resume. */
+  isGuest: boolean;
+
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -98,8 +110,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<Profile | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [guestResumes, setGuestResumes] = useState<Resume[]>([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
+
+  useEffect(() => {
+    setGuestResumes(readGuestResumes());
+  }, []);
+
+  const persistGuest = useCallback((list: Resume[]) => {
+    setGuestResumes(list);
+    writeGuestResumes(list);
+  }, []);
+
 
   useEffect(() => {
     void supabase
@@ -150,6 +173,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLoadingResumes(false);
   }, []);
 
+  /** Move a guest's locally stored resume into the cloud right after sign-in. */
+  const migrateGuestResumes = useCallback(async (userId: string) => {
+    const pending = readGuestResumes();
+    if (!pending.length) return;
+    clearGuestResumes();
+    setGuestResumes([]);
+    for (const item of pending) {
+      await supabase.from("resumes").insert({
+        user_id: userId,
+        title: item.title,
+        template_id: item.templateId,
+        language: item.language,
+        data: item.data as never,
+      });
+    }
+  }, []);
+
   useEffect(() => {
     let active = true;
 
@@ -162,9 +202,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return;
       }
       await loadProfile(session.user.id, session.user.email ?? "");
+      try {
+        await migrateGuestResumes(session.user.id);
+      } catch {
+        // Keep sign-in working even if the local draft cannot be uploaded.
+      }
       await loadResumes();
       if (active) setReady(true);
     };
+
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
@@ -178,7 +224,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, [loadProfile, loadResumes]);
+  }, [loadProfile, loadResumes, migrateGuestResumes]);
 
   const signIn = useCallback<Ctx["signIn"]>(
     async (email, password) => {
@@ -238,14 +284,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<Ctx>(() => {
-    const atLimit = resumes.length >= maxResumes;
+    const isGuest = !user;
+    const list = isGuest ? guestResumes : resumes;
+    const effectiveMax = isGuest ? GUEST_RESUME_LIMIT : maxResumes;
+    const atLimit = list.length >= effectiveMax;
     return {
       ready,
       user,
-      resumes,
+      resumes: list,
       loadingResumes,
       atLimit,
-      maxResumes,
+      maxResumes: effectiveMax,
+      isGuest,
+
       signIn,
       signUp,
       resetPassword: async (email) => {
@@ -276,23 +327,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (error) throw new Error(error.message);
       },
       createResume: async ({ title, templateId, language, seed, jobTitle }) => {
-        if (!user || atLimit) return null;
-        await ensureSession();
+        if (atLimit) return null;
         const base = seed
           ? demoResumeData()
           : {
               ...emptyResumeData(),
               personal: {
                 ...emptyResumeData().personal,
-                fullName: user.fullName,
-                email: user.email,
+                fullName: user?.fullName ?? "",
+                email: user?.email ?? "",
                 jobTitle: jobTitle ?? "",
               },
             };
+        if (isGuest) {
+          const resume = makeGuestResume({ title, templateId, language, data: base });
+          persistGuest([resume, ...guestResumes]);
+          return resume;
+        }
+        await ensureSession();
         const { data, error } = await supabase
           .from("resumes")
           .insert({
-            user_id: user.id,
+            user_id: user!.id,
             title,
             template_id: templateId,
             language,
@@ -302,13 +358,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .single();
         if (error || !data) return null;
         const resume = toResume(data as ResumeRow);
-        setResumes((list) => [resume, ...list]);
+        setResumes((rows) => [resume, ...rows]);
         return resume;
       },
       updateResume: async (id, patch) => {
+        if (isGuest || isGuestResumeId(id)) {
+          persistGuest(
+            guestResumes.map((r) =>
+              r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
+            ),
+          );
+          return;
+        }
         await ensureSession();
-        setResumes((list) =>
-          list.map((r) =>
+        setResumes((rows) =>
+          rows.map((r) =>
             r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
           ),
         );
@@ -329,13 +393,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
 
       duplicateResume: async (id) => {
-        const src = resumes.find((r) => r.id === id);
-        if (!src || !user || atLimit) return null;
+        const src = list.find((r) => r.id === id);
+        if (!src || atLimit) return null;
+        if (isGuest) {
+          const copy = makeGuestResume({
+            title: `${src.title} — نسخة`,
+            templateId: src.templateId,
+            language: src.language,
+            data: src.data,
+          });
+          persistGuest([copy, ...guestResumes]);
+          return copy;
+        }
         await ensureSession();
         const { data, error } = await supabase
           .from("resumes")
           .insert({
-            user_id: user.id,
+            user_id: user!.id,
             title: `${src.title} — نسخة`,
             template_id: src.templateId,
             language: src.language,
@@ -345,28 +419,48 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .single();
         if (error || !data) return null;
         const copy = toResume(data as ResumeRow);
-        setResumes((list) => [copy, ...list]);
+        setResumes((rows) => [copy, ...rows]);
         return copy;
       },
       deleteResume: async (id) => {
+        if (isGuest || isGuestResumeId(id)) {
+          persistGuest(guestResumes.filter((r) => r.id !== id));
+          return;
+        }
         await ensureSession();
-        setResumes((list) => list.filter((r) => r.id !== id));
+        setResumes((rows) => rows.filter((r) => r.id !== id));
         const { error } = await supabase.from("resumes").delete().eq("id", id);
         if (error) throw new Error(error.message);
       },
-      getResume: (id) => resumes.find((r) => r.id === id),
+      getResume: (id) => list.find((r) => r.id === id),
     };
-  }, [ready, user, resumes, loadingResumes, maxResumes, signIn, signUp]);
+  }, [
+    ready,
+    user,
+    resumes,
+    guestResumes,
+    persistGuest,
+    loadingResumes,
+    maxResumes,
+    signIn,
+    signUp,
+  ]);
+
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 
-/** Redirects to /auth only after confirming there is really no cloud session. */
-export function useAuthGuard() {
+/**
+ * Redirects to /auth only after confirming there is really no cloud session.
+ * Pass `{ allowGuest: true }` on surfaces that work without an account.
+ */
+export function useAuthGuard(options?: { allowGuest?: boolean }) {
   const { ready, user } = useStore();
   const navigate = useNavigate();
+  const allowGuest = options?.allowGuest ?? false;
   useEffect(() => {
-    if (!ready || user) return;
+    if (allowGuest || !ready || user) return;
+
     let cancelled = false;
     const timer = setTimeout(() => {
       void supabase.auth.getSession().then(({ data }) => {
@@ -377,7 +471,7 @@ export function useAuthGuard() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [ready, user, navigate]);
+  }, [allowGuest, ready, user, navigate]);
   return { ready, user };
 }
 

@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
+import { GuestNotice } from "@/components/guest-notice";
+
 import { SortableList, SortableItem, reorderArray } from "@/components/sortable";
 
 import { Button } from "@/components/ui/button";
@@ -154,7 +156,7 @@ function EditResume() {
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
   const [loadingVersions, setLoadingVersions] = useState(true);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   useEffect(() => {
     if (stored && !draft) setDraft(stored);
@@ -524,6 +526,10 @@ function EditResume() {
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="mx-auto max-w-[1500px] px-4 pt-4">
+        <GuestNotice />
       </div>
 
       <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">

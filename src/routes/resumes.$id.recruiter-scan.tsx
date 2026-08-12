@@ -24,7 +24,7 @@ function RecruiterScanPage() {
   const [graph, setGraph] = useState<FactGraph>(() => emptyFactGraph());
   const [evidenceLoading, setEvidenceLoading] = useState(false);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   useEffect(() => {
     if (!user?.id) {
