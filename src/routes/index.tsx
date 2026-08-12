@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
-import { TEAM } from "@/lib/team";
+import { TEAM, TEAM_COUNT } from "@/lib/team";
 import { LandingCareerVisual } from "@/components/landing-experience";
 import heroResume from "@/assets/hero-resume.jpg";
 import type { CSSProperties } from "react";
@@ -38,8 +38,7 @@ export const Route = createFileRoute("/")({
       { title: "سيرتي | Seerati — استوديو مهني رقمي" },
       {
         name: "description",
-        content:
-          "سيرتي استوديو مهني رقمي: فريق من ثمانية مختصين افتراضيين يساعدونك على بناء ملف مهني موحّد، متابعة وظائفك، ومطابقة سيرتك مع كل وصف وظيفي.",
+        content: `سيرتي استوديو مهني رقمي: فريق من ${TEAM_COUNT} مختصاً افتراضياً في المسار والهندسة يساعدونك على بناء ملف مهني موحّد، متابعة وظائفك، ومطابقة سيرتك مع كل وصف وظيفي.`,
       },
       { property: "og:title", content: "سيرتي | Seerati — استوديو مهني رقمي" },
       {
@@ -174,7 +173,7 @@ function Landing() {
     ? [
         {
           q: "من هو فريق سيرتي؟",
-          a: "ثمانية مختصين افتراضيين — من استشارية المسار المهني إلى مدير الطلبات — يعملون كأدوار متخصصة فوق مساعد كتابة واحد، كل منهم مسؤول عن جزء واضح من رحلتك.",
+          a: `${TEAM_COUNT} مختصاً افتراضياً — من استشارية المسار المهني إلى مهندسي السيرة التقنية — يعملون كأدوار متخصصة فوق مساعد كتابة واحد، كل منهم مسؤول عن جزء واضح من رحلتك.`,
         },
         {
           q: "هل القوالب متوافقة مع أنظمة التوظيف؟",
@@ -196,7 +195,7 @@ function Landing() {
     : [
         {
           q: "Who is the Seerati team?",
-          a: "Eight virtual specialists — from a career strategist to an application manager — running as focused roles on one writing assistant, each owning a clear part of your journey.",
+          a: `${TEAM_COUNT} virtual specialists — from a career strategist to tech resume engineers — running as focused roles on one writing assistant, each owning a clear part of your journey.`,
         },
         {
           q: "Are the templates ATS friendly?",
@@ -243,8 +242,8 @@ function Landing() {
               </h1>
               <p className="mt-4 max-w-xl text-[15px] leading-[1.9] text-ink-foreground/75 md:text-base">
                 {ar
-                  ? "فريق من ثمانية مختصين يعمل معك من الملف المهني الموحّد حتى PDF عربي جاهز للتقديم."
-                  : "Eight specialists work with you — from a unified career profile to a submission-ready Arabic PDF."}
+                  ? `فريق من ${TEAM_COUNT} مختصاً يعمل معك من الملف المهني الموحّد حتى PDF عربي جاهز للتقديم.`
+                  : `${TEAM_COUNT} specialists work with you — from a unified career profile to a submission-ready Arabic PDF.`}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button
@@ -356,8 +355,8 @@ function Landing() {
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {ar
-                  ? "ثمانية أدوار متخصصة فوق مساعد كتابة واحد، كل دور مسؤول عن جزء واضح من رحلتك المهنية."
-                  : "Eight focused roles on one writing assistant, each owning a clear part of your career journey."}
+                  ? `${TEAM_COUNT} دوراً متخصصاً فوق مساعد كتابة واحد — مسار مهني وهندسة — كل دور مسؤول عن جزء واضح من رحلتك.`
+                  : `${TEAM_COUNT} focused roles on one writing assistant — career and engineering — each owning a clear part of your journey.`}
               </p>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

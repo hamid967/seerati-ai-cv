@@ -6,6 +6,7 @@
  * module.
  */
 import { ITEM_TASKS, type AiRequest, type AiResponse, type AiTask } from "./ai-types";
+import { agentById } from "./team";
 
 /** Model chosen for short, latency-sensitive resume editing tasks. */
 export const AI_MODEL = "google/gemini-3.6-flash";
@@ -102,6 +103,7 @@ export function buildPrompt(req: AiRequest): { system: string; prompt: string } 
   const ar = req.lang === "ar";
   const instruction = TASK_INSTRUCTION[req.task][ar ? "ar" : "en"];
   const wantsItems = ITEM_TASKS.includes(req.task);
+  const agent = req.agentId ? agentById(req.agentId) : undefined;
 
   const format = wantsItems
     ? ar
@@ -111,8 +113,10 @@ export function buildPrompt(req: AiRequest): { system: string; prompt: string } 
       ? "أعد النص النهائي فقط بدون علامات تنسيق أو عناوين."
       : "Return only the final text with no markdown or headings.";
 
+  const specialist = agent ? `\nSpecialist role:\n${agent.systemRole}` : "";
+
   return {
-    system: `${ar ? HOUSE_RULES_AR : HOUSE_RULES_EN}\n${format}`,
+    system: `${ar ? HOUSE_RULES_AR : HOUSE_RULES_EN}${specialist}\n${format}`,
     prompt: `${instruction}${contextBlock(req)}\n\n---\n${req.input.slice(0, 6000)}`,
   };
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { z } from "zod";
 import { ArrowLeft, ArrowRight, Check, Loader2, Sparkles, Wand2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,15 @@ import {
   emptyAssistantAnswers,
   type AssistantAnswers,
 } from "@/lib/assistant-create";
+import { agentById, agentsForSurface } from "@/lib/team";
 import { defaultTemplates } from "@/lib/templates";
 import type { Resume } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+const ASSISTANT_AGENTS = agentsForSurface("assistant");
 
 export const Route = createFileRoute("/assistant")({
+  validateSearch: z.object({ agent: z.string().optional() }),
   head: () => ({
     meta: [
       { title: "مساعد سيرتي — أنشئ سيرتك خطوة بخطوة" },
@@ -50,10 +56,15 @@ function AssistantPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
+  const { agent: agentFromSearch } = Route.useSearch();
   const { atLimit, isGuest, createResume, updateResume } = useStore();
   useAuthGuard({ allowGuest: true });
 
+  const initialAgent =
+    (agentFromSearch && agentById(agentFromSearch)?.id) || ASSISTANT_AGENTS[0]?.id || "noura";
+
   const [step, setStep] = useState(0);
+  const [agentId, setAgentId] = useState(initialAgent);
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [resumeLang, setResumeLang] = useState<"ar" | "en">(lang);
   const [drafting, setDrafting] = useState(false);
@@ -62,6 +73,8 @@ function AssistantPage() {
   const [skills, setSkills] = useState<string[]>([]);
   const [templateId, setTemplateId] = useState("cloud-flow");
   const [saving, setSaving] = useState(false);
+
+  const specialist = agentById(agentId) ?? ASSISTANT_AGENTS[0]!;
 
   const set = (patch: Partial<Answers>) => setAnswers((a) => ({ ...a, ...patch }));
 
@@ -109,12 +122,14 @@ function AssistantPage() {
           achievement: answers.story,
         },
       };
+      const agentOpt = { agentId };
       const [sum, bl, sk] = await Promise.all([
         aiService.run({
           task: "summary",
           lang: resumeLang,
           input: `${answers.jobTitle} — ${answers.years} ${ar ? "سنوات خبرة" : "years"} — ${answers.industry}. ${answers.story}`,
           context: ctx,
+          ...agentOpt,
         }),
         answers.story
           ? aiService.run({
@@ -122,6 +137,7 @@ function AssistantPage() {
               lang: resumeLang,
               input: answers.story,
               context: { ...ctx, section: "experience" },
+              ...agentOpt,
             })
           : Promise.resolve({ text: "", items: [] }),
         aiService.run({
@@ -129,6 +145,7 @@ function AssistantPage() {
           lang: resumeLang,
           input: `${answers.jobTitle} ${answers.industry} ${answers.skills}`,
           context: ctx,
+          ...agentOpt,
         }),
       ]);
       setSummary(sum.text.trim());
@@ -205,8 +222,8 @@ function AssistantPage() {
             </h1>
             <p className="text-sm text-muted-foreground">
               {ar
-                ? "أسئلة قصيرة، صياغة بالذكاء الاصطناعي، ثم تختار القالب — ونبني سيرتك."
-                : "A few questions, AI drafting, then pick a template — and we build your resume."}
+                ? `أسئلة قصيرة مع ${specialist.name.ar}، صياغة بالذكاء الاصطناعي، ثم تختار القالب.`
+                : `A few questions with ${specialist.name.en}, AI drafting, then pick a template.`}
             </p>
           </div>
           <Badge variant="secondary" className="ms-auto">
@@ -223,6 +240,48 @@ function AssistantPage() {
 
             {step === 0 && (
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>
+                    {ar ? "المتخصص الذي يقود الجلسة" : "Specialist leading this session"}
+                  </Label>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {ASSISTANT_AGENTS.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => {
+                          setAgentId(a.id);
+                          void navigate({
+                            to: "/assistant",
+                            search: { agent: a.id },
+                            replace: true,
+                          });
+                        }}
+                        className={cn(
+                          "flex min-h-11 items-center gap-2 rounded-xl border p-2.5 text-start transition-colors",
+                          agentId === a.id
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:bg-secondary/60",
+                        )}
+                      >
+                        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                          {a.initials}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold">{a.name[lang]}</span>
+                          <span className="block truncate text-[11px] text-muted-foreground">
+                            {a.role[lang]}
+                          </span>
+                        </span>
+                        {a.track === "engineering" && (
+                          <Badge variant="outline" className="shrink-0 text-[9px]">
+                            {ar ? "هندسة" : "Eng"}
+                          </Badge>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="fullName">{ar ? "الاسم الكامل" : "Full name"}</Label>
                   <Input

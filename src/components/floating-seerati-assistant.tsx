@@ -15,11 +15,13 @@ import {
 import { aiService, AiUserError } from "@/lib/ai-service";
 import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
+import { agentById, agentsForSurface } from "@/lib/team";
 import { defaultTemplates } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
 type Msg = { id: number; role: "assistant" | "user"; text: string };
 type Phase =
+  | "pick_agent"
   | "ask_name"
   | "ask_title"
   | "ask_years"
@@ -43,6 +45,7 @@ const HIDDEN_PREFIXES = [
   "/privacy-center",
 ];
 const FOCUS_EDITOR = /^\/resumes\/[^/]+\/(edit|preview|studio|composer)$/;
+const ASSISTANT_AGENTS = agentsForSurface("assistant");
 
 function shouldHide(pathname: string) {
   if (pathname === "/assistant") return true;
@@ -60,7 +63,8 @@ export function FloatingSeeratiAssistant() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [input, setInput] = useState("");
-  const [phase, setPhase] = useState<Phase>("ask_name");
+  const [phase, setPhase] = useState<Phase>("pick_agent");
+  const [agentId, setAgentId] = useState("noura");
   const [answers, setAnswers] = useState<AssistantAnswers>(emptyAssistantAnswers);
   const [summary, setSummary] = useState("");
   const [bullets, setBullets] = useState<string[]>([]);
@@ -74,9 +78,11 @@ export function FloatingSeeratiAssistant() {
     [],
   );
 
+  const specialist = agentById(agentId) ?? ASSISTANT_AGENTS[0]!;
+
   const intro = ar
-    ? "مرحباً، أنا مساعد سيرتي. سأبني معك سيرة ذاتية باختيار قالب — ابدأ باسمك الكامل."
-    : "Hi, I’m the Seerati Assistant. I’ll help you build a resume and pick a template — start with your full name.";
+    ? "مرحباً، أنا مساعد سيرتي — مع فريق مسار مهني وهندسة. اختر من يقود جلستك، ثم نبني السيرة ونختار القالب."
+    : "Hi, I’m the Seerati Assistant — backed by career and engineering specialists. Pick who leads, then we’ll build your resume and pick a template.";
 
   const [messages, setMessages] = useState<Msg[]>([{ id: 0, role: "assistant", text: intro }]);
 
@@ -90,7 +96,8 @@ export function FloatingSeeratiAssistant() {
     setMessages((m) => [...m, { id: idRef.current++, role, text }]);
 
   const resetChat = () => {
-    setPhase("ask_name");
+    setPhase("pick_agent");
+    setAgentId("noura");
     setAnswers(emptyAssistantAnswers());
     setSummary("");
     setBullets([]);
@@ -105,6 +112,18 @@ export function FloatingSeeratiAssistant() {
   const askNext = (next: Phase, prompt: string) => {
     setPhase(next);
     push("assistant", prompt);
+  };
+
+  const beginWithAgent = (id: string) => {
+    const agent = agentById(id) ?? ASSISTANT_AGENTS[0]!;
+    setAgentId(agent.id);
+    push("user", ar ? agent.name.ar : agent.name.en);
+    askNext(
+      "ask_name",
+      ar
+        ? `معك ${agent.name.ar} — ${agent.role.ar}. ابدأ باسمك الكامل.`
+        : `${agent.name.en} here — ${agent.role.en}. Start with your full name.`,
+    );
   };
 
   const runDrafting = async (latest: AssistantAnswers) => {
@@ -124,12 +143,14 @@ export function FloatingSeeratiAssistant() {
           achievement: latest.story,
         },
       };
+      const agentOpt = { agentId };
       const [sum, bl, sk] = await Promise.all([
         aiService.run({
           task: "summary",
           lang,
           input: `${latest.jobTitle} — ${latest.years} ${ar ? "سنوات" : "years"} — ${latest.industry}. ${latest.story}`,
           context: ctx,
+          ...agentOpt,
         }),
         latest.story
           ? aiService.run({
@@ -137,6 +158,7 @@ export function FloatingSeeratiAssistant() {
               lang,
               input: latest.story,
               context: { ...ctx, section: "experience" },
+              ...agentOpt,
             })
           : Promise.resolve({ text: "", items: [] as string[] }),
         aiService.run({
@@ -144,6 +166,7 @@ export function FloatingSeeratiAssistant() {
           lang,
           input: `${latest.jobTitle} ${latest.industry} ${latest.skills}`,
           context: ctx,
+          ...agentOpt,
         }),
       ]);
       const nextSummary = sum.text.trim();
@@ -242,7 +265,7 @@ export function FloatingSeeratiAssistant() {
 
   const submitText = async () => {
     const text = input.trim();
-    if (!text || busy) return;
+    if (!text || busy || phase === "pick_agent") return;
     setInput("");
     push("user", text);
 
@@ -331,7 +354,13 @@ export function FloatingSeeratiAssistant() {
                 {ar ? "مساعد سيرتي" : "Seerati Assistant"}
               </p>
               <p className="truncate text-[11px] opacity-80">
-                {ar ? "إنشاء سيرة + اختيار قالب" : "Create a resume + pick a template"}
+                {phase === "pick_agent"
+                  ? ar
+                    ? "اختر متخصصاً ليقود الجلسة"
+                    : "Pick a specialist to lead"
+                  : ar
+                    ? `معك ${specialist.name.ar} · إنشاء سيرة + قالب`
+                    : `With ${specialist.name.en} · resume + template`}
               </p>
             </div>
             <Button
@@ -361,6 +390,34 @@ export function FloatingSeeratiAssistant() {
                   {m.text}
                 </div>
               ))}
+
+              {phase === "pick_agent" && (
+                <div className="grid gap-2">
+                  {ASSISTANT_AGENTS.map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => beginWithAgent(a.id)}
+                      className="flex min-h-11 items-center gap-2 rounded-xl border border-border bg-background p-2.5 text-start transition-colors hover:border-primary/40 hover:bg-secondary/70"
+                    >
+                      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        {a.initials}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold">{a.name[lang]}</span>
+                        <span className="block truncate text-[11px] text-muted-foreground">
+                          {a.role[lang]}
+                        </span>
+                      </span>
+                      {a.track === "engineering" && (
+                        <Badge variant="outline" className="shrink-0 text-[9px]">
+                          {ar ? "هندسة" : "Eng"}
+                        </Badge>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {phase === "pick_template" && (
                 <div className="space-y-2 rounded-2xl border border-border bg-background p-2">
@@ -410,7 +467,10 @@ export function FloatingSeeratiAssistant() {
           </ScrollArea>
 
           <footer className="shrink-0 border-t border-border p-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
-            {phase !== "pick_template" && phase !== "drafting" && phase !== "creating" ? (
+            {phase !== "pick_agent" &&
+            phase !== "pick_template" &&
+            phase !== "drafting" &&
+            phase !== "creating" ? (
               <form
                 className="flex items-end gap-2"
                 onSubmit={(e) => {
@@ -448,7 +508,7 @@ export function FloatingSeeratiAssistant() {
                   {ar ? "ابدأ من جديد" : "Start over"}
                 </Button>
                 <Button type="button" variant="outline" size="sm" asChild>
-                  <Link to="/assistant" onClick={() => setOpen(false)}>
+                  <Link to="/assistant" search={{ agent: agentId }} onClick={() => setOpen(false)}>
                     <Sparkles className="size-3.5" />
                     {ar ? "المساعد الكامل" : "Full assistant"}
                   </Link>
