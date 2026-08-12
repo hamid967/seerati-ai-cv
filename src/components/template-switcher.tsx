@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ResumePreview, getTemplate } from "@/components/resume-preview";
+import { ResumeThumb, getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import type { Resume, TemplateDef } from "@/lib/types";
@@ -57,7 +57,7 @@ export function TemplateSwitcher({
           <span className="truncate">{active.name[lang]}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[88dvh] max-w-5xl overflow-y-auto">
+      <DialogContent className="max-h-[88dvh] w-[min(96vw,64rem)] max-w-[96vw] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="size-4 text-emerald-accent" />
@@ -100,20 +100,15 @@ export function TemplateSwitcher({
                   selected ? "border-primary ring-2 ring-primary/40" : "border-border"
                 }`}
               >
-                <div className="relative h-[240px] overflow-hidden rounded-lg bg-white">
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute start-0 top-0 origin-top-left rtl:origin-top-right"
-                    style={{ width: 794, transform: "scale(0.36)" }}
-                  >
-                    <ResumePreview resume={{ ...resume, templateId: t.id }} template={t} />
-                  </div>
+                <div className="relative overflow-hidden rounded-lg bg-white">
+                  <ResumeThumb resume={{ ...resume, templateId: t.id }} template={t} />
                   {selected && (
                     <span className="absolute end-2 top-2 grid size-6 place-items-center rounded-full bg-primary text-primary-foreground">
                       <Check className="size-3.5" />
                     </span>
                   )}
                 </div>
+
                 <div className="mt-2 flex items-center justify-between gap-2 px-1 pb-1">
                   <span className="truncate text-sm font-semibold">{t.name[lang]}</span>
                   {t.atsFriendly && (

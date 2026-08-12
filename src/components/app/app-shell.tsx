@@ -90,7 +90,7 @@ export function AppShell({
   return (
     <AppChromeContext.Provider value={chrome}>
       <ProductAnalyticsBridge />
-      <div className="seerati-app-3d flex min-h-dvh w-full bg-sand text-foreground">
+      <div className="seerati-app-3d flex min-h-dvh w-full max-w-full overflow-x-hidden bg-sand text-foreground">
         <a
           href="#app-main-content"
           className="seerati-skip-link"
