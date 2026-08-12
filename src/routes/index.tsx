@@ -223,7 +223,7 @@ function Landing() {
       <main className="flex-1">
         {/* Hero — brand first, one CTA group, dominant resume visual */}
         <section className="relative overflow-hidden surface-ink">
-          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:gap-12 md:py-24">
+          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 sm:gap-10 sm:py-16 sm:grid-cols-2 md:gap-12 md:py-24">
             <div className="text-start">
               <Badge
                 variant="secondary"
