@@ -74,7 +74,13 @@ const emptyAnswers: Answers = {
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-function buildData(a: Answers, lang: "ar" | "en", summary: string, bullets: string[], skills: string[]): ResumeData {
+function buildData(
+  a: Answers,
+  lang: "ar" | "en",
+  summary: string,
+  bullets: string[],
+  skills: string[],
+): ResumeData {
   const base = emptyResumeData();
   const [start = "", end = ""] = a.period.split(/[-–—]/).map((s) => s.trim());
   return {
@@ -102,9 +108,7 @@ function buildData(a: Answers, lang: "ar" | "en", summary: string, bullets: stri
           },
         ]
       : [],
-    education: a.degree
-      ? [{ id: uid(), degree: a.degree, school: a.school }]
-      : [],
+    education: a.degree ? [{ id: uid(), degree: a.degree, school: a.school }] : [],
     skills: skills.map((name) => ({ id: uid(), name })),
   };
 }
@@ -126,10 +130,7 @@ function fillSections(data: ResumeData): ResumeData {
     "links",
     "references",
   ];
-  const hidden = [
-    ...(Object.keys(filled) as SectionKey[]).filter((k) => !filled[k]),
-    ...optional,
-  ];
+  const hidden = [...(Object.keys(filled) as SectionKey[]).filter((k) => !filled[k]), ...optional];
   return { ...data, hiddenSections: hidden };
 }
 
@@ -182,9 +183,7 @@ function AssistantPage() {
   ];
 
   const canNext =
-    step === 0
-      ? answers.fullName.trim().length > 1 && answers.jobTitle.trim().length > 1
-      : true;
+    step === 0 ? answers.fullName.trim().length > 1 && answers.jobTitle.trim().length > 1 : true;
 
   const runDrafting = async () => {
     setDrafting(true);
@@ -244,9 +243,7 @@ function AssistantPage() {
 
   const finish = async () => {
     if (atLimit) {
-      toast.error(
-        ar ? "وصلت الحد الأقصى للسير الذاتية." : "You reached your resume limit.",
-      );
+      toast.error(ar ? "وصلت الحد الأقصى للسير الذاتية." : "You reached your resume limit.");
       return;
     }
     setSaving(true);
@@ -323,9 +320,7 @@ function AssistantPage() {
                   />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="jobTitle">
-                    {ar ? "الوظيفة المستهدفة" : "Target job title"}
-                  </Label>
+                  <Label htmlFor="jobTitle">{ar ? "الوظيفة المستهدفة" : "Target job title"}</Label>
                   <Input
                     id="jobTitle"
                     value={answers.jobTitle}
@@ -429,7 +424,9 @@ function AssistantPage() {
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="story">
-                    {ar ? "أبرز إنجازاتك بجملة أو جملتين" : "Your top achievements in a sentence or two"}
+                    {ar
+                      ? "أبرز إنجازاتك بجملة أو جملتين"
+                      : "Your top achievements in a sentence or two"}
                   </Label>
                   <Textarea
                     id="story"
@@ -444,11 +441,15 @@ function AssistantPage() {
                   />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="skills">{ar ? "مهاراتك (اختياري)" : "Your skills (optional)"}</Label>
+                  <Label htmlFor="skills">
+                    {ar ? "مهاراتك (اختياري)" : "Your skills (optional)"}
+                  </Label>
                   <Input
                     id="skills"
                     value={answers.skills}
-                    placeholder={ar ? "Excel، SQL، إدارة المشاريع" : "Excel, SQL, Project management"}
+                    placeholder={
+                      ar ? "Excel، SQL، إدارة المشاريع" : "Excel, SQL, Project management"
+                    }
                     onChange={(e) => set({ skills: e.target.value })}
                   />
                 </div>
@@ -603,7 +604,11 @@ function AssistantPage() {
                 </Button>
               ) : (
                 <Button type="button" onClick={finish} disabled={saving} className="gap-2">
-                  {saving ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+                  {saving ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Check className="size-4" />
+                  )}
                   {ar ? "أنشئ سيرتي الآن" : "Create my resume"}
                 </Button>
               )}

@@ -153,6 +153,8 @@ const APP_PREFIXES = [
   "/admin",
   "/import",
   "/privacy-center",
+  "/cover-letters",
+  "/keyword-scanner",
 ];
 /** Editor-style routes: chrome shrinks into focus mode. */
 const FOCUS_PATTERN = /^\/resumes\/[^/]+\/(edit|preview)$/;

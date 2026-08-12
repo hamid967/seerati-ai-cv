@@ -3,9 +3,10 @@ import {
   Bot,
   FileDown,
   LayoutList,
-  ListOrdered,
+  Mail,
   MoveVertical,
   Save,
+  ScanSearch,
   ShieldCheck,
   Target,
 } from "lucide-react";
@@ -105,6 +106,24 @@ function FeaturesPage() {
         : ["Score out of 100", "Nine explicit checks", "Keywords from a job description"],
     },
     {
+      icon: ScanSearch,
+      title: ar ? "ماسح الكلمات المفتاحية" : "Keyword scanner",
+      items: ar
+        ? ["تغطية وصف الوظيفة", "كلمات مطابقة وناقصة", "خطوات تالية بدون إدراج تلقائي"]
+        : [
+            "Job-description coverage",
+            "Matched and missing terms",
+            "Next steps without auto-insert",
+          ],
+    },
+    {
+      icon: Mail,
+      title: ar ? "خطابات التقديم" : "Cover letters",
+      items: ar
+        ? ["توليد مربوط بالوظيفة", "فحص الادّعاءات قبل الحفظ", "مركز خطابات موحّد"]
+        : ["Job-linked generation", "Claims check before save", "Unified letters hub"],
+    },
+    {
       icon: FileDown,
       title: ar ? "التصدير" : "Export",
       items: ar
@@ -117,13 +136,6 @@ function FeaturesPage() {
       items: ar
         ? ["٣ سير ذاتية لكل حساب", "لا أسرار في الواجهة", "طبقة تحكم بمعدل الطلبات"]
         : ["3 resumes per account", "No secrets in the client", "Request rate-limit layer"],
-    },
-    {
-      icon: ListOrdered,
-      title: ar ? "قادم قريباً" : "Planned next",
-      items: ar
-        ? ["خطاب التعريف (Cover Letter)", "مطابقة الوظائف"]
-        : ["Cover letters", "Job matching"],
     },
   ];
 

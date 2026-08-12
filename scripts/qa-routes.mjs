@@ -23,6 +23,8 @@ const ROUTES = [
   "/jobs",
   "/resumes/new",
   "/ats",
+  "/cover-letters",
+  "/keyword-scanner",
   "/account",
   "/admin",
   "/privacy",

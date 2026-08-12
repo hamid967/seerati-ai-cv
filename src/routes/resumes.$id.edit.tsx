@@ -24,6 +24,7 @@ import {
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
 import { GuestNotice } from "@/components/guest-notice";
+import { BulletWriterPanel } from "@/components/bullet-writer-panel";
 
 import { SortableList, SortableItem, reorderArray } from "@/components/sortable";
 
@@ -1551,7 +1552,6 @@ function EditResume() {
               </div>
             </TabsContent>
 
-
             <TabsContent value="ai" className="mt-3 min-h-0 flex-1">
               <AiAssistant
                 resume={draft}
@@ -1667,9 +1667,34 @@ function EditResume() {
                     >
                       {ar ? "أضف الكلمات الناقصة إلى المهارات" : "Add missing keywords to skills"}
                     </Button>
+                    <Button size="sm" variant="ghost" className="mt-2" asChild>
+                      <Link to="/keyword-scanner">
+                        {ar ? "فتح ماسح الكلمات المفتاحية" : "Open keyword scanner"}
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </div>
+
+              <div className="mt-6">
+                <BulletWriterPanel
+                  lang={lang}
+                  bullets={draft.data.experience.flatMap((e) => e.bullets)}
+                  onApply={(original, suggested) => {
+                    setData((data) => {
+                      for (const exp of data.experience) {
+                        const idx = exp.bullets.findIndex((b) => b === original);
+                        if (idx >= 0) {
+                          exp.bullets[idx] = suggested;
+                          break;
+                        }
+                      }
+                    });
+                    toast.success(ar ? "تم تطبيق الاقتراح" : "Suggestion applied");
+                  }}
+                />
+              </div>
+
               <BilingualSyncCard current={draft} all={resumes} />
             </TabsContent>
           </Tabs>
