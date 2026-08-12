@@ -526,7 +526,12 @@ function EditResume() {
         </div>
       </div>
 
+      <div className="mx-auto max-w-[1500px] px-4 pt-4">
+        <GuestNotice />
+      </div>
+
       <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">
+
         {/* Section navigation */}
         <nav
           aria-label={ar ? "أقسام المحرر" : "Builder sections"}
