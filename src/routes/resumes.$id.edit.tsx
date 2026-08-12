@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
+import { GuestNotice } from "@/components/guest-notice";
+
 import { SortableList, SortableItem, reorderArray } from "@/components/sortable";
 
 import { Button } from "@/components/ui/button";
