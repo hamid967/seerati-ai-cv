@@ -14,7 +14,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ResumePreview, getTemplate } from "@/components/resume-preview";
+import { getTemplate } from "@/components/resume-preview";
+import { ProfessionalResumePreview } from "@/components/professional-resume-preview";
+import {
+  ResumeEditorLayoutControls,
+  ResumeSectionVisibilityControls,
+} from "@/components/resume-editor-layout-controls";
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
 import { GuestNotice } from "@/components/guest-notice";
@@ -450,7 +455,7 @@ function EditResume() {
                     value="preview"
                     className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl bg-secondary/40 p-2"
                   >
-                    <ResumePreview resume={draft} />
+                    <ProfessionalResumePreview resume={draft} />
                   </TabsContent>
                   <TabsContent value="ai" className="mt-2 min-h-0 flex-1">
                     <AiAssistant
@@ -1380,6 +1385,19 @@ function EditResume() {
                   </Select>
                 </div>
 
+                {tpl ? (
+                  <ResumeEditorLayoutControls
+                    ar={ar}
+                    design={d.design}
+                    template={tpl}
+                    onChange={(designPatch) =>
+                      setData((data) => {
+                        data.design = { ...data.design, ...designPatch };
+                      })
+                    }
+                  />
+                ) : null}
+
                 {tpl?.design.supportsPhoto ? (
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm">
@@ -1429,6 +1447,20 @@ function EditResume() {
                     ? "رتّب أقسام السيرة الذاتية. الأقسام الفارغة لا تظهر في المعاينة."
                     : "Reorder sections. Empty sections are hidden in the preview."}
                 </p>
+                <ResumeSectionVisibilityControls
+                  ar={ar}
+                  sections={d.sectionOrder.map((key) => ({
+                    key,
+                    label: sectionLabels[key][lang],
+                  }))}
+                  hiddenSections={d.hiddenSections ?? []}
+                  onChange={(hiddenSections) =>
+                    setData((data) => {
+                      data.hiddenSections = hiddenSections;
+                    })
+                  }
+                />
+
                 <SortableList
                   ids={d.sectionOrder}
                   onReorder={(from, to) =>
@@ -1503,7 +1535,7 @@ function EditResume() {
               value="preview"
               className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl bg-secondary/40 p-3"
             >
-              <ResumePreview resume={draft} />
+              <ProfessionalResumePreview resume={draft} />
             </TabsContent>
 
             <TabsContent value="ai" className="mt-3 min-h-0 flex-1">

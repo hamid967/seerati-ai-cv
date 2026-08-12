@@ -8,13 +8,14 @@ const sidebarKeys = new Set<SectionKey>(["skills", "languages", "links", "certif
 
 function renderedSectionOrder(resume: Resume): SectionKey[] {
   const template = getTemplate(resume.templateId);
+  const layout = resume.data.design?.layout ?? template.design.layout;
   const hidden = new Set(resume.data.hiddenSections ?? []);
   const visible = resume.data.sectionOrder.filter((key) => !hidden.has(key));
-  if (template.design.layout === "single") return visible;
+  if (layout === "single") return visible;
 
   const aside = visible.filter((key) => sidebarKeys.has(key));
   const main = visible.filter((key) => !sidebarKeys.has(key));
-  return template.design.layout === "sidebar-left" ? [...aside, ...main] : [...main, ...aside];
+  return layout === "sidebar-left" ? [...aside, ...main] : [...main, ...aside];
 }
 
 export const ProfessionalResumePreview = forwardRef<
