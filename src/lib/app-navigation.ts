@@ -14,12 +14,14 @@ import {
   Sparkles,
   User,
   UserSquare2,
+  Wand2,
   type LucideIcon,
 } from "lucide-react";
 
 /** Single source of truth for in-app navigation. */
 export type AppNavId =
   | "home"
+  | "assistant"
   | "career-twin"
   | "career-passport"
   | "career-evidence"
@@ -50,6 +52,16 @@ export type AppNavItem = {
 };
 
 export const APP_NAV: AppNavItem[] = [
+  {
+    id: "assistant",
+    label: { ar: "مساعد سيرتي", en: "Seerati Assistant" },
+    hint: { ar: "أنشئ سيرتك خطوة بخطوة", en: "Build your resume step by step" },
+    icon: Wand2,
+    to: "/assistant",
+    enabled: true,
+    mobile: true,
+    group: "main",
+  },
   {
     id: "home",
     label: { ar: "الرئيسية", en: "Home" },

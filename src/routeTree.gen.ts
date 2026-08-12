@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ArabicIntelligenceRouteImport } from './routes/arabic-intelligence'
+import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareerEvidenceRouteImport } from './routes/career-evidence'
@@ -60,6 +61,11 @@ const AdminRoute = AdminRouteImport.update({
 const ArabicIntelligenceRoute = ArabicIntelligenceRouteImport.update({
   id: '/arabic-intelligence',
   path: '/arabic-intelligence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistantRoute = AssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtsRoute = AtsRouteImport.update({
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/arabic-intelligence': typeof ArabicIntelligenceRoute
+  '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/arabic-intelligence': typeof ArabicIntelligenceRoute
+  '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
@@ -276,6 +284,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/arabic-intelligence': typeof ArabicIntelligenceRoute
+  '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
@@ -312,6 +321,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/arabic-intelligence'
+    | '/assistant'
     | '/ats'
     | '/auth'
     | '/career-evidence'
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/arabic-intelligence'
+    | '/assistant'
     | '/ats'
     | '/auth'
     | '/career-evidence'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/arabic-intelligence'
+    | '/assistant'
     | '/ats'
     | '/auth'
     | '/career-evidence'
@@ -414,6 +426,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
   ArabicIntelligenceRoute: typeof ArabicIntelligenceRoute
+  AssistantRoute: typeof AssistantRoute
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
   CareerEvidenceRoute: typeof CareerEvidenceRoute
@@ -467,6 +480,13 @@ declare module '@tanstack/react-router' {
       path: '/arabic-intelligence'
       fullPath: '/arabic-intelligence'
       preLoaderRoute: typeof ArabicIntelligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ats': {
@@ -691,6 +711,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
   ArabicIntelligenceRoute: ArabicIntelligenceRoute,
+  AssistantRoute: AssistantRoute,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
   CareerEvidenceRoute: CareerEvidenceRoute,
@@ -718,3 +739,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
