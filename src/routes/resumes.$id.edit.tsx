@@ -537,7 +537,7 @@ function EditResume() {
         <GuestNotice />
       </div>
 
-      <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">
+      <main className="mx-auto grid w-full max-w-[1760px] gap-6 px-4 py-6 lg:grid-cols-[176px_minmax(0,1fr)_minmax(0,1fr)] xl:gap-8">
         {/* Section navigation */}
         <nav
           aria-label={ar ? "أقسام المحرر" : "Builder sections"}
