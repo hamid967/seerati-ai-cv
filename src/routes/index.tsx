@@ -195,7 +195,7 @@ function Landing() {
                 "radial-gradient(50% 60% at 20% 10%, oklch(0.72 0.13 165 / 0.35), transparent 70%)",
             }}
           />
-          <div className="relative mx-auto max-w-4xl px-4 py-20 text-center md:py-28">
+          <div className="relative z-10 mx-auto max-w-4xl px-4 py-20 text-center md:py-28">
             <Badge
               variant="secondary"
               className="mb-6 gap-1.5 rounded-full border-none bg-white/10 px-3 py-1 text-[12px] text-ink-foreground"
