@@ -37,7 +37,7 @@ function NewResume() {
   const [resumeLang, setResumeLang] = useState<"ar" | "en">(lang);
   const [seed, setSeed] = useState(false);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   return (
     <div className="min-h-screen bg-background">

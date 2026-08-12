@@ -154,7 +154,7 @@ function EditResume() {
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
   const [loadingVersions, setLoadingVersions] = useState(true);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   useEffect(() => {
     if (stored && !draft) setDraft(stored);

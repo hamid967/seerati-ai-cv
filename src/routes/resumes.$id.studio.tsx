@@ -60,7 +60,7 @@ function ResumeStudioUltra() {
   } | null>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   useEffect(() => {
     if (resume) setLayout(normalizeResumeDesign(resume.data.design));

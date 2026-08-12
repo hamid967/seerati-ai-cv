@@ -47,7 +47,7 @@ function PreviewResume() {
   const [exportingImagePdf, setExportingImagePdf] = useState(false);
   const stamped = useRef<string | null>(null);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   useEffect(() => {
     if (!ready || !user || stamped.current === id) return;

@@ -51,7 +51,7 @@ function SmartPageComposer() {
   const [pageCount, setPageCount] = useState(1);
   const [zoom, setZoom] = useState(74);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   const design = useMemo(() => normalizeResumeDesign(resume?.data.design), [resume?.data.design]);
   const metrics = getPageMetrics(design.pageSize);
