@@ -17,7 +17,10 @@ export type AgentId =
   | "rashed"
   | "fahad"
   | "dana"
-  | "omar";
+  | "omar"
+  | "hala"
+  | "yousef"
+  | "lina";
 
 export type AgentSurface =
   | "career-twin"
@@ -42,8 +45,8 @@ export type AgentDef = {
   initials: string;
   /** Token name used for the avatar ring / accent. */
   accent: "ink" | "emerald" | "sand" | "gold";
-  /** Optional track label for engineering/dev specialists. */
-  track?: "engineering" | "career";
+  /** Optional track: career, engineering, or design (visual/campaign). */
+  track?: "engineering" | "career" | "design";
 };
 
 export const TEAM: AgentDef[] = [
@@ -105,7 +108,7 @@ export const TEAM: AgentDef[] = [
     surfaces: ["builder", "assistant"],
     initials: "خ",
     accent: "sand",
-    track: "career",
+    track: "design",
   },
   {
     id: "layan",
@@ -212,11 +215,60 @@ export const TEAM: AgentDef[] = [
     accent: "ink",
     track: "engineering",
   },
+  {
+    id: "hala",
+    name: { ar: "هالة", en: "Hala" },
+    role: { ar: "مديرة الهوية البصرية", en: "Brand Art Director" },
+    blurb: {
+      ar: "توحّد ألوان سيرتي وصور البطل مع القوالب والواجهات التسويقية.",
+      en: "Keeps Seerati colors, hero imagery and marketing surfaces on one visual system.",
+    },
+    systemRole:
+      "أنت هالة، مديرة هوية بصرية لسيرتي. تنصح بتوحيد الألوان (كحلي/زمردي)، الصور، والفراغات بين الصفحة الرئيسية والقوالب دون اقتراح ألوان بنفسجية أو خلفيات كريمية عامة. لا تختلق إحصاءات أو شهادات مستخدمين.",
+    surfaces: ["builder", "assistant"],
+    initials: "ه",
+    accent: "ink",
+    track: "design",
+  },
+  {
+    id: "yousef",
+    name: { ar: "يوسف", en: "Yousef" },
+    role: { ar: "مصمم حركة وإعلان", en: "Motion & Campaign Designer" },
+    blurb: {
+      ar: "يبني تأثيرات انترو وحركة إعلانية خفيفة توضّح المنتج دون ضوضاء.",
+      en: "Crafts intro and light campaign motion that explain the product without noise.",
+    },
+    systemRole:
+      "أنت يوسف، مصمم حركة وإعلان. تقترح حركات قصيرة هادفة (انترو، انتقالات، تأكيد CTA) وتتجنب الوهج الزائد والشارات العائمة على صور البطل. لا تعد بنتائج توظيف من حركة أو إعلان.",
+    surfaces: ["assistant"],
+    initials: "ي",
+    accent: "gold",
+    track: "design",
+  },
+  {
+    id: "lina",
+    name: { ar: "لينا", en: "Lina" },
+    role: { ar: "مصممة محتوى بصري", en: "Visual Content Designer" },
+    blurb: {
+      ar: "تربط نصوص الموقع بالصور والإطارات حتى يبدو كل قسم تركيبة واحدة.",
+      en: "Aligns site copy with imagery and frames so every section reads as one composition.",
+    },
+    systemRole:
+      "أنت لينا، مصممة محتوى بصري. تساعد على مواءمة العنوان والصورة والـ CTA في قسم واحد واضح، وترفض الحشو والملصقات الدعائية فوق صور البطل والبيانات الوهمية. ركّزي على فائدة المنتج الحقيقية فقط.",
+    surfaces: ["builder", "assistant"],
+    initials: "لن",
+    accent: "emerald",
+    track: "design",
+  },
 ];
 
 export const TEAM_COUNT = TEAM.length;
 
 export const ENGINEERING_TEAM = TEAM.filter((a) => a.track === "engineering");
+
+export const DESIGN_TEAM = TEAM.filter((a) => a.track === "design");
+
+export const CAREER_TEAM = TEAM.filter((a) => a.track === "career" || !a.track);
 
 export const agentById = (id: string): AgentDef | undefined => TEAM.find((a) => a.id === id);
 
@@ -225,6 +277,9 @@ export const agentsForSurface = (surface: AgentSurface): AgentDef[] =>
 
 /** Primary product surface each specialist opens from the team page. */
 export const agentPrimaryHref = (agent: AgentDef): string => {
+  if (agent.track === "design") {
+    return agent.surfaces.includes("assistant") ? `/assistant?agent=${agent.id}` : "/templates";
+  }
   if (agent.surfaces.includes("assistant") && agent.track === "engineering") {
     return `/assistant?agent=${agent.id}`;
   }

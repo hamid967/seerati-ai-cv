@@ -1,22 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowUpRight,
-  BadgeCheck,
-  BriefcaseBusiness,
-  FileCheck2,
-  FileText,
-  Gauge,
-  Sparkles,
-  Target,
-  X,
-} from "lucide-react";
+import { X } from "lucide-react";
+import { markIntroSeen } from "@/lib/intro";
 import "../landing-experience.css";
 
-const INTRO_SESSION_KEY = "seerati:intro:premium-v1";
-const INTRO_DURATION_MS = 8600;
+const INTRO_DURATION_MS = 9000;
 
-export function LandingIntro({ ar }: { ar: boolean }) {
-  const [visible, setVisible] = useState(false);
+type LandingIntroProps = {
+  ar: boolean;
+  /** Full-page route vs overlay (default page). */
+  mode?: "page" | "overlay";
+  onComplete?: () => void;
+};
+
+export function LandingIntro({ ar, mode = "page", onComplete }: LandingIntroProps) {
   const [scene, setScene] = useState(0);
 
   const copy = useMemo(
@@ -24,74 +20,71 @@ export function LandingIntro({ ar }: { ar: boolean }) {
       ar
         ? [
             {
-              eyebrow: "كل مسيرة تبدأ بقصة",
-              title: "اجمع خبرتك في مكان واحد",
-              body: "حوّل خبراتك ومهاراتك وإنجازاتك إلى ملف مهني موحّد يبقى معك.",
+              eyebrow: "سيرتي",
+              title: "ابنِ سيرة تفوز بالوظيفة",
+              body: "استوديو مهني عربي أولاً — من خبرتك الحقيقية إلى PDF جاهز للتقديم.",
             },
             {
-              eyebrow: "لكل فرصة نسخة أذكى",
-              title: "طابق سيرتك مع الوظيفة",
-              body: "افهم المتطلبات، أبرز ما لديك فعلًا، واعرف الفجوات قبل إرسال الطلب.",
+              eyebrow: "تصميم موحّد",
+              title: "صور وتصاميم بتأثير واحد",
+              body: "فريق مصممين يوحّد الهوية البصرية والقوالب والمحتوى الإعلاني للموقع.",
             },
             {
-              eyebrow: "من أول انطباع إلى آخر صفحة",
-              title: "صمّم، افحص، وصدّر بثقة",
-              body: "قوالب احترافية، فحص ATS إرشادي، وتصدير عربي مضبوط للطباعة والتقديم.",
+              eyebrow: "مساعد سيرتي",
+              title: "أسئلة قصيرة ثم سيرة جاهزة",
+              body: "اختر متخصصاً، أجب باختصار، واختر قالباً — بدون بيانات وهمية في صفحتك.",
             },
             {
-              eyebrow: "سيرتي | Seerati",
-              title: "مسارك المهني يبدأ من هنا",
-              body: "استوديو مهني سعودي، عربي أولًا، مصمم ليجعل بناء السيرة والتقديم أوضح وأسرع.",
+              eyebrow: "جاهز للبدء",
+              title: "ادخل الصفحة الرئيسية",
+              body: "واجهة نظيفة: ابدأ سيرة، استعرض القوالب، أو تعرّف على فريق التصميم.",
             },
           ]
         : [
             {
-              eyebrow: "Every career starts with a story",
-              title: "Bring your experience into one place",
-              body: "Turn your experience, skills and achievements into one reusable career profile.",
+              eyebrow: "Seerati",
+              title: "Build a job-winning resume",
+              body: "An Arabic-first career studio — from your real experience to a submission-ready PDF.",
             },
             {
-              eyebrow: "A smarter version for every opportunity",
-              title: "Match your resume to the role",
-              body: "Understand requirements, surface what you truly have and see the gaps before you apply.",
+              eyebrow: "Unified design",
+              title: "Images and layouts in one system",
+              body: "A design team keeps brand visuals, templates and campaign content aligned.",
             },
             {
-              eyebrow: "From first impression to final page",
-              title: "Design, check and export with clarity",
-              body: "Professional templates, rule-based ATS guidance and reliable Arabic-ready export.",
+              eyebrow: "Seerati Assistant",
+              title: "Short answers, then a resume",
+              body: "Pick a specialist, answer briefly, choose a template — no fake filler on your home page.",
             },
             {
-              eyebrow: "Seerati | سيرتي",
-              title: "Your career journey starts here",
-              body: "A Saudi-built, Arabic-first career studio designed to make resumes and applications clearer and faster.",
+              eyebrow: "Ready",
+              title: "Enter the homepage",
+              body: "A clean surface: start a resume, browse templates, or meet the design team.",
             },
           ],
     [ar],
   );
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const alreadySeen = window.sessionStorage.getItem(INTRO_SESSION_KEY) === "seen";
-    if (!reducedMotion && !alreadySeen) setVisible(true);
-  }, []);
+  const finish = () => {
+    markIntroSeen();
+    onComplete?.();
+  };
 
   useEffect(() => {
-    if (!visible) return;
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    if (mode === "overlay" || mode === "page") {
+      document.body.style.overflow = "hidden";
+    }
 
-    const close = () => {
-      window.sessionStorage.setItem(INTRO_SESSION_KEY, "seen");
-      setVisible(false);
-    };
     const timers = [
-      window.setTimeout(() => setScene(1), 2100),
-      window.setTimeout(() => setScene(2), 4200),
-      window.setTimeout(() => setScene(3), 6300),
-      window.setTimeout(close, INTRO_DURATION_MS),
+      window.setTimeout(() => setScene(1), 2200),
+      window.setTimeout(() => setScene(2), 4400),
+      window.setTimeout(() => setScene(3), 6600),
+      window.setTimeout(finish, INTRO_DURATION_MS),
     ];
-    const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && close();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.key === "Enter") finish();
+    };
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
@@ -99,26 +92,21 @@ export function LandingIntro({ ar }: { ar: boolean }) {
       timers.forEach(window.clearTimeout);
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [visible]);
-
-  const closeIntro = () => {
-    if (typeof window !== "undefined") window.sessionStorage.setItem(INTRO_SESSION_KEY, "seen");
-    setVisible(false);
-  };
-
-  if (!visible) return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per mount
+  }, []);
 
   return (
     <div
-      className="seerati-intro"
+      className={mode === "page" ? "seerati-intro seerati-intro--page" : "seerati-intro"}
       role="dialog"
       aria-modal="true"
-      aria-label={ar ? "مقدمة تعريفية عن سيرتي" : "Introduction to Seerati"}
+      aria-label={ar ? "مقدمة سيرتي" : "Seerati introduction"}
       dir={ar ? "rtl" : "ltr"}
     >
       <div className="seerati-intro__aurora" aria-hidden="true" />
       <div className="seerati-intro__grid" aria-hidden="true" />
-      <button className="seerati-intro__skip" type="button" onClick={closeIntro}>
+      <div className="seerati-intro__beam" aria-hidden="true" />
+      <button className="seerati-intro__skip" type="button" onClick={finish}>
         <X className="size-4" aria-hidden="true" />
         {ar ? "تخطي" : "Skip"}
       </button>
@@ -142,8 +130,13 @@ export function LandingIntro({ ar }: { ar: boolean }) {
         </div>
         <div className="seerati-intro__copy" key={scene}>
           <p>{copy[scene]?.eyebrow}</p>
-          <h2>{copy[scene]?.title}</h2>
+          <h1>{copy[scene]?.title}</h1>
           <span>{copy[scene]?.body}</span>
+          {scene === copy.length - 1 && (
+            <button type="button" className="seerati-intro__enter" onClick={finish}>
+              {ar ? "ادخل الموقع" : "Enter the site"}
+            </button>
+          )}
         </div>
       </div>
       <div className="seerati-intro__footer">
@@ -155,110 +148,7 @@ export function LandingIntro({ ar }: { ar: boolean }) {
         <div className="seerati-intro__progress" aria-hidden="true">
           <span />
         </div>
-        <p>{ar ? "اضغط ESC للتخطي" : "Press ESC to skip"}</p>
-      </div>
-    </div>
-  );
-}
-
-export function LandingCareerVisual({ ar }: { ar: boolean }) {
-  const stages = ar
-    ? [
-        { label: "ملفك المهني", value: "موحّد", icon: BriefcaseBusiness },
-        { label: "مطابقة الوظيفة", value: "واضحة", icon: Target },
-        { label: "فحص ATS", value: "إرشادي", icon: Gauge },
-      ]
-    : [
-        { label: "Career profile", value: "Unified", icon: BriefcaseBusiness },
-        { label: "Role matching", value: "Explainable", icon: Target },
-        { label: "ATS check", value: "Guidance", icon: Gauge },
-      ];
-
-  return (
-    <div
-      className="seerati-career-visual"
-      aria-label={ar ? "مثال توضيحي لواجهة سيرتي" : "Illustrative Seerati interface example"}
-    >
-      <div className="seerati-career-visual__glow" aria-hidden="true" />
-      <div className="seerati-career-visual__frame">
-        <div className="seerati-career-visual__topbar">
-          <div className="seerati-career-visual__identity">
-            <span className="seerati-career-visual__mini-logo">س</span>
-            <div>
-              <strong>{ar ? "مساحة مسارك المهني" : "Your career workspace"}</strong>
-              <small>{ar ? "مثال توضيحي" : "Illustrative preview"}</small>
-            </div>
-          </div>
-          <span className="seerati-career-visual__status">
-            <BadgeCheck className="size-3.5" />
-            {ar ? "جاهز للعمل" : "Ready"}
-          </span>
-        </div>
-        <div className="seerati-career-visual__content">
-          <div className="seerati-career-visual__resume">
-            <div className="seerati-career-visual__resume-head">
-              <span className="seerati-career-visual__avatar">س</span>
-              <div>
-                <span className="seerati-career-visual__line wide" />
-                <span className="seerati-career-visual__line medium" />
-              </div>
-            </div>
-            <div className="seerati-career-visual__section">
-              <span className="seerati-career-visual__label" />
-              <span className="seerati-career-visual__line wide" />
-              <span className="seerati-career-visual__line wide" />
-              <span className="seerati-career-visual__line medium" />
-            </div>
-            <div className="seerati-career-visual__section">
-              <span className="seerati-career-visual__label" />
-              <span className="seerati-career-visual__line wide" />
-              <span className="seerati-career-visual__line short" />
-            </div>
-            <div className="seerati-career-visual__skills">
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-          <div className="seerati-career-visual__rail">
-            <div className="seerati-career-visual__role">
-              <span>{ar ? "الوظيفة المستهدفة" : "Target role"}</span>
-              <strong>{ar ? "مثال: مهندس برمجيات" : "Example: Software Engineer"}</strong>
-              <small>{ar ? "يُستخدم للمطابقة فقط" : "Used for matching only"}</small>
-            </div>
-            {stages.map(({ label, value, icon: Icon }) => (
-              <div className="seerati-career-visual__metric" key={label}>
-                <span className="seerati-career-visual__metric-icon">
-                  <Icon className="size-4" />
-                </span>
-                <div>
-                  <small>{label}</small>
-                  <strong>{value}</strong>
-                </div>
-                <ArrowUpRight className="size-4 opacity-45 rtl:-scale-x-100" />
-              </div>
-            ))}
-            <div className="seerati-career-visual__export">
-              <FileCheck2 className="size-4" />
-              <span>{ar ? "PDF نصي للتقديم" : "Text PDF for applications"}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="seerati-career-visual__float seerati-career-visual__float--ai"
-        aria-hidden="true"
-      >
-        <Sparkles className="size-4" />
-        <span>{ar ? "مساعد سيرتي" : "Seerati copilot"}</span>
-      </div>
-      <div
-        className="seerati-career-visual__float seerati-career-visual__float--doc"
-        aria-hidden="true"
-      >
-        <FileText className="size-4" />
-        <span>{ar ? "سيرة قابلة للتخصيص" : "Tailorable resume"}</span>
+        <p>{ar ? "ESC للتخطي · Enter للمتابعة" : "ESC to skip · Enter to continue"}</p>
       </div>
     </div>
   );
