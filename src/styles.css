@@ -201,8 +201,15 @@
 
 @utility hero-grid {
   background-image:
-    radial-gradient(60% 55% at 50% 0%, oklch(0.35 0.09 256 / 0.1), transparent 70%),
-    linear-gradient(to bottom, oklch(0.94 0.03 253 / 0.6), transparent 55%);
+    radial-gradient(65% 55% at 50% 0%, oklch(0.62 0.19 256 / 0.12), transparent 70%),
+    linear-gradient(to bottom, oklch(0.955 0.026 254 / 0.7), transparent 60%);
+}
+
+/* Editor canvas: the neutral desk the A4 sheet floats on (FlowCV-style). */
+@utility resume-canvas {
+  background-color: oklch(0.945 0.008 250);
+  background-image: radial-gradient(oklch(0.86 0.01 250) 1px, transparent 1px);
+  background-size: 18px 18px;
 }
 
 @utility section-y {
