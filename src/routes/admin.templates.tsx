@@ -94,11 +94,11 @@ function AdminTemplates() {
     await qc.invalidateQueries({ queryKey: ["template-usage"] });
   };
 
-  const previewResume: Resume = {
+  const resumeFor = (tpl: TemplateDef): Resume => ({
     id: "preview",
     ownerId: "preview",
-    title: selected.name[lang],
-    templateId: selected.id,
+    title: tpl.name[lang],
+    templateId: tpl.id,
     language: lang,
     data: demoResumeData(),
     status: "complete",
@@ -106,7 +106,10 @@ function AdminTemplates() {
     atsScore: 86,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  };
+  });
+
+  const previewResume: Resume = resumeFor(selected);
+
 
   const handleSave = async () => {
     setSaving(true);
