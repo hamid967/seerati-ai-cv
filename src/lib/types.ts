@@ -20,7 +20,10 @@ export type TemplateDef = {
   supportsRTL: boolean;
   active: boolean;
   order: number;
+  /** Auto-generated preview image (data URL) shown in admin/gallery listings. */
+  thumbnailUrl?: string;
   design: TemplateDesign;
+
 };
 
 /** Limited, safe design controls exposed to the end user inside the builder. */

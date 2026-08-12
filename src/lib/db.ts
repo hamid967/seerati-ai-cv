@@ -30,6 +30,8 @@ export const rowToTemplate = (row: TemplateRow): TemplateDef => {
     atsFriendly: row.ats_friendly,
     active: row.active,
     order: row.display_order,
+    ...(row.thumbnail_url ? { thumbnailUrl: row.thumbnail_url } : {}),
+
     design: {
       ...baseDesign,
       ...(seed?.design ?? {}),
@@ -55,8 +57,16 @@ const templateColumns = (tpl: TemplateDef) => ({
   ats_friendly: tpl.atsFriendly,
   active: tpl.active,
   display_order: tpl.order,
+  thumbnail_url: tpl.thumbnailUrl ?? null,
   design: tpl.design as never,
 });
+
+/** Stores an auto-generated thumbnail (data URL) for a template. */
+export async function saveTemplateThumbnail(id: string, thumbnailUrl: string) {
+  const { error } = await supabase.from("templates").update({ thumbnail_url: thumbnailUrl }).eq("id", id);
+  return error ? { error: error.message } : {};
+}
+
 
 export async function saveTemplate(tpl: TemplateDef) {
   const { error } = await supabase.from("templates").update(templateColumns(tpl)).eq("id", tpl.id);
