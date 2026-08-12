@@ -32,7 +32,7 @@ function NewResume() {
   const ar = lang === "ar";
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const { user, ready, atLimit, isGuest, createResume } = useStore();
+  const { atLimit, isGuest, createResume } = useStore();
 
   const [title, setTitle] = useState(ar ? "سيرتي الذاتية" : "My resume");
   const [templateId, setTemplateId] = useState(search.template ?? "classic-ats");
