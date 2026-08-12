@@ -88,6 +88,7 @@ export function ResumePreview({
     ...tpl.design,
     accent: user.accent || tpl.design.accent,
     spacing: user.density || tpl.design.spacing,
+    layout: user.layout || tpl.design.layout,
   };
   const showPhoto = Boolean(
     design.supportsPhoto && (user.showPhoto ?? true) && d.personal.photoUrl,

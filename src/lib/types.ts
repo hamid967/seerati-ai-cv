@@ -27,6 +27,8 @@ export type TemplateDef = {
 export type ResumeUserDesign = {
   accent?: string;
   density?: "compact" | "normal" | "airy";
+  /** Optional user layout override; content remains unchanged. */
+  layout?: TemplateDesign["layout"];
   showPhoto?: boolean;
   pageSize?: "a4" | "letter";
   fontScale?: number;

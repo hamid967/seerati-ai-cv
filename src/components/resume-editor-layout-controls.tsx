@@ -17,7 +17,12 @@ type LayoutControlsProps = {
   onChange: (patch: Partial<ResumeUserDesign>) => void;
 };
 
-export function ResumeEditorLayoutControls({ ar, design, template, onChange }: LayoutControlsProps) {
+export function ResumeEditorLayoutControls({
+  ar,
+  design,
+  template,
+  onChange,
+}: LayoutControlsProps) {
   const layout = design?.layout ?? template.design.layout;
 
   return (
@@ -183,7 +188,9 @@ export function ResumeSectionVisibilityControls({
   return (
     <div className="rounded-2xl border border-border bg-secondary/30 p-4">
       <div className="mb-3">
-        <p className="text-sm font-semibold">{ar ? "إظهار وإخفاء الأقسام" : "Section visibility"}</p>
+        <p className="text-sm font-semibold">
+          {ar ? "إظهار وإخفاء الأقسام" : "Section visibility"}
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">
           {ar
             ? "إخفاء القسم لا يحذف محتواه. يمكنك إظهاره مرة أخرى في أي وقت."
