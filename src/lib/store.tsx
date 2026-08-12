@@ -224,7 +224,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, [loadProfile, loadResumes]);
+  }, [loadProfile, loadResumes, migrateGuestResumes]);
 
   const signIn = useCallback<Ctx["signIn"]>(
     async (email, password) => {
