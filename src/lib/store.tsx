@@ -113,13 +113,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
 
-  useEffect(() => {
-    setGuestResumes(readGuestResumes());
+  /**
+   * Refs mirror the lists synchronously so back-to-back mutations
+   * (create → update in the same tick) never read a stale closure snapshot.
+   */
+  const guestRef = useRef<Resume[]>([]);
+  const resumesRef = useRef<Resume[]>([]);
+
+  const persistGuest = useCallback(
+    (update: Resume[] | ((prev: Resume[]) => Resume[])) => {
+      const next = typeof update === "function" ? update(guestRef.current) : update;
+      guestRef.current = next;
+      setGuestResumes(next);
+      writeGuestResumes(next);
+    },
+    [],
+  );
+
+  const setResumesState = useCallback((update: Resume[] | ((prev: Resume[]) => Resume[])) => {
+    const next = typeof update === "function" ? update(resumesRef.current) : update;
+    resumesRef.current = next;
+    setResumes(next);
   }, []);
 
-  const persistGuest = useCallback((list: Resume[]) => {
-    setGuestResumes(list);
-    writeGuestResumes(list);
+  useEffect(() => {
+    const stored = readGuestResumes();
+    guestRef.current = stored;
+    setGuestResumes(stored);
   }, []);
 
   useEffect(() => {
