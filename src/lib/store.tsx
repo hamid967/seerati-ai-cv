@@ -110,8 +110,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<Profile | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [guestResumes, setGuestResumes] = useState<Resume[]>([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
+
+  useEffect(() => {
+    setGuestResumes(readGuestResumes());
+  }, []);
+
+  const persistGuest = useCallback((list: Resume[]) => {
+    setGuestResumes(list);
+    writeGuestResumes(list);
+  }, []);
+
 
   useEffect(() => {
     void supabase
