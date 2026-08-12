@@ -26,6 +26,7 @@ import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import { TEAM } from "@/lib/team";
 import { LandingCareerVisual } from "@/components/landing-experience";
+import heroResume from "@/assets/hero-resume.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,6 +46,8 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "https://hrhbs.com/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://hrhbs.com/og-image.png" },
+      { name: "twitter:image", content: "https://hrhbs.com/og-image.png" },
     ],
     links: [{ rel: "canonical", href: "https://hrhbs.com/" }],
   }),
@@ -243,6 +246,19 @@ function Landing() {
                 ? "التسجيل اختياري · ابدأ الآن وحمّل PDF بدون حساب · سجّل لاحقاً للحفظ حتى ٣ سير"
                 : "Signup is optional · start now and download a PDF · register later to save up to 3 resumes"}
             </p>
+            <div className="mx-auto mt-12 max-w-3xl">
+              <img
+                src={heroResume}
+                alt={
+                  ar
+                    ? "نموذج سيرة ذاتية عربية من سيرتي بتصميم عمودين"
+                    : "Arabic resume mockup built with Seerati"
+                }
+                width={1440}
+                height={1024}
+                className="mx-auto w-full rounded-2xl border border-white/10 shadow-2xl"
+              />
+            </div>
           </div>
           <LandingCareerVisual ar={ar} />
         </section>

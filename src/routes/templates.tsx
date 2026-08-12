@@ -25,6 +25,8 @@ export const Route = createFileRoute("/templates")({
       { property: "og:url", content: "https://hrhbs.com/templates" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://hrhbs.com/og-image.png" },
+      { name: "twitter:image", content: "https://hrhbs.com/og-image.png" },
     ],
     links: [{ rel: "canonical", href: "https://hrhbs.com/templates" }],
   }),
