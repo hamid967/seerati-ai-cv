@@ -1,4 +1,4 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import {
   Briefcase,
   FileText,
@@ -26,7 +26,10 @@ export function SiteHeader() {
   const { lang, toggle } = useI18n();
   const { user, signOut } = useStore();
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  /** Homepage hides login/signup — guests start via templates then register. */
+  const hideAuthCtas = !user && pathname === "/";
 
   const links = [
     { to: "/templates", label: t("nav_templates") },
@@ -130,16 +133,18 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden items-center gap-2 sm:flex">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/auth">{t("nav_login")}</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  {t("nav_start")}
-                </Link>
-              </Button>
-            </div>
+            !hideAuthCtas && (
+              <div className="hidden items-center gap-2 sm:flex">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/auth">{t("nav_login")}</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/auth" search={{ mode: "signup" }}>
+                    {t("nav_start")}
+                  </Link>
+                </Button>
+              </div>
+            )
           )}
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -201,23 +206,25 @@ export function SiteHeader() {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <Link
-                      to="/auth"
-                      onClick={() => setOpen(false)}
-                      className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
-                    >
-                      {t("nav_login")}
-                    </Link>
-                    <Link
-                      to="/auth"
-                      search={{ mode: "signup" }}
-                      onClick={() => setOpen(false)}
-                      className="rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
-                    >
-                      {t("nav_start")}
-                    </Link>
-                  </>
+                  !hideAuthCtas && (
+                    <>
+                      <Link
+                        to="/auth"
+                        onClick={() => setOpen(false)}
+                        className="rounded-md px-3 py-2.5 text-sm font-medium hover:bg-secondary"
+                      >
+                        {t("nav_login")}
+                      </Link>
+                      <Link
+                        to="/auth"
+                        search={{ mode: "signup" }}
+                        onClick={() => setOpen(false)}
+                        className="rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
+                      >
+                        {t("nav_start")}
+                      </Link>
+                    </>
+                  )
                 )}
               </nav>
             </SheetContent>
