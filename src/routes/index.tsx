@@ -40,6 +40,7 @@ function Landing() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
+  const templateCount = defaultTemplates.length;
   const featuredTemplates = defaultTemplates.filter((t) => t.active !== false).slice(0, 6);
 
   useEffect(() => {
@@ -185,8 +186,8 @@ function Landing() {
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 {ar
-                  ? "عربية وإنجليزية — قابلة للتبديل في أي وقت."
-                  : "Arabic and English — switch anytime."}
+                  ? `${templateCount} قالباً — عربية وإنجليزية، قابلة للتبديل في أي وقت.`
+                  : `${templateCount} templates — Arabic and English, switch anytime.`}
               </p>
             </div>
             <Button variant="outline" asChild>
