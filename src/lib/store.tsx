@@ -279,7 +279,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         createdAt: profile?.created_at ?? new Date().toISOString(),
       };
     },
-    [loadProfile, loadResumes],
+    [loadProfile, loadResumes, migrateGuestResumes],
   );
 
   const signUp = useCallback<Ctx["signUp"]>(
@@ -301,13 +301,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           // Session was returned by signUp; continue even if refresh is a no-op.
         }
         await loadProfile(data.session.user.id, data.session.user.email ?? email);
+        try {
+          await migrateGuestResumes(data.session.user.id);
+        } catch {
+          // The local draft stays in the browser if the upload fails.
+        }
         await loadResumes();
         return { needsConfirmation: false };
       }
       return { needsConfirmation: true };
     },
-    [loadProfile, loadResumes],
+    [loadProfile, loadResumes, migrateGuestResumes],
   );
+
 
   const value = useMemo<Ctx>(() => {
     const isGuest = !user;
