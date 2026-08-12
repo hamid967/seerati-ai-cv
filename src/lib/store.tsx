@@ -20,7 +20,6 @@ import {
   writeGuestResumes,
 } from "./guest-store";
 
-
 /**
  * Data layer backed by Lovable Cloud (profiles / resumes / user_roles).
  * All reads and writes go through RLS-protected tables; the 3-resume limit is
@@ -56,7 +55,6 @@ type Ctx = {
   maxResumes: number;
   /** True when the visitor has no account and is working on a local resume. */
   isGuest: boolean;
-
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -122,7 +120,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setGuestResumes(list);
     writeGuestResumes(list);
   }, []);
-
 
   useEffect(() => {
     void supabase
@@ -210,7 +207,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       await loadResumes();
       if (active) setReady(true);
     };
-
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
@@ -445,7 +441,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
   ]);
-
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

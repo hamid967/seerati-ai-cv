@@ -33,9 +33,7 @@ export default defineConfig({
     // Keeping these publishable values here prevents hydration from depending
     // on whether a particular build runner exported VITE_* variables.
     define: {
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-        resolvePublicEnv("VITE_SUPABASE_URL"),
-      ),
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(resolvePublicEnv("VITE_SUPABASE_URL")),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
         resolvePublicEnv("VITE_SUPABASE_PUBLISHABLE_KEY"),
       ),
