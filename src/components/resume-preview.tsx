@@ -27,6 +27,18 @@ const labels = {
 
 type Design = TemplateDef["design"];
 
+/** Darken a hex accent by a ratio (1 = unchanged) without CSS color-mix, so PDF export stays exact. */
+function shade(hex: string, ratio: number) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1]!, 16);
+  const mix = (c: number) => Math.max(0, Math.min(255, Math.round(c * ratio)));
+  const r = mix((n >> 16) & 255);
+  const g = mix((n >> 8) & 255);
+  const b = mix(n & 255);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
 function SectionTitle({ children, design }: { children: React.ReactNode; design: Design }) {
   const base: React.CSSProperties = {
     color: design.accent,
@@ -35,33 +47,53 @@ function SectionTitle({ children, design }: { children: React.ReactNode; design:
   if (design.sectionStyle === "line")
     return (
       <h3
-        style={{ ...base, borderBottom: `1.5px solid ${design.accent}`, paddingBottom: 3 }}
-        className="mb-2 text-[12.5px] font-bold uppercase tracking-[0.08em]"
+        style={{ ...base, paddingBottom: 4 }}
+        className="relative mb-2.5 text-[12px] font-semibold uppercase tracking-[0.16em]"
       >
         {children}
+        <span
+          className="absolute inset-x-0 bottom-0 block h-[1px]"
+          style={{
+            background: `linear-gradient(to right, ${design.accent}, ${design.accent}22)`,
+          }}
+        />
       </h3>
     );
   if (design.sectionStyle === "bar")
     return (
-      <h3 className="mb-2 flex items-center gap-2 text-[13px] font-bold" style={base}>
+      <h3
+        className="mb-2.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em]"
+        style={base}
+      >
         <span
           style={{ background: design.accent }}
-          className="inline-block h-3.5 w-1.5 rounded-full"
+          className="inline-block h-[11px] w-[3px] rounded-full"
         />
         {children}
+        <span
+          className="ms-1 block h-[1px] flex-1"
+          style={{ background: `linear-gradient(to right, ${design.accent}33, transparent)` }}
+        />
       </h3>
     );
   if (design.sectionStyle === "caps")
     return (
       <h3
-        className="mb-2 text-[12px] font-bold uppercase tracking-[0.22em]"
-        style={{ ...base, fontVariant: "small-caps" }}
+        className="mb-2.5 flex items-center gap-2.5 text-[11.5px] font-semibold uppercase tracking-[0.3em]"
+        style={base}
       >
         {children}
+        <span
+          className="block h-[1px] flex-1"
+          style={{ background: `${design.accent}2e` }}
+        />
       </h3>
     );
   return (
-    <h3 className="mb-1.5 text-[12.5px] font-bold tracking-wide" style={base}>
+    <h3
+      className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em]"
+      style={base}
+    >
       {children}
     </h3>
   );
@@ -118,20 +150,23 @@ export function ResumePreview({
       </p>
     ) : null,
     experience: d.experience.length ? (
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {d.experience.map((e) => (
           <div key={e.id} data-cv-item>
             <div className="flex flex-wrap items-baseline justify-between gap-1">
-              <p className="text-[13px] font-bold">{e.role}</p>
-              <p className="text-[11px] text-[#5a6779]">
+              <p className="text-[13px] font-semibold tracking-[0.01em] text-[#101828]">{e.role}</p>
+              <p className="text-[10.5px] uppercase tracking-[0.1em] text-[#6b7686]">
                 {e.start} – {e.current ? (rtl ? "حتى الآن" : "Present") : e.end}
               </p>
             </div>
-            <p className="text-[12px] font-medium" style={{ color: design.accent }}>
+            <p
+              className="mt-0.5 text-[11.5px] font-medium tracking-[0.02em]"
+              style={{ color: design.accent }}
+            >
               {e.company}
               {e.location ? ` · ${e.location}` : ""}
             </p>
-            <ul className={`mt-1 space-y-0.5 ${design.bullet === "dash" ? "" : "ps-4"}`}>
+            <ul className={`mt-1.5 space-y-1 ${design.bullet === "dash" ? "" : "ps-4"}`}>
               {e.bullets.filter(Boolean).map((b, i) => (
                 <li
                   key={i}
@@ -178,8 +213,12 @@ export function ResumePreview({
           {d.skills.map((s) => (
             <span
               key={s.id}
-              className="rounded-md px-2 py-0.5 text-[11.5px]"
-              style={{ background: `${design.accent}14`, color: design.accent }}
+              className="rounded-full px-2.5 py-[3px] text-[11px] font-medium tracking-[0.02em]"
+              style={{
+                background: `${design.accent}0d`,
+                border: `1px solid ${design.accent}26`,
+                color: design.accent,
+              }}
             >
               {s.name}
             </span>
@@ -270,18 +309,29 @@ export function ResumePreview({
     if (design.header === "banner")
       return (
         <header
-          className="-mx-8 -mt-8 mb-5 flex items-center gap-4 px-8 py-6"
-          style={{ background: design.accent }}
+          className="relative -mx-8 -mt-8 mb-6 flex items-center gap-4 overflow-hidden px-8 py-7"
+          style={{
+            background: `linear-gradient(135deg, ${design.accent} 0%, ${shade(design.accent, 0.78)} 100%)`,
+          }}
         >
+          <span
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px]"
+            style={{ background: "rgba(255,255,255,0.34)" }}
+          />
           <Photo />
           <div className="min-w-0 text-white">
-            <h1 className="text-[26px] font-extrabold leading-tight" style={nameStyle}>
+            <h1
+              className="text-[27px] font-semibold leading-tight tracking-[0.01em]"
+              style={nameStyle}
+            >
               {name}
             </h1>
             {d.personal.jobTitle && (
-              <p className="mt-0.5 text-[13px] opacity-90">{d.personal.jobTitle}</p>
+              <p className="mt-1 text-[11.5px] uppercase tracking-[0.22em] opacity-85">
+                {d.personal.jobTitle}
+              </p>
             )}
-            <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] opacity-85">
+            <p className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] opacity-80">
               {contactBits.map((x, i) => (
                 <span key={i}>{x}</span>
               ))}
@@ -292,71 +342,98 @@ export function ResumePreview({
     if (design.header === "centered")
       return (
         <header className="mb-6 text-center">
+          <span
+            className="mx-auto mb-3 block h-[1px] w-16"
+            style={{ background: `${design.accent}59` }}
+          />
           <h1
-            className="text-[27px] font-semibold tracking-tight"
+            className="text-[28px] font-semibold tracking-[0.02em]"
             style={{ ...nameStyle, color: "#101828" }}
           >
             {name}
           </h1>
           {d.personal.jobTitle && (
-            <p className="mt-1 text-[12.5px] uppercase tracking-[0.24em] text-[#5a6779]">
+            <p
+              className="mt-1.5 text-[11.5px] uppercase tracking-[0.3em]"
+              style={{ color: design.accent }}
+            >
               {d.personal.jobTitle}
             </p>
           )}
-          <p className="mt-2 flex flex-wrap justify-center gap-x-3 text-[11px] text-[#5a6779]">
+          <p className="mt-2.5 flex flex-wrap justify-center gap-x-3 text-[11px] text-[#5a6779]">
             {contactBits.map((x, i) => (
               <span key={i}>{x}</span>
             ))}
           </p>
+          <span
+            className="mx-auto mt-4 block h-[1px] w-full"
+            style={{
+              background: `linear-gradient(to right, transparent, ${design.accent}4d, transparent)`,
+            }}
+          />
         </header>
       );
     if (design.header === "split")
       return (
-        <header
-          className="mb-5 flex flex-wrap items-end justify-between gap-3 pb-3"
-          style={{ borderBottom: `2.5px solid ${design.accent}` }}
-        >
-          <div>
-            <h1
-              className="text-[26px] font-bold leading-tight"
-              style={{ ...nameStyle, color: "#0f1b2d" }}
+        <header className="mb-6">
+          <div className="flex flex-wrap items-end justify-between gap-3 pb-3">
+            <div>
+              <h1
+                className="text-[27px] font-semibold leading-tight tracking-[0.01em]"
+                style={{ ...nameStyle, color: "#0f1b2d" }}
+              >
+                {name}
+              </h1>
+              {d.personal.jobTitle && (
+                <p
+                  className="mt-1.5 text-[11.5px] uppercase tracking-[0.24em]"
+                  style={{ color: design.accent }}
+                >
+                  {d.personal.jobTitle}
+                </p>
+              )}
+            </div>
+            <div
+              className={`text-[11px] leading-[1.75] text-[#5a6779] ${rtl ? "text-left" : "text-right"}`}
             >
-              {name}
-            </h1>
-            {d.personal.jobTitle && (
-              <p className="mt-1 text-[13px] font-medium" style={{ color: design.accent }}>
-                {d.personal.jobTitle}
-              </p>
-            )}
+              {contactBits.map((x, i) => (
+                <div key={i}>{x}</div>
+              ))}
+            </div>
           </div>
+          <div className="h-[2px] w-full" style={{ background: design.accent }} />
           <div
-            className={`text-[11px] leading-[1.7] text-[#5a6779] ${rtl ? "text-left" : "text-right"}`}
-          >
-            {contactBits.map((x, i) => (
-              <div key={i}>{x}</div>
-            ))}
-          </div>
+            className="mt-[2px] h-[1px] w-full"
+            style={{ background: `${design.accent}33` }}
+          />
         </header>
       );
     return (
-      <header className="mb-5 flex items-start gap-4">
+      <header className="mb-6 flex items-start gap-4">
         <Photo />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1
-            className="text-[25px] font-extrabold leading-tight"
+            className="text-[26px] font-semibold leading-tight tracking-[0.01em]"
             style={{ ...nameStyle, color: design.accent }}
           >
             {name}
           </h1>
           {d.personal.jobTitle && (
-            <p className="mt-0.5 text-[13px] font-medium text-[#3d4b5e]">{d.personal.jobTitle}</p>
+            <p className="mt-1 text-[11.5px] uppercase tracking-[0.24em] text-[#5a6779]">
+              {d.personal.jobTitle}
+            </p>
           )}
-          <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#5a6779]">
+          <p className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#5a6779]">
             {contactBits.map((x, i) => (
               <span key={i}>{x}</span>
             ))}
           </p>
-          <div className="mt-3 h-[2px] w-full rounded-full" style={{ background: design.accent }} />
+          <div
+            className="mt-3 h-[2px] w-full"
+            style={{
+              background: `linear-gradient(to right, ${design.accent}, ${design.accent}1f)`,
+            }}
+          />
         </div>
       </header>
     );
@@ -364,8 +441,12 @@ export function ResumePreview({
 
   const aside = (
     <aside
-      className="rounded-lg p-3.5"
-      style={{ background: `${design.accent}0f`, borderTop: `3px solid ${design.accent}` }}
+      className="rounded-md p-4"
+      style={{
+        background: `linear-gradient(180deg, ${design.accent}12, ${design.accent}05)`,
+        border: `1px solid ${design.accent}1f`,
+        borderTop: `2.5px solid ${design.accent}`,
+      }}
     >
       {renderSections(asideOrder)}
     </aside>
