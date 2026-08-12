@@ -1517,7 +1517,7 @@ function EditResume() {
         </div>
 
         {/* Right column */}
-        <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[calc(100vh-10rem)]">
+        <div className="hidden lg:sticky lg:top-32 lg:block lg:h-[calc(100vh-9rem)]">
           <Tabs value={sideTab} onValueChange={setSideTab} className="flex h-full flex-col">
             <TabsList className="w-full">
               <TabsTrigger value="preview" className="flex-1">
@@ -1533,10 +1533,13 @@ function EditResume() {
 
             <TabsContent
               value="preview"
-              className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl bg-secondary/40 p-3"
+              className="resume-canvas mt-3 min-h-0 flex-1 overflow-auto rounded-2xl border border-border p-5"
             >
-              <ProfessionalResumePreview resume={draft} />
+              <div className="mx-auto w-fit rounded-[3px] shadow-lift ring-1 ring-black/5">
+                <ProfessionalResumePreview resume={draft} />
+              </div>
             </TabsContent>
+
 
             <TabsContent value="ai" className="mt-3 min-h-0 flex-1">
               <AiAssistant
