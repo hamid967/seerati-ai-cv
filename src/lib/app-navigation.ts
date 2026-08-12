@@ -9,6 +9,7 @@ import {
   Mic,
   Mail,
   Lock,
+  ScanSearch,
   Shield,
   ShieldCheck,
   Sparkles,
@@ -29,6 +30,7 @@ export type AppNavId =
   | "resumes"
   | "jobs"
   | "cover-letters"
+  | "keyword-scanner"
   | "interviews"
   | "templates"
   | "arabic-intelligence"
@@ -133,11 +135,20 @@ export const APP_NAV: AppNavItem[] = [
   {
     id: "cover-letters",
     label: { ar: "خطابات التقديم", en: "Cover letters" },
-    hint: { ar: "قريباً", en: "Coming soon" },
+    hint: { ar: "مسودات مربوطة بالوظائف", en: "Job-linked drafts" },
     icon: Mail,
     to: "/cover-letters",
-    enabled: false,
+    enabled: true,
     group: "main",
+  },
+  {
+    id: "keyword-scanner",
+    label: { ar: "ماسح الكلمات", en: "Keyword scanner" },
+    hint: { ar: "طابق وصف الوظيفة مع سيرتك", en: "Match the JD to your resume" },
+    icon: ScanSearch,
+    to: "/keyword-scanner",
+    enabled: true,
+    group: "tools",
   },
   {
     id: "interviews",

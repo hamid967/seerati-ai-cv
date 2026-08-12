@@ -16,10 +16,11 @@
     "test:ai-contract": "node --experimental-strip-types scripts/ai-contract-fixtures.mjs",
     "test:resume-diff": "node scripts/resume-diff-fixtures.mjs",
     "test:templates": "node scripts/template-smoke.mjs",
+    "test:rezi-additions": "node scripts/rezi-additions-smoke.mjs",
     "check:rtl": "node scripts/validate-rtl.mjs",
     "check:premium-3d": "node scripts/check-premium-3d.mjs",
     "check:client-env": "node scripts/check-client-env.mjs",
-    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run check:rtl && npm run check:premium-3d && QA_ALLOW_MISSING_DIST=1 npm run check:client-env"
+    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run test:rezi-additions && npm run check:rtl && npm run check:premium-3d && QA_ALLOW_MISSING_DIST=1 npm run check:client-env"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",

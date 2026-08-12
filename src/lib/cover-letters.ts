@@ -69,6 +69,15 @@ export async function listCoverLetters(jobId: string): Promise<CoverLetter[]> {
   return (data ?? []).map((r) => toLetter(r as Row));
 }
 
+/** All cover letters for the signed-in user (RLS-scoped). */
+export async function listAllCoverLetters(): Promise<CoverLetter[]> {
+  const { data } = await supabase
+    .from("cover_letters")
+    .select("*")
+    .order("updated_at", { ascending: false });
+  return (data ?? []).map((r) => toLetter(r as Row));
+}
+
 export async function saveCoverLetter(
   userId: string,
   input: {
