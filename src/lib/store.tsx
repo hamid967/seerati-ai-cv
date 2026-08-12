@@ -173,6 +173,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLoadingResumes(false);
   }, []);
 
+  /** Move a guest's locally stored resume into the cloud right after sign-in. */
+  const migrateGuestResumes = useCallback(async (userId: string) => {
+    const pending = readGuestResumes();
+    if (!pending.length) return;
+    clearGuestResumes();
+    setGuestResumes([]);
+    for (const item of pending) {
+      await supabase.from("resumes").insert({
+        user_id: userId,
+        title: item.title,
+        template_id: item.templateId,
+        language: item.language,
+        data: item.data as never,
+      });
+    }
+  }, []);
+
   useEffect(() => {
     let active = true;
 
@@ -185,9 +202,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return;
       }
       await loadProfile(session.user.id, session.user.email ?? "");
+      try {
+        await migrateGuestResumes(session.user.id);
+      } catch {
+        // Keep sign-in working even if the local draft cannot be uploaded.
+      }
       await loadResumes();
       if (active) setReady(true);
     };
+
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
