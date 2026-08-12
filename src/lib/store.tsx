@@ -173,22 +173,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLoadingResumes(false);
   }, []);
 
-  /** Move a guest's locally stored resume into the cloud right after sign-in. */
+  /**
+   * Move a guest's locally stored resume into the cloud once an account exists.
+   * Runs at most once per session and survives being called from several paths
+   * (sign-in, sign-up, auth-state hydration) without duplicating rows.
+   */
+  const migratingRef = useRef<Promise<void> | null>(null);
   const migrateGuestResumes = useCallback(async (userId: string) => {
+    if (migratingRef.current) return migratingRef.current;
     const pending = readGuestResumes();
     if (!pending.length) return;
-    clearGuestResumes();
-    setGuestResumes([]);
-    for (const item of pending) {
-      await supabase.from("resumes").insert({
-        user_id: userId,
-        title: item.title,
-        template_id: item.templateId,
-        language: item.language,
-        data: item.data as never,
-      });
-    }
+
+    const run = (async () => {
+      try {
+        await ensureSession();
+        for (const item of pending) {
+          const { error } = await supabase.from("resumes").insert({
+            user_id: userId,
+            title: item.title,
+            template_id: item.templateId,
+            language: item.language,
+            data: item.data as never,
+          });
+          // resume_limit_reached (or any failure) keeps the local copy intact.
+          if (error) throw new Error(error.message);
+        }
+        clearGuestResumes();
+        setGuestResumes([]);
+      } finally {
+        migratingRef.current = null;
+      }
+    })();
+
+    migratingRef.current = run;
+    return run;
   }, []);
+
 
   useEffect(() => {
     let active = true;
