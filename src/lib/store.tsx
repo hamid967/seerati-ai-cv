@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -173,22 +174,42 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLoadingResumes(false);
   }, []);
 
-  /** Move a guest's locally stored resume into the cloud right after sign-in. */
+  /**
+   * Move a guest's locally stored resume into the cloud once an account exists.
+   * Runs at most once per session and survives being called from several paths
+   * (sign-in, sign-up, auth-state hydration) without duplicating rows.
+   */
+  const migratingRef = useRef<Promise<void> | null>(null);
   const migrateGuestResumes = useCallback(async (userId: string) => {
+    if (migratingRef.current) return migratingRef.current;
     const pending = readGuestResumes();
     if (!pending.length) return;
-    clearGuestResumes();
-    setGuestResumes([]);
-    for (const item of pending) {
-      await supabase.from("resumes").insert({
-        user_id: userId,
-        title: item.title,
-        template_id: item.templateId,
-        language: item.language,
-        data: item.data as never,
-      });
-    }
+
+    const run = (async () => {
+      try {
+        await ensureSession();
+        for (const item of pending) {
+          const { error } = await supabase.from("resumes").insert({
+            user_id: userId,
+            title: item.title,
+            template_id: item.templateId,
+            language: item.language,
+            data: item.data as never,
+          });
+          // resume_limit_reached (or any failure) keeps the local copy intact.
+          if (error) throw new Error(error.message);
+        }
+        clearGuestResumes();
+        setGuestResumes([]);
+      } finally {
+        migratingRef.current = null;
+      }
+    })();
+
+    migratingRef.current = run;
+    return run;
   }, []);
+
 
   useEffect(() => {
     let active = true;
@@ -234,6 +255,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       });
       if (error || !data.user) return { error: error?.message ?? "sign_in_failed" };
       await loadProfile(data.user.id, data.user.email ?? email);
+      try {
+        await migrateGuestResumes(data.user.id);
+      } catch {
+        // Keep sign-in working even if the local draft cannot be uploaded.
+      }
       await loadResumes();
       const { data: roles } = await supabase
         .from("user_roles")
@@ -253,7 +279,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         createdAt: profile?.created_at ?? new Date().toISOString(),
       };
     },
-    [loadProfile, loadResumes],
+    [loadProfile, loadResumes, migrateGuestResumes],
   );
 
   const signUp = useCallback<Ctx["signUp"]>(
@@ -275,13 +301,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           // Session was returned by signUp; continue even if refresh is a no-op.
         }
         await loadProfile(data.session.user.id, data.session.user.email ?? email);
+        try {
+          await migrateGuestResumes(data.session.user.id);
+        } catch {
+          // The local draft stays in the browser if the upload fails.
+        }
         await loadResumes();
         return { needsConfirmation: false };
       }
       return { needsConfirmation: true };
     },
-    [loadProfile, loadResumes],
+    [loadProfile, loadResumes, migrateGuestResumes],
   );
+
 
   const value = useMemo<Ctx>(() => {
     const isGuest = !user;
