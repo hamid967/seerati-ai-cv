@@ -178,19 +178,17 @@ body {
     inset 0 1px 0 rgb(255 255 255 / 0.15),
     0 35px 80px -36px rgb(0 0 0 / 0.72),
     var(--seerati-glow-emerald);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
-  opacity: 0.72;
+  opacity: 0.5;
 }
 
 .surface-ink > .relative::before {
-  inset-inline-start: -74px;
+  inset-inline-start: -120px;
   transform: translateY(-42%) rotateY(36deg) rotateZ(-8deg) translateZ(-70px);
   animation: seerati-float-left 8s ease-in-out infinite alternate;
 }
 
 .surface-ink > .relative::after {
-  inset-inline-end: -64px;
+  inset-inline-end: -110px;
   transform: translateY(-54%) rotateY(-34deg) rotateZ(7deg) translateZ(-55px);
   animation: seerati-float-right 9s ease-in-out infinite alternate;
 }

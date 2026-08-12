@@ -453,10 +453,13 @@ function EditResume() {
                   </TabsList>
                   <TabsContent
                     value="preview"
-                    className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl bg-secondary/40 p-2"
+                    className="resume-canvas mt-2 min-h-0 flex-1 overflow-auto rounded-xl border border-border p-3"
                   >
-                    <ProfessionalResumePreview resume={draft} />
+                    <div className="mx-auto w-fit rounded-[3px] shadow-lift ring-1 ring-black/5">
+                      <ProfessionalResumePreview resume={draft} />
+                    </div>
                   </TabsContent>
+
                   <TabsContent value="ai" className="mt-2 min-h-0 flex-1">
                     <AiAssistant
                       resume={draft}
@@ -537,7 +540,7 @@ function EditResume() {
         <GuestNotice />
       </div>
 
-      <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">
+      <main className="mx-auto grid w-full max-w-[1760px] gap-6 px-4 py-6 lg:grid-cols-[176px_minmax(0,1fr)_minmax(0,1fr)] xl:gap-8">
         {/* Section navigation */}
         <nav
           aria-label={ar ? "أقسام المحرر" : "Builder sections"}
@@ -1517,7 +1520,7 @@ function EditResume() {
         </div>
 
         {/* Right column */}
-        <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[calc(100vh-10rem)]">
+        <div className="hidden lg:sticky lg:top-32 lg:block lg:h-[calc(100vh-9rem)]">
           <Tabs value={sideTab} onValueChange={setSideTab} className="flex h-full flex-col">
             <TabsList className="w-full">
               <TabsTrigger value="preview" className="flex-1">
@@ -1533,10 +1536,13 @@ function EditResume() {
 
             <TabsContent
               value="preview"
-              className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl bg-secondary/40 p-3"
+              className="resume-canvas mt-3 min-h-0 flex-1 overflow-auto rounded-2xl border border-border p-5"
             >
-              <ProfessionalResumePreview resume={draft} />
+              <div className="mx-auto w-fit rounded-[3px] shadow-lift ring-1 ring-black/5">
+                <ProfessionalResumePreview resume={draft} />
+              </div>
             </TabsContent>
+
 
             <TabsContent value="ai" className="mt-3 min-h-0 flex-1">
               <AiAssistant
