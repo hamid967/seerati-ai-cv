@@ -471,7 +471,7 @@ export function useAuthGuard(options?: { allowGuest?: boolean }) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [ready, user, navigate]);
+  }, [allowGuest, ready, user, navigate]);
   return { ready, user };
 }
 
