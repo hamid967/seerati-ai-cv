@@ -444,14 +444,20 @@ function Landing() {
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-ink-foreground/75">
               {ar
-                ? "أنشئ حساباً وابنِ ملفك المهني الموحّد خلال دقائق."
-                : "Create an account and build your unified career profile in minutes."}
+                ? "ابدأ فوراً بدون حساب، والتسجيل يبقى اختيارياً للحفظ والمزامنة."
+                : "Start instantly without an account — signing up stays optional for saving and syncing."}
             </p>
-            <Button size="lg" className="mt-6" asChild>
-              <Link to="/auth" search={{ mode: "signup" }}>
-                {ar ? "ابدأ مجاناً" : "Start for free"}
-              </Link>
-            </Button>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button size="lg" asChild>
+                <Link to="/resumes/new">{ar ? "ابدأ بدون تسجيل" : "Start without signup"}</Link>
+              </Button>
+              <Button size="lg" variant="secondary" asChild>
+                <Link to="/auth" search={{ mode: "signup" }}>
+                  {ar ? "إنشاء حساب" : "Create account"}
+                </Link>
+              </Button>
+            </div>
+
           </div>
         </section>
       </main>
