@@ -1,10 +1,12 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { useT } from "@/lib/i18n";
 
 export function SiteFooter() {
   const t = useT();
   const ar = t("brand") === "سيرتي";
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const hideAuthLinks = pathname === "/";
 
   return (
     <footer className="seerati-footer-ink">
@@ -43,9 +45,11 @@ export function SiteFooter() {
         <div>
           <p className="mb-3 text-sm font-semibold">{t("footer_company")}</p>
           <ul className="space-y-2 text-sm">
-            <li>
-              <Link to="/auth">{t("nav_login")}</Link>
-            </li>
+            {!hideAuthLinks && (
+              <li>
+                <Link to="/auth">{t("nav_login")}</Link>
+              </li>
+            )}
             <li>
               <Link to="/dashboard">{t("nav_dashboard")}</Link>
             </li>
