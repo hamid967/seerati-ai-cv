@@ -198,8 +198,12 @@ export function ResumePreview({
           {d.skills.map((s) => (
             <span
               key={s.id}
-              className="rounded-md px-2 py-0.5 text-[11.5px]"
-              style={{ background: `${design.accent}14`, color: design.accent }}
+              className="rounded-full px-2.5 py-[3px] text-[11px] font-medium tracking-[0.02em]"
+              style={{
+                background: `${design.accent}0d`,
+                border: `1px solid ${design.accent}26`,
+                color: design.accent,
+              }}
             >
               {s.name}
             </span>
