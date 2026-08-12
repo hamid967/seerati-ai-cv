@@ -166,6 +166,67 @@ function AdminTemplates() {
     toast.success(ar ? "تم نسخ القالب" : "Template duplicated");
   };
 
+  const captureRef = useRef<HTMLDivElement | null>(null);
+  const [captureTarget, setCaptureTarget] = useState<TemplateDef | null>(null);
+  const [thumbBusy, setThumbBusy] = useState<string | null>(null);
+  const [thumbProgress, setThumbProgress] = useState<{ done: number; total: number } | null>(null);
+
+  /** Renders one template offscreen at full width, captures it, and stores it. */
+  const generateThumbnail = async (tpl: TemplateDef) => {
+    setThumbBusy(tpl.id);
+    setCaptureTarget(tpl);
+    try {
+      await waitForPaint();
+      const el = captureRef.current?.firstElementChild as HTMLElement | null;
+      if (!el) throw new Error("no-node");
+      const dataUrl = await captureTemplateThumbnail(el);
+      const res = await saveTemplateThumbnail(tpl.id, dataUrl);
+      if (res.error) throw new Error(res.error);
+      setTemplates((list) =>
+        list.map((t) => (t.id === tpl.id ? { ...t, thumbnailUrl: dataUrl } : t)),
+      );
+      await logAudit("template.thumbnail", tpl.id);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setCaptureTarget(null);
+      setThumbBusy(null);
+    }
+  };
+
+  const handleGenerateOne = async () => {
+    const ok = await generateThumbnail(selected);
+    if (ok) toast.success(ar ? "تم توليد الصورة المصغّرة" : "Thumbnail generated");
+    else toast.error(ar ? "تعذّر توليد الصورة" : "Could not generate the thumbnail");
+    await refresh();
+  };
+
+  const handleGenerateAll = async () => {
+    let done = 0;
+    let failed = 0;
+    setThumbProgress({ done: 0, total: templates.length });
+    for (const tpl of templates) {
+      const ok = await generateThumbnail(tpl);
+      if (!ok) failed += 1;
+      done += 1;
+      setThumbProgress({ done, total: templates.length });
+    }
+    setThumbProgress(null);
+    await refresh();
+    if (failed === 0) {
+      toast.success(
+        ar ? `تم توليد ${done} صورة مصغّرة` : `Generated ${done} thumbnails`,
+      );
+    } else {
+      toast.warning(
+        ar ? `تم التوليد مع فشل ${failed} قالب` : `Generated with ${failed} failure(s)`,
+      );
+    }
+  };
+
+
+
   const handleDelete = async () => {
     setConfirmDelete(false);
     const res = await deleteOrDeactivateTemplate(selected.id);
