@@ -54,6 +54,9 @@ type Ctx = {
   getResume: (id: string) => Resume | undefined;
   atLimit: boolean;
   maxResumes: number;
+  /** True when the visitor has no account and is working on a local resume. */
+  isGuest: boolean;
+
 };
 
 const StoreContext = createContext<Ctx | null>(null);
