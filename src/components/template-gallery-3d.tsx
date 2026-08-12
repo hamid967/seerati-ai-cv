@@ -260,7 +260,7 @@ export function TemplateGallery3D() {
       )}
 
       <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelectedId(null)}>
-        <DialogContent className="seerati-cinematic-dialog max-w-6xl overflow-hidden p-0">
+        <DialogContent className="seerati-cinematic-dialog max-h-[92dvh] w-[min(96vw,72rem)] max-w-[96vw] overflow-y-auto overflow-x-hidden p-0 [&>button]:z-20 [&>button]:rounded-full [&>button]:bg-background/90 [&>button]:p-2 [&>button]:opacity-100 [&>button]:shadow-lift">
           {selected && (
             <div className="grid min-h-[70vh] lg:grid-cols-[1.2fr_0.8fr]">
               <div className="seerati-cinematic-preview">

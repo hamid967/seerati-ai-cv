@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ResumePreview, getTemplate } from "@/components/resume-preview";
+import { ResumeThumb, getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import type { Resume, TemplateDef } from "@/lib/types";
