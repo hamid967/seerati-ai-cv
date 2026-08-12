@@ -61,7 +61,6 @@ function NewResume() {
                 : "You reached the 3-resume limit. Delete one to continue."}
           </p>
         ) : (
-
           <>
             <div className="mt-8 space-y-5">
               <div className="space-y-1.5">

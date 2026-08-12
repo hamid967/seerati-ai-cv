@@ -463,7 +463,6 @@ function AuthPage() {
             <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground lg:hidden">
               {t("auth_secure_note")}
             </p>
-
           </div>
         </main>
       </section>
