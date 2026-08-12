@@ -245,6 +245,19 @@ function Landing() {
                 ? "التسجيل اختياري · ابدأ الآن وحمّل PDF بدون حساب · سجّل لاحقاً للحفظ حتى ٣ سير"
                 : "Signup is optional · start now and download a PDF · register later to save up to 3 resumes"}
             </p>
+            <div className="mx-auto mt-12 max-w-3xl">
+              <img
+                src={heroResume}
+                alt={
+                  ar
+                    ? "نموذج سيرة ذاتية عربية من سيرتي بتصميم عمودين"
+                    : "Arabic resume mockup built with Seerati"
+                }
+                width={1440}
+                height={1024}
+                className="mx-auto w-full rounded-2xl border border-white/10 shadow-2xl"
+              />
+            </div>
           </div>
           <LandingCareerVisual ar={ar} />
         </section>
