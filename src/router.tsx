@@ -1,4 +1,5 @@
 import "./premium-theme.css";
+import "./marketing-theme.css";
 import "./accessibility-performance.css";
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";

@@ -1,71 +1,71 @@
 import { Link } from "@tanstack/react-router";
+import { FileText } from "lucide-react";
 import { useT } from "@/lib/i18n";
 
 export function SiteFooter() {
   const t = useT();
+  const ar = t("brand") === "سيرتي";
+
   return (
-    <footer className="border-t border-border bg-secondary/40">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-4">
+    <footer className="seerati-footer-ink">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-4">
         <div>
-          <p className="text-lg font-extrabold">{t("brand")} | Seerati</p>
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span className="seerati-logo-cube grid size-9 place-items-center rounded-xl bg-emerald-accent text-ink-foreground">
+              <FileText className="size-5" />
+            </span>
+            <p className="text-lg font-extrabold">
+              {t("brand")}
+              <span className="ms-1 text-xs font-medium opacity-70">Seerati</span>
+            </p>
+          </div>
+          <p className="seerati-footer-muted mt-3 max-w-xs text-sm leading-relaxed">
             {t("tagline")}
           </p>
         </div>
         <div>
           <p className="mb-3 text-sm font-semibold">{t("footer_product")}</p>
-          <ul className="space-y-2 text-sm text-muted-foreground">
+          <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/templates" className="hover:text-foreground">
-                {t("nav_templates")}
-              </Link>
+              <Link to="/templates">{t("nav_templates")}</Link>
             </li>
             <li>
-              <Link to="/features" className="hover:text-foreground">
-                {t("nav_features")}
-              </Link>
+              <Link to="/features">{t("nav_features")}</Link>
             </li>
             <li>
-              <Link to="/ats" className="hover:text-foreground">
-                {t("nav_ats")}
-              </Link>
+              <Link to="/team">{t("nav_team")}</Link>
+            </li>
+            <li>
+              <Link to="/ats">{t("nav_ats")}</Link>
             </li>
           </ul>
         </div>
         <div>
           <p className="mb-3 text-sm font-semibold">{t("footer_company")}</p>
-          <ul className="space-y-2 text-sm text-muted-foreground">
+          <ul className="space-y-2 text-sm">
             <li>
-              <Link to="/auth" className="hover:text-foreground">
-                {t("nav_login")}
-              </Link>
+              <Link to="/auth">{t("nav_login")}</Link>
             </li>
             <li>
-              <Link to="/dashboard" className="hover:text-foreground">
-                {t("nav_dashboard")}
-              </Link>
+              <Link to="/dashboard">{t("nav_dashboard")}</Link>
             </li>
             <li>
-              <Link to="/privacy" className="hover:text-foreground">
-                {t("brand") === "سيرتي" ? "سياسة الخصوصية" : "Privacy policy"}
-              </Link>
+              <Link to="/privacy">{ar ? "سياسة الخصوصية" : "Privacy policy"}</Link>
             </li>
             <li>
-              <Link to="/terms" className="hover:text-foreground">
-                {t("brand") === "سيرتي" ? "شروط الاستخدام" : "Terms of use"}
-              </Link>
+              <Link to="/terms">{ar ? "شروط الاستخدام" : "Terms of use"}</Link>
             </li>
           </ul>
         </div>
-        <div className="text-sm text-muted-foreground">
-          <p className="mb-3 font-semibold text-foreground">
-            {t("brand") === "سيرتي" ? "تواصل" : "Contact"}
+        <div className="text-sm">
+          <p className="mb-3 font-semibold">{ar ? "تواصل" : "Contact"}</p>
+          <p className="seerati-footer-muted">hello@seerati.sa</p>
+          <p className="seerati-footer-muted mt-1">
+            {ar ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}
           </p>
-          <p>hello@seerati.sa</p>
-          <p className="mt-1">الرياض، المملكة العربية السعودية</p>
         </div>
       </div>
-      <div className="border-t border-border/70 py-5 text-center text-xs text-muted-foreground">
+      <div className="seerati-footer-rule border-t py-5 text-center text-xs opacity-60">
         © {new Date().getFullYear()} Seerati — {t("footer_rights")}
       </div>
     </footer>

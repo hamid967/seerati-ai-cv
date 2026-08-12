@@ -190,10 +190,10 @@ export const APP_NAV: AppNavItem[] = [
   {
     id: "team",
     label: { ar: "فريقي المهني", en: "My career team" },
-    hint: { ar: "قريباً", en: "Coming soon" },
+    hint: { ar: "ثمانية مختصين يعملون معك", en: "Eight specialists working with you" },
     icon: Sparkles,
     to: "/team",
-    enabled: false,
+    enabled: true,
     group: "tools",
   },
   {
