@@ -284,14 +284,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<Ctx>(() => {
-    const atLimit = resumes.length >= maxResumes;
+    const isGuest = !user;
+    const list = isGuest ? guestResumes : resumes;
+    const effectiveMax = isGuest ? GUEST_RESUME_LIMIT : maxResumes;
+    const atLimit = list.length >= effectiveMax;
     return {
       ready,
       user,
-      resumes,
+      resumes: list,
       loadingResumes,
       atLimit,
-      maxResumes,
+      maxResumes: effectiveMax,
+      isGuest,
+
       signIn,
       signUp,
       resetPassword: async (email) => {
