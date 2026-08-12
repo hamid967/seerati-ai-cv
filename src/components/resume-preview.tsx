@@ -83,17 +83,11 @@ function SectionTitle({ children, design }: { children: React.ReactNode; design:
         style={base}
       >
         {children}
-        <span
-          className="block h-[1px] flex-1"
-          style={{ background: `${design.accent}2e` }}
-        />
+        <span className="block h-[1px] flex-1" style={{ background: `${design.accent}2e` }} />
       </h3>
     );
   return (
-    <h3
-      className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em]"
-      style={base}
-    >
+    <h3 className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em]" style={base}>
       {children}
     </h3>
   );
@@ -402,10 +396,7 @@ export function ResumePreview({
             </div>
           </div>
           <div className="h-[2px] w-full" style={{ background: design.accent }} />
-          <div
-            className="mt-[2px] h-[1px] w-full"
-            style={{ background: `${design.accent}33` }}
-          />
+          <div className="mt-[2px] h-[1px] w-full" style={{ background: `${design.accent}33` }} />
         </header>
       );
     return (

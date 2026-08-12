@@ -120,15 +120,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const guestRef = useRef<Resume[]>([]);
   const resumesRef = useRef<Resume[]>([]);
 
-  const persistGuest = useCallback(
-    (update: Resume[] | ((prev: Resume[]) => Resume[])) => {
-      const next = typeof update === "function" ? update(guestRef.current) : update;
-      guestRef.current = next;
-      setGuestResumes(next);
-      writeGuestResumes(next);
-    },
-    [],
-  );
+  const persistGuest = useCallback((update: Resume[] | ((prev: Resume[]) => Resume[])) => {
+    const next = typeof update === "function" ? update(guestRef.current) : update;
+    guestRef.current = next;
+    setGuestResumes(next);
+    writeGuestResumes(next);
+  }, []);
 
   const setResumesState = useCallback((update: Resume[] | ((prev: Resume[]) => Resume[])) => {
     const next = typeof update === "function" ? update(resumesRef.current) : update;

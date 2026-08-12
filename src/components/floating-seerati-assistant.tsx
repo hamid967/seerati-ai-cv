@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Loader2, MessageCircle, Send, Sparkles, Wand2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -299,21 +300,29 @@ export function FloatingSeeratiAssistant() {
 
   if (hidden) return null;
 
-  return (
+  const ui = (
     <div
-      className="seerati-float-assistant pointer-events-none fixed end-4 z-50 flex flex-col items-end gap-3"
-      style={{ bottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
+      className="seerati-float-assistant pointer-events-none fixed z-[1100] flex flex-col items-stretch gap-3"
+      style={{
+        bottom: "max(1rem, env(safe-area-inset-bottom, 0px))",
+        insetInlineEnd: "max(1rem, env(safe-area-inset-inline-end, 0px))",
+        insetInlineStart: "auto",
+        width: "min(28rem, calc(100vw - 2rem))",
+        maxWidth: "calc(100vw - 2rem)",
+      }}
     >
       {open && (
         <div
           className={cn(
-            "pointer-events-auto flex w-[min(100vw-1.5rem,24rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lift",
-            "h-[min(70vh,34rem)]",
+            "pointer-events-auto flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lift",
+            "h-[min(34rem,calc(100dvh-6.5rem))] max-h-[calc(100dvh-6.5rem)]",
+            "max-md:h-[min(78dvh,calc(100dvh-5.5rem))]",
           )}
           role="dialog"
+          aria-modal="true"
           aria-label={ar ? "مساعد سيرتي" : "Seerati Assistant"}
         >
-          <header className="flex items-center gap-2 border-b border-border bg-primary px-3 py-2.5 text-primary-foreground">
+          <header className="flex shrink-0 items-center gap-2 border-b border-border bg-primary px-3 py-2.5 text-primary-foreground">
             <span className="grid size-8 place-items-center rounded-xl bg-primary-foreground/15">
               <Wand2 className="size-4" />
             </span>
@@ -329,7 +338,7 @@ export function FloatingSeeratiAssistant() {
               type="button"
               size="icon"
               variant="ghost"
-              className="size-8 text-primary-foreground hover:bg-primary-foreground/15"
+              className="size-10 shrink-0 text-primary-foreground hover:bg-primary-foreground/15 md:size-8"
               onClick={() => setOpen(false)}
               aria-label={ar ? "إغلاق" : "Close"}
             >
@@ -337,7 +346,7 @@ export function FloatingSeeratiAssistant() {
             </Button>
           </header>
 
-          <ScrollArea className="flex-1 px-3 py-3">
+          <ScrollArea className="min-h-0 flex-1 px-3 py-3">
             <div className="space-y-3">
               {messages.map((m) => (
                 <div
@@ -358,7 +367,7 @@ export function FloatingSeeratiAssistant() {
                   <p className="px-1 text-xs font-semibold text-muted-foreground">
                     {ar ? "اختر قالباً" : "Choose a template"}
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-2">
                     {templates.map((tpl) => (
                       <button
                         key={tpl.id}
@@ -366,7 +375,7 @@ export function FloatingSeeratiAssistant() {
                         disabled={busy}
                         onClick={() => void createWithTemplate(tpl.id)}
                         className={cn(
-                          "rounded-xl border p-2.5 text-start transition-colors",
+                          "min-h-11 rounded-xl border p-2.5 text-start transition-colors",
                           templateId === tpl.id
                             ? "border-primary bg-secondary"
                             : "border-border hover:bg-secondary/70",
@@ -400,7 +409,7 @@ export function FloatingSeeratiAssistant() {
             </div>
           </ScrollArea>
 
-          <footer className="border-t border-border p-2.5">
+          <footer className="shrink-0 border-t border-border p-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
             {phase !== "pick_template" && phase !== "drafting" && phase !== "creating" ? (
               <form
                 className="flex items-end gap-2"
@@ -415,7 +424,7 @@ export function FloatingSeeratiAssistant() {
                   rows={2}
                   disabled={busy}
                   placeholder={ar ? "اكتب ردك…" : "Type your reply…"}
-                  className="min-h-[2.75rem] resize-none text-sm"
+                  className="min-h-11 resize-none text-sm"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -426,6 +435,7 @@ export function FloatingSeeratiAssistant() {
                 <Button
                   type="submit"
                   size="icon"
+                  className="size-11 shrink-0"
                   disabled={busy || !input.trim()}
                   aria-label={ar ? "إرسال" : "Send"}
                 >
@@ -433,7 +443,7 @@ export function FloatingSeeratiAssistant() {
                 </Button>
               </form>
             ) : (
-              <div className="flex items-center justify-between gap-2 px-1">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                 <Button type="button" variant="ghost" size="sm" onClick={resetChat} disabled={busy}>
                   {ar ? "ابدأ من جديد" : "Start over"}
                 </Button>
@@ -453,18 +463,22 @@ export function FloatingSeeratiAssistant() {
         type="button"
         size="lg"
         className={cn(
-          "pointer-events-auto h-14 gap-2 rounded-2xl px-4 shadow-lift",
+          "pointer-events-auto ms-auto h-14 min-w-14 gap-2 rounded-2xl px-4 shadow-lift",
           "bg-emerald-accent text-ink-foreground hover:bg-emerald-accent/90",
+          "touch-manipulation",
         )}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={ar ? "فتح مساعد سيرتي" : "Open Seerati Assistant"}
       >
         {open ? <X className="size-5" /> : <MessageCircle className="size-5" />}
-        <span className="hidden font-bold sm:inline">
+        <span className="font-bold max-[380px]:hidden sm:inline">
           {ar ? "مساعد سيرتي" : "Seerati Assistant"}
         </span>
       </Button>
     </div>
   );
+
+  if (typeof document === "undefined") return ui;
+  return createPortal(ui, document.body);
 }
