@@ -452,11 +452,11 @@ function AuthPage() {
             <div className="mt-6 rounded-xl border border-border bg-secondary/50 p-4 text-center">
               <p className="text-xs leading-relaxed text-muted-foreground">
                 {ar
-                  ? "التسجيل اختياري في سيرتي — يمكنك بناء سيرتك وتحميلها PDF بدون حساب."
-                  : "Signing up is optional — you can build and download your CV as a PDF without an account."}
+                  ? "اختر قالباً وابنِ مسودة سيرتك أولاً، ثم أنشئ حساباً لحفظها ومزامنتها."
+                  : "Pick a template and build a draft first, then create an account to save and sync it."}
               </p>
               <Button variant="outline" size="sm" className="mt-3" asChild>
-                <Link to="/resumes/new">{ar ? "المتابعة كزائر" : "Continue as guest"}</Link>
+                <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
               </Button>
             </div>
 

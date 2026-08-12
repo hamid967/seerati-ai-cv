@@ -272,6 +272,15 @@ function AssistantPage() {
       toast.success(
         ar ? "أُنشئت سيرتك وتم ملء الأقسام تلقائياً" : "Resume created with sections pre-filled",
       );
+      if (isGuest) {
+        toast.message(
+          ar
+            ? "سجّل حساباً لحفظ سيرتك والمتابعة في المحرر"
+            : "Sign up to save your resume and continue in the editor",
+        );
+        navigate({ to: "/auth", search: { mode: "signup" } });
+        return;
+      }
       navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
     } catch {
       toast.error(ar ? "تعذّر إنشاء السيرة الذاتية." : "Could not create the resume.");

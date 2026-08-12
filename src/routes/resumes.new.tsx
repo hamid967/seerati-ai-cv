@@ -140,10 +140,25 @@ function NewResume() {
                   toast.error(ar ? "تعذّر الإنشاء" : "Could not create");
                   return;
                 }
+                if (isGuest) {
+                  toast.success(
+                    ar
+                      ? "تم إنشاء السيرة — سجّل حساباً لحفظها والمتابعة"
+                      : "Resume created — sign up to save it and continue",
+                  );
+                  navigate({ to: "/auth", search: { mode: "signup" } });
+                  return;
+                }
                 navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
               }}
             >
-              {ar ? "إنشاء والانتقال للمحرر" : "Create and open editor"}
+              {isGuest
+                ? ar
+                  ? "إنشاء ثم التسجيل"
+                  : "Create then sign up"
+                : ar
+                  ? "إنشاء والانتقال للمحرر"
+                  : "Create and open editor"}
             </Button>
           </>
         )}

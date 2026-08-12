@@ -268,8 +268,8 @@ function Landing() {
               </div>
               <p className="mt-5 text-xs text-ink-foreground/60">
                 {ar
-                  ? "التسجيل اختياري · ابدأ الآن وحمّل PDF بدون حساب"
-                  : "Signup optional · start now and download a PDF without an account"}
+                  ? "اختر قالباً وابنِ سيرتك — ثم أنشئ حساباً لحفظها ومزامنتها"
+                  : "Pick a template and build your resume — then create an account to save and sync"}
               </p>
             </div>
 
@@ -539,8 +539,8 @@ function Landing() {
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-ink-foreground/75">
               {ar
-                ? "ابدأ فوراً بدون حساب، والتسجيل يبقى اختيارياً للحفظ والمزامنة."
-                : "Start instantly without an account — signing up stays optional for saving and syncing."}
+                ? "اختر قالباً وابدأ بناء سيرتك، ثم سجّل لحفظها والمتابعة."
+                : "Pick a template, start building your resume, then sign up to save and continue."}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Button
@@ -548,12 +548,12 @@ function Landing() {
                 className="bg-emerald-accent text-ink-foreground hover:bg-emerald-accent/90"
                 asChild
               >
-                <Link to="/resumes/new">{ar ? "ابدأ بدون تسجيل" : "Start without signup"}</Link>
+                <Link to="/templates">
+                  {ar ? "ابدأ باختيار قالب" : "Start by choosing a template"}
+                </Link>
               </Button>
               <Button size="lg" variant="secondary" asChild>
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  {ar ? "إنشاء حساب" : "Create account"}
-                </Link>
+                <Link to="/resumes/new">{ar ? "سيرة جديدة" : "New resume"}</Link>
               </Button>
             </div>
           </div>
