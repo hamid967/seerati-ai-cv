@@ -1,0 +1,23 @@
+name: Stage 11 Format Guard
+on:
+  push:
+    branches:
+      - stage11/flowcv-editor-controls
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage11/flowcv-editor-controls
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bunx prettier --write scripts/check-flowcv-editor-controls.mjs
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/check-flowcv-editor-controls.mjs
+          git commit -m "style: format Stage 11 guard"
+          git push origin HEAD:stage11/flowcv-editor-controls
