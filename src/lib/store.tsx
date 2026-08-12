@@ -255,6 +255,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       });
       if (error || !data.user) return { error: error?.message ?? "sign_in_failed" };
       await loadProfile(data.user.id, data.user.email ?? email);
+      try {
+        await migrateGuestResumes(data.user.id);
+      } catch {
+        // Keep sign-in working even if the local draft cannot be uploaded.
+      }
       await loadResumes();
       const { data: roles } = await supabase
         .from("user_roles")
