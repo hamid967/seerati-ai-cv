@@ -15,6 +15,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { StoreProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/app/app-shell";
+import { FloatingSeeratiAssistant } from "@/components/floating-seerati-assistant";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getPublicRuntimeConfig } from "@/lib/public-runtime-config.functions";
 import { setSupabaseRuntimeConfig } from "@/integrations/supabase/client";
@@ -186,6 +187,7 @@ function RootComponent() {
         <StoreProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <AppFrame />
+          <FloatingSeeratiAssistant />
           <Toaster position="top-center" richColors />
         </StoreProvider>
       </I18nProvider>

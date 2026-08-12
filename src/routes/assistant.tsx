@@ -13,9 +13,14 @@ import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { aiService, AiUserError } from "@/lib/ai-service";
-import { analyzeResume, completeness } from "@/lib/ats";
+import {
+  buildAssistantData,
+  createFilledAssistantResume,
+  emptyAssistantAnswers,
+  type AssistantAnswers,
+} from "@/lib/assistant-create";
 import { defaultTemplates } from "@/lib/templates";
-import { emptyResumeData, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
+import type { Resume } from "@/lib/types";
 
 export const Route = createFileRoute("/assistant")({
   head: () => ({
@@ -38,101 +43,8 @@ export const Route = createFileRoute("/assistant")({
   component: AssistantPage,
 });
 
-type Answers = {
-  fullName: string;
-  jobTitle: string;
-  email: string;
-  phone: string;
-  city: string;
-  years: string;
-  industry: string;
-  role: string;
-  company: string;
-  period: string;
-  story: string;
-  skills: string;
-  degree: string;
-  school: string;
-};
-
-const emptyAnswers: Answers = {
-  fullName: "",
-  jobTitle: "",
-  email: "",
-  phone: "",
-  city: "",
-  years: "",
-  industry: "",
-  role: "",
-  company: "",
-  period: "",
-  story: "",
-  skills: "",
-  degree: "",
-  school: "",
-};
-
-const uid = () => Math.random().toString(36).slice(2, 10);
-
-function buildData(
-  a: Answers,
-  lang: "ar" | "en",
-  summary: string,
-  bullets: string[],
-  skills: string[],
-): ResumeData {
-  const base = emptyResumeData();
-  const [start = "", end = ""] = a.period.split(/[-–—]/).map((s) => s.trim());
-  return {
-    ...base,
-    personal: {
-      ...base.personal,
-      fullName: a.fullName,
-      jobTitle: a.jobTitle,
-      email: a.email,
-      phone: a.phone,
-      city: a.city,
-      country: lang === "ar" ? "السعودية" : "Saudi Arabia",
-    },
-    summary,
-    targetJob: a.jobTitle,
-    experience: a.role
-      ? [
-          {
-            id: uid(),
-            role: a.role,
-            company: a.company,
-            start,
-            end,
-            bullets: bullets.length ? bullets : a.story ? [a.story] : [],
-          },
-        ]
-      : [],
-    education: a.degree ? [{ id: uid(), degree: a.degree, school: a.school }] : [],
-    skills: skills.map((name) => ({ id: uid(), name })),
-  };
-}
-
-/** Hide sections the assistant had no answers for so the editor opens clean. */
-function fillSections(data: ResumeData): ResumeData {
-  const filled: Record<string, boolean> = {
-    summary: data.summary.trim().length > 0,
-    experience: data.experience.length > 0,
-    education: data.education.length > 0,
-    skills: data.skills.length > 0,
-  };
-  const optional: SectionKey[] = [
-    "languages",
-    "certificates",
-    "projects",
-    "achievements",
-    "volunteering",
-    "links",
-    "references",
-  ];
-  const hidden = [...(Object.keys(filled) as SectionKey[]).filter((k) => !filled[k]), ...optional];
-  return { ...data, hiddenSections: hidden };
-}
+type Answers = AssistantAnswers;
+const emptyAnswers = emptyAssistantAnswers();
 
 function AssistantPage() {
   const { lang } = useI18n();
@@ -154,7 +66,7 @@ function AssistantPage() {
   const set = (patch: Partial<Answers>) => setAnswers((a) => ({ ...a, ...patch }));
 
   const previewData = useMemo(
-    () => buildData(answers, resumeLang, summary, bullets, skills),
+    () => buildAssistantData(answers, resumeLang, summary, bullets, skills),
     [answers, resumeLang, summary, bullets, skills],
   );
 
@@ -248,27 +160,18 @@ function AssistantPage() {
     }
     setSaving(true);
     try {
-      const created = await createResume({
-        title: answers.jobTitle || (ar ? "سيرتي الذاتية" : "My resume"),
-        templateId,
-        language: resumeLang,
-        jobTitle: answers.jobTitle,
-      });
-      if (!created) throw new Error("create failed");
-
-      // Hand the assistant's answers straight to the editor: every section the
-      // assistant filled is written into the resume, empty ones are hidden so
-      // the editor opens on a complete-looking draft.
-      const data = fillSections(previewData);
-      const filled: Resume = { ...created, templateId, data, language: resumeLang };
-      const template = getTemplate(templateId);
-      await updateResume(created.id, {
-        data,
-        templateId,
-        language: resumeLang,
-        completionScore: completeness(filled),
-        atsScore: analyzeResume(filled, template).score,
-      });
+      const created = await createFilledAssistantResume(
+        { createResume, updateResume },
+        {
+          answers,
+          templateId,
+          language: resumeLang,
+          summary,
+          bullets,
+          skills,
+          titleFallback: ar ? "سيرتي الذاتية" : "My resume",
+        },
+      );
       toast.success(
         ar ? "أُنشئت سيرتك وتم ملء الأقسام تلقائياً" : "Resume created with sections pre-filled",
       );
