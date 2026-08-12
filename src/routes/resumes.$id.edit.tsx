@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getTemplate } from "@/components/resume-preview";
+import { TemplateSwitcher } from "@/components/template-switcher";
 import { ProfessionalResumePreview } from "@/components/professional-resume-preview";
 import {
   ResumeEditorLayoutControls,
