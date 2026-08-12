@@ -13,8 +13,9 @@ import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { aiService, AiUserError } from "@/lib/ai-service";
+import { analyzeResume, completeness } from "@/lib/ats";
 import { defaultTemplates } from "@/lib/templates";
-import { emptyResumeData, type Resume, type ResumeData } from "@/lib/types";
+import { emptyResumeData, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
 
 export const Route = createFileRoute("/assistant")({
   head: () => ({
@@ -106,6 +107,30 @@ function buildData(a: Answers, lang: "ar" | "en", summary: string, bullets: stri
       : [],
     skills: skills.map((name) => ({ id: uid(), name })),
   };
+}
+
+/** Hide sections the assistant had no answers for so the editor opens clean. */
+function fillSections(data: ResumeData): ResumeData {
+  const filled: Record<string, boolean> = {
+    summary: data.summary.trim().length > 0,
+    experience: data.experience.length > 0,
+    education: data.education.length > 0,
+    skills: data.skills.length > 0,
+  };
+  const optional: SectionKey[] = [
+    "languages",
+    "certificates",
+    "projects",
+    "achievements",
+    "volunteering",
+    "links",
+    "references",
+  ];
+  const hidden = [
+    ...(Object.keys(filled) as SectionKey[]).filter((k) => !filled[k]),
+    ...optional,
+  ];
+  return { ...data, hiddenSections: hidden };
 }
 
 function AssistantPage() {
