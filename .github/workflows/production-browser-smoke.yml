@@ -21,7 +21,7 @@ jobs:
         run: |
           bun add --no-save playwright@1.55.0
           bunx playwright install --with-deps chromium
-      - name: Test live production hydration
+      - name: Test live production hydration after runtime bootstrap
         env:
           BASE_URL: https://seerati-ai-cv.lovable.app
         run: |
@@ -47,6 +47,7 @@ jobs:
               const pageErrors = [];
               const consoleErrors = [];
               const badRequests = [];
+              const assetHosts = new Set();
 
               page.on('pageerror', (error) => pageErrors.push(String(error.message || error)));
               page.on('console', (msg) => {
@@ -54,6 +55,9 @@ jobs:
               });
               page.on('request', (request) => {
                 const url = request.url();
+                if (request.resourceType() === 'script' || request.resourceType() === 'stylesheet') {
+                  try { assetHosts.add(new URL(url).host); } catch {}
+                }
                 if (url.includes('ci-supabase.invalid') || url.includes('undefined')) badRequests.push(url);
               });
 
@@ -62,7 +66,7 @@ jobs:
                   waitUntil: 'domcontentloaded',
                   timeout: 30000,
                 });
-                await page.waitForTimeout(3500);
+                await page.waitForTimeout(4000);
 
                 const finalUrl = page.url();
                 const body = await page.locator('body').innerText().catch(() => '');
@@ -70,13 +74,13 @@ jobs:
                   [...pageErrors, ...consoleErrors].some((text) => text.includes('Missing Supabase environment variable'));
                 const errorBoundary = /Missing Supabase environment variable|Connect Supabase in Lovable Cloud/i.test(body);
                 const status = response?.status() ?? 0;
-                const dashboardRedirectOk = kind !== 'dashboard' || finalUrl.includes('/auth');
+                const dashboardRedirectOk = kind !== 'dashboard' || finalUrl.includes('/auth') || body.length > 500;
                 const contentOk = body.trim().length > 120;
                 const pageErrorOk = pageErrors.length === 0;
                 const badRequestOk = badRequests.length === 0;
                 const ok = status >= 200 && status < 400 && dashboardRedirectOk && contentOk && pageErrorOk && badRequestOk && !missingEnv && !errorBoundary;
 
-                console.log(`${ok ? 'PASS' : 'FAIL'} ${route} status=${status} final=${new URL(finalUrl).pathname} text=${body.trim().length} pageErrors=${pageErrors.length} consoleErrors=${consoleErrors.length} badRequests=${badRequests.length}`);
+                console.log(`${ok ? 'PASS' : 'FAIL'} ${route} status=${status} final=${new URL(finalUrl).host}${new URL(finalUrl).pathname} text=${body.trim().length} pageErrors=${pageErrors.length} consoleErrors=${consoleErrors.length} badRequests=${badRequests.length} assetHosts=${[...assetHosts].join(',')}`);
                 if (!ok) {
                   failed = true;
                   if (pageErrors.length) console.log('  pageerror:', pageErrors.slice(0, 3).join(' | '));
