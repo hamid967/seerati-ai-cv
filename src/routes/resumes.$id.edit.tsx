@@ -453,10 +453,13 @@ function EditResume() {
                   </TabsList>
                   <TabsContent
                     value="preview"
-                    className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl bg-secondary/40 p-2"
+                    className="resume-canvas mt-2 min-h-0 flex-1 overflow-auto rounded-xl border border-border p-3"
                   >
-                    <ProfessionalResumePreview resume={draft} />
+                    <div className="mx-auto w-fit rounded-[3px] shadow-lift ring-1 ring-black/5">
+                      <ProfessionalResumePreview resume={draft} />
+                    </div>
                   </TabsContent>
+
                   <TabsContent value="ai" className="mt-2 min-h-0 flex-1">
                     <AiAssistant
                       resume={draft}
