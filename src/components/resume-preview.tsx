@@ -35,33 +35,53 @@ function SectionTitle({ children, design }: { children: React.ReactNode; design:
   if (design.sectionStyle === "line")
     return (
       <h3
-        style={{ ...base, borderBottom: `1.5px solid ${design.accent}`, paddingBottom: 3 }}
-        className="mb-2 text-[12.5px] font-bold uppercase tracking-[0.08em]"
+        style={{ ...base, paddingBottom: 4 }}
+        className="relative mb-2.5 text-[12px] font-semibold uppercase tracking-[0.16em]"
       >
         {children}
+        <span
+          className="absolute inset-x-0 bottom-0 block h-[1px]"
+          style={{
+            background: `linear-gradient(to right, ${design.accent}, ${design.accent}22)`,
+          }}
+        />
       </h3>
     );
   if (design.sectionStyle === "bar")
     return (
-      <h3 className="mb-2 flex items-center gap-2 text-[13px] font-bold" style={base}>
+      <h3
+        className="mb-2.5 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em]"
+        style={base}
+      >
         <span
           style={{ background: design.accent }}
-          className="inline-block h-3.5 w-1.5 rounded-full"
+          className="inline-block h-[11px] w-[3px] rounded-full"
         />
         {children}
+        <span
+          className="ms-1 block h-[1px] flex-1"
+          style={{ background: `linear-gradient(to right, ${design.accent}33, transparent)` }}
+        />
       </h3>
     );
   if (design.sectionStyle === "caps")
     return (
       <h3
-        className="mb-2 text-[12px] font-bold uppercase tracking-[0.22em]"
-        style={{ ...base, fontVariant: "small-caps" }}
+        className="mb-2.5 flex items-center gap-2.5 text-[11.5px] font-semibold uppercase tracking-[0.3em]"
+        style={base}
       >
         {children}
+        <span
+          className="block h-[1px] flex-1"
+          style={{ background: `${design.accent}2e` }}
+        />
       </h3>
     );
   return (
-    <h3 className="mb-1.5 text-[12.5px] font-bold tracking-wide" style={base}>
+    <h3
+      className="mb-2 text-[12px] font-semibold uppercase tracking-[0.2em]"
+      style={base}
+    >
       {children}
     </h3>
   );
