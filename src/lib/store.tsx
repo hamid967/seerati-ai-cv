@@ -327,23 +327,28 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (error) throw new Error(error.message);
       },
       createResume: async ({ title, templateId, language, seed, jobTitle }) => {
-        if (!user || atLimit) return null;
-        await ensureSession();
+        if (atLimit) return null;
         const base = seed
           ? demoResumeData()
           : {
               ...emptyResumeData(),
               personal: {
                 ...emptyResumeData().personal,
-                fullName: user.fullName,
-                email: user.email,
+                fullName: user?.fullName ?? "",
+                email: user?.email ?? "",
                 jobTitle: jobTitle ?? "",
               },
             };
+        if (isGuest) {
+          const resume = makeGuestResume({ title, templateId, language, data: base });
+          persistGuest([resume, ...guestResumes]);
+          return resume;
+        }
+        await ensureSession();
         const { data, error } = await supabase
           .from("resumes")
           .insert({
-            user_id: user.id,
+            user_id: user!.id,
             title,
             template_id: templateId,
             language,
@@ -353,13 +358,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .single();
         if (error || !data) return null;
         const resume = toResume(data as ResumeRow);
-        setResumes((list) => [resume, ...list]);
+        setResumes((rows) => [resume, ...rows]);
         return resume;
       },
       updateResume: async (id, patch) => {
+        if (isGuest || isGuestResumeId(id)) {
+          persistGuest(
+            guestResumes.map((r) =>
+              r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
+            ),
+          );
+          return;
+        }
         await ensureSession();
-        setResumes((list) =>
-          list.map((r) =>
+        setResumes((rows) =>
+          rows.map((r) =>
             r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
           ),
         );
@@ -380,13 +393,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
 
       duplicateResume: async (id) => {
-        const src = resumes.find((r) => r.id === id);
-        if (!src || !user || atLimit) return null;
+        const src = list.find((r) => r.id === id);
+        if (!src || atLimit) return null;
+        if (isGuest) {
+          const copy = makeGuestResume({
+            title: `${src.title} — نسخة`,
+            templateId: src.templateId,
+            language: src.language,
+            data: src.data,
+          });
+          persistGuest([copy, ...guestResumes]);
+          return copy;
+        }
         await ensureSession();
         const { data, error } = await supabase
           .from("resumes")
           .insert({
-            user_id: user.id,
+            user_id: user!.id,
             title: `${src.title} — نسخة`,
             template_id: src.templateId,
             language: src.language,
@@ -396,18 +419,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .single();
         if (error || !data) return null;
         const copy = toResume(data as ResumeRow);
-        setResumes((list) => [copy, ...list]);
+        setResumes((rows) => [copy, ...rows]);
         return copy;
       },
       deleteResume: async (id) => {
+        if (isGuest || isGuestResumeId(id)) {
+          persistGuest(guestResumes.filter((r) => r.id !== id));
+          return;
+        }
         await ensureSession();
-        setResumes((list) => list.filter((r) => r.id !== id));
+        setResumes((rows) => rows.filter((r) => r.id !== id));
         const { error } = await supabase.from("resumes").delete().eq("id", id);
         if (error) throw new Error(error.message);
       },
-      getResume: (id) => resumes.find((r) => r.id === id),
+      getResume: (id) => list.find((r) => r.id === id),
     };
-  }, [ready, user, resumes, loadingResumes, maxResumes, signIn, signUp]);
+  }, [
+    ready,
+    user,
+    resumes,
+    guestResumes,
+    persistGuest,
+    loadingResumes,
+    maxResumes,
+    signIn,
+    signUp,
+  ]);
+
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
