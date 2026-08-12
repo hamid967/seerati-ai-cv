@@ -11,6 +11,15 @@ import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { emptyResumeData, RESUME_LIMIT, type Profile, type Resume, type ResumeData } from "./types";
 import { demoResumeData } from "./demo-data";
+import {
+  clearGuestResumes,
+  GUEST_RESUME_LIMIT,
+  isGuestResumeId,
+  makeGuestResume,
+  readGuestResumes,
+  writeGuestResumes,
+} from "./guest-store";
+
 
 /**
  * Data layer backed by Lovable Cloud (profiles / resumes / user_roles).
