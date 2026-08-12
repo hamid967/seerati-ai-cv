@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { emptyResumeData, RESUME_LIMIT, type Profile, type Resume, type ResumeData } from "./types";
 import { demoResumeData } from "./demo-data";
 import {
+  ANONYMOUS_SESSION_TIMEOUT_MS,
   clearGuestResumes,
   GUEST_RESUME_LIMIT,
   isGuestResumeId,
@@ -152,14 +153,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     );
     const reset = () => {
       window.clearTimeout(timeout);
-      timeout = window.setTimeout(
-        () => {
-          clearGuestResumes();
-          guestRef.current = [];
-          setGuestResumes([]);
-        },
-        20 * 60 * 1000,
-      );
+      timeout = window.setTimeout(() => {
+        clearGuestResumes();
+        guestRef.current = [];
+        setGuestResumes([]);
+      }, ANONYMOUS_SESSION_TIMEOUT_MS);
     };
     window.addEventListener("pointerdown", reset, { passive: true });
     window.addEventListener("keydown", reset, { passive: true });

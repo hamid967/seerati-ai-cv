@@ -6,6 +6,8 @@ import { emptyResumeData, type Resume, type ResumeData } from "./types";
  */
 export const GUEST_RESUME_LIMIT = 1;
 export const GUEST_OWNER = "guest";
+export const ANONYMOUS_SESSION_TIMEOUT_MINUTES = 20;
+export const ANONYMOUS_SESSION_TIMEOUT_MS = ANONYMOUS_SESSION_TIMEOUT_MINUTES * 60 * 1000;
 const CONSENT_KEY = "seerati.session-recovery-consent";
 const RECOVERY_KEY = "seerati.session-recovery";
 
