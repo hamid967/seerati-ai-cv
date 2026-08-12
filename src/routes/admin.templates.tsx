@@ -37,8 +37,11 @@ import {
   fetchTemplates,
   logAudit,
   saveTemplate,
+  saveTemplateThumbnail,
   templateUsage,
 } from "@/lib/db";
+import { captureTemplateThumbnail, waitForPaint } from "@/lib/template-thumbnail";
+
 import { demoResumeData } from "@/lib/demo-data";
 import type { Resume, TemplateDef } from "@/lib/types";
 
