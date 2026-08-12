@@ -26,6 +26,7 @@ import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import { TEAM } from "@/lib/team";
 import { LandingCareerVisual } from "@/components/landing-experience";
+import heroResume from "@/assets/hero-resume.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
