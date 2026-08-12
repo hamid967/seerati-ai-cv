@@ -110,7 +110,6 @@ function AdminTemplates() {
 
   const previewResume: Resume = resumeFor(selected);
 
-
   const handleSave = async () => {
     setSaving(true);
     const res = await saveTemplate(selected);
@@ -218,17 +217,13 @@ function AdminTemplates() {
     setThumbProgress(null);
     await refresh();
     if (failed === 0) {
-      toast.success(
-        ar ? `تم توليد ${done} صورة مصغّرة` : `Generated ${done} thumbnails`,
-      );
+      toast.success(ar ? `تم توليد ${done} صورة مصغّرة` : `Generated ${done} thumbnails`);
     } else {
       toast.warning(
         ar ? `تم التوليد مع فشل ${failed} قالب` : `Generated with ${failed} failure(s)`,
       );
     }
   };
-
-
 
   const handleDelete = async () => {
     setConfirmDelete(false);
@@ -589,7 +584,9 @@ function AdminTemplates() {
                     type="button"
                     onClick={() => setSelectedId(t.id)}
                     className={`space-y-1.5 rounded-xl border p-1.5 text-start transition ${
-                      t.id === selectedId ? "border-primary ring-2 ring-primary/25" : "border-border"
+                      t.id === selectedId
+                        ? "border-primary ring-2 ring-primary/25"
+                        : "border-border"
                     }`}
                   >
                     <div
@@ -639,7 +636,6 @@ function AdminTemplates() {
           />
         ) : null}
       </div>
-
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>

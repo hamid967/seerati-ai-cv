@@ -63,10 +63,12 @@ const templateColumns = (tpl: TemplateDef) => ({
 
 /** Stores an auto-generated thumbnail (data URL) for a template. */
 export async function saveTemplateThumbnail(id: string, thumbnailUrl: string) {
-  const { error } = await supabase.from("templates").update({ thumbnail_url: thumbnailUrl }).eq("id", id);
+  const { error } = await supabase
+    .from("templates")
+    .update({ thumbnail_url: thumbnailUrl })
+    .eq("id", id);
   return error ? { error: error.message } : {};
 }
-
 
 export async function saveTemplate(tpl: TemplateDef) {
   const { error } = await supabase.from("templates").update(templateColumns(tpl)).eq("id", tpl.id);
