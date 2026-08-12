@@ -27,6 +27,18 @@ const labels = {
 
 type Design = TemplateDef["design"];
 
+/** Darken a hex accent by a ratio (1 = unchanged) without CSS color-mix, so PDF export stays exact. */
+function shade(hex: string, ratio: number) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1]!, 16);
+  const mix = (c: number) => Math.max(0, Math.min(255, Math.round(c * ratio)));
+  const r = mix((n >> 16) & 255);
+  const g = mix((n >> 8) & 255);
+  const b = mix(n & 255);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
 function SectionTitle({ children, design }: { children: React.ReactNode; design: Design }) {
   const base: React.CSSProperties = {
     color: design.accent,
