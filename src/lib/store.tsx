@@ -450,12 +450,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 
-/** Redirects to /auth only after confirming there is really no cloud session. */
-export function useAuthGuard() {
+/**
+ * Redirects to /auth only after confirming there is really no cloud session.
+ * Pass `{ allowGuest: true }` on surfaces that work without an account.
+ */
+export function useAuthGuard(options?: { allowGuest?: boolean }) {
   const { ready, user } = useStore();
   const navigate = useNavigate();
+  const allowGuest = options?.allowGuest ?? false;
   useEffect(() => {
-    if (!ready || user) return;
+    if (allowGuest || !ready || user) return;
+
     let cancelled = false;
     const timer = setTimeout(() => {
       void supabase.auth.getSession().then(({ data }) => {
