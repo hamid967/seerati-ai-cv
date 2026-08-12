@@ -338,21 +338,28 @@ function EditResume() {
             className="h-9 w-52 font-semibold"
             aria-label={ar ? "اسم السيرة" : "Resume name"}
           />
-          <Select
-            value={draft.templateId}
-            onValueChange={(v) => patch((r) => ({ ...r, templateId: v }))}
-          >
-            <SelectTrigger className="h-9 w-44">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {defaultTemplates.map((x) => (
-                <SelectItem key={x.id} value={x.id}>
-                  {x.name[lang]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TemplateSwitcher
+            resume={draft}
+            templates={defaultTemplates}
+            onSelect={(templateId) =>
+              patch((r) => {
+                const next = getTemplate(templateId, defaultTemplates);
+                const design = { ...(r.data.design ?? {}) };
+                // Drop the overrides that would mask the new template's identity.
+                delete design.accent;
+                delete design.layout;
+                delete design.density;
+                return {
+                  ...r,
+                  templateId,
+                  data: {
+                    ...r.data,
+                    design: { ...design, columnWidth: next.design.layout === "single" ? 28 : 30 },
+                  },
+                };
+              })
+            }
+          />
           <Select
             value={draft.language}
             onValueChange={(v) => patch((r) => ({ ...r, language: v as "ar" | "en" }))}
