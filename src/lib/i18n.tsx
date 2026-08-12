@@ -12,6 +12,7 @@ export const dict: Dict = {
   },
   nav_templates: { ar: "القوالب", en: "Templates" },
   nav_features: { ar: "المزايا", en: "Features" },
+  nav_team: { ar: "الفريق", en: "Team" },
   nav_ats: { ar: "فحص ATS", en: "ATS Check" },
   nav_dashboard: { ar: "لوحتي", en: "Dashboard" },
   nav_career_twin: { ar: "ملفي المهني", en: "My Career Profile" },

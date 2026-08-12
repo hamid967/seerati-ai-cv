@@ -6,7 +6,10 @@ import {
   CheckCircle2,
   FileDown,
   FolderKanban,
+  Gift,
   Languages,
+  LayoutTemplate,
+  ShieldCheck,
   Sparkles,
   Target,
   UserSquare2,
@@ -27,6 +30,7 @@ import { defaultTemplates } from "@/lib/templates";
 import { TEAM } from "@/lib/team";
 import { LandingCareerVisual } from "@/components/landing-experience";
 import heroResume from "@/assets/hero-resume.jpg";
+import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,36 +63,65 @@ function Landing() {
   const ar = lang === "ar";
   const templateCount = defaultTemplates.length;
   const atsTemplateCount = defaultTemplates.filter((template) => template.atsFriendly).length;
+  const featuredTemplates = defaultTemplates.slice(0, 6);
+
+  const trustItems = ar
+    ? [
+        { icon: Gift, t: "أول سيرة مجاناً للأبد" },
+        { icon: Languages, t: "عربية وإنجليزية أصيلة" },
+        { icon: ShieldCheck, t: "فحص ATS إرشادي واضح" },
+        { icon: LayoutTemplate, t: `${templateCount} قالباً قابلاً للتبديل` },
+      ]
+    : [
+        { icon: Gift, t: "First resume free forever" },
+        { icon: Languages, t: "Native Arabic & English" },
+        { icon: ShieldCheck, t: "Clear rule-based ATS check" },
+        { icon: LayoutTemplate, t: `${templateCount} switchable templates` },
+      ];
 
   const steps = ar
     ? [
         {
           t: "ابنِ ملفك المهني الموحّد",
           d: "أدخل خبراتك وإنجازاتك ومهاراتك مرة واحدة — تُستخدم في كل سيرة ومهمة لاحقاً.",
+          visual: ["الهوية المهنية", "الخبرات", "المهارات", "الإنجازات"],
         },
         {
           t: "افتح مساحة لكل وظيفة",
           d: "احفظ وصف الوظيفة، وتابع حالتها من محفوظة إلى مقابلة أو عرض.",
+          visual: ["محفوظة", "قيد التقديم", "مقابلة", "عرض"],
         },
-        { t: "طابق وجهّز", d: "قارن ملفك مع متطلبات الوظيفة، واعرف الفجوات الحقيقية قبل التقديم." },
-        { t: "صدّر حزمة التقديم", d: "سيرة مخصصة، فحص ATS، ونسخة PDF عربية جاهزة للإرسال." },
+        {
+          t: "طابق وجهّز",
+          d: "قارن ملفك مع متطلبات الوظيفة، واعرف الفجوات الحقيقية قبل التقديم.",
+          visual: ["متطلبات", "مطابقة", "فجوات", "تحضير"],
+        },
+        {
+          t: "صدّر حزمة التقديم",
+          d: "سيرة مخصصة، فحص ATS، ونسخة PDF عربية جاهزة للإرسال.",
+          visual: ["قالب", "ATS", "معاينة", "PDF"],
+        },
       ]
     : [
         {
           t: "Build your unified career profile",
           d: "Add your experience, achievements and skills once — reused across every resume and task.",
+          visual: ["Identity", "Experience", "Skills", "Impact"],
         },
         {
           t: "Open a workspace per job",
           d: "Save the job description and track its status from saved to interview or offer.",
+          visual: ["Saved", "Applied", "Interview", "Offer"],
         },
         {
           t: "Match & prepare",
           d: "Compare your profile against the role's requirements and see the real gaps first.",
+          visual: ["Requirements", "Match", "Gaps", "Prep"],
         },
         {
           t: "Export your application pack",
           d: "A tailored resume, an ATS check, and a submission-ready Arabic PDF.",
+          visual: ["Template", "ATS", "Preview", "PDF"],
         },
       ];
 
@@ -184,69 +217,63 @@ function Landing() {
       ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-
+    <div className="seerati-marketing flex min-h-screen flex-col">
       <SiteHeader />
 
       <main className="flex-1">
-        {/* Hero */}
+        {/* Hero — brand first, one CTA group, dominant resume visual */}
         <section className="relative overflow-hidden surface-ink">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-20"
-            style={{
-              backgroundImage:
-                "radial-gradient(50% 60% at 20% 10%, oklch(0.72 0.13 165 / 0.35), transparent 70%)",
-            }}
-          />
-          <div className="relative z-10 mx-auto max-w-4xl px-4 py-20 text-center md:py-28">
-            <Badge
-              variant="secondary"
-              className="mb-6 gap-1.5 rounded-full border-none bg-white/10 px-3 py-1 text-[12px] text-ink-foreground"
-            >
-              <Sparkles className="size-3.5" />
-              {ar ? "استوديو مهني رقمي" : "A digital career studio"}
-            </Badge>
-            <h1 className="text-balance-ar text-4xl font-extrabold leading-[1.25] tracking-tight md:text-6xl">
-              {ar ? "فريق متخصص" : "A specialist team"}{" "}
-              <span className="text-emerald-accent">{ar ? "يعمل معك" : "working with you"}</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-[15px] leading-[1.9] text-ink-foreground/75 md:text-lg">
-              {ar
-                ? "من الملف المهني الموحّد إلى مساحة كل وظيفة، ومطابقة وصفها، وحزمة تقديم كاملة تنتهي بسيرة PDF عربية جاهزة."
-                : "From your unified career profile to a workspace per job, a match against its description, and a full application pack ending in an Arabic PDF."}
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" asChild>
-                <Link to="/resumes/new">
-                  {ar ? "أنشئ سيرتك بدون تسجيل" : "Build your CV — no signup"}
-                  <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
+          <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:gap-12 md:py-24">
+            <div className="text-start">
+              <Badge
                 variant="secondary"
-                className="border-none bg-white/10 text-ink-foreground hover:bg-white/20"
-                asChild
+                className="mb-5 gap-1.5 rounded-full border-none bg-white/10 px-3 py-1 text-[12px] text-ink-foreground"
               >
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  {ar ? "إنشاء حساب مجاني" : "Create a free account"}
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="ghost"
-                className="text-ink-foreground hover:bg-white/10"
-                asChild
-              >
-                <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
-              </Button>
+                <Sparkles className="size-3.5" />
+                {ar ? "استوديو مهني رقمي" : "A digital career studio"}
+              </Badge>
+              <p className="seerati-hero-brand text-ink-foreground">
+                {ar ? "سيرتي" : "Seerati"}
+                <span className="ms-2 align-middle text-base font-medium text-emerald-accent md:text-lg">
+                  {ar ? "Seerati" : "سيرتي"}
+                </span>
+              </p>
+              <h1 className="mt-3 text-balance-ar text-2xl font-extrabold leading-[1.35] tracking-tight md:text-4xl">
+                {ar ? "ابنِ سيرة تفوز بالوظيفة" : "Build a job-winning resume"}
+              </h1>
+              <p className="mt-4 max-w-xl text-[15px] leading-[1.9] text-ink-foreground/75 md:text-base">
+                {ar
+                  ? "فريق من ثمانية مختصين يعمل معك من الملف المهني الموحّد حتى PDF عربي جاهز للتقديم."
+                  : "Eight specialists work with you — from a unified career profile to a submission-ready Arabic PDF."}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button
+                  size="lg"
+                  className="bg-emerald-accent text-ink-foreground hover:bg-emerald-accent/90"
+                  asChild
+                >
+                  <Link to="/resumes/new">
+                    {ar ? "ابدأ مجاناً" : "Get started free"}
+                    <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="border-none bg-white/10 text-ink-foreground hover:bg-white/20"
+                  asChild
+                >
+                  <Link to="/team">{ar ? "تعرّف على الفريق" : "Meet the team"}</Link>
+                </Button>
+              </div>
+              <p className="mt-5 text-xs text-ink-foreground/60">
+                {ar
+                  ? "التسجيل اختياري · ابدأ الآن وحمّل PDF بدون حساب"
+                  : "Signup optional · start now and download a PDF without an account"}
+              </p>
             </div>
-            <p className="mt-5 text-xs text-ink-foreground/60">
-              {ar
-                ? "التسجيل اختياري · ابدأ الآن وحمّل PDF بدون حساب · سجّل لاحقاً للحفظ حتى ٣ سير"
-                : "Signup is optional · start now and download a PDF · register later to save up to 3 resumes"}
-            </p>
-            <div className="mx-auto mt-12 max-w-3xl">
+
+            <div className="seerati-hero-visual">
               <img
                 src={heroResume}
                 alt={
@@ -263,57 +290,107 @@ function Landing() {
           <LandingCareerVisual ar={ar} />
         </section>
 
-        {/* The team */}
-        <section className="section-y mx-auto max-w-6xl px-4">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight">
-              {ar ? "فريق سيرتي" : "The Seerati team"}
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {ar
-                ? "ثمانية أدوار متخصصة فوق مساعد كتابة واحد، كل دور مسؤول عن جزء واضح من رحلتك المهنية."
-                : "Eight focused roles on one writing assistant, each owning a clear part of your career journey."}
-            </p>
-          </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {TEAM.map((agent) => (
-              <Card key={agent.id} className="border-border/80 surface-editorial">
-                <CardContent className="pt-6">
-                  <span
-                    className="grid size-11 place-items-center rounded-full text-sm font-bold text-ink-foreground"
-                    style={{ backgroundColor: `var(--agent-${agent.accent})` }}
-                  >
-                    {agent.initials}
-                  </span>
-                  <h3 className="mt-4 font-bold">{agent.name[lang]}</h3>
-                  <p className="text-xs font-semibold text-emerald-accent">{agent.role[lang]}</p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {agent.blurb[lang]}
-                  </p>
-                </CardContent>
-              </Card>
+        {/* Trust strip */}
+        <section className="seerati-trust-strip">
+          <div className="mx-auto grid max-w-6xl gap-4 px-4 py-8 sm:grid-cols-2 lg:grid-cols-4">
+            {trustItems.map((item) => (
+              <div key={item.t} className="seerati-trust-item">
+                <span className="seerati-trust-icon">
+                  <item.icon className="size-4" />
+                </span>
+                <p className="text-sm font-semibold leading-snug">{item.t}</p>
+              </div>
             ))}
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="bg-secondary/40 section-y">
-          <div className="mx-auto max-w-6xl px-4">
-            <h2 className="text-center text-3xl font-extrabold tracking-tight">
+        {/* How it works — zigzag */}
+        <section className="section-y mx-auto max-w-6xl px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight">
               {ar ? "كيف يعمل" : "How it works"}
             </h2>
-            <div className="mt-10 grid gap-5 md:grid-cols-4">
-              {steps.map((s, i) => (
-                <Card key={s.t} className="border-border/80 shadow-soft">
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {ar
+                ? "أربع خطوات واضحة من ملفك المهني إلى حزمة التقديم."
+                : "Four clear steps from your career profile to an application pack."}
+            </p>
+          </div>
+          <div className="mt-12 space-y-12 md:space-y-16">
+            {steps.map((s, i) => (
+              <div
+                key={s.t}
+                className="seerati-how-step"
+                data-flip={i % 2 === 1 ? "true" : "false"}
+              >
+                <div className="seerati-how-copy">
+                  <span className="inline-flex size-10 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
+                    {i + 1}
+                  </span>
+                  <h3 className="mt-4 text-xl font-bold md:text-2xl">{s.t}</h3>
+                  <p className="mt-3 max-w-md text-sm leading-[1.9] text-muted-foreground">{s.d}</p>
+                </div>
+                <div className="seerati-how-visual">
+                  <div className="grid grid-cols-2 gap-2">
+                    {s.visual.map((label) => (
+                      <div
+                        key={label}
+                        className="rounded-xl border border-border/70 bg-background/80 px-3 py-4 text-center text-xs font-semibold text-foreground"
+                      >
+                        {label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* The team */}
+        <section className="bg-secondary/50 section-y">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-extrabold tracking-tight">
+                {ar ? "فريق سيرتي" : "The Seerati team"}
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {ar
+                  ? "ثمانية أدوار متخصصة فوق مساعد كتابة واحد، كل دور مسؤول عن جزء واضح من رحلتك المهنية."
+                  : "Eight focused roles on one writing assistant, each owning a clear part of your career journey."}
+              </p>
+            </div>
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {TEAM.map((agent) => (
+                <Card key={agent.id} className="border-border/80 bg-card shadow-soft">
                   <CardContent className="pt-6">
-                    <span className="grid size-10 place-items-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
-                      {i + 1}
+                    <span
+                      className="seerati-agent-avatar"
+                      style={
+                        {
+                          backgroundColor: `var(--agent-${agent.accent})`,
+                          "--agent-accent": `var(--agent-${agent.accent})`,
+                        } as CSSProperties
+                      }
+                    >
+                      {agent.initials}
                     </span>
-                    <h3 className="mt-4 text-base font-bold">{s.t}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+                    <h3 className="mt-4 font-bold">{agent.name[lang]}</h3>
+                    <p className="text-xs font-semibold text-emerald-accent">{agent.role[lang]}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {agent.blurb[lang]}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/team">
+                  {ar ? "صفحة الفريق الكاملة" : "Full team page"}
+                  <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -321,30 +398,28 @@ function Landing() {
         {/* Capabilities */}
         <section className="section-y mx-auto max-w-6xl px-4">
           <h2 className="text-3xl font-extrabold tracking-tight">
-            {ar ? "قدرات المنصة" : "Platform capabilities"}
+            {ar ? "ما يشمله الاستوديو" : "What's included"}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             {ar
               ? "كل قدرة مبنية لتخدم خطوة حقيقية في رحلة التقديم على وظيفة."
               : "Every capability serves a real step in the job-application journey."}
           </p>
-          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {capabilities.map((f) => (
-              <Card key={f.title} className="border-border/80">
-                <CardContent className="pt-6">
-                  <span className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
-                    <f.icon className="size-5" />
-                  </span>
-                  <h3 className="mt-4 font-bold">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-                </CardContent>
-              </Card>
+              <div key={f.title} className="border-0 bg-transparent p-0 shadow-none">
+                <span className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
+                  <f.icon className="size-5" />
+                </span>
+                <h3 className="mt-4 font-bold">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
+              </div>
             ))}
           </div>
         </section>
 
         {/* Templates */}
-        <section className="bg-secondary/40 section-y">
+        <section className="bg-secondary/50 section-y">
           <div className="mx-auto max-w-6xl px-4">
             <div className="text-center">
               <h2 className="text-3xl font-extrabold tracking-tight">
@@ -356,15 +431,15 @@ function Landing() {
                   : "Every template supports Arabic and English and can be switched anytime."}
               </p>
             </div>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {defaultTemplates.map((tpl) => (
+            <div className="mt-10 flex gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]">
+              {featuredTemplates.map((tpl) => (
                 <Link
                   key={tpl.id}
                   to="/templates"
-                  className="group rounded-2xl border border-border bg-card p-5 shadow-soft transition-transform hover:-translate-y-1"
+                  className="group w-[240px] shrink-0 rounded-2xl border border-border bg-card p-5 shadow-soft transition-transform hover:-translate-y-1"
                 >
                   <div
-                    className="mb-4 h-28 rounded-xl border border-border/70"
+                    className="mb-4 h-32 rounded-xl border border-border/70"
                     style={{
                       background: `linear-gradient(160deg, ${tpl.design.accent}1f, transparent 70%)`,
                       borderColor: `${tpl.design.accent}33`,
@@ -378,11 +453,16 @@ function Landing() {
                       </Badge>
                     )}
                   </div>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                     {tpl.description[lang]}
                   </p>
                 </Link>
               ))}
+            </div>
+            <div className="mt-8 text-center">
+              <Button size="lg" asChild>
+                <Link to="/templates">{ar ? "كل قوالب السيرة" : "All resume templates"}</Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -463,7 +543,11 @@ function Landing() {
                 : "Start instantly without an account — signing up stays optional for saving and syncing."}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button size="lg" asChild>
+              <Button
+                size="lg"
+                className="bg-emerald-accent text-ink-foreground hover:bg-emerald-accent/90"
+                asChild
+              >
                 <Link to="/resumes/new">{ar ? "ابدأ بدون تسجيل" : "Start without signup"}</Link>
               </Button>
               <Button size="lg" variant="secondary" asChild>

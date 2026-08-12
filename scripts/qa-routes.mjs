@@ -18,6 +18,7 @@ const ROUTES = [
   "/privacy-center",
   "/career-guides",
   "/features",
+  "/team",
   "/import",
   "/jobs",
   "/resumes/new",

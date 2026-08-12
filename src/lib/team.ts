@@ -145,3 +145,26 @@ export const agentById = (id: string): AgentDef | undefined => TEAM.find((a) => 
 
 export const agentsForSurface = (surface: AgentDef["surfaces"][number]): AgentDef[] =>
   TEAM.filter((a) => a.surfaces.includes(surface));
+
+/** Primary product surface each specialist opens from the team page. */
+export const agentPrimaryHref = (agent: AgentDef): string => {
+  const surface = agent.surfaces[0];
+  switch (surface) {
+    case "career-twin":
+      return "/career-twin";
+    case "jobs":
+      return "/jobs";
+    case "builder":
+      return "/resumes/new";
+    case "ats":
+      return "/ats";
+    case "cover-letter":
+      return "/assistant";
+    case "interview":
+      return "/assistant";
+    case "dashboard":
+      return "/dashboard";
+    default:
+      return "/dashboard";
+  }
+};
