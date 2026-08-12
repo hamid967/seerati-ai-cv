@@ -150,20 +150,23 @@ export function ResumePreview({
       </p>
     ) : null,
     experience: d.experience.length ? (
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {d.experience.map((e) => (
           <div key={e.id} data-cv-item>
             <div className="flex flex-wrap items-baseline justify-between gap-1">
-              <p className="text-[13px] font-bold">{e.role}</p>
-              <p className="text-[11px] text-[#5a6779]">
+              <p className="text-[13px] font-semibold tracking-[0.01em] text-[#101828]">{e.role}</p>
+              <p className="text-[10.5px] uppercase tracking-[0.1em] text-[#6b7686]">
                 {e.start} – {e.current ? (rtl ? "حتى الآن" : "Present") : e.end}
               </p>
             </div>
-            <p className="text-[12px] font-medium" style={{ color: design.accent }}>
+            <p
+              className="mt-0.5 text-[11.5px] font-medium tracking-[0.02em]"
+              style={{ color: design.accent }}
+            >
               {e.company}
               {e.location ? ` · ${e.location}` : ""}
             </p>
-            <ul className={`mt-1 space-y-0.5 ${design.bullet === "dash" ? "" : "ps-4"}`}>
+            <ul className={`mt-1.5 space-y-1 ${design.bullet === "dash" ? "" : "ps-4"}`}>
               {e.bullets.filter(Boolean).map((b, i) => (
                 <li
                   key={i}
