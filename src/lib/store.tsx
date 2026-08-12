@@ -22,9 +22,8 @@ import {
 } from "./guest-store";
 
 /**
- * Data layer backed by Lovable Cloud (profiles / resumes / user_roles).
- * All reads and writes go through RLS-protected tables; the 3-resume limit is
- * also enforced server-side by a database trigger.
+ * Authenticated account data uses Lovable Cloud. Anonymous resume content is
+ * deliberately kept in memory only and is never migrated or autosaved remotely.
  */
 
 type Ctx = {
@@ -56,6 +55,8 @@ type Ctx = {
   maxResumes: number;
   /** True when the visitor has no account and is working on a local resume. */
   isGuest: boolean;
+  /** Delete all anonymous resume data from the current in-memory session. */
+  clearGuestSession: () => void;
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -140,6 +141,36 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (user || guestResumes.length === 0 || typeof window === "undefined") return;
+    let timeout = window.setTimeout(
+      () => {
+        clearGuestResumes();
+        guestRef.current = [];
+        setGuestResumes([]);
+      },
+      20 * 60 * 1000,
+    );
+    const reset = () => {
+      window.clearTimeout(timeout);
+      timeout = window.setTimeout(
+        () => {
+          clearGuestResumes();
+          guestRef.current = [];
+          setGuestResumes([]);
+        },
+        20 * 60 * 1000,
+      );
+    };
+    window.addEventListener("pointerdown", reset, { passive: true });
+    window.addEventListener("keydown", reset, { passive: true });
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener("pointerdown", reset);
+      window.removeEventListener("keydown", reset);
+    };
+  }, [user, guestResumes.length]);
+
+  useEffect(() => {
     void supabase
       .from("app_settings")
       .select("max_resumes")
@@ -188,43 +219,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setLoadingResumes(false);
   }, []);
 
-  /**
-   * Move a guest's locally stored resume into the cloud once an account exists.
-   * Runs at most once per session and survives being called from several paths
-   * (sign-in, sign-up, auth-state hydration) without duplicating rows.
-   */
-  const migratingRef = useRef<Promise<void> | null>(null);
-  const migrateGuestResumes = useCallback(async (userId: string) => {
-    if (migratingRef.current) return migratingRef.current;
-    const pending = readGuestResumes();
-    if (!pending.length) return;
-
-    const run = (async () => {
-      try {
-        await ensureSession();
-        for (const item of pending) {
-          const { error } = await supabase.from("resumes").insert({
-            user_id: userId,
-            title: item.title,
-            template_id: item.templateId,
-            language: item.language,
-            data: item.data as never,
-          });
-          // resume_limit_reached (or any failure) keeps the local copy intact.
-          if (error) throw new Error(error.message);
-        }
-        clearGuestResumes();
-        guestRef.current = [];
-        setGuestResumes([]);
-      } finally {
-        migratingRef.current = null;
-      }
-    })();
-
-    migratingRef.current = run;
-    return run;
-  }, []);
-
   useEffect(() => {
     let active = true;
 
@@ -237,11 +231,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return;
       }
       await loadProfile(session.user.id, session.user.email ?? "");
-      try {
-        await migrateGuestResumes(session.user.id);
-      } catch {
-        // Keep sign-in working even if the local draft cannot be uploaded.
-      }
       await loadResumes();
       if (active) setReady(true);
     };
@@ -258,7 +247,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, [loadProfile, loadResumes, migrateGuestResumes]);
+  }, [loadProfile, loadResumes]);
 
   const signIn = useCallback<Ctx["signIn"]>(
     async (email, password) => {
@@ -268,11 +257,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       });
       if (error || !data.user) return { error: error?.message ?? "sign_in_failed" };
       await loadProfile(data.user.id, data.user.email ?? email);
-      try {
-        await migrateGuestResumes(data.user.id);
-      } catch {
-        // Keep sign-in working even if the local draft cannot be uploaded.
-      }
       await loadResumes();
       const { data: roles } = await supabase
         .from("user_roles")
@@ -292,7 +276,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         createdAt: profile?.created_at ?? new Date().toISOString(),
       };
     },
-    [loadProfile, loadResumes, migrateGuestResumes],
+    [loadProfile, loadResumes],
   );
 
   const signUp = useCallback<Ctx["signUp"]>(
@@ -314,18 +298,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           // Session was returned by signUp; continue even if refresh is a no-op.
         }
         await loadProfile(data.session.user.id, data.session.user.email ?? email);
-        try {
-          await migrateGuestResumes(data.session.user.id);
-        } catch {
-          // The local draft stays in the browser if the upload fails.
-        }
         await loadResumes();
         return { needsConfirmation: false };
       }
       return { needsConfirmation: true };
     },
-    [loadProfile, loadResumes, migrateGuestResumes],
+    [loadProfile, loadResumes],
   );
+
+  const clearGuestSession = useCallback(() => {
+    clearGuestResumes();
+    guestRef.current = [];
+    setGuestResumes([]);
+  }, []);
 
   const value = useMemo<Ctx>(() => {
     const isGuest = !user;
@@ -340,6 +325,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       atLimit,
       maxResumes: effectiveMax,
       isGuest,
+      clearGuestSession,
 
       signIn,
       signUp,
@@ -488,6 +474,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     maxResumes,
     signIn,
     signUp,
+    clearGuestSession,
   ]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
