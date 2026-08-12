@@ -178,7 +178,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const { data: auth } = await supabase.auth.getUser();
     const uid = auth.user?.id;
     if (!uid) {
-      setResumes([]);
+      setResumesState([]);
       setLoadingResumes(false);
       return;
     }
@@ -187,7 +187,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .select("*")
       .eq("user_id", uid)
       .order("updated_at", { ascending: false });
-    setResumes(((data as ResumeRow[] | null) ?? []).map(toResume));
+    setResumesState(((data as ResumeRow[] | null) ?? []).map(toResume));
     setLoadingResumes(false);
   }, []);
 
@@ -217,6 +217,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           if (error) throw new Error(error.message);
         }
         clearGuestResumes();
+        guestRef.current = [];
         setGuestResumes([]);
       } finally {
         migratingRef.current = null;
@@ -234,7 +235,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       if (!session?.user) {
         setUser(null);
-        setResumes([]);
+        setResumesState([]);
         setReady(true);
         return;
       }
@@ -354,7 +355,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       signOut: async () => {
         await supabase.auth.signOut();
         setUser(null);
-        setResumes([]);
+        setResumesState([]);
       },
       updateProfile: async (patch) => {
         if (!user) return;
@@ -387,7 +388,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             };
         if (isGuest) {
           const resume = makeGuestResume({ title, templateId, language, data: base });
-          persistGuest([resume, ...guestResumes]);
+          persistGuest((prev) => [resume, ...prev]);
           return resume;
         }
         await ensureSession();
@@ -404,25 +405,25 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .single();
         if (error || !data) return null;
         const resume = toResume(data as ResumeRow);
-        setResumes((rows) => [resume, ...rows]);
+        setResumesState((rows) => [resume, ...rows]);
         return resume;
       },
       updateResume: async (id, patch) => {
         if (isGuest || isGuestResumeId(id)) {
-          persistGuest(
-            guestResumes.map((r) =>
+          persistGuest((prev) =>
+            prev.map((r) =>
               r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
             ),
           );
           return;
         }
         await ensureSession();
-        setResumes((rows) =>
+        setResumesState((rows) =>
           rows.map((r) =>
             r.id === id ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r,
           ),
         );
-        const current = resumes.find((r) => r.id === id);
+        const current = resumesRef.current.find((r) => r.id === id);
         const { error } = await supabase
           .from("resumes")
           .update({
@@ -448,7 +449,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             language: src.language,
             data: src.data,
           });
-          persistGuest([copy, ...guestResumes]);
+          persistGuest((prev) => [copy, ...prev]);
           return copy;
         }
         await ensureSession();
@@ -465,16 +466,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           .single();
         if (error || !data) return null;
         const copy = toResume(data as ResumeRow);
-        setResumes((rows) => [copy, ...rows]);
+        setResumesState((rows) => [copy, ...rows]);
         return copy;
       },
       deleteResume: async (id) => {
         if (isGuest || isGuestResumeId(id)) {
-          persistGuest(guestResumes.filter((r) => r.id !== id));
+          persistGuest((prev) => prev.filter((r) => r.id !== id));
           return;
         }
         await ensureSession();
-        setResumes((rows) => rows.filter((r) => r.id !== id));
+        setResumesState((rows) => rows.filter((r) => r.id !== id));
         const { error } = await supabase.from("resumes").delete().eq("id", id);
         if (error) throw new Error(error.message);
       },
