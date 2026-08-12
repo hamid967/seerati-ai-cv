@@ -19,6 +19,7 @@ on:
         "stage7/**",
         "stage8/**",
         "stage9/**",
+        "stage11/**",
         "hotfix/**",
       ]
   pull_request:
@@ -80,6 +81,7 @@ jobs:
           node scripts/check-release-operations.mjs
           node scripts/check-production-activation.mjs
           node scripts/check-production-env-bundle.mjs
+          node scripts/check-flowcv-editor-controls.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
