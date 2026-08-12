@@ -33,9 +33,7 @@ export function SiteHeader() {
 
   const links = [
     { to: "/templates", label: t("nav_templates") },
-    { to: "/features", label: t("nav_features") },
     { to: "/team", label: t("nav_team") },
-    { to: "/ats", label: t("nav_ats") },
   ] as const;
 
   const memberLinks = [

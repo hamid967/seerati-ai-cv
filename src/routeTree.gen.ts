@@ -24,6 +24,7 @@ import { Route as CoverLettersRouteImport } from './routes/cover-letters'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ImportRouteImport } from './routes/import'
+import { Route as IntroRouteImport } from './routes/intro'
 import { Route as KeywordScannerRouteImport } from './routes/keyword-scanner'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -119,6 +120,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
 const ImportRoute = ImportRouteImport.update({
   id: '/import',
   path: '/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntroRoute = IntroRouteImport.update({
+  id: '/intro',
+  path: '/intro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KeywordScannerRoute = KeywordScannerRouteImport.update({
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
@@ -359,6 +368,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/intro'
     | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
@@ -396,6 +406,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/intro'
     | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/intro'
     | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
@@ -473,6 +485,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   ImportRoute: typeof ImportRoute
+  IntroRoute: typeof IntroRoute
   KeywordScannerRoute: typeof KeywordScannerRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -596,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/import'
       fullPath: '/import'
       preLoaderRoute: typeof ImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intro': {
+      id: '/intro'
+      path: '/intro'
+      fullPath: '/intro'
+      preLoaderRoute: typeof IntroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/keyword-scanner': {
@@ -782,6 +802,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   ImportRoute: ImportRoute,
+  IntroRoute: IntroRoute,
   KeywordScannerRoute: KeywordScannerRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,

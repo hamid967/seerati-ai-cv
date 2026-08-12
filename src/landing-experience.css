@@ -188,6 +188,7 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+.seerati-intro__copy h1,
 .seerati-intro__copy h2 {
   margin: 0;
   max-width: 13ch;
@@ -195,6 +196,42 @@
   line-height: 1.02;
   letter-spacing: -0.045em;
   font-weight: 900;
+}
+.seerati-intro--page {
+  position: fixed;
+  inset: 0;
+  min-height: 100dvh;
+}
+.seerati-intro__beam {
+  position: absolute;
+  inset: 20% -10% auto;
+  height: 40%;
+  background: linear-gradient(100deg, transparent, rgba(16, 185, 129, 0.12), transparent);
+  filter: blur(28px);
+  animation: seerati-intro-orbit 12s linear infinite;
+  pointer-events: none;
+}
+.seerati-intro__enter {
+  margin-top: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: #10b981;
+  color: #07111f;
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 18px 40px -20px rgba(16, 185, 129, 0.9);
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+.seerati-intro__enter:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
 }
 .seerati-intro__copy span {
   display: block;

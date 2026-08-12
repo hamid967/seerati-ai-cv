@@ -151,3 +151,120 @@
     filter: none;
   }
 }
+
+/* Campaign / ad motion — design team visual system on marketing pages */
+.seerati-ad-hero__glow {
+  position: absolute;
+  inset: -20% 10% auto;
+  height: 55%;
+  background:
+    radial-gradient(
+      ellipse at 30% 40%,
+      color-mix(in oklab, var(--emerald-accent) 22%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      color-mix(in oklab, var(--primary) 18%, transparent),
+      transparent 50%
+    );
+  filter: blur(40px);
+  pointer-events: none;
+  animation: seerati-ad-breathe 9s ease-in-out infinite alternate;
+}
+
+.seerati-ad-frame {
+  position: relative;
+}
+
+.seerati-ad-frame::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    transparent 40%,
+    color-mix(in oklab, var(--emerald-accent) 18%, transparent) 50%,
+    transparent 60%
+  );
+  background-size: 220% 100%;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.seerati-ad-frame:hover::after {
+  opacity: 1;
+  animation: seerati-ad-sheen 1.1s ease;
+}
+
+.seerati-ad-cta {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-editorial, 0 24px 60px -32px rgba(7, 17, 31, 0.55));
+}
+
+.seerati-ad-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    color-mix(in oklab, var(--emerald-accent) 12%, transparent) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.seerati-clean-step {
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: var(--card);
+  padding: 1.35rem 1.25rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.seerati-clean-step__n {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.75rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.seerati-design-card .seerati-agent-avatar {
+  font-size: 0.75rem;
+}
+
+@keyframes seerati-ad-breathe {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 0.85;
+  }
+  to {
+    transform: translateY(12px) scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes seerati-ad-sheen {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -20% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seerati-ad-hero__glow,
+  .seerati-ad-frame:hover::after {
+    animation: none;
+  }
+}

@@ -192,8 +192,8 @@ export const APP_NAV: AppNavItem[] = [
     id: "team",
     label: { ar: "فريقي المهني", en: "My career team" },
     hint: {
-      ar: `${TEAM_COUNT} مختصاً يعملون معك — مسار وهندسة`,
-      en: `${TEAM_COUNT} specialists working with you — career & eng`,
+      ar: `${TEAM_COUNT} مختصاً — مسار وتصميم وهندسة`,
+      en: `${TEAM_COUNT} specialists — career, design & eng`,
     },
     icon: Sparkles,
     to: "/team",

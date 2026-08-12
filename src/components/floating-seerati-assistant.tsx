@@ -48,7 +48,7 @@ const FOCUS_EDITOR = /^\/resumes\/[^/]+\/(edit|preview|studio|composer)$/;
 const ASSISTANT_AGENTS = agentsForSurface("assistant");
 
 function shouldHide(pathname: string) {
-  if (pathname === "/assistant") return true;
+  if (pathname === "/assistant" || pathname === "/intro") return true;
   if (FOCUS_EDITOR.test(pathname)) return true;
   return HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }

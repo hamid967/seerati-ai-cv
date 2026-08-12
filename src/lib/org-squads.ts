@@ -77,3 +77,48 @@ export const ENGINEERING_SQUADS: OrgSquad[] = [
 ];
 
 export const ENGINEERING_SQUAD_COUNT = ENGINEERING_SQUADS.length;
+
+/** Design & campaign squads — unify imagery, templates and ad motion. */
+export const DESIGN_SQUADS: OrgSquad[] = [
+  {
+    id: "brand-visual",
+    name: { ar: "الهوية والصورة", en: "Brand & Imagery" },
+    focus: {
+      ar: "توحيد ألوان سيرتي، صور البطل، وإطارات القوالب.",
+      en: "Seerati color system, hero imagery and template frames.",
+    },
+    roles: [
+      { ar: "مديرة هوية بصرية", en: "Brand art director" },
+      { ar: "مصمم أنظمة بصرية", en: "Visual systems designer" },
+      { ar: "مصمم صور منتج", en: "Product imagery designer" },
+    ],
+  },
+  {
+    id: "motion-campaign",
+    name: { ar: "الحركة والإعلان", en: "Motion & Campaign" },
+    focus: {
+      ar: "انترو الموقع، انتقالات خفيفة، وتأثيرات ترويجية هادفة.",
+      en: "Site intro, light transitions and purposeful campaign effects.",
+    },
+    roles: [
+      { ar: "مصمم حركة", en: "Motion designer" },
+      { ar: "مصمم حملات محتوى", en: "Campaign content designer" },
+      { ar: "منسق تجربة تسويقية", en: "Marketing experience lead" },
+    ],
+  },
+  {
+    id: "resume-craft",
+    name: { ar: "حرفة السيرة والطباعة", en: "Resume Craft & Print" },
+    focus: {
+      ar: "خطوط عربية، مسافات A4، وقوالب متوافقة مع ATS عند الحاجة.",
+      en: "Arabic type, A4 spacing and ATS-safe templates when needed.",
+    },
+    roles: [
+      { ar: "مصمم سير ذاتية", en: "Resume designer" },
+      { ar: "مصمم طباعة عربية", en: "Arabic print designer" },
+      { ar: "مصمم قوالب", en: "Template designer" },
+    ],
+  },
+];
+
+export const DESIGN_SQUAD_COUNT = DESIGN_SQUADS.length;
