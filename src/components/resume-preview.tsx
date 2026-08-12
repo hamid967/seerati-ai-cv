@@ -296,7 +296,7 @@ export function ResumePreview({
         <header
           className="relative -mx-8 -mt-8 mb-6 flex items-center gap-4 overflow-hidden px-8 py-7"
           style={{
-            background: `linear-gradient(135deg, ${design.accent} 0%, color-mix(in oklab, ${design.accent} 78%, #000) 100%)`,
+            background: `linear-gradient(135deg, ${design.accent} 0%, ${shade(design.accent, 0.78)} 100%)`,
           }}
         >
           <span
