@@ -30,6 +30,8 @@ export const rowToTemplate = (row: TemplateRow): TemplateDef => {
     atsFriendly: row.ats_friendly,
     active: row.active,
     order: row.display_order,
+    ...(row.thumbnail_url ? { thumbnailUrl: row.thumbnail_url } : {}),
+
     design: {
       ...baseDesign,
       ...(seed?.design ?? {}),
