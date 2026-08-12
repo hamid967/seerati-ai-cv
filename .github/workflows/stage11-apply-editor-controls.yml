@@ -1,0 +1,301 @@
+name: Stage 11 Apply Editor Controls
+on:
+  push:
+    branches:
+      - stage11/flowcv-editor-controls
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: stage11/flowcv-editor-controls
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Apply Stage 11 controls
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+
+          # 1) User-selectable layout override.
+          p = Path('src/lib/types.ts')
+          s = p.read_text()
+          old = '  density?: "compact" | "normal" | "airy";\n  showPhoto?: boolean;'
+          new = '  density?: "compact" | "normal" | "airy";\n  /** Optional user layout override; does not mutate the template definition. */\n  layout?: TemplateDesign["layout"];\n  showPhoto?: boolean;'
+          assert old in s
+          p.write_text(s.replace(old, new, 1))
+
+          # 2) Base renderer respects the user layout override.
+          p = Path('src/components/resume-preview.tsx')
+          s = p.read_text()
+          old = '    accent: user.accent || tpl.design.accent,\n    spacing: user.density || tpl.design.spacing,\n  };'
+          new = '    accent: user.accent || tpl.design.accent,\n    spacing: user.density || tpl.design.spacing,\n    layout: user.layout || tpl.design.layout,\n  };'
+          assert old in s
+          p.write_text(s.replace(old, new, 1))
+
+          # 3) Professional renderer uses the same effective layout for section geometry.
+          p = Path('src/components/professional-resume-preview.tsx')
+          s = p.read_text()
+          old = '  const template = getTemplate(resume.templateId);\n  const hidden = new Set(resume.data.hiddenSections ?? []);\n  const visible = resume.data.sectionOrder.filter((key) => !hidden.has(key));\n  if (template.design.layout === "single") return visible;'
+          new = '  const template = getTemplate(resume.templateId);\n  const layout = resume.data.design?.layout ?? template.design.layout;\n  const hidden = new Set(resume.data.hiddenSections ?? []);\n  const visible = resume.data.sectionOrder.filter((key) => !hidden.has(key));\n  if (layout === "single") return visible;'
+          assert old in s
+          s = s.replace(old, new, 1)
+          old = '  return template.design.layout === "sidebar-left" ? [...aside, ...main] : [...main, ...aside];'
+          new = '  return layout === "sidebar-left" ? [...aside, ...main] : [...main, ...aside];'
+          assert old in s
+          p.write_text(s.replace(old, new, 1))
+
+          # 4) Upgrade the editor controls and preview.
+          p = Path('src/routes/resumes.$id.edit.tsx')
+          s = p.read_text()
+          old = 'import { ResumePreview, getTemplate } from "@/components/resume-preview";'
+          new = 'import { getTemplate } from "@/components/resume-preview";\nimport { ProfessionalResumePreview } from "@/components/professional-resume-preview";'
+          assert old in s
+          s = s.replace(old, new, 1)
+
+          marker = '''                {tpl?.design.supportsPhoto ? ('''
+          controls = '''                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>{ar ? "تخطيط الصفحة" : "Page layout"}</Label>
+                    <Select
+                      value={d.design?.layout ?? tpl?.design.layout ?? "single"}
+                      onValueChange={(v) =>
+                        setData((data) => {
+                          data.design = {
+                            ...data.design,
+                            layout: v as "single" | "sidebar" | "sidebar-left",
+                          };
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="single">{ar ? "عمود واحد — ATS" : "Single column — ATS"}</SelectItem>
+                        <SelectItem value="sidebar">{ar ? "عمودان — جانبي يمين" : "Two columns — right sidebar"}</SelectItem>
+                        <SelectItem value="sidebar-left">{ar ? "عمودان — جانبي يسار" : "Two columns — left sidebar"}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>{ar ? "حجم الصفحة" : "Page size"}</Label>
+                    <Select
+                      value={d.design?.pageSize ?? "a4"}
+                      onValueChange={(v) =>
+                        setData((data) => {
+                          data.design = { ...data.design, pageSize: v as "a4" | "letter" };
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="a4">A4</SelectItem>
+                        <SelectItem value="letter">US Letter</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="space-y-1.5 text-sm">
+                    <span className="flex justify-between gap-3">
+                      <span>{ar ? "حجم الخط" : "Font scale"}</span>
+                      <span className="text-muted-foreground">{Math.round((d.design?.fontScale ?? 1) * 100)}%</span>
+                    </span>
+                    <Input
+                      type="range"
+                      min="0.85"
+                      max="1.15"
+                      step="0.01"
+                      value={d.design?.fontScale ?? 1}
+                      onChange={(e) =>
+                        setData((data) => {
+                          data.design = { ...data.design, fontScale: Number(e.target.value) };
+                        })
+                      }
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm">
+                    <span className="flex justify-between gap-3">
+                      <span>{ar ? "الهامش" : "Page margin"}</span>
+                      <span className="text-muted-foreground">{d.design?.marginMm ?? 14} mm</span>
+                    </span>
+                    <Input
+                      type="range"
+                      min="8"
+                      max="24"
+                      step="1"
+                      value={d.design?.marginMm ?? 14}
+                      onChange={(e) =>
+                        setData((data) => {
+                          data.design = { ...data.design, marginMm: Number(e.target.value) };
+                        })
+                      }
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm">
+                    <span className="flex justify-between gap-3">
+                      <span>{ar ? "تباعد الأسطر" : "Line height"}</span>
+                      <span className="text-muted-foreground">{(d.design?.lineHeight ?? 1.5).toFixed(2)}</span>
+                    </span>
+                    <Input
+                      type="range"
+                      min="1.2"
+                      max="1.8"
+                      step="0.05"
+                      value={d.design?.lineHeight ?? 1.5}
+                      onChange={(e) =>
+                        setData((data) => {
+                          data.design = { ...data.design, lineHeight: Number(e.target.value) };
+                        })
+                      }
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm">
+                    <span className="flex justify-between gap-3">
+                      <span>{ar ? "عرض العمود الجانبي" : "Sidebar width"}</span>
+                      <span className="text-muted-foreground">{d.design?.columnWidth ?? 32}%</span>
+                    </span>
+                    <Input
+                      type="range"
+                      min="25"
+                      max="42"
+                      step="1"
+                      disabled={(d.design?.layout ?? tpl?.design.layout ?? "single") === "single"}
+                      value={d.design?.columnWidth ?? 32}
+                      onChange={(e) =>
+                        setData((data) => {
+                          data.design = { ...data.design, columnWidth: Number(e.target.value) };
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+
+                {(d.design?.layout ?? tpl?.design.layout) !== "single" && tpl?.atsFriendly ? (
+                  <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-muted-foreground">
+                    {ar
+                      ? "اختر عمودًا واحدًا عند التقديم عبر نظام ATS صارم. العمودان أفضل للقراءة البشرية لكن قد تختلف طريقة تحليل بعض الأنظمة لهما."
+                      : "Use a single column for strict ATS submissions. Two columns can improve human scanning, but parsing varies between systems."}
+                  </p>
+                ) : null}
+
+'''
+          assert marker in s
+          s = s.replace(marker, controls + marker, 1)
+
+          old = '''                  {d.sectionOrder.map((key, idx) => (
+                    <SortableItem
+                      key={key}
+                      id={key}
+                      ar={ar}
+                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2"
+                    >
+                      <span className="text-sm font-medium">{sectionLabels[key][lang]}</span>
+                      <div className="ms-auto flex gap-1">'''
+          new = '''                  {d.sectionOrder.map((key, idx) => {
+                    const visible = !(d.hiddenSections ?? []).includes(key);
+                    return (
+                    <SortableItem
+                      key={key}
+                      id={key}
+                      ar={ar}
+                      className={`flex items-center gap-2 rounded-lg border border-border px-3 py-2 ${visible ? "" : "opacity-55"}`}
+                    >
+                      <Checkbox
+                        checked={visible}
+                        aria-label={ar ? `إظهار ${sectionLabels[key].ar}` : `Show ${sectionLabels[key].en}`}
+                        onCheckedChange={(checked) =>
+                          setData((data) => {
+                            const hidden = new Set(data.hiddenSections ?? []);
+                            if (checked) hidden.delete(key);
+                            else hidden.add(key);
+                            data.hiddenSections = [...hidden];
+                          })
+                        }
+                      />
+                      <span className="text-sm font-medium">{sectionLabels[key][lang]}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {visible ? (ar ? "ظاهر" : "Visible") : ar ? "مخفي" : "Hidden"}
+                      </span>
+                      <div className="ms-auto flex gap-1">'''
+          assert old in s
+          s = s.replace(old, new, 1)
+          old = '''                    </SortableItem>
+                  ))}
+                </SortableList>'''
+          new = '''                    </SortableItem>
+                    );
+                  })}
+                </SortableList>'''
+          # only replace the last matching order block occurrence
+          pos = s.rfind(old)
+          assert pos != -1
+          s = s[:pos] + new + s[pos+len(old):]
+
+          s = s.replace('<ResumePreview resume={draft} />', '<ProfessionalResumePreview resume={draft} />')
+          p.write_text(s)
+
+          # 5) Permanent static guard and template-count check.
+          Path('scripts/check-flowcv-editor-controls.mjs').write_text(r'''import fs from "node:fs";
+
+const read = (path) => fs.readFileSync(path, "utf8");
+const templates = read("src/lib/templates.ts");
+const editor = read("src/routes/resumes.$id.edit.tsx");
+const preview = read("src/components/resume-preview.tsx");
+const professional = read("src/components/professional-resume-preview.tsx");
+const types = read("src/lib/types.ts");
+
+const failures = [];
+const check = (condition, label) => {
+  console.log(`${condition ? "PASS" : "FAIL"}  ${label}`);
+  if (!condition) failures.push(label);
+};
+
+const templateCount = (templates.match(/\n\s*id: \"[^\"]+\",/g) ?? []).length;
+check(templateCount >= 15, `template library has at least 15 templates (found ${templateCount})`);
+check(types.includes('layout?: TemplateDesign["layout"]'), "resume design supports user layout override");
+check(preview.includes("layout: user.layout || tpl.design.layout"), "base preview respects user layout override");
+check(professional.includes("resume.data.design?.layout ?? template.design.layout"), "professional preview measures effective layout");
+check(editor.includes("تخطيط الصفحة") && editor.includes("Page layout"), "editor exposes bilingual layout control");
+check(editor.includes("حجم الخط") && editor.includes("Font scale"), "editor exposes font-scale control");
+check(editor.includes("الهامش") && editor.includes("Page margin"), "editor exposes margin control");
+check(editor.includes("تباعد الأسطر") && editor.includes("Line height"), "editor exposes line-height control");
+check(editor.includes("عرض العمود الجانبي") && editor.includes("Sidebar width"), "editor exposes sidebar-width control");
+check(editor.includes("data.hiddenSections = [...hidden]"), "editor exposes persistent section visibility control");
+check(editor.includes("ProfessionalResumePreview resume={draft}"), "editor uses professional measured preview");
+check(editor.includes("strict ATS submissions"), "two-column ATS caveat is disclosed");
+
+if (failures.length) {
+  console.error(`\nStage 11 editor guard failed (${failures.length}).`);
+  process.exit(1);
+}
+console.log("\nStage 11 FlowCV-class editor controls guard passed.");
+''')
+
+          # Add permanent QA command.
+          p = Path('package.json')
+          data = json.loads(p.read_text())
+          data['scripts']['check:flowcv-editor'] = 'node scripts/check-flowcv-editor-controls.mjs'
+          data['scripts']['qa'] += ' && npm run check:flowcv-editor'
+          p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+          PY
+      - name: Format changed files
+        run: bunx prettier --write src/lib/types.ts src/components/resume-preview.tsx src/components/professional-resume-preview.tsx 'src/routes/resumes.$id.edit.tsx' scripts/check-flowcv-editor-controls.mjs package.json
+      - name: Validate Stage 11 guard
+        run: bun run check:flowcv-editor
+      - name: Commit Stage 11
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/types.ts src/components/resume-preview.tsx src/components/professional-resume-preview.tsx 'src/routes/resumes.$id.edit.tsx' scripts/check-flowcv-editor-controls.mjs package.json
+          git commit -m "Stage 11 — FlowCV-class editor controls"
+          git push origin HEAD:stage11/flowcv-editor-controls
