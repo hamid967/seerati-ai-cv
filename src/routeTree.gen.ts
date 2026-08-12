@@ -20,9 +20,11 @@ import { Route as CareerEvidenceRouteImport } from './routes/career-evidence'
 import { Route as CareerGuidesRouteImport } from './routes/career-guides'
 import { Route as CareerPassportRouteImport } from './routes/career-passport'
 import { Route as CareerTwinRouteImport } from './routes/career-twin'
+import { Route as CoverLettersRouteImport } from './routes/cover-letters'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ImportRouteImport } from './routes/import'
+import { Route as KeywordScannerRouteImport } from './routes/keyword-scanner'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrivacyCenterRouteImport } from './routes/privacy-center'
@@ -98,6 +100,11 @@ const CareerTwinRoute = CareerTwinRouteImport.update({
   path: '/career-twin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoverLettersRoute = CoverLettersRouteImport.update({
+  id: '/cover-letters',
+  path: '/cover-letters',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -111,6 +118,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
 const ImportRoute = ImportRouteImport.update({
   id: '/import',
   path: '/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KeywordScannerRoute = KeywordScannerRouteImport.update({
+  id: '/keyword-scanner',
+  path: '/keyword-scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -221,9 +233,11 @@ export interface FileRoutesByFullPath {
   '/career-guides': typeof CareerGuidesRoute
   '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
+  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
@@ -255,9 +269,11 @@ export interface FileRoutesByTo {
   '/career-guides': typeof CareerGuidesRoute
   '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
+  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
@@ -291,9 +307,11 @@ export interface FileRoutesById {
   '/career-guides': typeof CareerGuidesRoute
   '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
+  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
@@ -328,9 +346,11 @@ export interface FileRouteTypes {
     | '/career-guides'
     | '/career-passport'
     | '/career-twin'
+    | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
@@ -362,9 +382,11 @@ export interface FileRouteTypes {
     | '/career-guides'
     | '/career-passport'
     | '/career-twin'
+    | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
@@ -397,9 +419,11 @@ export interface FileRouteTypes {
     | '/career-guides'
     | '/career-passport'
     | '/career-twin'
+    | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
@@ -433,9 +457,11 @@ export interface RootRouteChildren {
   CareerGuidesRoute: typeof CareerGuidesRoute
   CareerPassportRoute: typeof CareerPassportRoute
   CareerTwinRoute: typeof CareerTwinRoute
+  CoverLettersRoute: typeof CoverLettersRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   ImportRoute: typeof ImportRoute
+  KeywordScannerRoute: typeof KeywordScannerRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   PrivacyCenterRoute: typeof PrivacyCenterRoute
@@ -531,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareerTwinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cover-letters': {
+      id: '/cover-letters'
+      path: '/cover-letters'
+      fullPath: '/cover-letters'
+      preLoaderRoute: typeof CoverLettersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -550,6 +583,13 @@ declare module '@tanstack/react-router' {
       path: '/import'
       fullPath: '/import'
       preLoaderRoute: typeof ImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/keyword-scanner': {
+      id: '/keyword-scanner'
+      path: '/keyword-scanner'
+      fullPath: '/keyword-scanner'
+      preLoaderRoute: typeof KeywordScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -718,9 +758,11 @@ const rootRouteChildren: RootRouteChildren = {
   CareerGuidesRoute: CareerGuidesRoute,
   CareerPassportRoute: CareerPassportRoute,
   CareerTwinRoute: CareerTwinRoute,
+  CoverLettersRoute: CoverLettersRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   ImportRoute: ImportRoute,
+  KeywordScannerRoute: KeywordScannerRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   PrivacyCenterRoute: PrivacyCenterRoute,
