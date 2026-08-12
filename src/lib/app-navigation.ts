@@ -18,6 +18,7 @@ import {
   Wand2,
   type LucideIcon,
 } from "lucide-react";
+import { TEAM_COUNT } from "@/lib/team";
 
 /** Single source of truth for in-app navigation. */
 export type AppNavId =
@@ -190,7 +191,10 @@ export const APP_NAV: AppNavItem[] = [
   {
     id: "team",
     label: { ar: "فريقي المهني", en: "My career team" },
-    hint: { ar: "ثمانية مختصين يعملون معك", en: "Eight specialists working with you" },
+    hint: {
+      ar: `${TEAM_COUNT} مختصاً يعملون معك — مسار وهندسة`,
+      en: `${TEAM_COUNT} specialists working with you — career & eng`,
+    },
     icon: Sparkles,
     to: "/team",
     enabled: true,

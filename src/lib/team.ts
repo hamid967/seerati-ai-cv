@@ -1,13 +1,33 @@
 /**
- * «فريق سيرتي» — the eight virtual specialists.
+ * «فريق سيرتي» — virtual career specialists (product-facing roles).
  *
  * There is no separate model per specialist: each one is a system-role on top
- * of the existing AI provider (see `ai-service.ts`), so orchestration stays in
- * one place and the safe local fallback keeps working.
+ * of the existing AI provider (see `ai-service.ts` + `ai-prompts.server.ts`),
+ * so orchestration stays in one place and the safe local fallback keeps working.
  */
 
 export type AgentId =
-  "noura" | "salman" | "reem" | "khaled" | "layan" | "majed" | "sara" | "rashed";
+  | "noura"
+  | "salman"
+  | "reem"
+  | "khaled"
+  | "layan"
+  | "majed"
+  | "sara"
+  | "rashed"
+  | "fahad"
+  | "dana"
+  | "omar";
+
+export type AgentSurface =
+  | "career-twin"
+  | "jobs"
+  | "builder"
+  | "ats"
+  | "cover-letter"
+  | "interview"
+  | "dashboard"
+  | "assistant";
 
 export type AgentDef = {
   id: AgentId;
@@ -18,12 +38,12 @@ export type AgentDef = {
   /** Short system role used when this specialist runs an AI task. */
   systemRole: string;
   /** Where in the product this specialist is actually wired in. */
-  surfaces: Array<
-    "career-twin" | "jobs" | "builder" | "ats" | "cover-letter" | "interview" | "dashboard"
-  >;
+  surfaces: AgentSurface[];
   initials: string;
   /** Token name used for the avatar ring / accent. */
   accent: "ink" | "emerald" | "sand" | "gold";
+  /** Optional track label for engineering/dev specialists. */
+  track?: "engineering" | "career";
 };
 
 export const TEAM: AgentDef[] = [
@@ -37,9 +57,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت نورة، استشارية مسار مهني في السوق السعودي والخليجي. تساعد المستخدم على تحديد هدف مهني واقعي وواضح، وتحلل الفجوات بين ملفه الحالي وهدفه. لا تخترع خبرات أو أرقاماً، واطلب توضيحاً عند نقص المعلومات.",
-    surfaces: ["career-twin", "dashboard"],
+    surfaces: ["career-twin", "dashboard", "assistant"],
     initials: "ن",
     accent: "ink",
+    track: "career",
   },
   {
     id: "salman",
@@ -51,9 +72,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت سلمان، أخصائي توظيف وخبير أنظمة تتبع المتقدمين (ATS). تقيّم ملاءمة السيرة للوظيفة وتقترح كلمات مفتاحية مأخوذة فعلاً من وصف الوظيفة. لا تعد المستخدم بتجاوز أنظمة ATS ولا بضمان القبول، ولا تقترح إضافة مهارة لا يملكها.",
-    surfaces: ["ats", "jobs", "builder"],
+    surfaces: ["ats", "jobs", "builder", "assistant"],
     initials: "س",
     accent: "emerald",
+    track: "career",
   },
   {
     id: "reem",
@@ -65,9 +87,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت ريم، كاتبة سير ذاتية تنفيذية. تصوغ الملخص والخبرات بأسلوب مهني موجز يبدأ بأفعال قوية ويربط العمل بالأثر. أي رقم لم يذكره المستخدم يُكتب كعنصر يحتاج تأكيداً بالشكل [أكّد الرقم: …] ولا يُخترع.",
-    surfaces: ["builder", "career-twin"],
+    surfaces: ["builder", "career-twin", "assistant"],
     initials: "ر",
     accent: "ink",
+    track: "career",
   },
   {
     id: "khaled",
@@ -79,9 +102,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت خالد، مصمم سير ذاتية. تنصح باختيار القالب والخط والمسافات وكثافة المحتوى بما يناسب مستوى الوظيفة وعدد الصفحات. لا تقترح تصاميم تضر بقراءة أنظمة ATS للقوالب المخصصة لها.",
-    surfaces: ["builder"],
+    surfaces: ["builder", "assistant"],
     initials: "خ",
     accent: "sand",
+    track: "career",
   },
   {
     id: "layan",
@@ -93,9 +117,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت ليان، باحثة وظائف. تعمل فقط على النص والمعلومات التي يزودك بها المستخدم؛ لا تدّعي الوصول إلى الإنترنت أو مصادر خارجية. تستخرج المهارات التقنية والشخصية وسنوات الخبرة والمسؤوليات ولغة العمل والمؤهلات، وتذكر بوضوح ما لم يرد في النص.",
-    surfaces: ["jobs"],
+    surfaces: ["jobs", "assistant"],
     initials: "ل",
     accent: "emerald",
+    track: "career",
   },
   {
     id: "majed",
@@ -107,9 +132,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت ماجد، مدرب مقابلات. تبني الأسئلة المتوقعة والإجابات على خبرات المستخدم المؤكدة فقط، بإطار STAR. تقييمك استشاري وليس حكماً نهائياً، وتوضح ذلك.",
-    surfaces: ["interview"],
+    surfaces: ["interview", "assistant"],
     initials: "م",
     accent: "gold",
+    track: "career",
   },
   {
     id: "sara",
@@ -121,9 +147,10 @@ export const TEAM: AgentDef[] = [
     },
     systemRole:
       "أنت سارة، محررة لغوية عربية وإنجليزية. تصحح النحو والإملاء وتوحّد المصطلحات والأسلوب دون تغيير المعنى أو إضافة معلومات جديدة.",
-    surfaces: ["builder", "cover-letter"],
+    surfaces: ["builder", "cover-letter", "assistant"],
     initials: "س",
     accent: "sand",
+    track: "career",
   },
   {
     id: "rashed",
@@ -138,16 +165,69 @@ export const TEAM: AgentDef[] = [
     surfaces: ["jobs", "dashboard"],
     initials: "ر",
     accent: "ink",
+    track: "career",
+  },
+  {
+    id: "fahad",
+    name: { ar: "فهد", en: "Fahad" },
+    role: { ar: "مهندس سيرة تقنية", en: "Tech Resume Engineer" },
+    blurb: {
+      ar: "يصوغ مشاريعك ومخزونك التقني (Stack) بأسلوب يناسب وظائف هندسة البرمجيات.",
+      en: "Frames your projects and tech stack for software-engineering roles.",
+    },
+    systemRole:
+      "أنت فهد، مهندس سيرة تقنية. تساعد على صياغة المشاريع التقنية، الـ stack، والمساهمات بلغة واضحة للمُوظِّفين التقنيين في السعودية والخليج. أبرز الأثر والمسؤولية دون اختلاق مستودعات أو أرقام أو تقنيات لم يذكرها المستخدم. احتفظ بأسماء التقنيات بالإنجليزية عند الحاجة.",
+    surfaces: ["builder", "assistant", "ats"],
+    initials: "ف",
+    accent: "emerald",
+    track: "engineering",
+  },
+  {
+    id: "dana",
+    name: { ar: "دانة", en: "Dana" },
+    role: { ar: "مطورة واجهات ومنتجات", en: "Frontend & Product Engineer" },
+    blurb: {
+      ar: "تبرز مهارات React/TypeScript وRTL وتجربة المستخدم في سيرتك.",
+      en: "Surfaces React/TypeScript, RTL and UX impact in your resume.",
+    },
+    systemRole:
+      "أنت دانة، مطورة واجهات ومنتجات. تساعد على صياغة خبرات الواجهات (React، TypeScript، RTL، الأداء، إمكانية الوصول) بنقاط تبدأ بفعل قوي وتربط العمل بالأثر. لا تختلق مكتبات أو مقاييس أداء لم يذكرها المستخدم.",
+    surfaces: ["builder", "assistant", "interview"],
+    initials: "د",
+    accent: "gold",
+    track: "engineering",
+  },
+  {
+    id: "omar",
+    name: { ar: "عمر", en: "Omar" },
+    role: { ar: "مهندس منصات وبيانات", en: "Platform & Data Engineer" },
+    blurb: {
+      ar: "يربط خبراتك في APIs وقواعد البيانات وRLS بصياغة يفهمها مسؤولو التوظيف التقني.",
+      en: "Turns APIs, databases and RLS work into recruiter-ready wording.",
+    },
+    systemRole:
+      "أنت عمر، مهندس منصات وبيانات. تساعد على صياغة خبرات الـ backend وقواعد البيانات وواجهات البرمجة والأمان متعدد المستأجرين بلغة مهنية دقيقة. لا تختلق أنظمة أو أحجام بيانات أو نسب موثوقية غير مذكورة؛ ضع أي رقم مقترح داخل [أكّد الرقم: …].",
+    surfaces: ["builder", "assistant", "ats"],
+    initials: "ع",
+    accent: "ink",
+    track: "engineering",
   },
 ];
 
+export const TEAM_COUNT = TEAM.length;
+
+export const ENGINEERING_TEAM = TEAM.filter((a) => a.track === "engineering");
+
 export const agentById = (id: string): AgentDef | undefined => TEAM.find((a) => a.id === id);
 
-export const agentsForSurface = (surface: AgentDef["surfaces"][number]): AgentDef[] =>
+export const agentsForSurface = (surface: AgentSurface): AgentDef[] =>
   TEAM.filter((a) => a.surfaces.includes(surface));
 
 /** Primary product surface each specialist opens from the team page. */
 export const agentPrimaryHref = (agent: AgentDef): string => {
+  if (agent.surfaces.includes("assistant") && agent.track === "engineering") {
+    return `/assistant?agent=${agent.id}`;
+  }
   const surface = agent.surfaces[0];
   switch (surface) {
     case "career-twin":
@@ -159,9 +239,9 @@ export const agentPrimaryHref = (agent: AgentDef): string => {
     case "ats":
       return "/ats";
     case "cover-letter":
-      return "/assistant";
     case "interview":
-      return "/assistant";
+    case "assistant":
+      return `/assistant?agent=${agent.id}`;
     case "dashboard":
       return "/dashboard";
     default:

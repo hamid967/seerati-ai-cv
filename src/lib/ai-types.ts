@@ -22,6 +22,8 @@ export type AiRequest = {
   task: AiTask;
   lang: "ar" | "en";
   input: string;
+  /** Optional virtual specialist — prepends TEAM systemRole on the server. */
+  agentId?: string;
   context?: Partial<ResumeData> & {
     targetRole?: string;
     jobDescription?: string;

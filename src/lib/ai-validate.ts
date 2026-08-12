@@ -26,5 +26,16 @@ export function parseAiRequest(input: unknown): AiRequest {
       ? (raw["context"] as NonNullable<AiRequest["context"]>)
       : undefined;
 
-  return { task: task as AiTask, lang, input: text, ...(context ? { context } : {}) };
+  const agentId =
+    typeof raw["agentId"] === "string" && raw["agentId"].trim()
+      ? raw["agentId"].trim().slice(0, 40)
+      : undefined;
+
+  return {
+    task: task as AiTask,
+    lang,
+    input: text,
+    ...(agentId ? { agentId } : {}),
+    ...(context ? { context } : {}),
+  };
 }
