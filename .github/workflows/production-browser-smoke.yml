@@ -1,0 +1,106 @@
+name: Production Browser Smoke
+
+on:
+  push:
+    branches:
+      - ops/production-browser-smoke
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install Playwright
+        run: |
+          bun add --no-save playwright@1.55.0
+          bunx playwright install --with-deps chromium
+      - name: Test live production hydration after runtime bootstrap
+        env:
+          BASE_URL: https://seerati-ai-cv.lovable.app
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const routes = [
+              ['/', 'public'],
+              ['/templates', 'public'],
+              ['/features', 'public'],
+              ['/ats', 'public'],
+              ['/auth', 'auth'],
+              ['/dashboard', 'dashboard'],
+            ];
+
+            const browser = await chromium.launch({ headless: true });
+            let failed = false;
+
+            for (const [route, kind] of routes) {
+              const context = await browser.newContext();
+              const page = await context.newPage();
+              const pageErrors = [];
+              const consoleErrors = [];
+              const badRequests = [];
+              const assetHosts = new Set();
+
+              page.on('pageerror', (error) => pageErrors.push(String(error.message || error)));
+              page.on('console', (msg) => {
+                if (msg.type() === 'error') consoleErrors.push(msg.text());
+              });
+              page.on('request', (request) => {
+                const url = request.url();
+                if (request.resourceType() === 'script' || request.resourceType() === 'stylesheet') {
+                  try { assetHosts.add(new URL(url).host); } catch {}
+                }
+                if (url.includes('ci-supabase.invalid') || url.includes('undefined')) badRequests.push(url);
+              });
+
+              try {
+                const response = await page.goto(`${process.env.BASE_URL}${route}`, {
+                  waitUntil: 'domcontentloaded',
+                  timeout: 30000,
+                });
+                await page.waitForTimeout(4000);
+
+                const finalUrl = page.url();
+                const body = await page.locator('body').innerText().catch(() => '');
+                const missingEnv = body.includes('Missing Supabase environment variable') ||
+                  [...pageErrors, ...consoleErrors].some((text) => text.includes('Missing Supabase environment variable'));
+                const errorBoundary = /Missing Supabase environment variable|Connect Supabase in Lovable Cloud/i.test(body);
+                const status = response?.status() ?? 0;
+                const dashboardRedirectOk = kind !== 'dashboard' || finalUrl.includes('/auth') || body.length > 500;
+                const contentOk = body.trim().length > 120;
+                const pageErrorOk = pageErrors.length === 0;
+                const badRequestOk = badRequests.length === 0;
+                const ok = status >= 200 && status < 400 && dashboardRedirectOk && contentOk && pageErrorOk && badRequestOk && !missingEnv && !errorBoundary;
+
+                console.log(`${ok ? 'PASS' : 'FAIL'} ${route} status=${status} final=${new URL(finalUrl).host}${new URL(finalUrl).pathname} text=${body.trim().length} pageErrors=${pageErrors.length} consoleErrors=${consoleErrors.length} badRequests=${badRequests.length} assetHosts=${[...assetHosts].join(',')}`);
+                if (!ok) {
+                  failed = true;
+                  if (pageErrors.length) console.log('  pageerror:', pageErrors.slice(0, 3).join(' | '));
+                  const importantConsole = consoleErrors.filter((x) => /supabase|error|failed|uncaught/i.test(x));
+                  if (importantConsole.length) console.log('  console:', importantConsole.slice(0, 3).join(' | '));
+                  if (badRequests.length) console.log('  bad request detected');
+                }
+              } catch (error) {
+                failed = true;
+                console.log(`FAIL ${route} navigation=${String(error.message || error)}`);
+              } finally {
+                await context.close();
+              }
+            }
+
+            await browser.close();
+            if (failed) process.exit(1);
+            console.log('Production browser hydration smoke passed.');
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE

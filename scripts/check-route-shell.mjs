@@ -18,6 +18,8 @@ const APP_ROUTES = [
   "/import",
   "/admin",
   "/privacy-center",
+  "/cover-letters",
+  "/keyword-scanner",
 ];
 
 const root = readFileSync("src/routes/__root.tsx", "utf8");

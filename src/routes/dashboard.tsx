@@ -74,17 +74,8 @@ function Dashboard() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
-  const {
-    user,
-    ready,
-    resumes,
-    atLimit,
-    duplicateResume,
-    deleteResume,
-    updateResume,
-    createResume,
-    maxResumes,
-  } = useStore();
+  const { user, ready, resumes, atLimit, duplicateResume, deleteResume, updateResume, maxResumes } =
+    useStore();
   const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   const [twin, setTwin] = useState<CareerTwin | null>(null);
@@ -333,23 +324,6 @@ function Dashboard() {
                 <div className="flex flex-wrap justify-center gap-2">
                   <Button asChild>
                     <Link to="/resumes/new">{t("dash_new")}</Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      void (async () => {
-                        const created = await createResume({
-                          title: ar ? "سيرة تجريبية" : "Demo resume",
-                          templateId: "saudi-professional",
-                          language: "ar",
-                          seed: true,
-                        });
-                        if (created) toast.success(ar ? "أضفنا سيرة تجريبية" : "Demo resume added");
-                        else toast.error(t("limit_reached"));
-                      })();
-                    }}
-                  >
-                    {ar ? "جرّب ببيانات تجريبية" : "Try with demo data"}
                   </Button>
                 </div>
               </CardContent>

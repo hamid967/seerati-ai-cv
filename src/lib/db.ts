@@ -30,6 +30,8 @@ export const rowToTemplate = (row: TemplateRow): TemplateDef => {
     atsFriendly: row.ats_friendly,
     active: row.active,
     order: row.display_order,
+    ...(row.thumbnail_url ? { thumbnailUrl: row.thumbnail_url } : {}),
+
     design: {
       ...baseDesign,
       ...(seed?.design ?? {}),
@@ -55,8 +57,18 @@ const templateColumns = (tpl: TemplateDef) => ({
   ats_friendly: tpl.atsFriendly,
   active: tpl.active,
   display_order: tpl.order,
+  thumbnail_url: tpl.thumbnailUrl ?? null,
   design: tpl.design as never,
 });
+
+/** Stores an auto-generated thumbnail (data URL) for a template. */
+export async function saveTemplateThumbnail(id: string, thumbnailUrl: string) {
+  const { error } = await supabase
+    .from("templates")
+    .update({ thumbnail_url: thumbnailUrl })
+    .eq("id", id);
+  return error ? { error: error.message } : {};
+}
 
 export async function saveTemplate(tpl: TemplateDef) {
   const { error } = await supabase.from("templates").update(templateColumns(tpl)).eq("id", tpl.id);
@@ -307,9 +319,24 @@ export type AppSettings = {
   aiProvider: string | null;
 };
 
+type AppSettingsRow = {
+  id: string;
+  site_name: string;
+  logo_url: string | null;
+  default_language: string;
+  max_resumes: number;
+  maintenance: boolean;
+  ai_mode: string;
+  ai_provider: string | null;
+};
+
 export async function fetchAppSettings(): Promise<AppSettings | null> {
-  const { data } = await supabase.from("app_settings").select("*").limit(1).maybeSingle();
+  // Full configuration (including internal AI/maintenance fields) is admin-only and
+  // guarded server-side; regular users may only read the public columns.
+  const { data: rows } = await supabase.rpc("admin_get_app_settings");
+  const data = (rows as AppSettingsRow[] | null)?.[0];
   if (!data) return null;
+
   return {
     id: data.id,
     siteName: data.site_name,

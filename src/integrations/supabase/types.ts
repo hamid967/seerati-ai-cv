@@ -77,6 +77,13 @@ export type Database = {
             referencedRelation: "job_workspaces";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "agent_activity_owned_job_fk";
+            columns: ["job_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "job_workspaces";
+            referencedColumns: ["id", "user_id"];
+          },
         ];
       };
       ai_usage: {
@@ -192,6 +199,27 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "application_assets_owned_job_fk";
+            columns: ["job_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "job_workspaces";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "application_assets_owned_letter_fk";
+            columns: ["cover_letter_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "cover_letters";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "application_assets_owned_resume_fk";
+            columns: ["resume_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "resumes";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
             foreignKeyName: "application_assets_resume_id_fkey";
             columns: ["resume_id"];
             isOneToOne: false;
@@ -256,6 +284,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "career_facts";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "career_evidence_owned_fact_fk";
+            columns: ["fact_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "career_facts";
+            referencedColumns: ["id", "user_id"];
           },
         ];
       };
@@ -409,6 +444,13 @@ export type Database = {
             referencedRelation: "job_workspaces";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "career_tasks_owned_job_fk";
+            columns: ["job_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "job_workspaces";
+            referencedColumns: ["id", "user_id"];
+          },
         ];
       };
       cover_letters: {
@@ -463,6 +505,20 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "cover_letters_owned_job_fk";
+            columns: ["job_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "job_workspaces";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "cover_letters_owned_resume_fk";
+            columns: ["resume_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "resumes";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
             foreignKeyName: "cover_letters_resume_id_fkey";
             columns: ["resume_id"];
             isOneToOne: false;
@@ -513,6 +569,13 @@ export type Database = {
             referencedRelation: "job_workspaces";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "interview_sessions_owned_job_fk";
+            columns: ["job_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "job_workspaces";
+            referencedColumns: ["id", "user_id"];
+          },
         ];
       };
       job_application_events: {
@@ -556,6 +619,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "job_workspaces";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "job_application_events_owned_job_fk";
+            columns: ["job_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "job_workspaces";
+            referencedColumns: ["id", "user_id"];
           },
         ];
       };
@@ -715,6 +785,20 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "resume_versions_owned_parent_fk";
+            columns: ["parent_version_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "resume_versions";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
+            foreignKeyName: "resume_versions_owned_resume_fk";
+            columns: ["resume_id", "user_id"];
+            isOneToOne: false;
+            referencedRelation: "resumes";
+            referencedColumns: ["id", "user_id"];
+          },
+          {
             foreignKeyName: "resume_versions_parent_version_id_fkey";
             columns: ["parent_version_id"];
             isOneToOne: false;
@@ -860,6 +944,37 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      admin_career_privacy_metrics: {
+        Args: never;
+        Returns: {
+          active_career_users: number;
+          agent_activity_count: number;
+          career_evidence_count: number;
+          career_fact_count: number;
+          resume_version_count: number;
+        }[];
+      };
+      admin_get_app_settings: {
+        Args: never;
+        Returns: {
+          ai_mode: string;
+          ai_provider: string | null;
+          created_at: string;
+          default_language: string;
+          id: string;
+          logo_url: string | null;
+          maintenance: boolean;
+          max_resumes: number;
+          site_name: string;
+          updated_at: string;
+        }[];
+        SetofOptions: {
+          from: "*";
+          to: "app_settings";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
       admin_set_user_role: {
         Args: {
           new_role: Database["public"]["Enums"]["app_role"];

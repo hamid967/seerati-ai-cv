@@ -4,17 +4,8 @@
  *
  * HONEST SCOPE: this project has no headless-browser screenshot infrastructure,
  * so this script does NOT claim pixel-perfect or overflow detection. It verifies
- * only what can be verified statically:
- *
- *  1. every template in the registry is complete and uses design values the
- *     shared renderer actually implements;
- *  2. the renderer handles each layout / header / sectionStyle / bullet variant
- *     used by the registry;
- *  3. every section key referenced by the fixtures is rendered somewhere;
- *  4. the fixtures cover short / normal / long-stress in Arabic and English and
- *     stay structurally valid (required props present, no undefined arrays);
- *  5. RTL metadata is coherent (templates flagged supportsRTL exist and the
- *     renderer receives a direction flag).
+ * registry integrity, renderer coverage, RTL metadata, ATS-safe declarations,
+ * design diversity and representative bilingual stress fixtures.
  */
 import { readFileSync } from "node:fs";
 import { fixtures } from "./fixtures/resume-fixtures.mjs";
@@ -31,9 +22,6 @@ const fail = (m) => {
 };
 const note = (m) => console.log(`NOTE  ${m}`);
 
-/* ------------------------- 1. registry completeness ------------------------ */
-
-// Templates spread `...baseDesign`, so unspecified design keys are inherited.
 const baseBlock =
   registrySrc.match(/baseDesign:\s*TemplateDesign\s*=\s*\{([\s\S]*?)\n\};/)?.[1] ?? "";
 const baseGrab = (k) => baseBlock.match(new RegExp(`${k}:\\s*("?)([\\w-]+)\\1`))?.[2] ?? null;
@@ -55,6 +43,7 @@ const templates = blocks.map((b) => {
     atsFriendly: grab("atsFriendly") === "true",
     supportsRTL: grab("supportsRTL") === "true",
     active: grab("active") === "true",
+    order: Number(b.match(/order:\s*(\d+)/)?.[1] ?? NaN),
     layout: grab("layout") ?? baseDesign.layout,
     header: grab("header") ?? baseDesign.header,
     sectionStyle: grab("sectionStyle") ?? baseDesign.sectionStyle,
@@ -62,12 +51,23 @@ const templates = blocks.map((b) => {
     spacing: grab("spacing") ?? baseDesign.spacing,
     accent: b.match(/accent:\s*"([^"]+)"/)?.[1] ?? null,
     hasNameAr: /name:\s*\{[^}]*ar:/.test(b),
+    hasNameEn: /name:\s*\{[^}]*en:/.test(b),
     hasDescAr: /description:\s*\{[^}]*ar:/.test(b),
+    hasDescEn: /description:\s*\{[^}]*en:/.test(b),
   };
 });
 
-if (templates.length < 6) fail(`registry has only ${templates.length} templates (expected 6+)`);
+if (templates.length < 10) fail(`registry has only ${templates.length} templates (expected 10+)`);
 else pass(`registry lists ${templates.length} templates`);
+
+const ids = new Set(templates.map((t) => t.id));
+if (ids.size !== templates.length) fail("template ids must be unique");
+else pass("template ids are unique");
+
+const orders = templates.map((t) => t.order);
+if (orders.every(Number.isFinite) && new Set(orders).size === orders.length)
+  pass("template ordering values are unique");
+else fail("template order values must be finite and unique");
 
 const unions = {
   category: typesSrc.match(/TemplateCategory\s*=\s*([^;]+);/)?.[1] ?? "",
@@ -80,22 +80,37 @@ const unions = {
 
 for (const t of templates) {
   const problems = [];
-  if (!t.hasNameAr) problems.push("missing Arabic name");
-  if (!t.hasDescAr) problems.push("missing Arabic description");
+  if (!t.hasNameAr || !t.hasNameEn) problems.push("missing bilingual name");
+  if (!t.hasDescAr || !t.hasDescEn) problems.push("missing bilingual description");
   if (!/^#[0-9a-fA-F]{6}$/.test(t.accent ?? "")) problems.push(`invalid accent ${t.accent}`);
+  if (!t.supportsRTL) problems.push("RTL support must be explicit for Seerati templates");
   for (const key of ["category", "layout", "header", "sectionStyle", "bullet", "spacing"]) {
     if (!t[key]) problems.push(`missing ${key}`);
     else if (!unions[key].includes(`"${t[key]}"`))
       problems.push(`${key}="${t[key]}" not in type union`);
   }
+  // Seerati's ATS promise is intentionally conservative: multi-column layouts
+  // are not labelled ATS-friendly even if some parsers may handle them.
+  if (t.atsFriendly && t.layout !== "single")
+    problems.push("ATS-friendly templates must stay single-column");
+  if (t.category === "creative" && t.atsFriendly)
+    problems.push("creative templates must not claim ATS-friendly status");
   if (problems.length) fail(`template ${t.id}: ${problems.join("; ")}`);
   else pass(`template ${t.id} metadata valid (${t.layout}/${t.header}/${t.sectionStyle})`);
 }
 
-/* --------------------- 2. renderer covers design variants ------------------ */
+const accents = new Set(templates.map((t) => t.accent).filter(Boolean));
+if (accents.size >= Math.ceil(templates.length * 0.65))
+  pass(`visual palette has ${accents.size} distinct accents across ${templates.length} templates`);
+else fail("template palette is too repetitive");
 
-// The renderer is config-driven: some variants are the fall-through branch
-// rather than an explicit comparison, so those count as covered.
+const categories = new Map();
+for (const t of templates) categories.set(t.category, (categories.get(t.category) ?? 0) + 1);
+for (const category of ["ats", "modern", "executive", "minimal", "creative"]) {
+  if ((categories.get(category) ?? 0) > 0) pass(`category "${category}" is represented`);
+  else fail(`category "${category}" has no template`);
+}
+
 const RENDERER_DEFAULTS = {
   layout: "single",
   header: "stack",
@@ -116,16 +131,12 @@ for (const key of ["layout", "header", "sectionStyle", "bullet", "spacing"]) {
   }
 }
 
-/* ------------------------ 3. section coverage in DOM ----------------------- */
-
 const sectionKeys = [...new Set(fixtures.flatMap((f) => f.data.sectionOrder))];
 for (const key of sectionKeys) {
   if (rendererSrc.includes(`"${key}"`) || new RegExp(`\\b${key}:`).test(rendererSrc))
     pass(`renderer renders section "${key}"`);
   else fail(`renderer has no branch for section "${key}"`);
 }
-
-/* --------------------------- 4. fixture integrity -------------------------- */
 
 const REQUIRED_ARRAYS = [
   "experience",
@@ -185,22 +196,18 @@ for (const f of stress) {
     );
 }
 
-/* ---------------------------- 5. RTL metadata ------------------------------ */
-
 const rtlTemplates = templates.filter((t) => t.supportsRTL);
-if (!rtlTemplates.length) fail("no template declares supportsRTL");
-else pass(`${rtlTemplates.length}/${templates.length} templates declare RTL support`);
+if (rtlTemplates.length === templates.length)
+  pass(`all ${templates.length} templates declare RTL support`);
+else fail(`${templates.length - rtlTemplates.length} template(s) do not declare RTL support`);
 
 if (/rtl/.test(rendererSrc)) pass("renderer receives a direction flag (rtl)");
 else fail("renderer has no direction handling");
-
 if (/dir=|direction/.test(rendererSrc)) pass("renderer sets an explicit dir/direction on the page");
 else fail("renderer never sets dir/direction");
 
 const atsCount = templates.filter((t) => t.atsFriendly).length;
-note(
-  `${atsCount} template(s) declare an ATS-friendly configuration (single column, no decorative-only text).`,
-);
+note(`${atsCount} template(s) use Seerati's conservative ATS-friendly declaration.`);
 note(
   "Pixel/overflow rendering is NOT checked here: no headless screenshot infrastructure in this project.",
 );

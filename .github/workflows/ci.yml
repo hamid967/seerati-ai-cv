@@ -2,7 +2,26 @@ name: Seerati CI
 
 on:
   push:
-    branches: [main, "codex/**"]
+    branches:
+      [
+        main,
+        "codex/**",
+        "stage5c/**",
+        "stage5d/**",
+        "stage5e/**",
+        "stage5f/**",
+        "stage5g/**",
+        "stage5i/**",
+        "stage6/**",
+        "stage6b/**",
+        "stage6c/**",
+        "stage6d-h/**",
+        "stage7/**",
+        "stage8/**",
+        "stage9/**",
+        "stage11/**",
+        "hotfix/**",
+      ]
   pull_request:
     branches: [main]
 
@@ -20,27 +39,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
-
       - name: Format check
         run: bunx prettier --check .
-
       - name: Lint
         run: bun run lint
-
       - name: Type check
         run: bunx tsc --noEmit
-
       - name: Build
+        env:
+          VITE_SUPABASE_URL: https://ci-supabase.invalid
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_bundle_guard
+          SUPABASE_URL: https://ci-supabase.invalid
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_bundle_guard
         run: bun run build
-
       - name: Static QA
         run: |
           bun run qa:ai
@@ -49,6 +66,22 @@ jobs:
           bun run test:resume-diff
           bun run test:templates
           bun run check:rtl
+          bun run check:premium-3d
+          node scripts/check-template-gallery-3d.mjs
+          node scripts/check-resume-studio-ultra.mjs
+          node scripts/check-professional-layout-engine.mjs
+          node scripts/check-smart-pagination-composer.mjs
+          node scripts/check-resume-design-intelligence.mjs
+          node scripts/check-recruiter-ten-second-scan.mjs
+          node scripts/check-saudi-market-leadership.mjs
+          node scripts/check-job-application-readiness.mjs
+          node scripts/check-tailoring-studio.mjs
+          node scripts/check-stage6d-h-market-leadership.mjs
+          node scripts/check-production-launch-readiness.mjs
+          node scripts/check-release-operations.mjs
+          node scripts/check-production-activation.mjs
+          node scripts/check-production-env-bundle.mjs
+          node scripts/check-flowcv-editor-controls.mjs
 
   route-smoke:
     runs-on: ubuntu-latest
@@ -61,20 +94,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-
       - name: Skip when QA Supabase secrets are unavailable
         if: ${{ env.VITE_SUPABASE_URL == '' || env.VITE_SUPABASE_PUBLISHABLE_KEY == '' || env.SUPABASE_URL == '' || env.SUPABASE_PUBLISHABLE_KEY == '' }}
         run: echo "Route smoke skipped because QA Supabase secrets are not configured."
-
       - name: Install dependencies
         if: ${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != '' && env.SUPABASE_URL != '' && env.SUPABASE_PUBLISHABLE_KEY != '' }}
         run: bun install --frozen-lockfile
-
       - name: Start app
         if: ${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != '' && env.SUPABASE_URL != '' && env.SUPABASE_PUBLISHABLE_KEY != '' }}
         run: |
@@ -86,7 +115,6 @@ jobs:
           done
           cat /tmp/seerati-vite.log
           exit 1
-
       - name: Route smoke tests
         if: ${{ env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != '' && env.SUPABASE_URL != '' && env.SUPABASE_PUBLISHABLE_KEY != '' }}
         env:

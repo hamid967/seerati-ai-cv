@@ -14,9 +14,18 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ResumePreview, getTemplate } from "@/components/resume-preview";
+import { getTemplate } from "@/components/resume-preview";
+import { TemplateSwitcher } from "@/components/template-switcher";
+import { ProfessionalResumePreview } from "@/components/professional-resume-preview";
+import {
+  ResumeEditorLayoutControls,
+  ResumeSectionVisibilityControls,
+} from "@/components/resume-editor-layout-controls";
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
+import { GuestNotice } from "@/components/guest-notice";
+import { BulletWriterPanel } from "@/components/bullet-writer-panel";
+
 import { SortableList, SortableItem, reorderArray } from "@/components/sortable";
 
 import { Button } from "@/components/ui/button";
@@ -154,7 +163,7 @@ function EditResume() {
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
   const [loadingVersions, setLoadingVersions] = useState(true);
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   useEffect(() => {
     if (stored && !draft) setDraft(stored);
@@ -331,21 +340,28 @@ function EditResume() {
             className="h-9 w-52 font-semibold"
             aria-label={ar ? "اسم السيرة" : "Resume name"}
           />
-          <Select
-            value={draft.templateId}
-            onValueChange={(v) => patch((r) => ({ ...r, templateId: v }))}
-          >
-            <SelectTrigger className="h-9 w-44">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {defaultTemplates.map((x) => (
-                <SelectItem key={x.id} value={x.id}>
-                  {x.name[lang]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TemplateSwitcher
+            resume={draft}
+            templates={defaultTemplates}
+            onSelect={(templateId) =>
+              patch((r) => {
+                const next = getTemplate(templateId, defaultTemplates);
+                const design = { ...(r.data.design ?? {}) };
+                // Drop the overrides that would mask the new template's identity.
+                delete design.accent;
+                delete design.layout;
+                delete design.density;
+                return {
+                  ...r,
+                  templateId,
+                  data: {
+                    ...r.data,
+                    design: { ...design, columnWidth: next.design.layout === "single" ? 28 : 30 },
+                  },
+                };
+              })
+            }
+          />
           <Select
             value={draft.language}
             onValueChange={(v) => patch((r) => ({ ...r, language: v as "ar" | "en" }))}
@@ -446,10 +462,13 @@ function EditResume() {
                   </TabsList>
                   <TabsContent
                     value="preview"
-                    className="mt-2 min-h-0 flex-1 overflow-auto rounded-xl bg-secondary/40 p-2"
+                    className="resume-canvas mt-2 min-h-0 flex-1 overflow-auto rounded-xl border border-border p-3"
                   >
-                    <ResumePreview resume={draft} />
+                    <div className="mx-auto w-fit rounded-[3px] shadow-lift ring-1 ring-black/5">
+                      <ProfessionalResumePreview resume={draft} />
+                    </div>
                   </TabsContent>
+
                   <TabsContent value="ai" className="mt-2 min-h-0 flex-1">
                     <AiAssistant
                       resume={draft}
@@ -526,7 +545,11 @@ function EditResume() {
         </div>
       </div>
 
-      <main className="mx-auto grid max-w-[1500px] gap-6 px-4 py-6 lg:grid-cols-[190px_minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="mx-auto max-w-[1500px] px-4 pt-4">
+        <GuestNotice />
+      </div>
+
+      <main className="mx-auto grid w-full max-w-[1760px] gap-6 px-4 py-6 lg:grid-cols-[176px_minmax(0,1fr)_minmax(0,1fr)] xl:gap-8">
         {/* Section navigation */}
         <nav
           aria-label={ar ? "أقسام المحرر" : "Builder sections"}
@@ -1374,6 +1397,19 @@ function EditResume() {
                   </Select>
                 </div>
 
+                {tpl ? (
+                  <ResumeEditorLayoutControls
+                    ar={ar}
+                    design={d.design}
+                    template={tpl}
+                    onChange={(designPatch) =>
+                      setData((data) => {
+                        data.design = { ...data.design, ...designPatch };
+                      })
+                    }
+                  />
+                ) : null}
+
                 {tpl?.design.supportsPhoto ? (
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm">
@@ -1423,6 +1459,20 @@ function EditResume() {
                     ? "رتّب أقسام السيرة الذاتية. الأقسام الفارغة لا تظهر في المعاينة."
                     : "Reorder sections. Empty sections are hidden in the preview."}
                 </p>
+                <ResumeSectionVisibilityControls
+                  ar={ar}
+                  sections={d.sectionOrder.map((key) => ({
+                    key,
+                    label: sectionLabels[key][lang],
+                  }))}
+                  hiddenSections={d.hiddenSections ?? []}
+                  onChange={(hiddenSections) =>
+                    setData((data) => {
+                      data.hiddenSections = hiddenSections;
+                    })
+                  }
+                />
+
                 <SortableList
                   ids={d.sectionOrder}
                   onReorder={(from, to) =>
@@ -1479,7 +1529,7 @@ function EditResume() {
         </div>
 
         {/* Right column */}
-        <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[calc(100vh-10rem)]">
+        <div className="hidden lg:sticky lg:top-32 lg:block lg:h-[calc(100vh-9rem)]">
           <Tabs value={sideTab} onValueChange={setSideTab} className="flex h-full flex-col">
             <TabsList className="w-full">
               <TabsTrigger value="preview" className="flex-1">
@@ -1495,9 +1545,11 @@ function EditResume() {
 
             <TabsContent
               value="preview"
-              className="mt-3 min-h-0 flex-1 overflow-auto rounded-2xl bg-secondary/40 p-3"
+              className="resume-canvas mt-3 min-h-0 flex-1 overflow-auto rounded-2xl border border-border p-5"
             >
-              <ResumePreview resume={draft} />
+              <div className="mx-auto w-fit rounded-[3px] shadow-lift ring-1 ring-black/5">
+                <ProfessionalResumePreview resume={draft} />
+              </div>
             </TabsContent>
 
             <TabsContent value="ai" className="mt-3 min-h-0 flex-1">
@@ -1615,9 +1667,34 @@ function EditResume() {
                     >
                       {ar ? "أضف الكلمات الناقصة إلى المهارات" : "Add missing keywords to skills"}
                     </Button>
+                    <Button size="sm" variant="ghost" className="mt-2" asChild>
+                      <Link to="/keyword-scanner">
+                        {ar ? "فتح ماسح الكلمات المفتاحية" : "Open keyword scanner"}
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </div>
+
+              <div className="mt-6">
+                <BulletWriterPanel
+                  lang={lang}
+                  bullets={draft.data.experience.flatMap((e) => e.bullets)}
+                  onApply={(original, suggested) => {
+                    setData((data) => {
+                      for (const exp of data.experience) {
+                        const idx = exp.bullets.findIndex((b) => b === original);
+                        if (idx >= 0) {
+                          exp.bullets[idx] = suggested;
+                          break;
+                        }
+                      }
+                    });
+                    toast.success(ar ? "تم تطبيق الاقتراح" : "Suggestion applied");
+                  }}
+                />
+              </div>
+
               <BilingualSyncCard current={draft} all={resumes} />
             </TabsContent>
           </Tabs>

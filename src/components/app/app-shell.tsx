@@ -4,6 +4,7 @@ import { AppSidebar } from "./app-sidebar";
 import { AppTopbar } from "./app-topbar";
 import { CommandPalette } from "./command-palette";
 import { MobileBottomNav } from "./mobile-bottom-nav";
+import { ProductAnalyticsBridge } from "./product-analytics-bridge";
 
 const STORAGE_KEY = "seerati.sidebar.collapsed";
 
@@ -40,7 +41,6 @@ export function AppShell({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
-  // Restore the user's rail preference; focus mode always starts collapsed.
   useEffect(() => {
     if (focus) {
       setCollapsed(true);
@@ -89,7 +89,19 @@ export function AppShell({
 
   return (
     <AppChromeContext.Provider value={chrome}>
-      <div className="flex min-h-dvh w-full bg-sand text-foreground">
+      <ProductAnalyticsBridge />
+      <div className="seerati-app-3d flex min-h-dvh w-full bg-sand text-foreground">
+        <a
+          href="#app-main-content"
+          className="seerati-skip-link"
+          onClick={() => {
+            window.requestAnimationFrame(() =>
+              document.getElementById("app-main-content")?.focus(),
+            );
+          }}
+        >
+          تخطَّ إلى المحتوى / Skip to content
+        </a>
         <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <AppTopbar
@@ -99,7 +111,9 @@ export function AppShell({
             {...(back ? { back } : {})}
           />
           <main
-            className={`flex-1 ${bare ? "" : "px-4 py-5 md:px-6 md:py-7"} ${focus ? "pb-6" : "pb-24 md:pb-6"}`}
+            id="app-main-content"
+            tabIndex={-1}
+            className={`seerati-app-stage flex-1 ${bare ? "" : "px-4 py-5 md:px-6 md:py-7"} ${focus ? "pb-6" : "pb-24 md:pb-6"}`}
           >
             <div className={bare ? "h-full w-full" : widthClass}>{children}</div>
           </main>

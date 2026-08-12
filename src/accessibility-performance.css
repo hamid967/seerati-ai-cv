@@ -1,0 +1,79 @@
+.seerati-skip-link {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 10000;
+  max-width: calc(100vw - 1.5rem);
+  transform: translateY(-180%);
+  border: 2px solid var(--ring);
+  border-radius: 0.75rem;
+  background: var(--background);
+  color: var(--foreground);
+  padding: 0.65rem 0.9rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-lift);
+  transition: transform 140ms ease;
+}
+
+.seerati-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid color-mix(in oklab, var(--ring) 45%, transparent);
+  outline-offset: 3px;
+}
+
+#app-main-content:focus {
+  outline: none;
+}
+
+:where(a, button, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+@media (pointer: coarse) {
+  :where(button, [role="button"], a[role="button"]) {
+    min-block-size: 2.75rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .seerati-app-stage {
+    overflow-wrap: anywhere;
+  }
+
+  .seerati-app-stage :where(input, textarea, select) {
+    font-size: max(1rem, 16px);
+  }
+}
+
+/* Skip off-screen layout/paint for long dashboard cards while preserving an estimated block size. */
+@supports (content-visibility: auto) {
+  .seerati-app-stage [data-slot="card"] {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 240px;
+  }
+
+  /* Editors and live document surfaces must always render for measurement/export. */
+  .paper,
+  [data-resume-page],
+  [data-resume-section] {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seerati-skip-link {
+    transition: none;
+  }
+
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}
+
+@media print {
+  .seerati-skip-link {
+    display: none !important;
+  }
+}

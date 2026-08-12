@@ -1,13 +1,18 @@
 // Client-only high-res image PDF export. Never import this at module top-level
 // on server-rendered code paths — html2canvas/jspdf touch the DOM/window.
 
-export async function exportResumePdf(el: HTMLElement, fileBaseName: string): Promise<void> {
+import { PAGE_SIZES, type ResumePageSize } from "@/lib/resume-layout";
+
+export async function exportResumePdf(
+  el: HTMLElement,
+  fileBaseName: string,
+  pageSize: ResumePageSize = "a4",
+): Promise<void> {
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
     import("html2canvas"),
     import("jspdf"),
   ]);
 
-  // Neutralize any preview-only transforms/shadows that would clip or distort the capture.
   const prevTransform = el.style.transform;
   const prevBoxShadow = el.style.boxShadow;
   const prevTransformOrigin = el.style.transformOrigin;
@@ -25,18 +30,21 @@ export async function exportResumePdf(el: HTMLElement, fileBaseName: string): Pr
       width: captureWidth,
     });
 
-    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-    const pageWidthMm = 210;
-    const pageHeightMm = 297;
+    const page = PAGE_SIZES[pageSize];
+    const pdf = new jsPDF({
+      unit: "mm",
+      format: [page.widthMm, page.heightMm],
+      orientation: "portrait",
+    });
+    const pageWidthMm = page.widthMm;
+    const pageHeightMm = page.heightMm;
 
-    // Map the canvas (px) to mm using the page width as the scale reference.
     const pxToMm = pageWidthMm / canvas.width;
     const pageHeightPx = pageHeightMm / pxToMm;
-
     const totalPages = Math.max(1, Math.ceil(canvas.height / pageHeightPx));
 
-    for (let page = 0; page < totalPages; page++) {
-      const sliceHeightPx = Math.min(pageHeightPx, canvas.height - page * pageHeightPx);
+    for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+      const sliceHeightPx = Math.min(pageHeightPx, canvas.height - pageIndex * pageHeightPx);
       if (sliceHeightPx <= 0) break;
 
       const sliceCanvas = document.createElement("canvas");
@@ -49,7 +57,7 @@ export async function exportResumePdf(el: HTMLElement, fileBaseName: string): Pr
       ctx.drawImage(
         canvas,
         0,
-        page * pageHeightPx,
+        pageIndex * pageHeightPx,
         canvas.width,
         sliceHeightPx,
         0,
@@ -59,7 +67,7 @@ export async function exportResumePdf(el: HTMLElement, fileBaseName: string): Pr
       );
 
       const imgData = sliceCanvas.toDataURL("image/jpeg", 0.95);
-      if (page > 0) pdf.addPage();
+      if (pageIndex > 0) pdf.addPage([page.widthMm, page.heightMm], "portrait");
       const sliceHeightMm = sliceHeightPx * pxToMm;
       pdf.addImage(imgData, "JPEG", 0, 0, pageWidthMm, sliceHeightMm);
     }

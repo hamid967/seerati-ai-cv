@@ -20,6 +20,8 @@ export type TemplateDef = {
   supportsRTL: boolean;
   active: boolean;
   order: number;
+  /** Auto-generated preview image (data URL) shown in admin/gallery listings. */
+  thumbnailUrl?: string;
   design: TemplateDesign;
 };
 
@@ -27,7 +29,18 @@ export type TemplateDef = {
 export type ResumeUserDesign = {
   accent?: string;
   density?: "compact" | "normal" | "airy";
+  /** Optional user layout override; content remains unchanged. */
+  layout?: TemplateDesign["layout"];
   showPhoto?: boolean;
+  pageSize?: "a4" | "letter";
+  fontScale?: number;
+  marginMm?: number;
+  lineHeight?: number;
+  columnWidth?: number;
+  /** Manual page break inserted immediately before these top-level sections. */
+  pageBreakBefore?: SectionKey[];
+  /** Sections the user explicitly prefers to keep together when they fit on one page. */
+  keepTogetherSections?: SectionKey[];
 };
 
 export const ACCENT_PALETTE = [

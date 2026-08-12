@@ -54,6 +54,8 @@ import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
 import { NextBestActions } from "@/components/next-best-actions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 import { InterviewEvidenceAnswer } from "@/components/interview-evidence-answer";
+import { ApplicationReadinessPanel } from "@/components/application-readiness-panel";
+import { TailoringStudioPanel } from "@/components/tailoring-studio-panel";
 import {
   addJobEvent,
   listJobEvents,
@@ -769,6 +771,27 @@ function JobWorkspacePage() {
                 )}
               </CardContent>
             </Card>
+
+            <ApplicationReadinessPanel
+              jobTitle={form.jobTitle}
+              jobDescription={form.jobDescription}
+              resumes={resumes}
+              graph={graph}
+              lang={lang}
+            />
+
+            <TailoringStudioPanel
+              userId={user.id}
+              jobId={job.id}
+              jobTitle={form.jobTitle}
+              company={form.company}
+              jobDescription={form.jobDescription}
+              resumes={resumes}
+              graph={graph}
+              lang={lang}
+              onUpdateResume={updateResume}
+              onChanged={() => setReload((n) => n + 1)}
+            />
 
             <Card>
               <CardHeader>

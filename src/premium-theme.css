@@ -1,0 +1,534 @@
+/* Stage 5C — Premium 3D visual system.
+ *
+ * The product UI gets depth, layered light and subtle perspective inspired by
+ * high-end studio templates. Resume content remains a professional 2D document
+ * and all screen-only depth is removed for print/PDF.
+ */
+
+:root {
+  --seerati-hairline: color-mix(in oklab, var(--border) 78%, transparent);
+  --seerati-paper-border: oklch(0.9 0.012 250);
+  --seerati-paper-shadow:
+    0 1px 1px rgb(15 23 42 / 0.04), 0 14px 40px -24px rgb(15 23 42 / 0.2),
+    0 36px 90px -48px rgb(15 23 42 / 0.28);
+  --seerati-depth-1: 0 1px 2px rgb(15 23 42 / 0.05), 0 12px 28px -20px rgb(15 23 42 / 0.22);
+  --seerati-depth-2: 0 20px 70px -38px rgb(15 23 42 / 0.42);
+  --seerati-depth-3: 0 44px 120px -56px rgb(2 12 27 / 0.62);
+  --seerati-glow-emerald: 0 0 60px -20px color-mix(in oklab, var(--emerald-accent) 55%, transparent);
+  --seerati-glow-gold: 0 0 70px -28px rgb(196 146 67 / 0.36);
+  --seerati-perspective: 1600px;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 20% -10%, oklch(0.96 0.02 250 / 0.55), transparent 26rem),
+    radial-gradient(circle at 90% 0%, oklch(0.96 0.018 85 / 0.45), transparent 24rem);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at 15% -10%, oklch(0.28 0.045 258 / 0.22), transparent 28rem),
+    radial-gradient(circle at 90% 0%, oklch(0.24 0.03 85 / 0.14), transparent 24rem);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--emerald-accent) 24%, transparent);
+  color: var(--foreground);
+}
+
+:where(a, button, input, textarea, select, [role="button"]):focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ring) 72%, white);
+  outline-offset: 3px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Premium site chrome                                                        */
+/* -------------------------------------------------------------------------- */
+
+.seerati-site-header {
+  background: color-mix(in oklab, var(--background) 78%, transparent) !important;
+  border-color: color-mix(in oklab, var(--border) 65%, transparent) !important;
+  box-shadow: 0 10px 42px -34px rgb(15 23 42 / 0.42);
+  backdrop-filter: blur(22px) saturate(1.22);
+  -webkit-backdrop-filter: blur(22px) saturate(1.22);
+}
+
+.seerati-logo-cube {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(520px) rotateX(8deg) rotateY(-10deg) translateZ(0);
+  box-shadow:
+    0 8px 18px -9px color-mix(in oklab, var(--primary) 72%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset -5px -6px 12px rgb(0 0 0 / 0.12);
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 260ms ease;
+}
+
+.seerati-logo-cube::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a:hover .seerati-logo-cube {
+    transform: perspective(520px) rotateX(2deg) rotateY(4deg) translateY(-2px) translateZ(12px);
+    box-shadow:
+      0 18px 34px -14px color-mix(in oklab, var(--primary) 66%, transparent),
+      inset 0 1px 0 rgb(255 255 255 / 0.3),
+      inset -5px -6px 12px rgb(0 0 0 / 0.1);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Legendary hero depth                                                       */
+/* -------------------------------------------------------------------------- */
+
+.surface-ink {
+  position: relative;
+  isolation: isolate;
+  perspective: var(--seerati-perspective);
+  transform-style: preserve-3d;
+  background-image:
+    radial-gradient(circle at 18% 20%, oklch(0.64 0.13 165 / 0.18), transparent 22rem),
+    radial-gradient(circle at 82% 12%, oklch(0.72 0.11 85 / 0.12), transparent 21rem),
+    linear-gradient(145deg, oklch(0.15 0.035 258), oklch(0.23 0.06 256) 58%, oklch(0.16 0.038 250));
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06);
+}
+
+.surface-ink::before {
+  content: "";
+  position: absolute;
+  width: min(68vw, 920px);
+  aspect-ratio: 1.55;
+  left: 50%;
+  bottom: -44%;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 42px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 50% 18%, oklch(0.7 0.13 165 / 0.18), transparent 54%);
+  background-size:
+    38px 38px,
+    38px 38px,
+    auto;
+  transform: translateX(-50%) rotateX(68deg) translateZ(-120px);
+  transform-origin: center center;
+  box-shadow: 0 -40px 120px -45px oklch(0.62 0.13 165 / 0.32);
+  mask-image: linear-gradient(to bottom, black 25%, transparent 86%);
+  opacity: 0.86;
+}
+
+.surface-ink::after {
+  content: "";
+  position: absolute;
+  width: 410px;
+  height: 410px;
+  inset-inline-end: -130px;
+  top: -190px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 34%, rgb(255 255 255 / 0.32), transparent 6%),
+    radial-gradient(
+      circle at 42% 40%,
+      oklch(0.77 0.12 85 / 0.24),
+      oklch(0.62 0.13 165 / 0.12) 34%,
+      transparent 68%
+    );
+  filter: blur(1px);
+  box-shadow: var(--seerati-glow-gold);
+  animation: seerati-orbit 12s ease-in-out infinite alternate;
+}
+
+.surface-ink > .relative {
+  transform-style: preserve-3d;
+}
+
+.surface-ink > .relative::before,
+.surface-ink > .relative::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  z-index: -1;
+  width: 155px;
+  height: 215px;
+  border-radius: 18px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.035)),
+    repeating-linear-gradient(to bottom, transparent 0 23px, rgb(255 255 255 / 0.07) 23px 24px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    0 35px 80px -36px rgb(0 0 0 / 0.72),
+    var(--seerati-glow-emerald);
+  opacity: 0.5;
+}
+
+.surface-ink > .relative::before {
+  inset-inline-start: -120px;
+  transform: translateY(-42%) rotateY(36deg) rotateZ(-8deg) translateZ(-70px);
+  animation: seerati-float-left 8s ease-in-out infinite alternate;
+}
+
+.surface-ink > .relative::after {
+  inset-inline-end: -110px;
+  transform: translateY(-54%) rotateY(-34deg) rotateZ(7deg) translateZ(-55px);
+  animation: seerati-float-right 9s ease-in-out infinite alternate;
+}
+
+@keyframes seerati-orbit {
+  from {
+    transform: translate3d(0, 0, 0) scale(0.94);
+  }
+  to {
+    transform: translate3d(-28px, 24px, 30px) scale(1.05);
+  }
+}
+
+@keyframes seerati-float-left {
+  from {
+    transform: translateY(-42%) rotateY(36deg) rotateZ(-8deg) translateZ(-70px);
+  }
+  to {
+    transform: translateY(-47%) rotateY(31deg) rotateZ(-5deg) translateZ(-32px);
+  }
+}
+
+@keyframes seerati-float-right {
+  from {
+    transform: translateY(-54%) rotateY(-34deg) rotateZ(7deg) translateZ(-55px);
+  }
+  to {
+    transform: translateY(-48%) rotateY(-29deg) rotateZ(4deg) translateZ(-18px);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3D application shell                                                       */
+/* -------------------------------------------------------------------------- */
+
+.seerati-app-3d {
+  position: relative;
+  isolation: isolate;
+  perspective: var(--seerati-perspective);
+  background:
+    radial-gradient(
+      circle at 8% 4%,
+      color-mix(in oklab, var(--emerald-accent) 10%, transparent),
+      transparent 24rem
+    ),
+    radial-gradient(circle at 92% 8%, rgb(191 145 70 / 0.09), transparent 25rem),
+    linear-gradient(180deg, color-mix(in oklab, var(--sand) 88%, var(--background)), var(--sand));
+}
+
+.seerati-app-3d::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--border) 36%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--border) 30%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 50% 0%, black 0, transparent 66%);
+  opacity: 0.3;
+}
+
+.seerati-app-3d::after {
+  content: "";
+  position: fixed;
+  width: 460px;
+  height: 460px;
+  inset-inline-end: -220px;
+  bottom: -240px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--emerald-accent) 16%, transparent),
+    transparent 68%
+  );
+  filter: blur(14px);
+}
+
+.seerati-app-stage {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.seerati-app-stage::before {
+  content: "";
+  position: absolute;
+  inset: 1rem 2rem auto;
+  height: 170px;
+  z-index: -1;
+  border-radius: 36px;
+  background: linear-gradient(110deg, rgb(255 255 255 / 0.22), transparent 60%);
+  filter: blur(22px);
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Premium 3D surfaces                                                        */
+/* -------------------------------------------------------------------------- */
+
+[data-slot="card"],
+.surface-editorial,
+.seerati-panel {
+  position: relative;
+  transform-style: preserve-3d;
+  border-color: var(--seerati-hairline);
+  box-shadow: var(--seerati-depth-1);
+}
+
+[data-slot="card"] {
+  overflow: hidden;
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 320ms ease,
+    border-color 320ms ease;
+}
+
+[data-slot="card"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    rgb(255 255 255 / 0.18),
+    transparent 24%,
+    transparent 74%,
+    rgb(255 255 255 / 0.06)
+  );
+  opacity: 0.55;
+}
+
+[data-slot="card"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-slot="button"] {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-slot="button"]:not(:disabled):hover {
+    transform: translateY(-2px) translateZ(4px);
+    box-shadow: 0 10px 22px -16px rgb(15 23 42 / 0.4);
+  }
+
+  [data-slot="card"]:hover {
+    transform: perspective(1000px) translateY(-6px) rotateX(1.2deg) rotateY(-1deg) translateZ(8px);
+    border-color: color-mix(in oklab, var(--border) 68%, var(--emerald-accent));
+    box-shadow: var(--seerati-depth-2), var(--seerati-glow-emerald);
+  }
+
+  [dir="rtl"] [data-slot="card"]:hover {
+    transform: perspective(1000px) translateY(-6px) rotateX(1.2deg) rotateY(1deg) translateZ(8px);
+  }
+}
+
+/* Resume studio: screen presentation can feel premium; document content stays flat. */
+.paper {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--seerati-paper-border);
+  border-radius: 6px;
+  box-shadow: var(--seerati-paper-shadow);
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -2;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.9), rgb(236 239 244 / 0.48));
+}
+
+.paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / 0.55), transparent 14%),
+    radial-gradient(circle at 12% 8%, rgb(15 23 42 / 0.018) 0 0.6px, transparent 0.8px);
+  background-size:
+    auto,
+    8px 8px;
+  opacity: 0.7;
+}
+
+.paper [data-cv-section] {
+  position: relative;
+}
+
+.paper [data-cv-item] {
+  text-wrap: pretty;
+}
+
+/* Premium editorial helpers for new and existing app surfaces. */
+.seerati-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+[dir="rtl"] .seerati-kicker {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.seerati-panel {
+  border: 1px solid var(--seerati-hairline);
+  border-radius: calc(var(--radius) + 0.35rem);
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+  box-shadow: var(--seerati-depth-2);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+
+.seerati-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border) 12%,
+    var(--border) 88%,
+    transparent
+  );
+}
+
+.seerati-status-dot {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--emerald-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--emerald-accent) 13%, transparent);
+}
+
+/* Mobile receives depth and lighting, not expensive continuous transforms. */
+@media (max-width: 767px) {
+  .surface-ink::before {
+    width: 110vw;
+    bottom: -28%;
+    opacity: 0.55;
+  }
+
+  .surface-ink > .relative::before,
+  .surface-ink > .relative::after {
+    width: 95px;
+    height: 138px;
+    opacity: 0.34;
+  }
+
+  .surface-ink > .relative::before {
+    inset-inline-start: -20px;
+  }
+
+  .surface-ink > .relative::after {
+    inset-inline-end: -18px;
+  }
+
+  .seerati-app-3d::before {
+    background-size: 48px 48px;
+    opacity: 0.18;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .surface-ink::after,
+  .surface-ink > .relative::before,
+  .surface-ink > .relative::after {
+    animation: none !important;
+  }
+
+  [data-slot="card"]:hover,
+  [data-slot="button"]:hover,
+  a:hover .seerati-logo-cube {
+    transform: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .seerati-app-3d,
+  .seerati-app-stage,
+  .surface-ink,
+  .paper {
+    transform: none !important;
+    perspective: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .seerati-app-3d::before,
+  .seerati-app-3d::after,
+  .seerati-app-stage::before,
+  .surface-ink::before,
+  .surface-ink::after,
+  .surface-ink > .relative::before,
+  .surface-ink > .relative::after {
+    display: none !important;
+  }
+
+  .paper {
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: white !important;
+  }
+
+  .paper::before,
+  .paper::after {
+    display: none !important;
+  }
+}

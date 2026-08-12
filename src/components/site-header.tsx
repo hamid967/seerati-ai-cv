@@ -31,21 +31,20 @@ export function SiteHeader() {
   const links = [
     { to: "/templates", label: t("nav_templates") },
     { to: "/features", label: t("nav_features") },
+    { to: "/team", label: t("nav_team") },
     { to: "/ats", label: t("nav_ats") },
   ] as const;
 
-  // /career-twin and /jobs are new surfaces still being wired up by another
-  // workstream, so they are plain links (not typed router Links) for now.
   const memberLinks = [
     { href: "/career-twin", label: t("nav_career_twin"), icon: UserSquare2 },
     { href: "/jobs", label: t("nav_jobs"), icon: Briefcase },
   ] as const;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
+    <header className="seerati-site-header sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
+          <span className="seerati-logo-cube grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
             <FileText className="size-5" />
           </span>
           <span className="text-lg font-extrabold tracking-tight">

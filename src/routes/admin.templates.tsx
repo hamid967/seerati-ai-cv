@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { Copy, ImageIcon, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { ResumePreview } from "@/components/resume-preview";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,8 +37,11 @@ import {
   fetchTemplates,
   logAudit,
   saveTemplate,
+  saveTemplateThumbnail,
   templateUsage,
 } from "@/lib/db";
+import { captureTemplateThumbnail, waitForPaint } from "@/lib/template-thumbnail";
+
 import { demoResumeData } from "@/lib/demo-data";
 import type { Resume, TemplateDef } from "@/lib/types";
 
@@ -90,11 +94,11 @@ function AdminTemplates() {
     await qc.invalidateQueries({ queryKey: ["template-usage"] });
   };
 
-  const previewResume: Resume = {
+  const resumeFor = (tpl: TemplateDef): Resume => ({
     id: "preview",
     ownerId: "preview",
-    title: selected.name[lang],
-    templateId: selected.id,
+    title: tpl.name[lang],
+    templateId: tpl.id,
     language: lang,
     data: demoResumeData(),
     status: "complete",
@@ -102,7 +106,9 @@ function AdminTemplates() {
     atsScore: 86,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  };
+  });
+
+  const previewResume: Resume = resumeFor(selected);
 
   const handleSave = async () => {
     setSaving(true);
@@ -160,6 +166,63 @@ function AdminTemplates() {
     await refresh();
     setSelectedId(id);
     toast.success(ar ? "تم نسخ القالب" : "Template duplicated");
+  };
+
+  const captureRef = useRef<HTMLDivElement | null>(null);
+  const [captureTarget, setCaptureTarget] = useState<TemplateDef | null>(null);
+  const [thumbBusy, setThumbBusy] = useState<string | null>(null);
+  const [thumbProgress, setThumbProgress] = useState<{ done: number; total: number } | null>(null);
+
+  /** Renders one template offscreen at full width, captures it, and stores it. */
+  const generateThumbnail = async (tpl: TemplateDef) => {
+    setThumbBusy(tpl.id);
+    setCaptureTarget(tpl);
+    try {
+      await waitForPaint();
+      const el = captureRef.current?.firstElementChild as HTMLElement | null;
+      if (!el) throw new Error("no-node");
+      const dataUrl = await captureTemplateThumbnail(el);
+      const res = await saveTemplateThumbnail(tpl.id, dataUrl);
+      if (res.error) throw new Error(res.error);
+      setTemplates((list) =>
+        list.map((t) => (t.id === tpl.id ? { ...t, thumbnailUrl: dataUrl } : t)),
+      );
+      await logAudit("template.thumbnail", tpl.id);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setCaptureTarget(null);
+      setThumbBusy(null);
+    }
+  };
+
+  const handleGenerateOne = async () => {
+    const ok = await generateThumbnail(selected);
+    if (ok) toast.success(ar ? "تم توليد الصورة المصغّرة" : "Thumbnail generated");
+    else toast.error(ar ? "تعذّر توليد الصورة" : "Could not generate the thumbnail");
+    await refresh();
+  };
+
+  const handleGenerateAll = async () => {
+    let done = 0;
+    let failed = 0;
+    setThumbProgress({ done: 0, total: templates.length });
+    for (const tpl of templates) {
+      const ok = await generateThumbnail(tpl);
+      if (!ok) failed += 1;
+      done += 1;
+      setThumbProgress({ done, total: templates.length });
+    }
+    setThumbProgress(null);
+    await refresh();
+    if (failed === 0) {
+      toast.success(ar ? `تم توليد ${done} صورة مصغّرة` : `Generated ${done} thumbnails`);
+    } else {
+      toast.warning(
+        ar ? `تم التوليد مع فشل ${failed} قالب` : `Generated with ${failed} failure(s)`,
+      );
+    }
   };
 
   const handleDelete = async () => {
@@ -460,21 +523,118 @@ function AdminTemplates() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              {ar ? "معاينة حية" : "Live preview"}
-              {!selected.atsFriendly && (
-                <Badge variant="destructive" className="text-[10.5px]">
-                  {ar ? "غير مُحسَّن لـ ATS" : "Not ATS optimised"}
-                </Badge>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="max-h-[70vh] overflow-auto bg-secondary/40 p-3">
-            <ResumePreview resume={previewResume} template={selected} />
-          </CardContent>
-        </Card>
+        <div className="space-y-5">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                {ar ? "معاينة حية" : "Live preview"}
+                {!selected.atsFriendly && (
+                  <Badge variant="destructive" className="text-[10.5px]">
+                    {ar ? "غير مُحسَّن لـ ATS" : "Not ATS optimised"}
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="max-h-[70vh] overflow-auto bg-secondary/40 p-3">
+              <ResumePreview resume={previewResume} template={selected} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex flex-wrap items-center justify-between gap-2 text-base">
+                <span className="flex items-center gap-2">
+                  <ImageIcon className="size-4" />
+                  {ar ? "الصور المصغّرة التلقائية" : "Auto thumbnails"}
+                </span>
+                <span className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!!thumbBusy || !!thumbProgress}
+                    onClick={() => void handleGenerateOne()}
+                  >
+                    <RefreshCw className={`size-4 ${thumbBusy ? "animate-spin" : ""}`} />
+                    {ar ? "توليد للقالب الحالي" : "Generate current"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={!!thumbBusy || !!thumbProgress}
+                    onClick={() => void handleGenerateAll()}
+                  >
+                    {thumbProgress
+                      ? `${thumbProgress.done}/${thumbProgress.total}`
+                      : ar
+                        ? "توليد للكل"
+                        : "Generate all"}
+                  </Button>
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                {ar
+                  ? "تُولَّد الصور من المعاينة الحقيقية للقالب ببيانات تجريبية، وتُخزَّن مع القالب لعرضها في المعرض ولوحة الإدارة."
+                  : "Thumbnails are captured from the real template preview with demo data and stored with the template for the gallery and admin listings."}
+              </p>
+              <div className="grid max-h-[52vh] grid-cols-2 gap-3 overflow-auto sm:grid-cols-3">
+                {templates.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setSelectedId(t.id)}
+                    className={`space-y-1.5 rounded-xl border p-1.5 text-start transition ${
+                      t.id === selectedId
+                        ? "border-primary ring-2 ring-primary/25"
+                        : "border-border"
+                    }`}
+                  >
+                    <div
+                      className="flex items-center justify-center overflow-hidden rounded-lg border bg-white"
+                      style={{ aspectRatio: "1 / 1.414" }}
+                    >
+                      {t.thumbnailUrl ? (
+                        <img
+                          src={t.thumbnailUrl}
+                          alt={t.name[lang]}
+                          className="size-full object-cover object-top"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="px-2 text-center text-[10.5px] text-muted-foreground">
+                          {thumbBusy === t.id
+                            ? ar
+                              ? "جارٍ التوليد…"
+                              : "Generating…"
+                            : ar
+                              ? "لا توجد صورة"
+                              : "No thumbnail"}
+                        </span>
+                      )}
+                    </div>
+                    <p className="truncate text-[11.5px] font-semibold">{t.name[lang]}</p>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Offscreen full-width render used only for thumbnail capture. */}
+      <div
+        ref={captureRef}
+        aria-hidden
+        className="pointer-events-none fixed top-0 opacity-0"
+        style={{ insetInlineStart: -20000, width: 794 }}
+      >
+        {captureTarget ? (
+          <ResumePreview
+            resume={resumeFor(captureTarget)}
+            template={captureTarget}
+            className="shadow-none"
+          />
+        ) : null}
       </div>
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>

@@ -16,6 +16,8 @@ import { StoreProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/app/app-shell";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { getPublicRuntimeConfig } from "@/lib/public-runtime-config.functions";
+import { setSupabaseRuntimeConfig } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -78,6 +80,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: () => getPublicRuntimeConfig(),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -97,13 +100,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "theme-color", content: "#0b3b2e" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "سيرتي" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/app-icon-512.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -143,6 +153,8 @@ const APP_PREFIXES = [
   "/admin",
   "/import",
   "/privacy-center",
+  "/cover-letters",
+  "/keyword-scanner",
 ];
 /** Editor-style routes: chrome shrinks into focus mode. */
 const FOCUS_PATTERN = /^\/resumes\/[^/]+\/(edit|preview)$/;
@@ -162,6 +174,11 @@ function AppFrame() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const runtimeConfig = Route.useLoaderData();
+
+  // The Supabase proxy is lazy; inject browser-safe runtime metadata before
+  // StoreProvider effects touch auth/database APIs during hydration.
+  setSupabaseRuntimeConfig(runtimeConfig);
 
   return (
     <QueryClientProvider client={queryClient}>

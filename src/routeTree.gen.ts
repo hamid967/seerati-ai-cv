@@ -12,16 +12,24 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ArabicIntelligenceRouteImport } from './routes/arabic-intelligence'
+import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AtsRouteImport } from './routes/ats'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareerEvidenceRouteImport } from './routes/career-evidence'
+import { Route as CareerGuidesRouteImport } from './routes/career-guides'
+import { Route as CareerPassportRouteImport } from './routes/career-passport'
 import { Route as CareerTwinRouteImport } from './routes/career-twin'
+import { Route as CoverLettersRouteImport } from './routes/cover-letters'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ImportRouteImport } from './routes/import'
+import { Route as KeywordScannerRouteImport } from './routes/keyword-scanner'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrivacyCenterRouteImport } from './routes/privacy-center'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TeamRouteImport } from './routes/team'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -32,8 +40,11 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
+import { Route as ResumesIdComposerRouteImport } from './routes/resumes.$id.composer'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
+import { Route as ResumesIdRecruiterScanRouteImport } from './routes/resumes.$id.recruiter-scan'
+import { Route as ResumesIdStudioRouteImport } from './routes/resumes.$id.studio'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +59,16 @@ const AccountRoute = AccountRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArabicIntelligenceRoute = ArabicIntelligenceRouteImport.update({
+  id: '/arabic-intelligence',
+  path: '/arabic-intelligence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistantRoute = AssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtsRoute = AtsRouteImport.update({
@@ -65,9 +86,24 @@ const CareerEvidenceRoute = CareerEvidenceRouteImport.update({
   path: '/career-evidence',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CareerGuidesRoute = CareerGuidesRouteImport.update({
+  id: '/career-guides',
+  path: '/career-guides',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerPassportRoute = CareerPassportRouteImport.update({
+  id: '/career-passport',
+  path: '/career-passport',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CareerTwinRoute = CareerTwinRouteImport.update({
   id: '/career-twin',
   path: '/career-twin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoverLettersRoute = CoverLettersRouteImport.update({
+  id: '/cover-letters',
+  path: '/cover-letters',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -85,6 +121,11 @@ const ImportRoute = ImportRouteImport.update({
   path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KeywordScannerRoute = KeywordScannerRouteImport.update({
+  id: '/keyword-scanner',
+  path: '/keyword-scanner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -98,6 +139,16 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PrivacyCenterRoute = PrivacyCenterRouteImport.update({
   id: '/privacy-center',
   path: '/privacy-center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -150,6 +201,11 @@ const ResumesNewRoute = ResumesNewRouteImport.update({
   path: '/resumes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIdComposerRoute = ResumesIdComposerRouteImport.update({
+  id: '/resumes/$id/composer',
+  path: '/resumes/$id/composer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesIdEditRoute = ResumesIdEditRouteImport.update({
   id: '/resumes/$id/edit',
   path: '/resumes/$id/edit',
@@ -160,21 +216,39 @@ const ResumesIdPreviewRoute = ResumesIdPreviewRouteImport.update({
   path: '/resumes/$id/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResumesIdRecruiterScanRoute = ResumesIdRecruiterScanRouteImport.update({
+  id: '/resumes/$id/recruiter-scan',
+  path: '/resumes/$id/recruiter-scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResumesIdStudioRoute = ResumesIdStudioRouteImport.update({
+  id: '/resumes/$id/studio',
+  path: '/resumes/$id/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/arabic-intelligence': typeof ArabicIntelligenceRoute
+  '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
+  '/career-guides': typeof CareerGuidesRoute
+  '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
+  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/team': typeof TeamRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -185,22 +259,33 @@ export interface FileRoutesByFullPath {
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
+  '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/recruiter-scan': typeof ResumesIdRecruiterScanRoute
+  '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/arabic-intelligence': typeof ArabicIntelligenceRoute
+  '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
+  '/career-guides': typeof CareerGuidesRoute
+  '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
+  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/team': typeof TeamRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -211,24 +296,35 @@ export interface FileRoutesByTo {
   '/resumes/new': typeof ResumesNewRoute
   '/admin': typeof AdminIndexRoute
   '/jobs': typeof JobsIndexRoute
+  '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/recruiter-scan': typeof ResumesIdRecruiterScanRoute
+  '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/arabic-intelligence': typeof ArabicIntelligenceRoute
+  '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
   '/auth': typeof AuthRoute
   '/career-evidence': typeof CareerEvidenceRoute
+  '/career-guides': typeof CareerGuidesRoute
+  '/career-passport': typeof CareerPassportRoute
   '/career-twin': typeof CareerTwinRoute
+  '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/keyword-scanner': typeof KeywordScannerRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/team': typeof TeamRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -239,8 +335,11 @@ export interface FileRoutesById {
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
+  '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
+  '/resumes/$id/recruiter-scan': typeof ResumesIdRecruiterScanRoute
+  '/resumes/$id/studio': typeof ResumesIdStudioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -248,16 +347,24 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/arabic-intelligence'
+    | '/assistant'
     | '/ats'
     | '/auth'
     | '/career-evidence'
+    | '/career-guides'
+    | '/career-passport'
     | '/career-twin'
+    | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
+    | '/sitemap.xml'
+    | '/team'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -268,22 +375,33 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
+    | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/recruiter-scan'
+    | '/resumes/$id/studio'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
+    | '/arabic-intelligence'
+    | '/assistant'
     | '/ats'
     | '/auth'
     | '/career-evidence'
+    | '/career-guides'
+    | '/career-passport'
     | '/career-twin'
+    | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
+    | '/sitemap.xml'
+    | '/team'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -294,23 +412,34 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin'
     | '/jobs'
+    | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/recruiter-scan'
+    | '/resumes/$id/studio'
   id:
     | '__root__'
     | '/'
     | '/account'
     | '/admin'
+    | '/arabic-intelligence'
+    | '/assistant'
     | '/ats'
     | '/auth'
     | '/career-evidence'
+    | '/career-guides'
+    | '/career-passport'
     | '/career-twin'
+    | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/keyword-scanner'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
+    | '/sitemap.xml'
+    | '/team'
     | '/templates'
     | '/terms'
     | '/admin/audit'
@@ -321,31 +450,45 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
+    | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
+    | '/resumes/$id/recruiter-scan'
+    | '/resumes/$id/studio'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ArabicIntelligenceRoute: typeof ArabicIntelligenceRoute
+  AssistantRoute: typeof AssistantRoute
   AtsRoute: typeof AtsRoute
   AuthRoute: typeof AuthRoute
   CareerEvidenceRoute: typeof CareerEvidenceRoute
+  CareerGuidesRoute: typeof CareerGuidesRoute
+  CareerPassportRoute: typeof CareerPassportRoute
   CareerTwinRoute: typeof CareerTwinRoute
+  CoverLettersRoute: typeof CoverLettersRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   ImportRoute: typeof ImportRoute
+  KeywordScannerRoute: typeof KeywordScannerRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   PrivacyCenterRoute: typeof PrivacyCenterRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TeamRoute: typeof TeamRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
   JobsIdRoute: typeof JobsIdRoute
   ResumesNewRoute: typeof ResumesNewRoute
   JobsIndexRoute: typeof JobsIndexRoute
+  ResumesIdComposerRoute: typeof ResumesIdComposerRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
+  ResumesIdRecruiterScanRoute: typeof ResumesIdRecruiterScanRoute
+  ResumesIdStudioRoute: typeof ResumesIdStudioRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -371,6 +514,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/arabic-intelligence': {
+      id: '/arabic-intelligence'
+      path: '/arabic-intelligence'
+      fullPath: '/arabic-intelligence'
+      preLoaderRoute: typeof ArabicIntelligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ats': {
       id: '/ats'
       path: '/ats'
@@ -392,11 +549,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareerEvidenceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/career-guides': {
+      id: '/career-guides'
+      path: '/career-guides'
+      fullPath: '/career-guides'
+      preLoaderRoute: typeof CareerGuidesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career-passport': {
+      id: '/career-passport'
+      path: '/career-passport'
+      fullPath: '/career-passport'
+      preLoaderRoute: typeof CareerPassportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/career-twin': {
       id: '/career-twin'
       path: '/career-twin'
       fullPath: '/career-twin'
       preLoaderRoute: typeof CareerTwinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cover-letters': {
+      id: '/cover-letters'
+      path: '/cover-letters'
+      fullPath: '/cover-letters'
+      preLoaderRoute: typeof CoverLettersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -420,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/keyword-scanner': {
+      id: '/keyword-scanner'
+      path: '/keyword-scanner'
+      fullPath: '/keyword-scanner'
+      preLoaderRoute: typeof KeywordScannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -439,6 +624,20 @@ declare module '@tanstack/react-router' {
       path: '/privacy-center'
       fullPath: '/privacy-center'
       preLoaderRoute: typeof PrivacyCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates': {
@@ -511,6 +710,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resumes/$id/composer': {
+      id: '/resumes/$id/composer'
+      path: '/resumes/$id/composer'
+      fullPath: '/resumes/$id/composer'
+      preLoaderRoute: typeof ResumesIdComposerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/$id/edit': {
       id: '/resumes/$id/edit'
       path: '/resumes/$id/edit'
@@ -523,6 +729,20 @@ declare module '@tanstack/react-router' {
       path: '/resumes/$id/preview'
       fullPath: '/resumes/$id/preview'
       preLoaderRoute: typeof ResumesIdPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resumes/$id/recruiter-scan': {
+      id: '/resumes/$id/recruiter-scan'
+      path: '/resumes/$id/recruiter-scan'
+      fullPath: '/resumes/$id/recruiter-scan'
+      preLoaderRoute: typeof ResumesIdRecruiterScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resumes/$id/studio': {
+      id: '/resumes/$id/studio'
+      path: '/resumes/$id/studio'
+      fullPath: '/resumes/$id/studio'
+      preLoaderRoute: typeof ResumesIdStudioRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -550,24 +770,45 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
+  ArabicIntelligenceRoute: ArabicIntelligenceRoute,
+  AssistantRoute: AssistantRoute,
   AtsRoute: AtsRoute,
   AuthRoute: AuthRoute,
   CareerEvidenceRoute: CareerEvidenceRoute,
+  CareerGuidesRoute: CareerGuidesRoute,
+  CareerPassportRoute: CareerPassportRoute,
   CareerTwinRoute: CareerTwinRoute,
+  CoverLettersRoute: CoverLettersRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   ImportRoute: ImportRoute,
+  KeywordScannerRoute: KeywordScannerRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   PrivacyCenterRoute: PrivacyCenterRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TeamRoute: TeamRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
   JobsIdRoute: JobsIdRoute,
   ResumesNewRoute: ResumesNewRoute,
   JobsIndexRoute: JobsIndexRoute,
+  ResumesIdComposerRoute: ResumesIdComposerRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
+  ResumesIdRecruiterScanRoute: ResumesIdRecruiterScanRoute,
+  ResumesIdStudioRoute: ResumesIdStudioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

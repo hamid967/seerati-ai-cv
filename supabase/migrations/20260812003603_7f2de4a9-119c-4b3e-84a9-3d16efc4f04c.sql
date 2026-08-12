@@ -1,0 +1,11 @@
+insert into public.templates (id, name_ar, name_en, description_ar, description_en, category, supports_rtl, ats_friendly, active, display_order, design) values
+('royal-executive','تنفيذي سعودي فاخر','Saudi Luxe Executive','رأس أنيق بخط مطبعي رصين وتباعد واسع؛ مصمم للمناصب القيادية والملفات التنفيذية.','An elegant serif header with generous spacing, built for leadership and executive profiles.','executive',true,true,true,13,'{"accent":"#0b3b2e","headingFont":"serif","spacing":"airy","sectionStyle":"caps","layout":"single","header":"banner","bullet":"square","supportsPhoto":false}'::jsonb),
+('ats-strict','ATS صارم بسيط','Strict ATS','عمود واحد بدون أي رسومات أو أعمدة، أعلى توافق ممكن مع أنظمة تتبع المتقدمين.','One column, zero graphics or sidebars — the highest possible applicant-tracking compatibility.','ats',true,true,true,14,'{"accent":"#111827","headingFont":"sans","spacing":"normal","sectionStyle":"plain","layout":"single","header":"stack","bullet":"disc","supportsPhoto":false}'::jsonb),
+('modern-two-column','حديث بعمودين','Modern Two Column','عمود جانبي للمهارات واللغات والتواصل مع عمود رئيسي للخبرات؛ أنيق وسهل المسح البصري.','A sidebar for skills, languages and contact next to a main experience column — elegant and easy to scan.','modern',true,false,true,15,'{"accent":"#1d4ed8","headingFont":"sans","spacing":"normal","sectionStyle":"bar","layout":"sidebar","header":"split","bullet":"dash","supportsPhoto":true}'::jsonb),
+('creative-tech','إبداعي تقني','Creative Tech','لمسات لونية جسورة ومساحة بارزة للمشاريع والأدوات؛ مناسب للمصممين والمطورين.','Bold accent colour with prominent room for projects and tooling — made for designers and developers.','creative',true,false,true,16,'{"accent":"#7c3aed","headingFont":"sans","spacing":"compact","sectionStyle":"bar","layout":"sidebar-left","header":"centered","bullet":"square","supportsPhoto":true}'::jsonb)
+on conflict (id) do update set
+  name_ar = excluded.name_ar, name_en = excluded.name_en,
+  description_ar = excluded.description_ar, description_en = excluded.description_en,
+  category = excluded.category, supports_rtl = excluded.supports_rtl,
+  ats_friendly = excluded.ats_friendly, active = excluded.active,
+  display_order = excluded.display_order, design = excluded.design;

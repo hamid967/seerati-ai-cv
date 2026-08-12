@@ -1,0 +1,132 @@
+import { useMemo, useState } from "react";
+import { Check, LayoutTemplate, Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ResumePreview, getTemplate } from "@/components/resume-preview";
+import { useI18n } from "@/lib/i18n";
+import { defaultTemplates } from "@/lib/templates";
+import type { Resume, TemplateDef } from "@/lib/types";
+
+const CATEGORIES: { id: string; ar: string; en: string }[] = [
+  { id: "all", ar: "الكل", en: "All" },
+  { id: "ats", ar: "ATS", en: "ATS" },
+  { id: "modern", ar: "عصري", en: "Modern" },
+  { id: "executive", ar: "تنفيذي", en: "Executive" },
+  { id: "minimal", ar: "مبسّط", en: "Minimal" },
+  { id: "creative", ar: "إبداعي", en: "Creative" },
+];
+
+/**
+ * Live template switcher for the resume editor: each card renders the user's
+ * real content in that template, and picking one applies the template design
+ * immediately (clearing the overrides that would otherwise mask the change).
+ */
+export function TemplateSwitcher({
+  resume,
+  onSelect,
+  templates = defaultTemplates,
+}: {
+  resume: Resume;
+  onSelect: (templateId: string) => void;
+  templates?: TemplateDef[];
+}) {
+  const { lang } = useI18n();
+  const ar = lang === "ar";
+  const [open, setOpen] = useState(false);
+  const [cat, setCat] = useState("all");
+
+  const active = getTemplate(resume.templateId, templates);
+  const list = useMemo(
+    () => templates.filter((t) => t.active !== false && (cat === "all" || t.category === cat)),
+    [templates, cat],
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="h-9 max-w-[15rem] gap-2">
+          <LayoutTemplate className="size-4 shrink-0" />
+          <span className="truncate">{active.name[lang]}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[88dvh] max-w-5xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Sparkles className="size-4 text-emerald-accent" />
+            {ar ? "تبديل القالب" : "Switch template"}
+          </DialogTitle>
+          <DialogDescription>
+            {ar
+              ? "المعاينة تعرض بياناتك الحقيقية داخل كل قالب — الاختيار يُطبّق التخطيط فورًا."
+              : "Each preview uses your real content — picking one applies the layout instantly."}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map((c) => (
+            <Button
+              key={c.id}
+              type="button"
+              size="sm"
+              variant={cat === c.id ? "default" : "outline"}
+              onClick={() => setCat(c.id)}
+            >
+              {ar ? c.ar : c.en}
+            </Button>
+          ))}
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((t) => {
+            const selected = t.id === resume.templateId;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => {
+                  onSelect(t.id);
+                  setOpen(false);
+                }}
+                aria-pressed={selected}
+                className={`group overflow-hidden rounded-xl border bg-card p-2 text-start transition-shadow hover:shadow-lift ${
+                  selected ? "border-primary ring-2 ring-primary/40" : "border-border"
+                }`}
+              >
+                <div className="relative h-[240px] overflow-hidden rounded-lg bg-white">
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute start-0 top-0 origin-top-left rtl:origin-top-right"
+                    style={{ width: 794, transform: "scale(0.36)" }}
+                  >
+                    <ResumePreview resume={{ ...resume, templateId: t.id }} template={t} />
+                  </div>
+                  {selected && (
+                    <span className="absolute end-2 top-2 grid size-6 place-items-center rounded-full bg-primary text-primary-foreground">
+                      <Check className="size-3.5" />
+                    </span>
+                  )}
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2 px-1 pb-1">
+                  <span className="truncate text-sm font-semibold">{t.name[lang]}</span>
+                  {t.atsFriendly && (
+                    <Badge variant="secondary" className="shrink-0 text-[10px]">
+                      ATS
+                    </Badge>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
