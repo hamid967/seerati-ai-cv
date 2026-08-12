@@ -233,8 +233,23 @@ function AssistantPage() {
         jobTitle: answers.jobTitle,
       });
       if (!created) throw new Error("create failed");
-      await updateResume(created.id, { data: previewData, templateId });
-      toast.success(ar ? "أُنشئت سيرتك الذاتية" : "Resume created");
+
+      // Hand the assistant's answers straight to the editor: every section the
+      // assistant filled is written into the resume, empty ones are hidden so
+      // the editor opens on a complete-looking draft.
+      const data = fillSections(previewData);
+      const filled: Resume = { ...created, templateId, data, language: resumeLang };
+      const template = getTemplate(templateId);
+      await updateResume(created.id, {
+        data,
+        templateId,
+        language: resumeLang,
+        completionScore: completeness(filled),
+        atsScore: analyzeResume(filled, template).score,
+      });
+      toast.success(
+        ar ? "أُنشئت سيرتك وتم ملء الأقسام تلقائياً" : "Resume created with sections pre-filled",
+      );
       navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
     } catch {
       toast.error(ar ? "تعذّر إنشاء السيرة الذاتية." : "Could not create the resume.");
