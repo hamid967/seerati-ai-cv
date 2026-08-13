@@ -1,5 +1,25 @@
-# Phase 15 Theme Performance Report
+# Phase 17 Theme Performance Report
 
-No cinematic intro or broad visual redesign is enabled in the current commit. This is intentional: the post-merge baseline still has an unresolved `/assistant` LCP gap.
+## Budgets
 
-Any future theme change must compare against the Phase 15 baseline and fail review if it causes more than 2 Lighthouse performance points, 100ms LCP, 0.02 CLS, 35KB compressed initial JavaScript, or 100KB additional initial image transfer. The release target remains median LCP ≤2.5s, CLS ≤0.1, accessibility ≥95, best practices ≥95, zero critical console errors, and zero privacy leakage.
+| Metric                      |       Budget | Enforcement                                     |
+| --------------------------- | -----------: | ----------------------------------------------- |
+| Intro compressed JavaScript |       ≤35 KB | Blocking after production measurement           |
+| Intro assets                |      ≤150 KB | Blocking before rollout                         |
+| Initial JavaScript growth   |       ≤35 KB | Compare against Phase 17 baseline               |
+| LCP regression              |      ≤100 ms | Blocking after three-run comparison             |
+| CLS                         |         ≤0.1 | Blocking                                        |
+| Homepage Performance        |          ≥90 | Initially warning, then owner-reviewed blocking |
+| Templates Performance       | ≥85, then 90 | Staged                                          |
+| Assistant Performance       |          ≥85 | Staged                                          |
+| Accessibility               |          ≥95 | Blocking after stable baseline                  |
+| Best Practices              |          ≥95 | Blocking                                        |
+| Public SEO                  |          ≥95 | Staged; noindex tools remain exempt             |
+
+## Current implementation impact
+
+The semantic theme is CSS-only and adds no runtime dependency. The homepage city story uses text and CSS gradients rather than image or WebGL assets. The hero continues to use the existing preloaded resume image. A production preview and three-run Lighthouse comparison remain required before claiming that the new slice meets the budgets.
+
+## Failure response
+
+If a visual slice increases LCP, CLS, long tasks, or scroll jank, remove the heavy effect, use CSS/SVG or a static asset, shorten the intro, stop autoplay, or move the feature below the critical path. Do not lower the budget or update a visual/performance baseline merely to make CI green.
