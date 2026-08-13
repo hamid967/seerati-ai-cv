@@ -218,7 +218,8 @@ async function runBrowser(browserName) {
       return;
     }
     const failure = request.failure()?.errorText ?? "unknown request failure";
-    if (/Load request cancelled|NS_BINDING_ABORTED|NS_ERROR_ABORT/i.test(failure)) return;
+    if (/Load request cancelled|NS_BINDING_ABORTED|NS_ERROR_ABORT|ERR_ABORTED/i.test(failure))
+      return;
     fail(`${browserName}: request failed ${request.method()} ${url} (${failure})`);
   });
   page.on("console", (message) => {
