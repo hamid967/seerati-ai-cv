@@ -33,7 +33,6 @@ function safeNext(value?: string): string | undefined {
   return /^\/(?!\/)/.test(value) ? value : undefined;
 }
 
-
 type AuthMode = "signin" | "signup" | "reset";
 type AuthErrors = Partial<Record<"email" | "password" | "confirm" | "name" | "terms", string>>;
 
@@ -96,7 +95,6 @@ function AuthPage() {
       replace: true,
     });
   };
-
 
   const strength = useMemo(() => passwordScore(password), [password]);
   const strengthLabel =

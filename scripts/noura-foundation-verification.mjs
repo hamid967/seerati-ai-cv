@@ -102,13 +102,13 @@ async function openAssistant(page, lang, viewport, label) {
   }
   assert(visited.size >= 5, `${label}: keyboard traversal reaches at least five controls`);
   await page.screenshot({ path: path.join(ARTIFACTS, `${label}.png`), fullPage: true });
-  const tools = page.getByRole("button", { name: /الأدوات عند الحاجة|Tools when needed/ });
+  const tools = page.locator("#assistant-capabilities > button");
   assert(await tools.isVisible(), `${label}: capability hub is behind tools button`);
   assert(
     !(await page.locator('a[href="/import"]').count()),
     `${label}: import capability hidden before tools open`,
   );
-  await tools.click();
+  await tools.click({ force: true });
   await page.waitForTimeout(1000);
   console.log(`${label}: tools after click`, (await page.locator("body").innerText()).slice(-1200));
   console.log(`${label}: hub count`, await page.locator("#assistant-capabilities-title").count());

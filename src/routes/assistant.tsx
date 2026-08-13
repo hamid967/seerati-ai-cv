@@ -25,7 +25,15 @@ import { agentById, agentsForSurface } from "@/lib/team";
 import { defaultTemplates } from "@/lib/templates";
 import type { Resume } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { NOURA_GOALS, NOURA_PROFILE, type NouraGoal, type NouraState } from "@/modules/noura";
+import {
+  createInitialJourney,
+  journeyPrompt,
+  NOURA_GOALS,
+  NOURA_PROFILE,
+  transitionJourney,
+  type JourneyEvent,
+  type NouraGoal,
+} from "@/modules/noura";
 
 const ASSISTANT_AGENTS = agentsForSurface("assistant");
 const AssistantCapabilityHub = lazy(() =>
@@ -103,9 +111,12 @@ function AssistantPage() {
   const initialAgent =
     (agentFromSearch && agentById(agentFromSearch)?.id) || ASSISTANT_AGENTS[0]?.id || "noura";
 
-  const [step, setStep] = useState(0);
-  const [goal, setGoal] = useState<NouraGoal | "">("");
-  const [nouraState, setNouraState] = useState<NouraState>("idle");
+  const [journey, setJourney] = useState(createInitialJourney);
+  const step = journey.step;
+  const goal = journey.goal ?? "";
+  const nouraState = journey.state;
+  const dispatchJourney = (event: JourneyEvent) =>
+    setJourney((snapshot) => transitionJourney(snapshot, event));
   const [agentId, setAgentId] = useState(initialAgent);
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [resumeLang, setResumeLang] = useState<"ar" | "en">(lang);
@@ -126,9 +137,8 @@ function AssistantPage() {
 
   const set = (patch: Partial<Answers>) => setAnswers((a) => ({ ...a, ...patch }));
   const chooseGoal = (nextGoal: NouraGoal) => {
-    setGoal(nextGoal);
+    dispatchJourney({ type: "choose_goal", goal: nextGoal });
     set({ creationMode: goalToCreationMode[nextGoal] });
-    setNouraState("asking");
     if (nextGoal === "import_resume") {
       void navigate({ to: "/import" });
     } else if (nextGoal === "check_ats" || nextGoal === "review_resume") {
@@ -177,7 +187,7 @@ function AssistantPage() {
 
   const runDrafting = async () => {
     if (!aiConsent) {
-      setNouraState("consent_required");
+      dispatchJourney({ type: "request_ai" });
       toast.message(
         ar
           ? "اختر الموافقة أولاً. يمكنك متابعة التحرير محلياً دون إرسال البيانات."
@@ -186,7 +196,7 @@ function AssistantPage() {
       return;
     }
     setDrafting(true);
-    setNouraState("ai_processing");
+    dispatchJourney({ type: "request_ai" });
     try {
       const { aiService } = await import("@/lib/ai-service");
       const ctx = {
@@ -235,7 +245,7 @@ function AssistantPage() {
         .filter(Boolean);
       const suggested = (sk.items ?? []).map((s) => s.trim()).filter(Boolean);
       setSkills(Array.from(new Set([...manual, ...suggested])).slice(0, 12));
-      setNouraState("suggestion_ready");
+      dispatchJourney({ type: "suggestion_ready" });
       toast.success(ar ? "جهّزت مسودة سيرتك للمراجعة" : "Your draft is ready for review");
     } catch (error) {
       toast.error(
@@ -247,7 +257,7 @@ function AssistantPage() {
       );
     } finally {
       setDrafting(false);
-      if (nouraState === "ai_processing") setNouraState("error");
+      if (journey.state === "ai_processing") dispatchJourney({ type: "retry" });
     }
   };
 
@@ -345,6 +355,18 @@ function AssistantPage() {
         <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_.9fr]" id="assistant-builder">
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <h2 className="text-lg font-bold">{ar ? steps[step]!.ar : steps[step]!.en}</h2>
+            {journey.questionFamily && (
+              <div
+                className="mt-3 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-muted-foreground"
+                aria-live="polite"
+                data-testid="journey-next-question"
+              >
+                <span className="font-semibold text-foreground">
+                  {ar ? "السؤال التالي:" : "Next question:"}
+                </span>{" "}
+                {journeyPrompt(journey, lang)}
+              </div>
+            )}
 
             {step === 0 && (
               <div className="mt-4 space-y-5">
@@ -606,7 +628,11 @@ function AssistantPage() {
                   <Checkbox
                     id="assistant-ai-consent"
                     checked={aiConsent}
-                    onCheckedChange={(value) => setAiConsent(Boolean(value))}
+                    onCheckedChange={(value) => {
+                      const consent = Boolean(value);
+                      setAiConsent(consent);
+                      if (consent) dispatchJourney({ type: "consent_granted" });
+                    }}
                   />
                   <label htmlFor="assistant-ai-consent" className="cursor-pointer leading-relaxed">
                     {ar
@@ -729,7 +755,7 @@ function AssistantPage() {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                onClick={() => dispatchJourney({ type: "back" })}
                 disabled={step === 0}
                 className="gap-2"
               >
@@ -740,7 +766,7 @@ function AssistantPage() {
               {step < steps.length - 1 ? (
                 <Button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => dispatchJourney({ type: "next" })}
                   disabled={!canNext}
                   className="gap-2"
                 >
