@@ -13,18 +13,18 @@ Lighthouse CI also runs on the five public routes. Accessibility, Best Practices
 
 ## Implemented hardening coverage
 
-| Area                    | Evidence                                                                                                     | Final status                   |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------ |
-| `/assistant` E2E        | All capability cards navigate and render without application error                                           | PASS                           |
-| Network Privacy         | Anonymous assistant journey produced no unauthorized mutation or personal payload                            | PASS / blocking                |
-| Free path               | Guest journey completed without the previous `401` app-settings failure                                      | PASS / blocking                |
-| axe                     | `/assistant`, `/`, `/templates`, `/features`, and `/privacy` checked in Arabic; assistant checked in English | PASS / blocking                |
-| Keyboard                | 20 interactive elements reached in Chromium, Firefox, and WebKit                                             | PASS                           |
-| Browser matrix          | Chromium, Firefox, WebKit                                                                                    | PASS                           |
-| PDF Arabic              | Generated PDF contains expected Arabic text                                                                  | PASS / blocking                |
-| PDF English             | Generated PDF contains expected English text                                                                 | PASS / blocking                |
-| Print visual regression | Arabic and English assistant print snapshots at 0.00% difference after approved baseline update              | PASS / blocking                |
-| Lighthouse              | Five public routes, two runs per route                                                                       | PASS with performance warnings |
+| Area                    | Evidence                                                                                                         | Final status                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `/assistant` E2E        | All capability cards navigate without application error; protected guest cards may redirect to `/auth` by design | PASS                           |
+| Network Privacy         | Anonymous assistant journey produced no unauthorized mutation or personal payload                                | PASS / blocking                |
+| Free path               | Guest journey completed without the previous `401` app-settings failure                                          | PASS / blocking                |
+| axe                     | `/assistant`, `/`, `/templates`, `/features`, and `/privacy` checked in Arabic; assistant checked in English     | PASS / blocking                |
+| Keyboard                | 20 interactive elements reached in Chromium, Firefox, and WebKit                                                 | PASS                           |
+| Browser matrix          | Chromium, Firefox, WebKit                                                                                        | PASS                           |
+| PDF Arabic              | Generated PDF contains expected Arabic text                                                                      | PASS / blocking                |
+| PDF English             | Generated PDF contains expected English text                                                                     | PASS / blocking                |
+| Print visual regression | Arabic and English assistant print snapshots at 0.00% difference after approved baseline update                  | PASS / blocking                |
+| Lighthouse              | Five public routes, two runs per route                                                                           | PASS with performance warnings |
 
 ## Critical and high findings remediated
 
@@ -47,6 +47,10 @@ The render-blocking Google Fonts stylesheet and preconnect links were removed fr
 ### Homepage contrast and accessible language control
 
 Low-contrast emerald text on the public homepage was changed to a darker accessible shade. The language control accessible name now includes its visible `EN` or `ع` label, resolving the Lighthouse label/content mismatch.
+
+### Protected guest routes
+
+The capability smoke suite distinguishes public guest destinations from protected destinations. `/jobs` and `/cover-letters` may redirect an anonymous visitor to `/auth`; this is the expected privacy-preserving behavior. Application errors and unexpected redirects remain blocking.
 
 ### Baseline integrity
 

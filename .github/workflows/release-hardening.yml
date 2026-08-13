@@ -40,7 +40,10 @@ jobs:
       - name: Build production artifact
         run: bun run build
       - name: Install browser and OS dependencies
-        run: bunx playwright install --with-deps ${{ matrix.browser }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+          bunx playwright install --with-deps ${{ matrix.browser }}
       - name: Start production preview
         run: |
           bunx wrangler dev --config .output/server/wrangler.json --port 4173 > /tmp/seerati-release-hardening.log 2>&1 &

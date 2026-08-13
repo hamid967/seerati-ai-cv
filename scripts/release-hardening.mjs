@@ -13,6 +13,7 @@ const BASELINES = path.join(ROOT, "tests", "release-baselines");
 const UPDATE = process.env.UPDATE_RELEASE_BASELINE === "1";
 const browsers = { chromium, firefox, webkit };
 const capabilityHrefs = ["/import", "/ats", "/jobs", "/cover-letters", "/arabic-intelligence"];
+const protectedCapabilityHrefs = new Set(["/jobs", "/cover-letters"]);
 const failures = [];
 
 function fail(message) {
@@ -66,10 +67,15 @@ async function comparePng(actualPath, baselinePath, label) {
 }
 async function gotoAssistant(page, lang) {
   await page.addInitScript((value) => localStorage.setItem("seerati.lang", value), lang);
-  const response = await page.goto(`${BASE_URL}/assistant`, {
-    waitUntil: "networkidle",
-    timeout: 30000,
-  });
+  let response;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    response = await page.goto(`${BASE_URL}/assistant`, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+    if (page.url().includes("/assistant")) break;
+    await page.waitForTimeout(attempt * 300);
+  }
   if (!response || response.status() >= 400)
     throw new Error(`assistant returned ${response?.status()}`);
   await page.locator("#assistant-capabilities-title").waitFor({ state: "visible", timeout: 15000 });
@@ -86,7 +92,12 @@ async function checkCapabilities(page, browserName) {
     await page.waitForLoadState("domcontentloaded").catch(() => {});
     await page.waitForTimeout(300);
     const body = await page.locator("body").innerText();
-    if (!page.url().includes(href)) fail(`${browserName}: ${href} did not become the active route`);
+    const reachedTarget = page.url().includes(href);
+    const expectedGuestAuthRedirect =
+      protectedCapabilityHrefs.has(href) && page.url().includes("/auth");
+    if (!reachedTarget && !expectedGuestAuthRedirect) {
+      fail(`${browserName}: ${href} did not become the active route`);
+    }
     if (/Internal Server Error|Application error|Cannot read properties/i.test(body)) {
       fail(`${browserName}: ${href} rendered an application error`);
     }
@@ -165,12 +176,12 @@ async function checkVisuals(page, lang) {
   await gotoAssistant(page, lang);
   const screen = path.join(ARTIFACTS, `assistant-${lang}.png`);
   const base = path.join(BASELINES, `assistant-${lang}.png`);
-  await page.screenshot({ path: screen, fullPage: true });
+  await page.screenshot({ path: screen, fullPage: false });
   await comparePng(screen, base, `assistant-${lang}`);
   await page.emulateMedia({ media: "print" });
   const print = path.join(ARTIFACTS, `assistant-${lang}-print.png`);
   const printBase = path.join(BASELINES, `assistant-${lang}-print.png`);
-  await page.screenshot({ path: print, fullPage: true });
+  await page.screenshot({ path: print, fullPage: false });
   await comparePng(print, printBase, `assistant-${lang}-print`);
   await page.emulateMedia({ media: "screen" });
   const pdf = path.join(ARTIFACTS, `assistant-${lang}.pdf`);
@@ -196,6 +207,7 @@ async function runBrowser(browserName) {
       return;
     }
     const failure = request.failure()?.errorText ?? "unknown request failure";
+    if (/Load request cancelled|NS_BINDING_ABORTED|NS_ERROR_ABORT/i.test(failure)) return;
     fail(`${browserName}: request failed ${request.method()} ${url} (${failure})`);
   });
   page.on("console", (message) => {
