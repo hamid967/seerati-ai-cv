@@ -45,8 +45,8 @@ function LightweightTemplatePreview({
         style={{ gridTemplateColumns: template.design.layout === "single" ? "1fr" : "0.7fr 1.3fr" }}
       >
         <div className="space-y-2">
-          {["w-full", "w-5/6", "w-4/5", "w-3/4", "w-5/6"].map((width) => (
-            <div key={width} className={`h-2 rounded-full bg-slate-200 ${width}`} />
+          {["w-full", "w-5/6", "w-4/5", "w-3/4", "w-5/6"].map((width, index) => (
+            <div key={`${width}-${index}`} className={`h-2 rounded-full bg-slate-200 ${width}`} />
           ))}
         </div>
         {template.design.layout !== "single" && (
