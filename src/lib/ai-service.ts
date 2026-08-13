@@ -223,6 +223,22 @@ export class AiUserError extends Error {}
 
 const limiter = new RateLimiter({ maxRequests: 25, windowMs: 60_000 });
 
+/**
+ * Guests (no session) cannot call the authenticated gateway server function —
+ * it rejects with "Unauthorized: No authorization header provided". Detect that
+ * up front and serve the local draft provider instead.
+ */
+async function hasSession(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session?.access_token);
+  } catch {
+    return false;
+  }
+}
+
 export const aiService = {
   providerId: gatewayProvider.id,
   isMock: false,
@@ -236,6 +252,11 @@ export const aiService = {
           ? `تم تجاوز الحد المسموح، أعد المحاولة بعد ${gate.retryIn} ثانية.`
           : `Rate limit reached, retry in ${gate.retryIn}s.`,
       );
+    }
+
+    if (!(await hasSession())) {
+      aiService.lastProvider = localProvider.id;
+      return localProvider.run(req);
     }
 
     try {
