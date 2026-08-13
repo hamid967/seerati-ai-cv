@@ -13,23 +13,23 @@ The branch also adds a deterministic 300-case synthetic Golden Dataset, fixture/
 
 ## Evidence
 
-| Area | Result |
-|---|---|
-| Baseline commit | `19bfffa` |
-| Format/type/build | Pass after current changes |
-| Static QA/AI contracts/RTL | Pass |
-| QA routes | Pass on clean single dev server: 23/23 routes |
-| Chromium hardening | Pass; known English visual warning 1.08% |
-| Firefox hardening | Pass |
-| WebKit hardening | Pass |
-| Guest parity/privacy | Pass |
-| Lighthouse | Completed 3× per route; existing LCP/performance/SEO warnings remain |
-| Synthetic dataset | Pass; 300 cases; hash `a0f156d9bc623f026ee93501522856667f8602107c790ce6cab84eeaa36aa2` |
-| AI output quality | Not measured yet |
-| ATS F1/precision/recall | Not measured yet |
-| Full deletion browser matrix | Pending |
-| Full security red-team | Pending |
-| Saudi user beta | Not started; correctly blocked |
+| Area                         | Result                                                                                 |
+| ---------------------------- | -------------------------------------------------------------------------------------- |
+| Baseline commit              | `19bfffa`                                                                              |
+| Format/type/build            | Pass after current changes                                                             |
+| Static QA/AI contracts/RTL   | Pass                                                                                   |
+| QA routes                    | Pass on clean single dev server: 23/23 routes                                          |
+| Chromium hardening           | Pass; known English visual warning 1.08%                                               |
+| Firefox hardening            | Pass                                                                                   |
+| WebKit hardening             | Pass                                                                                   |
+| Guest parity/privacy         | Pass                                                                                   |
+| Lighthouse                   | Completed 3× per route; existing LCP/performance/SEO warnings remain                   |
+| Synthetic dataset            | Pass; 300 cases; hash `a0f156d9bc623f026ee93501522856667f8602107c790ce6cab84eeaa36aa2` |
+| AI output quality            | Not measured yet                                                                       |
+| ATS F1/precision/recall      | Not measured yet                                                                       |
+| Full deletion browser matrix | Pending                                                                                |
+| Full security red-team       | Pending                                                                                |
+| Saudi user beta              | Not started; correctly blocked                                                         |
 
 ## Performance decision
 
