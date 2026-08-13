@@ -98,7 +98,7 @@ async function gotoAssistant(page, lang) {
 }
 async function checkCapabilities(page, browserName) {
   for (const href of capabilityHrefs) {
-    await page.goto(`${BASE_URL}/assistant`, { waitUntil: "domcontentloaded", timeout: 30000 });
+    await gotoAssistant(page, "ar");
     await page.locator(`a[href="${href}"]`).waitFor({ state: "visible", timeout: 15000 });
     const link = page.locator(`a[href="${href}"]`).first();
     const name = (await link.innerText()).trim();
