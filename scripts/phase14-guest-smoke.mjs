@@ -43,7 +43,8 @@ try {
   const createGoal = page.getByRole("button", {
     name: /إنشاء سيرة من الصفر|Create a resume from scratch/,
   });
-  await createGoal.click();
+  await page.waitForTimeout(1000);
+  await createGoal.click({ force: true });
   await page.waitForFunction(() => document.querySelector('button[aria-pressed="true"]') !== null);
   await page.waitForFunction(() =>
     [...document.querySelectorAll("button")].some(
