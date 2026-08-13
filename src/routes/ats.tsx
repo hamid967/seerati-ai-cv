@@ -13,8 +13,10 @@ import { explainFinding, LINT_CATEGORY_LABEL, lintResume } from "@/lib/resume-li
 import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
 import { emptyFactGraph } from "@/lib/career-facts";
 import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
-import { demoResume } from "@/lib/demo-data";
+import { demoResume, demoResumeData } from "@/lib/demo-data";
 import { getTemplate } from "@/components/resume-preview";
+import { fromResumeData } from "@/modules/career";
+import { analyzeCareerGraph } from "@/modules/ats";
 
 export const Route = createFileRoute("/ats")({
   head: () => ({
@@ -46,10 +48,16 @@ function AtsPage() {
   const ar = lang === "ar";
   const [jd, setJd] = useState("");
   const sample = useMemo(() => demoResume("demo"), []);
+  const phase18Input = useMemo(() => demoResumeData(), []);
   const report = useMemo(
     () => analyzeResume(sample, getTemplate(sample.templateId), jd),
     [sample, jd],
   );
+  const phase18Graph = useMemo(
+    () => fromResumeData(phase18Input, { graphId: "ats-demo-phase18", language: lang }).graph,
+    [phase18Input, lang],
+  );
+  const phase18Report = useMemo(() => analyzeCareerGraph(phase18Graph, jd), [phase18Graph, jd]);
   const lint = useMemo(() => lintResume(sample), [sample]);
   const snapshot = useMemo(
     () => buildRecruiterSnapshot(sample, { graph: emptyFactGraph(), jobDescription: jd }),
@@ -178,6 +186,45 @@ function AtsPage() {
               {ar
                 ? "لا توجد ملاحظات — بنية السيرة سليمة."
                 : "No findings — the structure looks clean."}
+            </p>
+          )}
+        </section>
+
+        <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="font-bold">
+                {ar ? "طبقة ATS القابلة للتفسير — Phase 18" : "Phase 18 explainable ATS layer"}
+              </p>
+              <p className="mt-1 text-xs leading-[1.8] text-muted-foreground">
+                {ar
+                  ? "نتيجة إرشادية مرتبطة بمعرّفات الأدلة وقواعد قابلة للمراجعة، وليست ضماناً للقبول."
+                  : "An advisory result linked to evidence IDs and reviewable rules; it is not a hiring guarantee."}
+              </p>
+            </div>
+            <p className="text-2xl font-extrabold">{phase18Report.overallAdvisoryScore}/100</p>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {phase18Report.failedRules.slice(0, 4).map((rule) => (
+              <div key={rule.ruleId} className="rounded-xl border border-border p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <Badge variant={rule.severity === "high" ? "destructive" : "outline"}>
+                    {rule.severity}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">{rule.ruleId}</span>
+                </div>
+                <p className="mt-2 text-sm leading-[1.8]">
+                  {ar ? rule.explanationArabic : rule.explanationEnglish}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Evidence: {rule.evidenceFactIds.length}
+                </p>
+              </div>
+            ))}
+          </div>
+          {phase18Report.failedRules.length === 0 && (
+            <p className="mt-4 text-sm text-emerald-accent">
+              {ar ? "اجتازت القواعد الحالية." : "The current rules passed."}
             </p>
           )}
         </section>
