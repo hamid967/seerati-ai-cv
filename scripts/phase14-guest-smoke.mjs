@@ -40,9 +40,11 @@ try {
 
   await page.goto(`${base}/assistant?agent=noura`, { waitUntil: "networkidle" });
   await assertText(/ما الذي تريد إنجازه اليوم؟|What do you want to accomplish today\?/);
-  await page
-    .getByRole("button", { name: /إنشاء سيرة من الصفر|Create a resume from scratch/ })
-    .click();
+  const createGoal = page.getByRole("button", {
+    name: /إنشاء سيرة من الصفر|Create a resume from scratch/,
+  });
+  await createGoal.click();
+  await page.waitForFunction(() => document.querySelector('button[aria-pressed="true"]') !== null);
   await page.waitForFunction(() =>
     [...document.querySelectorAll("button")].some(
       (button) => /التالي|Next/.test(button.textContent ?? "") && !button.disabled,
