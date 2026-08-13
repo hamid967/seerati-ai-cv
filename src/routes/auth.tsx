@@ -21,7 +21,18 @@ import { useI18n, useT } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-const searchSchema = z.object({ mode: z.enum(["signin", "signup", "reset"]).optional() });
+const searchSchema = z.object({
+  mode: z.enum(["signin", "signup", "reset"]).optional(),
+  /** Same-origin relative path to return to after authentication (e.g. OAuth consent). */
+  next: z.string().optional(),
+});
+
+/** Only same-origin relative paths are allowed as a post-auth redirect target. */
+function safeNext(value?: string): string | undefined {
+  if (!value) return undefined;
+  return /^\/(?!\/)/.test(value) ? value : undefined;
+}
+
 
 type AuthMode = "signin" | "signup" | "reset";
 type AuthErrors = Partial<Record<"email" | "password" | "confirm" | "name" | "terms", string>>;
