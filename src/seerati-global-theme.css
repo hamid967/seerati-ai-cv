@@ -18,6 +18,32 @@
   --seerati-motion-emphasis: 360ms;
   --seerati-content-gutter: clamp(1rem, 3vw, 4rem);
   --seerati-safe-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  --seerati-space-1: 0.25rem;
+  --seerati-space-2: 0.5rem;
+  --seerati-space-3: 0.75rem;
+  --seerati-space-4: 1rem;
+  --seerati-space-6: 1.5rem;
+  --seerati-space-8: 2rem;
+  --seerati-space-12: 3rem;
+  --seerati-space-16: 4rem;
+  --seerati-radius-sm: 0.5rem;
+  --seerati-radius-md: 0.75rem;
+  --seerati-radius-lg: 1rem;
+  --seerati-radius-pill: 999px;
+  --seerati-text-xs: 0.75rem;
+  --seerati-text-sm: 0.875rem;
+  --seerati-text-md: 1rem;
+  --seerati-text-lg: clamp(1.125rem, 1.6vw, 1.375rem);
+  --seerati-text-xl: clamp(1.5rem, 3vw, 2.5rem);
+  --seerati-text-display: clamp(2.25rem, 6vw, 5rem);
+  --seerati-surface-1: var(--card);
+  --seerati-surface-2: color-mix(in oklch, var(--card) 92%, var(--background));
+  --seerati-surface-3: color-mix(in oklch, var(--card) 84%, var(--background));
+  --seerati-print-width: 210mm;
+  --seerati-print-height: 297mm;
+  --seerati-content-max: 72rem;
+  --seerati-breakpoint-mobile: 40rem;
+  --seerati-breakpoint-tablet: 64rem;
 }
 
 .dark {
