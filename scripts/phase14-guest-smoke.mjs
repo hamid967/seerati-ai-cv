@@ -43,6 +43,11 @@ try {
   await page
     .getByRole("button", { name: /إنشاء سيرة من الصفر|Create a resume from scratch/ })
     .click();
+  await page.waitForFunction(() =>
+    [...document.querySelectorAll("button")].some(
+      (button) => /التالي|Next/.test(button.textContent ?? "") && !button.disabled,
+    ),
+  );
   await page.getByRole("button", { name: /التالي|Next/ }).click();
   await assertText(/من أنت|About you/);
 
