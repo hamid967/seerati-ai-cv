@@ -83,7 +83,11 @@ async function gotoAssistant(page, lang) {
       if (page.url().includes("/assistant")) break;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      if (!/NS_BINDING_ABORTED|frame was detached/i.test(message) || attempt === 3) throw error;
+      if (
+        !/NS_BINDING_ABORTED|frame was detached|interrupted by another navigation/i.test(message) ||
+        attempt === 3
+      )
+        throw error;
     }
     await page.waitForTimeout(attempt * 500);
   }
