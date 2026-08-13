@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { markIntroSeen } from "@/lib/intro";
 import "../landing-experience.css";
 
-const INTRO_DURATION_MS = 9000;
+const INTRO_DURATION_MS = 7600;
+const INTRO_REDUCED_MOTION_MS = 600;
 
 type LandingIntroProps = {
   ar: boolean;
@@ -14,6 +14,8 @@ type LandingIntroProps = {
 
 export function LandingIntro({ ar, mode = "page", onComplete }: LandingIntroProps) {
   const [scene, setScene] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const skipRef = useRef<HTMLButtonElement>(null);
 
   const copy = useMemo(
     () =>
@@ -71,16 +73,25 @@ export function LandingIntro({ ar, mode = "page", onComplete }: LandingIntroProp
   };
 
   useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    skipRef.current?.focus();
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+
+  useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     if (mode === "overlay" || mode === "page") {
       document.body.style.overflow = "hidden";
     }
 
     const timers = [
-      window.setTimeout(() => setScene(1), 2200),
-      window.setTimeout(() => setScene(2), 4400),
-      window.setTimeout(() => setScene(3), 6600),
-      window.setTimeout(finish, INTRO_DURATION_MS),
+      window.setTimeout(() => setScene(1), reducedMotion ? 150 : 1900),
+      window.setTimeout(() => setScene(2), reducedMotion ? 300 : 3800),
+      window.setTimeout(() => setScene(3), reducedMotion ? 450 : 5700),
+      window.setTimeout(finish, reducedMotion ? INTRO_REDUCED_MOTION_MS : INTRO_DURATION_MS),
     ];
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" || event.key === "Enter") finish();
@@ -92,8 +103,8 @@ export function LandingIntro({ ar, mode = "page", onComplete }: LandingIntroProp
       timers.forEach(window.clearTimeout);
       window.removeEventListener("keydown", onKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per mount
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- finish is intentionally scoped to the mounted intro
+  }, [reducedMotion]);
 
   return (
     <div
@@ -106,8 +117,14 @@ export function LandingIntro({ ar, mode = "page", onComplete }: LandingIntroProp
       <div className="seerati-intro__aurora" aria-hidden="true" />
       <div className="seerati-intro__grid" aria-hidden="true" />
       <div className="seerati-intro__beam" aria-hidden="true" />
-      <button className="seerati-intro__skip" type="button" onClick={finish}>
-        <X className="size-4" aria-hidden="true" />
+      <button
+        ref={skipRef}
+        className="seerati-intro__skip"
+        type="button"
+        onClick={finish}
+        aria-label={ar ? "تخطي المقدمة" : "Skip introduction"}
+      >
+        <span aria-hidden="true">×</span>
         {ar ? "تخطي" : "Skip"}
       </button>
       <div className="seerati-intro__brand" aria-hidden="true">

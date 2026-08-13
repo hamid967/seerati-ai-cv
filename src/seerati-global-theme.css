@@ -1,0 +1,51 @@
+/* Seerati Global Experience Studio tokens.
+ * This layer aliases the existing design system; it does not add a runtime dependency.
+ */
+
+:root {
+  --seerati-midnight-navy: var(--ink);
+  --seerati-saudi-emerald: var(--emerald-accent);
+  --seerati-warm-sand: var(--sand);
+  --seerati-pearl-white: var(--card);
+  --seerati-slate: var(--muted-foreground);
+  --seerati-sky-blue: oklch(0.58 0.09 235);
+  --seerati-amber: oklch(0.68 0.14 80);
+  --seerati-error: var(--destructive);
+  --seerati-focus-ring: var(--ring);
+  --seerati-motion-instant: 100ms;
+  --seerati-motion-fast: 160ms;
+  --seerati-motion-standard: 240ms;
+  --seerati-motion-emphasis: 360ms;
+  --seerati-content-gutter: clamp(1rem, 3vw, 4rem);
+  --seerati-safe-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.dark {
+  --seerati-sky-blue: oklch(0.76 0.09 235);
+  --seerati-amber: oklch(0.8 0.13 80);
+}
+
+:where(:focus-visible) {
+  outline: 2px solid var(--seerati-focus-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  :root {
+    --seerati-motion-instant: 0ms;
+    --seerati-motion-fast: 0ms;
+    --seerati-motion-standard: 0ms;
+    --seerati-motion-emphasis: 0ms;
+  }
+}
