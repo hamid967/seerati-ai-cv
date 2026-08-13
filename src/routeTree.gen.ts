@@ -41,6 +41,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ResumesIdComposerRouteImport } from './routes/resumes.$id.composer'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
@@ -207,6 +208,11 @@ const ResumesNewRoute = ResumesNewRouteImport.update({
   path: '/resumes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResumesIdComposerRoute = ResumesIdComposerRouteImport.update({
   id: '/resumes/$id/composer',
   path: '/resumes/$id/composer',
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/resumes/new': typeof ResumesNewRoute
   '/admin': typeof AdminIndexRoute
   '/jobs': typeof JobsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/resumes/new': typeof ResumesNewRoute
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
+    | '/.lovable/oauth/consent'
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin'
     | '/jobs'
+    | '/.lovable/oauth/consent'
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/resumes/new'
     | '/admin/'
     | '/jobs/'
+    | '/.lovable/oauth/consent'
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
@@ -497,6 +509,7 @@ export interface RootRouteChildren {
   JobsIdRoute: typeof JobsIdRoute
   ResumesNewRoute: typeof ResumesNewRoute
   JobsIndexRoute: typeof JobsIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ResumesIdComposerRoute: typeof ResumesIdComposerRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
@@ -730,6 +743,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resumes/$id/composer': {
       id: '/resumes/$id/composer'
       path: '/resumes/$id/composer'
@@ -814,6 +834,7 @@ const rootRouteChildren: RootRouteChildren = {
   JobsIdRoute: JobsIdRoute,
   ResumesNewRoute: ResumesNewRoute,
   JobsIndexRoute: JobsIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ResumesIdComposerRoute: ResumesIdComposerRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
