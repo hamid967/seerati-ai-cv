@@ -39,6 +39,7 @@ try {
   await assertText(/راجع المسودة|Review your draft/);
 
   await page.goto(`${base}/assistant?agent=noura`, { waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "networkidle" });
   await assertText(/ما الذي تريد إنجازه اليوم؟|What do you want to accomplish today\?/);
   const createGoal = page.getByRole("button", {
     name: /إنشاء سيرة من الصفر|Create a resume from scratch/,
