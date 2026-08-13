@@ -54,8 +54,8 @@ function NewResume() {
           <p className="mt-6 rounded-lg border border-border bg-secondary px-4 py-3 text-sm">
             {isGuest
               ? ar
-                ? "كزائر يمكنك العمل على سيرة واحدة. أنشئ حساباً مجانياً للوصول إلى ٣ سير ذاتية."
-                : "As a guest you can keep one resume. Create a free account for up to 3 resumes."
+                ? "كزائر يمكنك العمل على سيرة واحدة في هذه الجلسة. يمكنك حذفها وبدء سيرة جديدة أو اختيار الحفظ في حساب لاحقاً."
+                : "As a guest, you can work on one resume in this session. Delete it to start another or choose account saving later."
               : ar
                 ? "وصلت الحد الأقصى (٣ سير ذاتية). احذف واحدة للمتابعة."
                 : "You reached the 3-resume limit. Delete one to continue."}
@@ -140,22 +140,22 @@ function NewResume() {
                   toast.error(ar ? "تعذّر الإنشاء" : "Could not create");
                   return;
                 }
-                if (isGuest) {
-                  toast.success(
-                    ar
-                      ? "تم إنشاء السيرة — سجّل حساباً لحفظها والمتابعة"
-                      : "Resume created — sign up to save it and continue",
-                  );
-                  navigate({ to: "/auth", search: { mode: "signup" } });
-                  return;
-                }
+                toast.success(
+                  isGuest
+                    ? ar
+                      ? "تم إنشاء السيرة في هذه الجلسة. الحفظ في حساب اختياري لاحقاً."
+                      : "Your resume is ready in this session. Saving to an account is optional later."
+                    : ar
+                      ? "تم إنشاء السيرة وفتح المحرر."
+                      : "Your resume is ready in the editor.",
+                );
                 navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
               }}
             >
               {isGuest
                 ? ar
-                  ? "إنشاء ثم التسجيل"
-                  : "Create then sign up"
+                  ? "إنشاء وفتح المحرر"
+                  : "Create and open editor"
                 : ar
                   ? "إنشاء والانتقال للمحرر"
                   : "Create and open editor"}

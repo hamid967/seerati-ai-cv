@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
+import { useStore } from "@/lib/store";
 import { analyzeResume } from "@/lib/ats";
 import { explainFinding, LINT_CATEGORY_LABEL, lintResume } from "@/lib/resume-lint";
 import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
@@ -48,8 +49,10 @@ function AtsPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const [jd, setJd] = useState("");
-  const sample = useMemo(() => demoResume("demo"), []);
-  const phase18Input = useMemo(() => demoResumeData(), []);
+  const { resumes, isGuest } = useStore();
+  const guestResume = isGuest ? resumes[0] : undefined;
+  const sample = useMemo(() => guestResume ?? demoResume("demo"), [guestResume]);
+  const phase18Input = useMemo(() => guestResume?.data ?? demoResumeData(), [guestResume]);
   const report = useMemo(
     () => analyzeResume(sample, getTemplate(sample.templateId), jd),
     [sample, jd],
@@ -81,7 +84,15 @@ function AtsPage() {
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="flex items-center justify-between">
-            <p className="font-bold">{ar ? "مثال على سيرة تجريبية" : "Example: demo resume"}</p>
+            <p className="font-bold">
+              {guestResume
+                ? ar
+                  ? "فحص سيرتك في هذه الجلسة"
+                  : "Checking your resume in this session"
+                : ar
+                  ? "مثال على سيرة تجريبية"
+                  : "Example: demo resume"}
+            </p>
             <p className="text-2xl font-extrabold text-emerald-accent">{report.score}/100</p>
           </div>
           <Progress value={report.score} className="mt-4" />
@@ -268,8 +279,14 @@ function AtsPage() {
         </div>
 
         <Button size="lg" className="mt-8" asChild>
-          <Link to="/auth" search={{ mode: "signup" }}>
-            {ar ? "افحص سيرتي" : "Check my resume"}
+          <Link to="/assistant" search={{ agent: "noura" }}>
+            {guestResume
+              ? ar
+                ? "العودة إلى نورة"
+                : "Return to Noura"
+              : ar
+                ? "ابدأ سيرتك مجانًا"
+                : "Start your resume free"}
           </Link>
         </Button>
       </main>

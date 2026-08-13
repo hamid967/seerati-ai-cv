@@ -49,6 +49,7 @@ import {
 import {
   buildImportDraft,
   CONFIDENCE_LABEL,
+  draftToGuestResumeData,
   draftToTwinPatch,
   type Confidence,
   type ImportDraft,
@@ -99,8 +100,8 @@ const LIST_LABEL: Record<ListKind, { ar: string; en: string }> = {
 function ImportCenterPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { user } = useStore();
-  useAuthGuard();
+  const { user, isGuest, resumes, createResume, updateResume } = useStore();
+  useAuthGuard({ allowGuest: true });
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>("source");
@@ -352,9 +353,52 @@ function ImportCenterPage() {
     ];
 
     async function save(next: "gaps" | "only") {
-      if (!user || !draft) return;
+      if (!draft) return;
       setBusy(true);
       try {
+        if (isGuest) {
+          const guestData = draftToGuestResumeData(draft);
+          const guestResumeLanguage = resumeLang === "en" ? "en" : "ar";
+          const title =
+            guestData.personal.jobTitle ||
+            guestData.personal.fullName ||
+            (ar ? "سيرة مستوردة" : "Imported resume");
+          const existing = resumes[0];
+          const target =
+            existing ??
+            (await createResume({
+              title,
+              templateId: "classic-ats",
+              language: guestResumeLanguage,
+            }));
+          if (!target) {
+            toast.error(
+              ar
+                ? "تعذّر إنشاء سيرة محلية للاستيراد."
+                : "Could not create a local resume for this import.",
+            );
+            return;
+          }
+          await updateResume(target.id, { title, language: guestResumeLanguage, data: guestData });
+          const importedCount =
+            draft.fields.filter((field) => field.include && field.value.trim()).length +
+            [
+              draft.experience,
+              draft.education,
+              draft.skills,
+              draft.languages,
+              draft.certificates,
+              draft.projects,
+            ].reduce((sum, list) => sum + list.filter((item) => item.include).length, 0);
+          toast.success(
+            ar
+              ? `تمت إضافة ${importedCount} عناصر إلى سيرتك في هذه الجلسة فقط.`
+              : `${importedCount} items were added to your resume in this session only.`,
+          );
+          navigate({ to: "/resumes/$id/edit", params: { id: target.id } });
+          return;
+        }
+        if (!user) return;
         const { patch, sections, count } = draftToTwinPatch(draft, twin);
         if (!count) {
           toast.info(ar ? "لم تختر أي عنصر للحفظ." : "No item selected to save.");
@@ -674,11 +718,23 @@ function ImportCenterPage() {
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => void save("gaps")} disabled={busy}>
             {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
-            {ar ? "اعتماد واستكمال مع المساعد" : "Approve and continue with the copilot"}
+            {isGuest
+              ? ar
+                ? "اعتماد وفتح المحرر"
+                : "Approve and open editor"
+              : ar
+                ? "اعتماد واستكمال مع المساعد"
+                : "Approve and continue with the copilot"}
           </Button>
           <Button variant="outline" onClick={() => void save("only")} disabled={busy}>
             <Upload className="size-4" />
-            {ar ? "استيراد فقط" : "Import only"}
+            {isGuest
+              ? ar
+                ? "اعتماد محلي"
+                : "Approve locally"
+              : ar
+                ? "استيراد فقط"
+                : "Import only"}
           </Button>
           <Button variant="ghost" onClick={() => setStep("source")} disabled={busy}>
             {ar ? "رجوع" : "Back"}

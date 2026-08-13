@@ -73,13 +73,13 @@ function Landing() {
               </p>
               <h1 className="mt-3 text-balance-ar text-3xl font-extrabold leading-[1.3] tracking-tight md:text-5xl">
                 {ar
-                  ? "سيرة سعودية احترافية تفتح لك أبواب الفرص"
-                  : "A Saudi professional resume that opens new opportunities"}
+                  ? "أنشئ سيرتك الآن — دون تسجيل"
+                  : "Create your resume now — no registration needed"}
               </h1>
               <p className="mt-4 max-w-lg text-[15px] leading-[1.9] text-ink-foreground/75 md:text-base">
                 {ar
-                  ? "أنشئ سيرتك بالعربية أو الإنجليزية، حسّنها بالذكاء الاصطناعي، وافحص توافقها مع ATS — مجانًا، دون تسجيل، ودون حفظ بياناتك."
-                  : "Create your resume in Arabic or English, improve it with AI, and check ATS guidance — free, without registration, and without saving your data."}
+                  ? "ابدأ مجانًا، حسّن سيرتك مع نورة، وافحصها واطبعها دون إنشاء حساب. لن تُحفظ بياناتك افتراضيًا."
+                  : "Start free, improve your resume with Noura, check it, and print it without an account. Your data is not saved by default."}
               </p>
               <p
                 className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-ink-foreground/80"
@@ -96,8 +96,8 @@ function Landing() {
                   className="bg-emerald-accent text-ink-foreground hover:bg-emerald-accent/90"
                   asChild
                 >
-                  <Link to="/resumes/new">
-                    {ar ? "ابدأ سيرة" : "Start a resume"}
+                  <Link to="/assistant" search={{ agent: "noura" }}>
+                    {ar ? "ابدأ سيرتك مجانًا" : "Start your resume free"}
                     <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
                   </Link>
                 </Button>
@@ -116,6 +116,14 @@ function Landing() {
                   asChild
                 >
                   <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="text-ink-foreground/80 hover:bg-white/10 hover:text-ink-foreground"
+                  asChild
+                >
+                  <Link to="/auth">{ar ? "لدي حساب" : "I have an account"}</Link>
                 </Button>
               </div>
             </div>

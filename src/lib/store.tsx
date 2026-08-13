@@ -21,6 +21,12 @@ import {
   readGuestResumes,
   writeGuestResumes,
 } from "./guest-store";
+import {
+  clearGuestResumeSession,
+  readGuestResumeSession,
+  upsertGuestResumeSession,
+  type GuestResumeSession,
+} from "./guest-session";
 
 /**
  * Authenticated account data uses Lovable Cloud. Anonymous resume content is
@@ -58,6 +64,8 @@ type Ctx = {
   isGuest: boolean;
   /** Delete all anonymous resume data from the current in-memory session. */
   clearGuestSession: () => void;
+  /** In-memory metadata for the current anonymous editing session. */
+  guestSession: GuestResumeSession | null;
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -112,6 +120,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Profile | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [guestResumes, setGuestResumes] = useState<Resume[]>([]);
+  const [guestSession, setGuestSession] = useState<GuestResumeSession | null>(null);
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
 
@@ -127,6 +136,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     guestRef.current = next;
     setGuestResumes(next);
     writeGuestResumes(next);
+    setGuestSession(next[0] ? upsertGuestResumeSession(next[0]) : null);
   }, []);
 
   const setResumesState = useCallback((update: Resume[] | ((prev: Resume[]) => Resume[])) => {
@@ -139,6 +149,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const stored = readGuestResumes();
     guestRef.current = stored;
     setGuestResumes(stored);
+    setGuestSession(stored[0] ? upsertGuestResumeSession(stored[0]) : readGuestResumeSession());
   }, []);
 
   useEffect(() => {
@@ -146,8 +157,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     let timeout = window.setTimeout(
       () => {
         clearGuestResumes();
+        clearGuestResumeSession();
         guestRef.current = [];
         setGuestResumes([]);
+        setGuestSession(null);
       },
       20 * 60 * 1000,
     );
@@ -155,8 +168,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(timeout);
       timeout = window.setTimeout(() => {
         clearGuestResumes();
+        clearGuestResumeSession();
         guestRef.current = [];
         setGuestResumes([]);
+        setGuestSession(null);
       }, ANONYMOUS_SESSION_TIMEOUT_MS);
     };
     window.addEventListener("pointerdown", reset, { passive: true });
@@ -309,8 +324,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const clearGuestSession = useCallback(() => {
     clearGuestResumes();
+    clearGuestResumeSession();
     guestRef.current = [];
     setGuestResumes([]);
+    setGuestSession(null);
   }, []);
 
   const value = useMemo<Ctx>(() => {
@@ -327,6 +344,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       maxResumes: effectiveMax,
       isGuest,
       clearGuestSession,
+      guestSession,
 
       signIn,
       signUp,
@@ -476,6 +494,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     clearGuestSession,
+    guestSession,
   ]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

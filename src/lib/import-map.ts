@@ -9,8 +9,8 @@ import { parseResumeText, type ParsedResume } from "./resume-import";
 import { detectLanguage } from "./file-extract";
 import type { CareerTwin, TwinPatch } from "./career";
 import type { SourceType } from "./import-connectors";
-import { uid } from "./types";
-import type { Education, Experience, LanguageItem, SkillItem } from "./types";
+import { emptyResumeData, uid } from "./types";
+import type { Education, Experience, LanguageItem, ResumeData, SkillItem } from "./types";
 
 export type Confidence = "high" | "medium" | "low";
 
@@ -248,6 +248,36 @@ export function buildImportDraft(args: {
 }
 
 export type ApplySummary = { patch: TwinPatch; sections: string[]; count: number };
+
+/**
+ * Converts selected import candidates into a browser-local resume document.
+ * This intentionally does not read or write a Career Twin, profile, or remote row.
+ */
+export function draftToGuestResumeData(draft: ImportDraft): ResumeData {
+  const data = emptyResumeData();
+  for (const field of draft.fields) {
+    if (!field.include || !field.value.trim()) continue;
+    const value = field.value.trim();
+    if (field.key === "fullName") data.personal.fullName = value;
+    if (field.key === "headline") {
+      data.personal.jobTitle = value;
+      data.targetJob = value;
+    }
+    if (field.key === "email") data.personal.email = value;
+    if (field.key === "phone") data.personal.phone = value;
+    if (field.key === "city") data.personal.city = value;
+    if (field.key === "summary") data.summary = value;
+  }
+  const pick = <T>(list: ListCandidate<T>[]) =>
+    list.filter((candidate) => candidate.include).map((candidate) => candidate.value);
+  data.experience = pick(draft.experience);
+  data.education = pick(draft.education);
+  data.skills = pick(draft.skills);
+  data.languages = pick(draft.languages);
+  data.certificates = pick(draft.certificates);
+  data.projects = pick(draft.projects);
+  return data;
+}
 
 /**
  * Converts the reviewed draft into a Twin patch. Only entries the user kept

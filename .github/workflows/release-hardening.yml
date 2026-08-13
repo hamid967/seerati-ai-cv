@@ -64,6 +64,9 @@ jobs:
       - name: Run Phase 14 guest parity and privacy smoke
         if: matrix.browser == 'chromium'
         run: bun run test:phase14-guest
+      - name: Run Guest-First visitor flow smoke
+        if: matrix.browser == 'chromium'
+        run: bun run test:guest-first-browser
       - name: Upload hardening artifacts
         if: always()
         uses: actions/upload-artifact@v4
