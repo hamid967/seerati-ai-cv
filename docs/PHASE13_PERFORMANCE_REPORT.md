@@ -16,24 +16,24 @@ Lighthouse remains in the staged, non-blocking performance-warning phase. The fi
 
 ## Change manifest
 
-| Area | Change | Acceptance evidence |
-|---|---|---|
-| Homepage asset | Replaced the local 83 KB JPEG hero with a 27 KB WebP asset and added image preload metadata. | Build succeeds; final artifact contains `hero-resume-*.webp`. |
-| Guest critical path | Converted `FloatingSeeratiAssistant` to a lazy import and deferred activation until user interaction or five seconds. | Runtime profile shows no floating-assistant chunk in the initial anonymous route measurement. |
-| Template gallery | Replaced initial full `ResumeThumb` cards with CSS lightweight previews. | Initial `/templates` DOM reduced from 3,302 to 337 nodes. |
-| Full preview behavior | Lazy-loads `ResumeThumb` only in selected-template and comparison dialogs. | Full preview code remains available on explicit preview/compare actions. |
-| Off-screen rendering | Added `content-visibility: auto` and an intrinsic size to the gallery grid. | Build and Lighthouse route checks pass. |
-| Firefox stability | Retries transient `NS_BINDING_ABORTED`/detached-frame navigation during assistant setup, while keeping the third failure blocking. | Firefox final regression passed. |
+| Area                  | Change                                                                                                                             | Acceptance evidence                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Homepage asset        | Replaced the local 83 KB JPEG hero with a 27 KB WebP asset and added image preload metadata.                                       | Build succeeds; final artifact contains `hero-resume-*.webp`.                                 |
+| Guest critical path   | Converted `FloatingSeeratiAssistant` to a lazy import and deferred activation until user interaction or five seconds.              | Runtime profile shows no floating-assistant chunk in the initial anonymous route measurement. |
+| Template gallery      | Replaced initial full `ResumeThumb` cards with CSS lightweight previews.                                                           | Initial `/templates` DOM reduced from 3,302 to 337 nodes.                                     |
+| Full preview behavior | Lazy-loads `ResumeThumb` only in selected-template and comparison dialogs.                                                         | Full preview code remains available on explicit preview/compare actions.                      |
+| Off-screen rendering  | Added `content-visibility: auto` and an intrinsic size to the gallery grid.                                                        | Build and Lighthouse route checks pass.                                                       |
+| Firefox stability     | Retries transient `NS_BINDING_ABORTED`/detached-frame navigation during assistant setup, while keeping the third failure blocking. | Firefox final regression passed.                                                              |
 
 ## Runtime profile: before and after
 
 The profile was run against a production build with the repository's synthetic demo data. JavaScript transfer includes route resources observed during the profile window; it is not a claim about all eventual interaction code.
 
-| Route | Baseline DOM | Final DOM | Change | Baseline JS transfer | Final JS transfer | Change |
-|---|---:|---:|---:|---:|---:|---:|
-| `/` | 239 | 237 | −0.8% | 311,157 B | 289,377 B | −7.0% |
-| `/templates` | 3,302 | 337 | **−89.8%** | 312,127 B | 291,117 B | −6.7% |
-| `/assistant` | 334 | 343 | +2.7% | 317,479 B | 314,719 B | −0.9% |
+| Route        | Baseline DOM | Final DOM |     Change | Baseline JS transfer | Final JS transfer | Change |
+| ------------ | -----------: | --------: | ---------: | -------------------: | ----------------: | -----: |
+| `/`          |          239 |       237 |      −0.8% |            311,157 B |         289,377 B |  −7.0% |
+| `/templates` |        3,302 |       337 | **−89.8%** |            312,127 B |         291,117 B |  −6.7% |
+| `/assistant` |          334 |       343 |      +2.7% |            317,479 B |         314,719 B |  −0.9% |
 
 The template-gallery result is the primary Phase 13 win: the initial DOM is reduced by 2,965 nodes while the complete gallery remains available through the existing interaction flow. The assistant route itself is intentionally not stripped of its capability content; its small DOM increase reflects the unified Assistant Hub and remains covered by privacy, accessibility, and browser tests.
 
@@ -41,30 +41,30 @@ The template-gallery result is the primary Phase 13 win: the initial DOM is redu
 
 The official Lighthouse CI configuration ran two samples per route in the local production preview for this phase. The route set was `/`, `/templates`, `/features`, `/privacy`, and `/assistant`. The command completed successfully and wrote ten JSON reports under the local `artifacts/lighthouse/` directory; those generated artifacts are excluded from the PR to avoid noisy or accidental report retention.
 
-| Route | Performance samples | LCP samples | Status |
-|---|---:|---:|---|
-| `/` | 0.78, 0.79 | 4,250 ms, 4,232 ms | Warning; non-blocking variance/budget breach |
-| `/templates` | 0.80, 0.79 | 3,947 ms, 4,103 ms | Warning; improved DOM and near budget |
-| `/features` | 0.80, 0.84 | 3,991 ms, 3,382 ms | Warning threshold variance |
-| `/privacy` | 0.86, 0.86 | 3,239 ms, 3,244 ms | Informational performance warning only |
-| `/assistant` | 0.72, 0.70 | 4,509 ms, 4,585 ms | Warning; requires a separate assistant-route optimization pass |
+| Route        | Performance samples |        LCP samples | Status                                                         |
+| ------------ | ------------------: | -----------------: | -------------------------------------------------------------- |
+| `/`          |          0.78, 0.79 | 4,250 ms, 4,232 ms | Warning; non-blocking variance/budget breach                   |
+| `/templates` |          0.80, 0.79 | 3,947 ms, 4,103 ms | Warning; improved DOM and near budget                          |
+| `/features`  |          0.80, 0.84 | 3,991 ms, 3,382 ms | Warning threshold variance                                     |
+| `/privacy`   |          0.86, 0.86 | 3,239 ms, 3,244 ms | Informational performance warning only                         |
+| `/assistant` |          0.72, 0.70 | 4,509 ms, 4,585 ms | Warning; requires a separate assistant-route optimization pass |
 
 A targeted single-run check after the lightweight gallery change measured `/templates` at Performance **0.84**, LCP **3,382 ms**, TBT **103 ms**, and **275** DOM elements. Because the CI configuration intentionally runs repeated samples, the two-run values above are the authoritative release evidence and show why performance remains staged rather than blocking.
 
 ## Hardening and release gates
 
-| Gate | Result | Blocking interpretation |
-|---|---|---|
-| Chromium assistant capabilities | Passed | No blocking E2E failure. |
-| Firefox assistant capabilities | Passed after transient navigation retry | No persistent browser failure. |
-| WebKit assistant capabilities | Passed | No blocking E2E failure. |
-| Network Privacy anonymous journey | Passed on Chromium | Blocking privacy gate remains green. |
-| axe Arabic/English and public routes | Passed on Chromium | No critical or serious violations. |
-| Keyboard navigation | Passed on Chromium, Firefox, and WebKit | 20 interactive elements reached in Chromium. |
-| Arabic/English PDF selectable text | Passed on Chromium | Blocking PDF gate remains green. |
-| Arabic/English print visual regression | Passed on Chromium | Blocking print/PDF presentation gate remains green. |
-| Lighthouse accessibility, best practices, SEO | Passed | No quality regression observed. |
-| Lighthouse performance | Warning only | Kept non-blocking per staged rollout policy. |
+| Gate                                          | Result                                  | Blocking interpretation                             |
+| --------------------------------------------- | --------------------------------------- | --------------------------------------------------- |
+| Chromium assistant capabilities               | Passed                                  | No blocking E2E failure.                            |
+| Firefox assistant capabilities                | Passed after transient navigation retry | No persistent browser failure.                      |
+| WebKit assistant capabilities                 | Passed                                  | No blocking E2E failure.                            |
+| Network Privacy anonymous journey             | Passed on Chromium                      | Blocking privacy gate remains green.                |
+| axe Arabic/English and public routes          | Passed on Chromium                      | No critical or serious violations.                  |
+| Keyboard navigation                           | Passed on Chromium, Firefox, and WebKit | 20 interactive elements reached in Chromium.        |
+| Arabic/English PDF selectable text            | Passed on Chromium                      | Blocking PDF gate remains green.                    |
+| Arabic/English print visual regression        | Passed on Chromium                      | Blocking print/PDF presentation gate remains green. |
+| Lighthouse accessibility, best practices, SEO | Passed                                  | No quality regression observed.                     |
+| Lighthouse performance                        | Warning only                            | Kept non-blocking per staged rollout policy.        |
 
 The screen visual regression remains diagnostic unless it represents print/PDF output. The blocking visual gates are Arabic and English print/PDF checks, and both passed with zero reported difference in the final Chromium run.
 
