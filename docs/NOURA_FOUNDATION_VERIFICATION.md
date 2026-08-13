@@ -107,3 +107,15 @@ The minimal product/test fix is revertible at `03df1ff`; release-hardening align
 ## Final decision
 
 **Do not merge PR #53 yet.** Local Build, QA, Network Privacy, Data Deletion parity, PDF/Print, browser checks, and GitHub Release Hardening pass on `a2291d3`; Seerati CI quality still fails at repository-wide formatting, so owner review and a green quality check are required.
+
+## Status update — 2026-08-13 after Phase 20 merges
+
+The historical body above records the Foundation verification at commit `a2291d3`. Its original PR-status statements are now superseded: PR #53 merged to `main` as `be47fba521a82365d90fe20486d3ab3a558847e3`; the repository-wide formatter drift described there was corrected in PR #54 (`9c4867e` on the branch, merged as `c1cb62f615e6cd7481615fc60ba4cbb880dfe940`); and the Phase 20 journey smoke expectation was aligned with the intentional immediate goal-to-question transition in PR #55 (`c6b4720`, merged as `e873a720960d1dc0ec1fdb640229f3e91d73c1c1`).
+
+| Current evidence                        | Result                                                                                                                 |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| PR #54 Seerati CI and Release Hardening | Passed, including Chromium, Firefox, WebKit, Network Privacy, keyboard, PDF/print, and Lighthouse artifacts.           |
+| PR #55 Seerati CI and Release Hardening | Passed, including the Phase 14 guest/data-deletion smoke in Chromium and the same browser/PDF/print/Lighthouse matrix. |
+| `main` post-merge CI                    | Passed on `c1cb62f` in run `31742933228`.                                                                              |
+
+This status update does not claim that later proposed capabilities—full evidence-AI transport, persistent career facts, achievement interview, diff/undo UI, or optional recovery—are implemented. It confirms only that the Foundation and deterministic Wave 1 journey evidence is merged and that its later release gates passed.
