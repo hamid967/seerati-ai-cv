@@ -3,8 +3,8 @@
 **Repository:** `hamid967/seerati-ai-cv`  
 **Branch:** `feat/phase-13-performance`  
 **Base commit:** `1519c71` (`origin/main`, merged Release Hardening PR #42)  
-**Review commit:** `d6e09b0` (`feat/phase-13-performance`)
-**Official CI run:** [Release Hardening run 31664665020](https://github.com/hamid967/seerati-ai-cv/actions/runs/31664665020) — successful on Chromium, Firefox, WebKit, and Lighthouse.
+**Review commit:** `7571517` (`feat/phase-13-performance`)
+**Official CI run:** [Release Hardening run 31665480618](https://github.com/hamid967/seerati-ai-cv/actions/runs/31665480618) — successful on Chromium, Firefox, WebKit, and Lighthouse.
 **Scope:** Public-page performance, template-gallery rendering, anonymous guest critical path, and regression safety.  
 **Data policy:** All measurements used synthetic demo content. No CV text, prompts, responses, tokens, or personal identifiers were uploaded to reports or artifacts.
 
@@ -82,7 +82,8 @@ The local environment showed transient resource pressure when multiple Wrangler/
 
 ## Final CI evidence
 
-The official GitHub Actions run [31664665020](https://github.com/hamid967/seerati-ai-cv/actions/runs/31664665020) completed successfully for review commit `d6e09b0`. Its three browser jobs passed, the Lighthouse public-route job passed, and the separate Seerati CI quality and route-smoke checks were successful on the same branch. GitHub reported only the existing Node.js 20 deprecation annotations for third-party actions; no application or release-gate failure remained.
+The official GitHub Actions run [31665480618](https://github.com/hamid967/seerati-ai-cv/actions/runs/31665480618) completed successfully for review commit `7571517`.
+Its three browser jobs passed, the Lighthouse public-route job passed, and the separate Seerati CI quality and route-smoke checks were successful on the same branch. GitHub reported only the existing Node.js 20 deprecation annotations for third-party actions; no application or release-gate failure remained.
 
 ## Reproducibility commands
 
