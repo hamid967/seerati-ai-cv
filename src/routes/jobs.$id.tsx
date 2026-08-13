@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
@@ -63,6 +63,8 @@ import {
   type TimelineEvent,
 } from "@/lib/job-timeline";
 import { buildRecruiterSnapshot } from "@/lib/recruiter-view";
+import { graphFromCareerTwin } from "@/modules/career";
+import { matchCareerToJob } from "@/modules/matching";
 import { computeNextActions } from "@/lib/next-best-action";
 import { loadFactGraph, type FactGraph } from "@/lib/career-facts";
 import {
@@ -140,7 +142,6 @@ function JobWorkspacePage() {
     resumes.find((r) => r.id === assets.find((a) => a.assetType === "resume")?.resumeId) ??
     resumes[0] ??
     null;
-
   const [form, setForm] = useState({
     jobTitle: "",
     company: "",
@@ -151,6 +152,11 @@ function JobWorkspacePage() {
     jobDescription: "",
     status: "saved" as JobWorkspace["status"],
   });
+
+  const phase18JobMatch = useMemo(() => {
+    if (!twin || !form.jobDescription.trim()) return null;
+    return matchCareerToJob(graphFromCareerTwin(twin, lang), form.jobDescription);
+  }, [twin, form.jobDescription, lang]);
 
   useEffect(() => {
     if (!user) return;
@@ -768,6 +774,30 @@ function JobWorkspacePage() {
                       ? "حلّل الوصف الوظيفي أولاً لعرض المطابقة."
                       : "Analyze the job description first to see the match."}
                   </p>
+                )}
+                {phase18JobMatch && (
+                  <div className="mt-4 rounded-lg border border-border bg-secondary/40 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-bold">
+                        {ar ? "مطابقة Phase 18 القابلة للتفسير" : "Phase 18 explainable match"}
+                      </p>
+                      <span className="text-sm font-extrabold">
+                        {phase18JobMatch.advisoryScore}%
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[11px] leading-[1.7] text-muted-foreground">
+                      {ar
+                        ? "مصنفة حسب الدليل؛ لا تضيف مهارات تلقائياً ولا تضمن القبول."
+                        : "Evidence-classified; it never auto-adds skills or guarantees hiring."}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {phase18JobMatch.missingEvidence.slice(0, 4).map((item) => (
+                        <Badge key={item.term} variant="outline" className="text-[10px]">
+                          {item.term}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
