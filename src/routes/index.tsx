@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Palette } from "lucide-react";
+import { ArrowLeft, LockKeyhole, Palette } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,8 @@ export const Route = createFileRoute("/")({
       { title: "سيرتي | Seerati — ابنِ سيرة تفوز بالوظيفة" },
       {
         name: "description",
-        content: "سيرتي استوديو مهني عربي لبناء سيرة ذاتية واختيار قالب وتصدير PDF جاهز للتقديم.",
+        content:
+          "أنشئ سيرتك بالعربية أو الإنجليزية، حسّنها بالذكاء الاصطناعي، وافحص توافقها مع ATS — مجانًا، دون تسجيل، ودون حفظ بياناتك.",
       },
       { property: "og:title", content: "سيرتي | Seerati" },
       {
@@ -65,14 +66,27 @@ function Landing() {
           <div className="seerati-ad-hero__glow" aria-hidden="true" />
           <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:grid-cols-2 md:py-20">
             <div className="text-start">
-              <p className="seerati-hero-brand text-ink-foreground">{ar ? "سيرتي" : "Seerati"}</p>
+              <p className="seerati-hero-brand text-ink-foreground">
+                {ar ? "سيرتي | Saudi Future Professional" : "Seerati | Saudi Future Professional"}
+              </p>
               <h1 className="mt-3 text-balance-ar text-3xl font-extrabold leading-[1.3] tracking-tight md:text-5xl">
-                {ar ? "ابنِ سيرة تفوز بالوظيفة" : "Build a job-winning resume"}
+                {ar
+                  ? "سيرة سعودية احترافية تفتح لك أبواب الفرص"
+                  : "A Saudi professional resume that opens new opportunities"}
               </h1>
               <p className="mt-4 max-w-lg text-[15px] leading-[1.9] text-ink-foreground/75 md:text-base">
                 {ar
-                  ? "قوالب عربية، مساعد كتابة، وتصدير PDF — بواجهة نظيفة دون حشو."
-                  : "Arabic templates, a writing assistant, and PDF export — a clean page without filler."}
+                  ? "أنشئ سيرتك بالعربية أو الإنجليزية، حسّنها بالذكاء الاصطناعي، وافحص توافقها مع ATS — مجانًا، دون تسجيل، ودون حفظ بياناتك."
+                  : "Create your resume in Arabic or English, improve it with AI, and check ATS guidance — free, without registration, and without saving your data."}
+              </p>
+              <p
+                className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-ink-foreground/80"
+                role="note"
+              >
+                <LockKeyhole className="size-3.5" aria-hidden="true" />
+                {ar
+                  ? "سيرتك لك وحدك — حذف الجلسة متاح فورًا"
+                  : "Your CV stays yours — delete the session anytime"}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button
@@ -91,7 +105,15 @@ function Landing() {
                   className="border-none bg-white/10 text-ink-foreground hover:bg-white/20"
                   asChild
                 >
-                  <Link to="/templates">{ar ? "القوالب" : "Templates"}</Link>
+                  <Link to="/import">{ar ? "استورد سيرتك" : "Import your CV"}</Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  className="text-ink-foreground hover:bg-white/10 hover:text-ink-foreground"
+                  asChild
+                >
+                  <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
                 </Button>
               </div>
             </div>
