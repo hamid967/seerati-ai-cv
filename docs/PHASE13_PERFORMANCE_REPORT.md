@@ -3,6 +3,8 @@
 **Repository:** `hamid967/seerati-ai-cv`  
 **Branch:** `feat/phase-13-performance`  
 **Base commit:** `1519c71` (`origin/main`, merged Release Hardening PR #42)  
+**Review commit:** `d6e09b0` (`feat/phase-13-performance`)
+**Official CI run:** [Release Hardening run 31664665020](https://github.com/hamid967/seerati-ai-cv/actions/runs/31664665020) — successful on Chromium, Firefox, WebKit, and Lighthouse.
 **Scope:** Public-page performance, template-gallery rendering, anonymous guest critical path, and regression safety.  
 **Data policy:** All measurements used synthetic demo content. No CV text, prompts, responses, tokens, or personal identifiers were uploaded to reports or artifacts.
 
@@ -76,7 +78,11 @@ The implementation does not add persistence, analytics, URL state, Supabase writ
 
 Performance is improved but not yet a stable `Performance >= 0.90` release gate. The most important remaining work is a dedicated `/assistant` performance pass, followed by three-run Lighthouse calibration on stable CI runners. Candidate work includes isolating non-critical assistant capability code, reducing route-level hydration work, and reviewing font and CSS delivery. These are proposed follow-up actions, not claims of completion in this PR.
 
-The local environment showed transient resource pressure when multiple Wrangler/workerd previews and Lighthouse Chromium instances were left running concurrently. The final Lighthouse CI run was rerun after cleaning stale preview workers and completed all ten samples successfully. This is an environment note, not an application failure.
+The local environment showed transient resource pressure when multiple Wrangler/workerd previews and Lighthouse Chromium instances were left running concurrently. The official PR run initially exposed two transient runner failures: cancelled asset requests and a WebKit navigation interruption. The hardening retry policy now treats those known navigation cancellations as retryable while retaining all real network failures as blocking. The rerun completed successfully across Chromium, Firefox, WebKit, and Lighthouse. This is an environment note, not an application failure.
+
+## Final CI evidence
+
+The official GitHub Actions run [31664665020](https://github.com/hamid967/seerati-ai-cv/actions/runs/31664665020) completed successfully for review commit `d6e09b0`. Its three browser jobs passed, the Lighthouse public-route job passed, and the separate Seerati CI quality and route-smoke checks were successful on the same branch. GitHub reported only the existing Node.js 20 deprecation annotations for third-party actions; no application or release-gate failure remained.
 
 ## Reproducibility commands
 
