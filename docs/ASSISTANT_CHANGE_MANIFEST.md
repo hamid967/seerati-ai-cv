@@ -6,16 +6,16 @@ Unify the existing Seerati Assistant, ATS, import, tailoring, bilingual, and cov
 
 ## Delivered in this slice
 
-| Area | Change | Acceptance evidence |
-|---|---|---|
-| Discoverability | Add a capability hub to `/assistant` | Six visible links/actions with Arabic and English copy |
-| AI drafting | Keep existing question flow, specialist selection, drafting, and template creation | Existing assistant route and AI contract tests remain green |
-| Import | Link to `/import` | Route exists and is reachable from the hub |
-| ATS | Link to `/ats` | Route exists and is reachable from the hub |
-| Tailoring | Link to `/jobs` | Jobs/tailoring surface exists and is reachable |
-| Cover letters | Link to `/cover-letters` | Cover-letter surface exists and is reachable |
-| Arabic/English | Link to `/arabic-intelligence` | Bilingual intelligence route exists and is reachable |
-| Privacy | Keep guest disclosure above the hub | Existing guest privacy behavior remains unchanged |
+| Area            | Change                                                                             | Acceptance evidence                                         |
+| --------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Discoverability | Add a capability hub to `/assistant`                                               | Six visible links/actions with Arabic and English copy      |
+| AI drafting     | Keep existing question flow, specialist selection, drafting, and template creation | Existing assistant route and AI contract tests remain green |
+| Import          | Link to `/import`                                                                  | Route exists and is reachable from the hub                  |
+| ATS             | Link to `/ats`                                                                     | Route exists and is reachable from the hub                  |
+| Tailoring       | Link to `/jobs`                                                                    | Jobs/tailoring surface exists and is reachable              |
+| Cover letters   | Link to `/cover-letters`                                                           | Cover-letter surface exists and is reachable                |
+| Arabic/English  | Link to `/arabic-intelligence`                                                     | Bilingual intelligence route exists and is reachable        |
+| Privacy         | Keep guest disclosure above the hub                                                | Existing guest privacy behavior remains unchanged           |
 
 ## Scope exclusions
 
