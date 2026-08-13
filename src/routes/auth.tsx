@@ -151,6 +151,10 @@ function AuthPage() {
           return;
         }
         toast.success(t("auth_ok_created"));
+        if (returnTo) {
+          window.location.href = returnTo;
+          return;
+        }
         navigate({ to: "/onboarding" });
         return;
       }
@@ -160,6 +164,10 @@ function AuthPage() {
         return;
       }
       toast.success(t("auth_ok_welcome"));
+      if (returnTo) {
+        window.location.href = returnTo;
+        return;
+      }
       navigate({
         to: res.role === "admin" ? "/admin" : res.onboarded ? "/dashboard" : "/onboarding",
       });
