@@ -8,17 +8,22 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { I18nProvider } from "@/lib/i18n";
 import { StoreProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/app/app-shell";
-import { FloatingSeeratiAssistant } from "@/components/floating-seerati-assistant";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getPublicRuntimeConfig } from "@/lib/public-runtime-config.functions";
 import { setSupabaseRuntimeConfig } from "@/integrations/supabase/client";
+
+const FloatingSeeratiAssistant = lazy(() =>
+  import("@/components/floating-seerati-assistant").then((module) => ({
+    default: module.FloatingSeeratiAssistant,
+  })),
+);
 
 function NotFoundComponent() {
   return (
@@ -167,6 +172,29 @@ function AppFrame() {
   );
 }
 
+function DeferredFloatingAssistant() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const activate = () => setReady(true);
+    const timeoutId = window.setTimeout(activate, 5000);
+    window.addEventListener("pointerdown", activate, { once: true, passive: true });
+    window.addEventListener("keydown", activate, { once: true });
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener("pointerdown", activate);
+      window.removeEventListener("keydown", activate);
+    };
+  }, []);
+
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <FloatingSeeratiAssistant />
+    </Suspense>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const runtimeConfig = Route.useLoaderData();
@@ -181,7 +209,7 @@ function RootComponent() {
         <StoreProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <AppFrame />
-          <FloatingSeeratiAssistant />
+          <DeferredFloatingAssistant />
           <Toaster position="top-center" richColors />
         </StoreProvider>
       </I18nProvider>

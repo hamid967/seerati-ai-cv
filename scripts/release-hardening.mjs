@@ -75,12 +75,21 @@ async function gotoAssistant(page, lang) {
   await page.addInitScript((value) => localStorage.setItem("seerati.lang", value), lang);
   let response;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    response = await page.goto(`${BASE_URL}/assistant`, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
-    if (page.url().includes("/assistant")) break;
-    await page.waitForTimeout(attempt * 300);
+    try {
+      response = await page.goto(`${BASE_URL}/assistant`, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+      if (page.url().includes("/assistant")) break;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (
+        !/NS_BINDING_ABORTED|frame was detached|interrupted by another navigation/i.test(message) ||
+        attempt === 3
+      )
+        throw error;
+    }
+    await page.waitForTimeout(attempt * 500);
   }
   if (!response || response.status() >= 400)
     throw new Error(`assistant returned ${response?.status()}`);
@@ -89,7 +98,7 @@ async function gotoAssistant(page, lang) {
 }
 async function checkCapabilities(page, browserName) {
   for (const href of capabilityHrefs) {
-    await page.goto(`${BASE_URL}/assistant`, { waitUntil: "domcontentloaded", timeout: 30000 });
+    await gotoAssistant(page, "ar");
     await page.locator(`a[href="${href}"]`).waitFor({ state: "visible", timeout: 15000 });
     const link = page.locator(`a[href="${href}"]`).first();
     const name = (await link.innerText()).trim();
@@ -213,7 +222,8 @@ async function runBrowser(browserName) {
       return;
     }
     const failure = request.failure()?.errorText ?? "unknown request failure";
-    if (/Load request cancelled|NS_BINDING_ABORTED|NS_ERROR_ABORT/i.test(failure)) return;
+    if (/Load request cancelled|NS_BINDING_ABORTED|NS_ERROR_ABORT|ERR_ABORTED/i.test(failure))
+      return;
     fail(`${browserName}: request failed ${request.method()} ${url} (${failure})`);
   });
   page.on("console", (message) => {

@@ -1,20 +1,90 @@
-import { useMemo, useState, type PointerEvent } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Eye, GitCompareArrows, Sparkles, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ResumeThumb } from "@/components/resume-preview";
 import { demoResume } from "@/lib/demo-data";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import type { TemplateCategory, TemplateDef } from "@/lib/types";
 import "../template-gallery-3d.css";
 
+const LazyResumeThumb = lazy(() =>
+  import("@/components/resume-preview").then((module) => ({ default: module.ResumeThumb })),
+);
+
 type Filter = "all" | "ats" | TemplateCategory;
 
 const FILTERS: Filter[] = ["all", "ats", "executive", "modern", "minimal", "creative"];
 const MAX_COMPARE = 3;
+const INITIAL_PREVIEW_COUNT = 4;
+
+function LightweightTemplatePreview({
+  template,
+  lang,
+}: {
+  template: TemplateDef;
+  lang: "ar" | "en";
+}) {
+  const accent = template.design.accent;
+  return (
+    <div
+      className="flex h-full min-h-[280px] flex-col gap-3 bg-white p-5 text-start"
+      dir={lang === "ar" ? "rtl" : "ltr"}
+    >
+      <div className="h-8 rounded-md" style={{ backgroundColor: `${accent}22` }}>
+        <div className="h-full w-2/3 rounded-md" style={{ backgroundColor: accent }} />
+      </div>
+      <div className="space-y-2">
+        <div className="h-2.5 w-3/5 rounded-full bg-slate-300" />
+        <div className="h-2 w-4/5 rounded-full bg-slate-200" />
+      </div>
+      <div
+        className="mt-2 grid flex-1 gap-3"
+        style={{ gridTemplateColumns: template.design.layout === "single" ? "1fr" : "0.7fr 1.3fr" }}
+      >
+        <div className="space-y-2">
+          {["w-full", "w-5/6", "w-4/5", "w-3/4", "w-5/6"].map((width) => (
+            <div key={width} className={`h-2 rounded-full bg-slate-200 ${width}`} />
+          ))}
+        </div>
+        {template.design.layout !== "single" && (
+          <div className="space-y-2 rounded-md p-2" style={{ backgroundColor: `${accent}10` }}>
+            <div className="h-2 w-2/3 rounded-full" style={{ backgroundColor: `${accent}66` }} />
+            <div className="h-2 w-full rounded-full bg-slate-200" />
+            <div className="h-2 w-5/6 rounded-full bg-slate-200" />
+          </div>
+        )}
+      </div>
+      <p className="text-center text-[10px] font-semibold text-slate-400">
+        {lang === "ar"
+          ? "معاينة خفيفة — افتح لرؤية القالب الكامل"
+          : "Light preview — open to view the full template"}
+      </p>
+    </div>
+  );
+}
+
+function FullTemplatePreview({
+  resume,
+  template,
+}: {
+  resume: ReturnType<typeof demoResume>;
+  template: TemplateDef;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[280px] items-center justify-center text-sm text-muted-foreground">
+          Loading preview…
+        </div>
+      }
+    >
+      <LazyResumeThumb resume={resume} template={template} />
+    </Suspense>
+  );
+}
 
 export function TemplateGallery3D() {
   const { lang } = useI18n();
@@ -24,6 +94,7 @@ export function TemplateGallery3D() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [previewLimit, setPreviewLimit] = useState(INITIAL_PREVIEW_COUNT);
 
   const sample = useMemo(() => demoResume("template-gallery-preview"), []);
   const list = useMemo(
@@ -37,7 +108,12 @@ export function TemplateGallery3D() {
     [filter],
   );
 
+  useEffect(() => {
+    setPreviewLimit(INITIAL_PREVIEW_COUNT);
+  }, [filter]);
+
   const selected = defaultTemplates.find((template) => template.id === selectedId) ?? null;
+  const visibleList = list.slice(0, previewLimit);
   const compared = compareIds
     .map((id) => defaultTemplates.find((template) => template.id === id))
     .filter((template): template is TemplateDef => Boolean(template));
@@ -140,7 +216,7 @@ export function TemplateGallery3D() {
         </div>
 
         <div className="seerati-gallery-grid">
-          {list.map((template, index) => {
+          {visibleList.map((template, index) => {
             const isCompared = compareIds.includes(template.id);
             return (
               <article
@@ -153,7 +229,7 @@ export function TemplateGallery3D() {
                 <div className="seerati-template-card-glow" aria-hidden="true" />
                 <div className="seerati-template-paper-wrap">
                   <div className="seerati-template-paper">
-                    <ResumeThumb resume={resumeFor(template)} template={template} />
+                    <LightweightTemplatePreview template={template} lang={lang} />
                   </div>
                 </div>
 
@@ -224,6 +300,15 @@ export function TemplateGallery3D() {
             );
           })}
         </div>
+        {list.length > visibleList.length && (
+          <div className="mt-6 flex justify-center">
+            <Button type="button" variant="outline" onClick={() => setPreviewLimit(list.length)}>
+              {ar
+                ? `تحميل بقية المعاينات (${list.length - visibleList.length})`
+                : `Load ${list.length - visibleList.length} more previews`}
+            </Button>
+          </div>
+        )}
       </section>
 
       {compareIds.length > 0 && (
@@ -265,7 +350,7 @@ export function TemplateGallery3D() {
             <div className="grid min-h-[70vh] lg:grid-cols-[1.2fr_0.8fr]">
               <div className="seerati-cinematic-preview">
                 <div className="seerati-cinematic-paper">
-                  <ResumeThumb resume={resumeFor(selected)} template={selected} />
+                  <FullTemplatePreview resume={resumeFor(selected)} template={selected} />
                 </div>
               </div>
               <div className="flex flex-col p-6 md:p-8">
@@ -314,7 +399,7 @@ export function TemplateGallery3D() {
             {compared.map((template) => (
               <div key={template.id} className="rounded-2xl border border-border bg-card p-4">
                 <div className="h-[420px] overflow-hidden rounded-xl bg-muted/40 p-2">
-                  <ResumeThumb resume={resumeFor(template)} template={template} />
+                  <FullTemplatePreview resume={resumeFor(template)} template={template} />
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-2">
                   <div>
