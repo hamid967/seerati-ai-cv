@@ -38,27 +38,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout
+      - name: Checkout PR head for quality
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Format check (pull request diff)
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          git fetch --no-tags origin "${{ github.event.pull_request.base.sha }}" --depth=1
-          files=$(git diff --name-only --diff-filter=ACMR "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- \
-            '*.css' '*.json' '*.js' '*.jsx' '*.mjs' '*.md' '*.ts' '*.tsx' '*.yml' '*.yaml')
-          if [ -z "$files" ]; then
-            echo "No Prettier-supported files changed in this pull request."
-            exit 0
-          fi
-          printf '%s\n' "$files" | xargs bunx prettier@3.9.6 --check
-      - name: Format check (full repository)
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Format check
         run: bunx prettier@3.9.6 --check .
       - name: Lint
         run: bun run lint
