@@ -2,7 +2,8 @@
 
 **Repository:** `hamid967/seerati-ai-cv`  
 **Branch:** `feat/noura-intelligent-career-experience`  
-**HEAD verified:** `668550c5f2bb6e6cff2674dc6fd6af671cf85f7c` (`668550c`)  
+**HEAD verified:** `03df1ff6be5170a79feee70d76bc2d2d15ea4306` (`03df1ff`)
+
 **PR:** [#53](https://github.com/hamid967/seerati-ai-cv/pull/53) — Draft, not merged  
 **Verification date:** 2026-08-13
 
@@ -10,13 +11,13 @@
 
 The current Noura Foundation route was verified without adding product features. The Arabic and English goal-first entry point shows Noura's identity and professional role, presents one goal question, keeps the capability hub behind the tools button, does not show an assumed country or city, and exposes the current privacy deletion control. The local browser harness passed the Chromium, Firefox, and WebKit desktop/mobile matrix with reduced-motion context, keyboard traversal, no horizontal overflow, no console errors, no resume storage keys, and no guest mutation or Supabase write requests.
 
-The branch is **not release-ready**. The production build passed, but the available Phase 14 guest/data-deletion smoke is stale and expects the removed “Choose your path” copy. PDF/Print verification produced blank PDFs for both languages when executed against the assistant route, so the PDF gate is failed. The repository CI for `668550c` also has failing Release Hardening and Seerati CI quality checks. Per the acceptance rule, no merge is allowed.
+The Foundation release gates were rerun after a minimal print-area and guest-smoke alignment fix. Build, QA, Data Deletion/guest parity, PDF/Print, Network Privacy, and the Chromium/Firefox/WebKit desktop/mobile checks now pass locally. The GitHub CI runs associated with the previous `668550c` commit failed; a new CI run is required for `03df1ff`. The branch remains Draft and must not be merged until the new CI checks are reviewed.
 
 ## Commit and CI evidence
 
 | Item                  | Evidence                                                                                  |
 | --------------------- | ----------------------------------------------------------------------------------------- |
-| Verified commit       | `668550c5f2bb6e6cff2674dc6fd6af671cf85f7c`                                                |
+| Verified commit       | `03df1ff6be5170a79feee70d76bc2d2d15ea4306`                                                |
 | PR                    | [#53](https://github.com/hamid967/seerati-ai-cv/pull/53)                                  |
 | Seerati CI run        | [31712419004](https://github.com/hamid967/seerati-ai-cv/actions/runs/31712419004), failed |
 | Release Hardening run | [31712419040](https://github.com/hamid967/seerati-ai-cv/actions/runs/31712419040), failed |
@@ -24,22 +25,22 @@ The branch is **not release-ready**. The production build passed, but the availa
 
 ## Commands and results
 
-| Command or gate                    | Result                                                     | Notes                                                                                                                                                       |
-| ---------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun install`                      | Passed through `npm exec bun -- install --frozen-lockfile` | Bun is not on the base PATH; the equivalent Bun runtime was used.                                                                                           |
-| `bun run lint`                     | Passed with 20 warnings                                    | No lint errors. Warnings are existing Fast Refresh and hook dependency warnings.                                                                            |
-| TypeScript `noEmit`                | Passed                                                     | No type errors.                                                                                                                                             |
-| `bun run build`                    | Passed                                                     | Vite/TanStack production build and client environment guard completed.                                                                                      |
-| `bun run qa`                       | Passed                                                     | Existing route, AI, templates, RTL, premium, and environment checks passed.                                                                                 |
-| `bun run check:routes-shell`       | Passed                                                     | App shell wiring passed.                                                                                                                                    |
-| `test:noura-foundation`            | Passed                                                     | Noura identity, seven goals, and no assumed country in generated data.                                                                                      |
-| Phase 19 intelligence smoke        | Passed                                                     | Existing Phase 19 contract checks passed.                                                                                                                   |
-| Phase 19 evaluation                | Passed                                                     | 500/500 synthetic cases; 100% intent accuracy.                                                                                                              |
-| Phase 14 guest/data-deletion smoke | Failed                                                     | Stale selector waits for `اختر مسارك` / `Choose your path`, which is intentionally absent after the goal-first Foundation change.                           |
-| Network Privacy harness            | Passed                                                     | No non-GET mutation, no Supabase write, no persistence endpoint mutation, no CV/PII markers in request bodies.                                              |
-| Data deletion control              | Passed at UI presence level                                | Current route exposes `حذف بياناتي الآن` / `Delete my data now`; the stale end-to-end deletion smoke did not execute because it failed at its old selector. |
-| PDF/Print Arabic                   | Failed                                                     | Generated PDF was blank under `pdftotext`; Noura identity text was absent.                                                                                  |
-| PDF/Print English                  | Failed                                                     | Generated PDF was blank under `pdftotext`; Noura identity text was absent.                                                                                  |
+| Command or gate                    | Result                                                     | Notes                                                                                                                                     |
+| ---------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun install`                      | Passed through `npm exec bun -- install --frozen-lockfile` | Bun is not on the base PATH; the equivalent Bun runtime was used.                                                                         |
+| `bun run lint`                     | Passed with 20 warnings                                    | No lint errors. Warnings are existing Fast Refresh and hook dependency warnings.                                                          |
+| TypeScript `noEmit`                | Passed                                                     | No type errors.                                                                                                                           |
+| `bun run build`                    | Passed                                                     | Vite/TanStack production build and client environment guard completed.                                                                    |
+| `bun run qa`                       | Passed                                                     | Existing route, AI, templates, RTL, premium, and environment checks passed.                                                               |
+| `bun run check:routes-shell`       | Passed                                                     | App shell wiring passed.                                                                                                                  |
+| `test:noura-foundation`            | Passed                                                     | Noura identity, seven goals, and no assumed country in generated data.                                                                    |
+| Phase 19 intelligence smoke        | Passed                                                     | Existing Phase 19 contract checks passed.                                                                                                 |
+| Phase 19 evaluation                | Passed                                                     | 500/500 synthetic cases; 100% intent accuracy.                                                                                            |
+| Phase 14 guest/data-deletion smoke | Passed                                                     | Updated only the stale assistant selectors to `/assistant?agent=noura` and the current goal-first copy; guest mutation assertions passed. |
+| Network Privacy harness            | Passed                                                     | No non-GET mutation, no Supabase write, no persistence endpoint mutation, no CV/PII markers in request bodies.                            |
+| Data deletion control              | Passed                                                     | Current route exposes `حذف بياناتي الآن` / `Delete my data now`; guest parity smoke passed without persistence writes.                    |
+| PDF/Print Arabic                   | Passed                                                     | `print-area` now exposes the resume preview to print CSS; generated PDF contains `اسمك الكامل`.                                           |
+| PDF/Print English                  | Passed                                                     | `print-area` now exposes the resume preview to print CSS; generated PDF contains `Your name`.                                             |
 
 ## Browser verification
 
@@ -67,7 +68,7 @@ The harness also verified no horizontal overflow, no assumed city/country/nation
 | Import and ATS visible after tools action                  |                     Passed |
 | Privacy deletion control visible                           |                     Passed |
 | Editor, templates, ATS, import, preview route availability | Passed at route HTTP level |
-| PDF content preservation                                   |                 **Failed** |
+| PDF content preservation                                   |                     Passed |
 
 ## Screenshots and artifacts
 
@@ -96,12 +97,12 @@ The anonymous route did not expose resume, CV, draft, or document keys in `local
 
 The verification did not claim full Noura Phase 2 adaptive conversation, journey-specific state machines, achievement interviewing, diff/undo flows, offline recovery, live AI failure recovery, or mobile bottom navigation. Those belong to the separate Phase 2 request and were intentionally excluded from this Foundation-only verification.
 
-The old Phase 14 guest smoke must be updated to the current Noura selectors before it can serve as a valid deletion gate. The blank Arabic and English PDFs are a release blocker and require investigation of the existing print-area contract; no workaround or product feature was added during this verification. The current GitHub CI failures remain unresolved.
+The Phase 14 guest smoke and assistant PDF contract were updated with the smallest compatible changes. The PDF fix adds the existing `print-area` contract to the current live resume preview; it does not add a new user-facing feature. The previous GitHub CI failures remain historical evidence for `668550c`; CI must be rerun for `03df1ff`. Full Noura Phase 2 adaptive conversation remains intentionally excluded.
 
 ## Rollback
 
-No product commit was created during this verification. The Foundation implementation remains revertible at `668550c`. Any verification-only harness or report changes must be reviewed separately and must not be merged while Build, Network Privacy, or PDF/guest-path gates are failing.
+The minimal product/test fix is revertible at `03df1ff`; the Foundation implementation before it is `668550c`. Verification harnesses, screenshots, and this report are committed separately for review. No merge is allowed until the new CI run is green and the owner approves.
 
 ## Final decision
 
-**Do not merge PR #53.** Build and Foundation browser/privacy checks passed, but the PDF gate, stale Data Deletion smoke, and CI Release Hardening failures prevent release approval.
+**Do not merge PR #53 yet.** Local Build, QA, Network Privacy, Data Deletion parity, PDF/Print, and browser checks pass after `03df1ff`, but GitHub CI must complete successfully for the new commit and the owner must approve the Draft PR.
