@@ -68,9 +68,10 @@ function AuthPage() {
   const t = useT();
   const { lang, toggle } = useI18n();
   const ar = lang === "ar";
-  const { mode: modeFromSearch } = Route.useSearch();
+  const { mode: modeFromSearch, next: nextFromSearch } = Route.useSearch();
   const navigate = useNavigate();
   const { signIn, signUp, resetPassword } = useStore();
+  const returnTo = safeNext(nextFromSearch);
 
   const [tab, setTab] = useState<AuthMode>(modeFromSearch ?? "signin");
   const [email, setEmail] = useState("");
@@ -89,8 +90,13 @@ function AuthPage() {
   const setMode = (next: AuthMode) => {
     setTab(next);
     setErrors({});
-    void navigate({ to: "/auth", search: { mode: next }, replace: true });
+    void navigate({
+      to: "/auth",
+      search: { mode: next, ...(returnTo ? { next: returnTo } : {}) },
+      replace: true,
+    });
   };
+
 
   const strength = useMemo(() => passwordScore(password), [password]);
   const strengthLabel =
