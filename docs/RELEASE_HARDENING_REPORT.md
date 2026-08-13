@@ -116,6 +116,6 @@ The workflow uses synthetic CI Supabase values and does not require production c
 
 **Non-blocking follow-up:** Lighthouse Performance and LCP remain above the initial target on `/` and `/templates`. They are tracked as a measured warning and must be promoted to a blocking gate after the next optimization cycle and production RUM baseline review.
 
-**Final CI verification (2026-08-13):** Draft PR [#42](https://github.com/hamid967/seerati-ai-cv/pull/42) at commit `867f601a564dfcaddadd9c4a8286015005132ac2` is **CLEAN** and remains a Draft. All six required checks passed: Chromium, Firefox, WebKit, Lighthouse public routes, quality, and route-smoke. CI run: [31660368836](https://github.com/hamid967/seerati-ai-cv/actions/runs/31660368836).
+**Final CI verification (2026-08-13):** Draft PR [#42](https://github.com/hamid967/seerati-ai-cv/pull/42) at commit `728817f5160f901ade8eb9da8332d3f3a3afe7ce` is **CLEAN** and remains a Draft. All six required checks passed: Chromium, Firefox, WebKit, Lighthouse public routes, quality, and route-smoke. CI run: [31660649683](https://github.com/hamid967/seerati-ai-cv/actions/runs/31660649683).
 
 **Merge policy:** This change is intentionally prepared as a Draft Pull Request. It must not be merged without explicit owner approval.
