@@ -16,15 +16,15 @@
 
 ## 2. الفجوات التي تعالجها Phase 20
 
-| الفجوة الحالية | أثرها | استجابة Phase 20 المقترحة |
-|---|---|---|
-| Goal-first موجود، لكن state machine الكاملة غير منفذة | الرحلة قد تتوقف عند أسئلة عامة أو deep links | بناء Adaptive Journey State Machine قابلة للتفسير |
-| Smart Interview وSection Coach موجودان محلياً بصورة أولية | لا توجد رحلة مقابلة متكاملة أو حفظ اختياري للنتائج | تحويل المقابلة إلى جلسات evidence-linked مع progress وreview |
-| Evidence-Locked contracts موجودة، لكن الاستخدام remote الكامل يحتاج wiring وتقييم | لا يمكن قياس جودة الاقتراحات التوليدية على حالات متنوعة | Remote AI gateway اختياري مع payload preview وschema validation وdiff approval |
-| التقييم الحالي يغطي intent فقط | لا توجد أدلة على حفظ الحقائق أو منع الاختلاق | إنشاء corpus من 300 حالة مع gates للملاءمة والحفظ والخصوصية |
-| Recovery/offline وsession expiry معرفة جزئياً | فقدان السياق أو غموض حالة الجلسة | حالات صريحة للانقطاع والانتهاء والاسترجاع الاختياري |
-| Observability redaction موجودة كعقد أولي | لا توجد SLOs أو لوحات تشغيل مرتبطة بالرحلة | إضافة قياس privacy-safe للأداء والأخطاء مع منع CV/prompt/response telemetry |
-| PDF وLighthouse والمتصفحات أصبحت بوابات، لكن calibration النهائي يحتاج تثبيتاً | صعوبة اكتشاف regressions قبل الإصدار | Baselines وموازنات reviewed تدريجياً، دون جعل threshold غير معاير مانعاً فورياً |
+| الفجوة الحالية                                                                    | أثرها                                                   | استجابة Phase 20 المقترحة                                                       |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Goal-first موجود، لكن state machine الكاملة غير منفذة                             | الرحلة قد تتوقف عند أسئلة عامة أو deep links            | بناء Adaptive Journey State Machine قابلة للتفسير                               |
+| Smart Interview وSection Coach موجودان محلياً بصورة أولية                         | لا توجد رحلة مقابلة متكاملة أو حفظ اختياري للنتائج      | تحويل المقابلة إلى جلسات evidence-linked مع progress وreview                    |
+| Evidence-Locked contracts موجودة، لكن الاستخدام remote الكامل يحتاج wiring وتقييم | لا يمكن قياس جودة الاقتراحات التوليدية على حالات متنوعة | Remote AI gateway اختياري مع payload preview وschema validation وdiff approval  |
+| التقييم الحالي يغطي intent فقط                                                    | لا توجد أدلة على حفظ الحقائق أو منع الاختلاق            | إنشاء corpus من 300 حالة مع gates للملاءمة والحفظ والخصوصية                     |
+| Recovery/offline وsession expiry معرفة جزئياً                                     | فقدان السياق أو غموض حالة الجلسة                        | حالات صريحة للانقطاع والانتهاء والاسترجاع الاختياري                             |
+| Observability redaction موجودة كعقد أولي                                          | لا توجد SLOs أو لوحات تشغيل مرتبطة بالرحلة              | إضافة قياس privacy-safe للأداء والأخطاء مع منع CV/prompt/response telemetry     |
+| PDF وLighthouse والمتصفحات أصبحت بوابات، لكن calibration النهائي يحتاج تثبيتاً    | صعوبة اكتشاف regressions قبل الإصدار                    | Baselines وموازنات reviewed تدريجياً، دون جعل threshold غير معاير مانعاً فورياً |
 
 ## 3. النطاق المقترح حسب الأولوية
 
@@ -36,14 +36,14 @@
 
 #### المتطلبات الوظيفية
 
-| المعرّف | المتطلب | معيار القبول |
-|---|---|---|
-| JRN-001 | اختيار الهدف يحدد عائلة السؤال التالية | لكل هدف من الأهداف السبعة انتقال موثق واختبار عربي/إنجليزي/mixed |
-| JRN-002 | كل حالة تعرض status صادقاً للمستخدم | لا تظهر عبارة AI عند تنفيذ تحليل محلي؛ تستخدم صياغة «أراجع القسم محلياً» |
-| JRN-003 | دعم الرجوع والتخطي دون فقدان المسودة | العودة لا تمسح ResumeData ولا تنشئ تخزيناً جديداً |
+| المعرّف | المتطلب                                  | معيار القبول                                                                 |
+| ------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| JRN-001 | اختيار الهدف يحدد عائلة السؤال التالية   | لكل هدف من الأهداف السبعة انتقال موثق واختبار عربي/إنجليزي/mixed             |
+| JRN-002 | كل حالة تعرض status صادقاً للمستخدم      | لا تظهر عبارة AI عند تنفيذ تحليل محلي؛ تستخدم صياغة «أراجع القسم محلياً»     |
+| JRN-003 | دعم الرجوع والتخطي دون فقدان المسودة     | العودة لا تمسح ResumeData ولا تنشئ تخزيناً جديداً                            |
 | JRN-004 | حفظ session state داخل الذاكرة فقط للضيف | لا localStorage أو IndexedDB أو Cache Storage لمحتوى السيرة دون consent صريح |
-| JRN-005 | انتهاء الجلسة قابل للفهم والحذف | تظهر مدة الانتهاء وزر الحذف وتصدر deletion receipt من Privacy Runtime |
-| JRN-006 | كل انتقال قابل للتسجيل الآمن | event metadata فقط؛ لا CV text أو prompt أو response أو identifiers |
+| JRN-005 | انتهاء الجلسة قابل للفهم والحذف          | تظهر مدة الانتهاء وزر الحذف وتصدر deletion receipt من Privacy Runtime        |
+| JRN-006 | كل انتقال قابل للتسجيل الآمن             | event metadata فقط؛ لا CV text أو prompt أو response أو identifiers          |
 
 ### P0 — Evidence-Locked Generative AI Gateway
 
@@ -53,15 +53,15 @@
 
 #### المتطلبات الوظيفية والأمنية
 
-| المعرّف | المتطلب | معيار القبول |
-|---|---|---|
-| AI-001 | معاينة payload قبل الإرسال | تعرض الحقول المرسلة والمستبعدة والسبب والمزوّد والمدة المتوقعة |
-| AI-002 | Evidence projection | لا تصل إلى provider أي حقيقة خارج `allowedFactIds` |
-| AI-003 | Schema validation | الرد غير المطابق يرفض بأمان ولا يعدّل المسودة |
-| AI-004 | Diff approval | كل اقتراح يعرض before/after ويحتاج موافقة صريحة لكل تطبيق |
-| AI-005 | رفض consent bypass | غياب consent أو انتهاءه يؤدي إلى local fallback أو طلب موافقة، دون network call |
-| AI-006 | منع الاختلاق | أي شركة أو مؤهل أو تاريخ أو metric غير مسند يرفض ويظهر كفشل قابل للمراجعة |
-| AI-007 | فشل provider آمن | timeout أو 4xx/5xx ينتج fallback محلياً ورسالة قابلة للفهم دون كشف payload في logs |
+| المعرّف | المتطلب                    | معيار القبول                                                                       |
+| ------- | -------------------------- | ---------------------------------------------------------------------------------- |
+| AI-001  | معاينة payload قبل الإرسال | تعرض الحقول المرسلة والمستبعدة والسبب والمزوّد والمدة المتوقعة                     |
+| AI-002  | Evidence projection        | لا تصل إلى provider أي حقيقة خارج `allowedFactIds`                                 |
+| AI-003  | Schema validation          | الرد غير المطابق يرفض بأمان ولا يعدّل المسودة                                      |
+| AI-004  | Diff approval              | كل اقتراح يعرض before/after ويحتاج موافقة صريحة لكل تطبيق                          |
+| AI-005  | رفض consent bypass         | غياب consent أو انتهاءه يؤدي إلى local fallback أو طلب موافقة، دون network call    |
+| AI-006  | منع الاختلاق               | أي شركة أو مؤهل أو تاريخ أو metric غير مسند يرفض ويظهر كفشل قابل للمراجعة          |
+| AI-007  | فشل provider آمن           | timeout أو 4xx/5xx ينتج fallback محلياً ورسالة قابلة للفهم دون كشف payload في logs |
 
 ### P1 — Smart Career Interview 2.0
 
@@ -95,17 +95,17 @@
 
 ينبغي إنشاء 300 حالة اصطناعية تغطي الطلاب والخريجين والموظفين والباحثين عن عمل والقادة، وقطاعات سعودية متعددة، والعربية والإنجليزية والخلط اللغوي، والحقائق المفقودة والمتعارضة، وطلبات الاختلاق، والبيانات الحساسة، وprompt injection [4].
 
-| المقياس | الحد المقترح | شرط مانع |
-|---|---:|---:|
-| Intent accuracy | ≥ 95% | لا |
-| Question relevance | ≥ 90% | لا |
-| Fact preservation | ≥ 98% | نعم عند الانخفاض الحاد |
-| Structured output | ≥ 99.5% | نعم |
-| Invented companies/qualifications/dates/metrics | 0 | نعم |
-| Critical privacy failures | 0 | نعم |
-| Consent bypass | 0 | نعم |
-| Data loss | 0 | نعم |
-| Human review score | ≥ 4/5 | لا؛ يحتاج مراجعة نوعية |
+| المقياس                                         | الحد المقترح |               شرط مانع |
+| ----------------------------------------------- | -----------: | ---------------------: |
+| Intent accuracy                                 |        ≥ 95% |                     لا |
+| Question relevance                              |        ≥ 90% |                     لا |
+| Fact preservation                               |        ≥ 98% | نعم عند الانخفاض الحاد |
+| Structured output                               |      ≥ 99.5% |                    نعم |
+| Invented companies/qualifications/dates/metrics |            0 |                    نعم |
+| Critical privacy failures                       |            0 |                    نعم |
+| Consent bypass                                  |            0 |                    نعم |
+| Data loss                                       |            0 |                    نعم |
+| Human review score                              |        ≥ 4/5 | لا؛ يحتاج مراجعة نوعية |
 
 هذه حدود مقترحة للاعتماد، وليست نتائج مثبتة حالياً. يجب فصل تقييم local deterministic عن تقييم remote generative، وتسجيل fixtures والنتائج دون بيانات شخصية.
 
@@ -126,14 +126,14 @@
 
 #### مؤشرات مقترحة
 
-| المجال | المؤشر | ملاحظة الاعتماد |
-|---|---|---|
-| UX | LCP/CLS/INP حسب route | يبدأ كbaseline ثم تصبح budgets blocking بعد calibration |
-| Reliability | route error rate وAI fallback rate | aggregate فقط |
-| PDF | success rate وduration وfailure class | لا PDF content |
-| Privacy | blocked request count وconsent rejection count | لا payload bodies |
-| AI | latency وschema rejection وcost aggregate | لا prompt/response |
-| Guest flow | session expiry وdeletion completion | correlation ID غير مباشر |
+| المجال      | المؤشر                                         | ملاحظة الاعتماد                                         |
+| ----------- | ---------------------------------------------- | ------------------------------------------------------- |
+| UX          | LCP/CLS/INP حسب route                          | يبدأ كbaseline ثم تصبح budgets blocking بعد calibration |
+| Reliability | route error rate وAI fallback rate             | aggregate فقط                                           |
+| PDF         | success rate وduration وfailure class          | لا PDF content                                          |
+| Privacy     | blocked request count وconsent rejection count | لا payload bodies                                       |
+| AI          | latency وschema rejection وcost aggregate      | لا prompt/response                                      |
+| Guest flow  | session expiry وdeletion completion            | correlation ID غير مباشر                                |
 
 ## 4. المعمارية المقترحة
 
@@ -159,11 +159,11 @@ Safe Observability (metadata only)
 
 ## 5. خطة التنفيذ المقترحة
 
-| الموجة | المحتوى | مخرجاتها |
-|---|---|---|
-| Wave 1 — Journey Core | state machine، goal-specific questions، session expiry، local evidence review | عقود Zod، fixtures عربية/إنجليزية، route integration، smoke tests |
-| Wave 2 — Evidence AI | remote gateway، payload preview، schema validation، diff/approval، provider fallback | provider adapter، privacy/network tests، 300-case corpus أولي |
-| Wave 3 — Career Continuity | Interview 2.0، optional recovery، offline state، observability calibration | E2E، deletion proof، dashboards/metrics، Lighthouse baselines |
+| الموجة                     | المحتوى                                                                              | مخرجاتها                                                          |
+| -------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Wave 1 — Journey Core      | state machine، goal-specific questions، session expiry، local evidence review        | عقود Zod، fixtures عربية/إنجليزية، route integration، smoke tests |
+| Wave 2 — Evidence AI       | remote gateway، payload preview، schema validation، diff/approval، provider fallback | provider adapter، privacy/network tests، 300-case corpus أولي     |
+| Wave 3 — Career Continuity | Interview 2.0، optional recovery، offline state، observability calibration           | E2E، deletion proof، dashboards/metrics، Lighthouse baselines     |
 
 كل موجة يجب أن تكون PR مستقلة وقابلة للعكس، ولا يجوز فتح migration قاعدة بيانات قبل اعتماد نموذج التخزين والخصوصية صراحة.
 
@@ -177,15 +177,15 @@ Safe Observability (metadata only)
 
 ## 8. القرارات المطلوبة من المالك
 
-| القرار | الخيار الموصى به |
-|---|---|
-| أولوية Phase 20 | البدء بـAdaptive Journey State Machine قبل توسيع remote AI |
-| remote AI | opt-in فقط، Evidence-Locked، مع payload preview وdiff approval |
-| guest recovery | memory-only افتراضياً؛ recovery اختياري خلف consent |
-| التقييم | اعتماد corpus 300 حالة مع فصل local وremote metrics |
-| observability | metadata-only، redaction قبل النقل، لا CV/prompt/response |
-| قواعد البيانات | لا migration في Wave 1 أو Wave 2 قبل مراجعة منفصلة |
-| التسليم | ثلاث PRs مستقلة، Draft أولاً، ولا merge دون موافقة صريحة |
+| القرار          | الخيار الموصى به                                               |
+| --------------- | -------------------------------------------------------------- |
+| أولوية Phase 20 | البدء بـAdaptive Journey State Machine قبل توسيع remote AI     |
+| remote AI       | opt-in فقط، Evidence-Locked، مع payload preview وdiff approval |
+| guest recovery  | memory-only افتراضياً؛ recovery اختياري خلف consent            |
+| التقييم         | اعتماد corpus 300 حالة مع فصل local وremote metrics            |
+| observability   | metadata-only، redaction قبل النقل، لا CV/prompt/response      |
+| قواعد البيانات  | لا migration في Wave 1 أو Wave 2 قبل مراجعة منفصلة             |
+| التسليم         | ثلاث PRs مستقلة، Draft أولاً، ولا merge دون موافقة صريحة       |
 
 ## 9. قرار البدء المقترح
 
