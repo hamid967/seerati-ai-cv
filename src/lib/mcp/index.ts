@@ -1,4 +1,4 @@
-import { auth, defineMcp, type AnyToolDefinition } from "@lovable.dev/mcp-js";
+import { auth, defineMcp } from "@lovable.dev/mcp-js";
 import createResumeTool from "./tools/create-resume";
 import getResumeTool from "./tools/get-resume";
 import listResumesTool from "./tools/list-resumes";
@@ -15,5 +15,7 @@ export default defineMcp({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [listResumesTool, getResumeTool, createResumeTool],
+  tools: [listResumesTool, getResumeTool, createResumeTool] as Parameters<
+    typeof defineMcp
+  >[0]["tools"],
 });
