@@ -26,6 +26,7 @@
     "test:phase18-taxonomy": "bun scripts/phase18-taxonomy-smoke.ts",
     "test:phase18-ai-evidence": "bun scripts/phase18-ai-evidence-smoke.ts",
     "test:phase18-legacy-ai-adapter": "bun scripts/phase18-legacy-ai-adapter-smoke.ts",
+    "test:phase19-intelligence": "bun scripts/phase19-intelligence-smoke.ts",
     "test:phase18-ats": "bun scripts/phase18-ats-smoke.ts",
     "test:phase18-job-match": "bun scripts/phase18-job-match-smoke.ts",
     "test:phase18-versioning": "bun scripts/phase18-versioning-smoke.ts",
