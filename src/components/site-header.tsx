@@ -1,15 +1,18 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import {
+  ArrowUpRight,
   Briefcase,
+  ChevronDown,
   FileText,
   Globe,
   LayoutDashboard,
   LogOut,
   Menu,
   Shield,
+  Sparkles,
   UserSquare2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,8 +31,19 @@ export function SiteHeader() {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const [exploreOpen, setExploreOpen] = useState(false);
   /** Homepage hides login/signup — guests start via templates then register. */
   const hideAuthCtas = !user && pathname === "/";
+  const ar = lang === "ar";
+
+  useEffect(() => {
+    if (!exploreOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExploreOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [exploreOpen]);
 
   const links = [
     { to: "/templates", label: t("nav_templates") },
@@ -55,6 +69,134 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
+          <div className="relative">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-expanded={exploreOpen}
+              aria-haspopup="menu"
+              onClick={() => setExploreOpen((value) => !value)}
+              className="gap-1.5 text-sm font-medium text-muted-foreground"
+            >
+              <Sparkles className="size-4" />
+              {ar ? "استكشف" : "Explore"}
+              <ChevronDown
+                className={`size-3.5 transition-transform ${exploreOpen ? "rotate-180" : ""}`}
+              />
+            </Button>
+            {exploreOpen && (
+              <div
+                role="menu"
+                aria-label={ar ? "استكشف سيرتي" : "Explore Seerati"}
+                className="absolute start-0 top-[calc(100%+0.75rem)] z-50 grid w-[min(42rem,calc(100vw-2rem))] grid-cols-1 gap-4 rounded-2xl border border-border/80 bg-background/95 p-4 shadow-2xl backdrop-blur md:grid-cols-3"
+              >
+                <div className="space-y-2">
+                  <p className="px-3 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    {ar ? "ابنِ" : "Build"}
+                  </p>
+                  <Link
+                    role="menuitem"
+                    to="/resumes/new"
+                    onClick={() => setExploreOpen(false)}
+                    className="group block rounded-xl p-3 hover:bg-secondary"
+                  >
+                    <span className="flex items-center justify-between text-sm font-semibold">
+                      {ar ? "ابدأ سيرة" : "Start a resume"}
+                      <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {ar
+                        ? "مجاني، دون تسجيل، وذاكرة مؤقتة"
+                        : "Free, registration-optional, memory-only"}
+                    </span>
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    to="/templates"
+                    onClick={() => setExploreOpen(false)}
+                    className="group block rounded-xl p-3 hover:bg-secondary"
+                  >
+                    <span className="flex items-center justify-between text-sm font-semibold">
+                      {ar ? "تصفّح القوالب" : "Browse templates"}
+                      <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {ar
+                        ? "24 قالباً أصلياً بلا علامة مائية"
+                        : "24 original watermark-free templates"}
+                    </span>
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  <p className="px-3 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    {ar ? "حسّن" : "Improve"}
+                  </p>
+                  <Link
+                    role="menuitem"
+                    to="/features"
+                    onClick={() => setExploreOpen(false)}
+                    className="group block rounded-xl p-3 hover:bg-secondary"
+                  >
+                    <span className="flex items-center justify-between text-sm font-semibold">
+                      {ar ? "المزايا" : "Features"}
+                      <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {ar ? "ذكاء اصطناعي وفحص ATS وPDF" : "AI guidance, ATS checks, and PDF"}
+                    </span>
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    to="/ats"
+                    onClick={() => setExploreOpen(false)}
+                    className="group block rounded-xl p-3 hover:bg-secondary"
+                  >
+                    <span className="flex items-center justify-between text-sm font-semibold">
+                      {ar ? "فحص ATS" : "ATS check"}
+                      <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {ar ? "إرشاد عملي دون وعود توظيف" : "Practical guidance, no hiring promises"}
+                    </span>
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  <p className="px-3 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    {ar ? "اطمئن" : "Trust"}
+                  </p>
+                  <Link
+                    role="menuitem"
+                    to="/privacy"
+                    onClick={() => setExploreOpen(false)}
+                    className="group block rounded-xl p-3 hover:bg-secondary"
+                  >
+                    <span className="flex items-center justify-between text-sm font-semibold">
+                      {ar ? "الخصوصية أولاً" : "Privacy first"}
+                      <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {ar ? "تحكم واضح وحذف فوري للجلسة" : "Clear controls and immediate deletion"}
+                    </span>
+                  </Link>
+                  <Link
+                    role="menuitem"
+                    to="/team"
+                    onClick={() => setExploreOpen(false)}
+                    className="group block rounded-xl p-3 hover:bg-secondary"
+                  >
+                    <span className="flex items-center justify-between text-sm font-semibold">
+                      {ar ? "فريق التصميم" : "Design team"}
+                      <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {ar ? "هوية سعودية مهنية أصلية" : "Original Saudi professional identity"}
+                    </span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
           {user &&
             memberLinks.map((l) => (
               <a
@@ -170,6 +312,13 @@ export function SiteHeader() {
                       {l.label}
                     </a>
                   ))}
+                <Link
+                  to="/resumes/new"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
+                >
+                  {ar ? "ابدأ سيرة" : "Start a resume"}
+                </Link>
                 {links.map((l) => (
                   <Link
                     key={l.to}
