@@ -15,12 +15,12 @@ The current product already contains Resume/ResumeData types, a guest-store boun
 
 Phase 17 established the current performance baseline against a Wrangler production-like preview. CLS was within the target on the measured public routes, but LCP and Performance Score were not yet within the intended product budgets.
 
-| Route | Median LCP | Median CLS | Median Performance |
-|---|---:|---:|---:|
-| `/` | 4.194s | 0.000 | 78 |
-| `/assistant` | 4.241s | 0.000 | 77 |
-| `/templates` | 4.031s | 0.000 | 79 |
-| `/jobs` | 4.216s | 0.036 | 77 |
+| Route        | Median LCP | Median CLS | Median Performance |
+| ------------ | ---------: | ---------: | -----------------: |
+| `/`          |     4.194s |      0.000 |                 78 |
+| `/assistant` |     4.241s |      0.000 |                 77 |
+| `/templates` |     4.031s |      0.000 |                 79 |
+| `/jobs`      |     4.216s |      0.036 |                 77 |
 
 Phase 18 must not add large engines to the initial bundle. The initial route should retain only shell, language, privacy status, first action, and lightweight preview concerns.
 
@@ -30,11 +30,11 @@ Anonymous resume content is held in module memory through `src/lib/guest-store.t
 
 The Phase 18 Privacy Runtime must make these states explicit:
 
-| Mode | Location | Persistence | User action |
-|---|---|---|---|
-| Memory-only | Browser memory | Tab/session lifetime | Delete now clears memory |
-| Consented recovery | `sessionStorage` | Explicitly consented browser recovery | Delete clears recovery and consent |
-| Authenticated cloud | Supabase/RLS | Account-controlled | Export/delete through account controls |
+| Mode                | Location         | Persistence                           | User action                            |
+| ------------------- | ---------------- | ------------------------------------- | -------------------------------------- |
+| Memory-only         | Browser memory   | Tab/session lifetime                  | Delete now clears memory               |
+| Consented recovery  | `sessionStorage` | Explicitly consented browser recovery | Delete clears recovery and consent     |
+| Authenticated cloud | Supabase/RLS     | Account-controlled                    | Export/delete through account controls |
 
 No guest content may be placed in analytics, URLs, logs, or request metadata. AI transmission requires an explicit preview and approval boundary.
 

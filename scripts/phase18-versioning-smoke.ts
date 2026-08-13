@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import { emptyResumeData } from "@/lib/types";
+import { fromResumeData } from "@/modules/career";
+import { createCareerVersionManager } from "@/modules/versioning";
+
+const data = emptyResumeData();
+data.summary = "النسخة الأولى";
+const first = fromResumeData(data, { graphId: "version-fixture", language: "ar" }).graph;
+const changedData = structuredClone(data);
+changedData.summary = "النسخة الثانية";
+const second = fromResumeData(changedData, { graphId: "version-fixture", language: "ar" }).graph;
+const manager = createCareerVersionManager();
+const version = manager.create("Draft A", first);
+const duplicate = manager.duplicate(version.id, "Draft B");
+assert.equal(duplicate?.name, "Draft B");
+const diff = manager.diff(first, second);
+assert.ok(diff.changed.some((item) => item.factId === "summary.text"));
+assert.equal(manager.restore(version.id)?.id, first.id);
+assert.equal(manager.delete(version.id), true);
+assert.equal(manager.list().length, 1);
+console.log("Phase 18 versioning smoke OK.");

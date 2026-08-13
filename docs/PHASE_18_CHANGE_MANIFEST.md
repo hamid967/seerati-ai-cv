@@ -12,28 +12,28 @@ The guest path must remain free, registration-optional, memory-only by default, 
 
 ## Affected files and modules
 
-| Area | Planned paths | Change type |
-|---|---|---|
-| Career graph | `src/modules/career/` | New domain schemas, adapters, fixtures, and tests |
-| Privacy | `src/modules/privacy/` | New runtime contracts and tests; adapter around guest-store |
-| Providers | `src/modules/providers/` | New interfaces, mocks, normalized errors, and contract tests |
-| Documentation | `docs/PHASE_18_*.md` | Baseline, architecture, manifest, and decision records |
-| CI | Existing QA scripts/workflows | Add only focused contract gates after local pass |
-| Database | None in Wave 1 | Explicitly deferred pending live migration inventory |
-| UI routes | None initially | Avoid route regressions and bundle growth |
+| Area          | Planned paths                 | Change type                                                  |
+| ------------- | ----------------------------- | ------------------------------------------------------------ |
+| Career graph  | `src/modules/career/`         | New domain schemas, adapters, fixtures, and tests            |
+| Privacy       | `src/modules/privacy/`        | New runtime contracts and tests; adapter around guest-store  |
+| Providers     | `src/modules/providers/`      | New interfaces, mocks, normalized errors, and contract tests |
+| Documentation | `docs/PHASE_18_*.md`          | Baseline, architecture, manifest, and decision records       |
+| CI            | Existing QA scripts/workflows | Add only focused contract gates after local pass             |
+| Database      | None in Wave 1                | Explicitly deferred pending live migration inventory         |
+| UI routes     | None initially                | Avoid route regressions and bundle growth                    |
 
 ## Acceptance checks
 
-| Gate | Acceptance condition |
-|---|---|
-| Schema | Malformed graph input fails safely; valid graph has stable IDs, locale, provenance, and sensitivity. |
-| Round-trip | `ResumeData -> Graph -> ResumeData` preserves supported data and emits a loss report for unsupported data. |
-| Privacy | Guest graph remains in memory; consented recovery is explicit; deletion clears memory and recovery. |
-| Transmission | Provider request without consent or allowed fact IDs is rejected before provider invocation. |
-| Mock providers | AI, parser, PDF, storage, and error providers satisfy interfaces and deterministic fixtures. |
-| Security | No secrets, personal fixtures, or provider content in client bundle, logs, or artifacts. |
-| Performance | No new route is added to the initial bundle; module budget is documented. |
-| CI | Lint, typecheck, build, existing QA, and focused Wave 1 tests pass. |
+| Gate           | Acceptance condition                                                                                       |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| Schema         | Malformed graph input fails safely; valid graph has stable IDs, locale, provenance, and sensitivity.       |
+| Round-trip     | `ResumeData -> Graph -> ResumeData` preserves supported data and emits a loss report for unsupported data. |
+| Privacy        | Guest graph remains in memory; consented recovery is explicit; deletion clears memory and recovery.        |
+| Transmission   | Provider request without consent or allowed fact IDs is rejected before provider invocation.               |
+| Mock providers | AI, parser, PDF, storage, and error providers satisfy interfaces and deterministic fixtures.               |
+| Security       | No secrets, personal fixtures, or provider content in client bundle, logs, or artifacts.                   |
+| Performance    | No new route is added to the initial bundle; module budget is documented.                                  |
+| CI             | Lint, typecheck, build, existing QA, and focused Wave 1 tests pass.                                        |
 
 ## Exclusions from Wave 1
 
@@ -50,3 +50,13 @@ Rollback is a revert of the Wave 1 commit(s) or removal of the new module direct
 ## Follow-on Waves
 
 Wave 2 covers deterministic Document Engine, Template Plugin SDK, and export compatibility. Wave 3 covers evidence-locked AI, taxonomy, ATS, and matching. Wave 4 covers versioning, workspace, cover letters, interview, and portfolio. Wave 5 covers admin, observability, security, and performance hardening. Each Wave receives a separate manifest update and focused PR.
+
+## Implemented slices on the Phase 18 branch
+
+The branch now contains tested, additive foundations for CareerProfileGraph, Privacy Runtime, provider contracts and mocks, deterministic ResumeDocument, Template Plugin SDK, export models, Seerati Career Taxonomy v0.1.0, Evidence-Locked AI, Explainable ATS, Job Match, local versioning, application workspace, cover letters, interview preparation, portfolio generation, metadata-only administration, and redacted observability.
+
+These slices are domain contracts and deterministic engines. They do not yet claim full UI integration, authenticated graph persistence, production provider rollout, public portfolio publishing, DOCX export, or production readiness. Those claims remain gated on integration, security, performance, and browser evidence.
+
+## Current known gaps
+
+The current branch still needs route-level integration, full import/export regression wiring, live migration inventory, provider adapter integration with existing AI services, bundle measurement after lazy loading, production-domain verification, full security tooling, and a final Draft PR review. These gaps are release gates, not hidden assumptions.

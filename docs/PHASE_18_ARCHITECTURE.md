@@ -19,18 +19,18 @@ Domain modules must not import React components, route files, browser navigation
 
 ## Initial module map
 
-| Module | Initial responsibility | First consumer | Privacy classification |
-|---|---|---|---|
-| `career` | CareerProfileGraph, facts, provenance, consent types, ResumeData adapters | Contract tests and future editor adapter | Personal data; memory-only for guest |
-| `privacy` | Storage mode, consent, expiry, deletion, transmission preview | Guest store and AI request boundary | Policy/runtime metadata; never content telemetry |
-| `providers` | AI, parser, PDF, storage, error interfaces and mocks | Contract tests | Provider metadata only |
-| `document` | Future ResumeDocument conversion and deterministic layout contracts | Structural tests first | Derived personal document |
-| `templates` | Manifest and renderer compatibility contracts | Existing 24-template registry | Personal document output |
-| `ats` | Evidence-linked deterministic rules | Existing ATS and lint adapters | Personal data plus job input |
-| `matching` | Evidence-linked job matching | Existing job-match adapter | Personal data plus job description |
-| `import` | Safe parse stages and candidate facts | Existing import pipeline | Uploaded personal data; local by default |
-| `export` | PDF/print/text/JSON output contracts | Existing PDF path | Personal document output |
-| `evaluation` | Synthetic fixtures and scoring reports | CI only | Synthetic data only |
+| Module       | Initial responsibility                                                    | First consumer                           | Privacy classification                           |
+| ------------ | ------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------ |
+| `career`     | CareerProfileGraph, facts, provenance, consent types, ResumeData adapters | Contract tests and future editor adapter | Personal data; memory-only for guest             |
+| `privacy`    | Storage mode, consent, expiry, deletion, transmission preview             | Guest store and AI request boundary      | Policy/runtime metadata; never content telemetry |
+| `providers`  | AI, parser, PDF, storage, error interfaces and mocks                      | Contract tests                           | Provider metadata only                           |
+| `document`   | Future ResumeDocument conversion and deterministic layout contracts       | Structural tests first                   | Derived personal document                        |
+| `templates`  | Manifest and renderer compatibility contracts                             | Existing 24-template registry            | Personal document output                         |
+| `ats`        | Evidence-linked deterministic rules                                       | Existing ATS and lint adapters           | Personal data plus job input                     |
+| `matching`   | Evidence-linked job matching                                              | Existing job-match adapter               | Personal data plus job description               |
+| `import`     | Safe parse stages and candidate facts                                     | Existing import pipeline                 | Uploaded personal data; local by default         |
+| `export`     | PDF/print/text/JSON output contracts                                      | Existing PDF path                        | Personal document output                         |
+| `evaluation` | Synthetic fixtures and scoring reports                                    | CI only                                  | Synthetic data only                              |
 
 ## CareerProfileGraph boundary
 
