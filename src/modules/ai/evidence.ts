@@ -38,6 +38,12 @@ function projectedGraph(graph: CareerProfileGraph, factIds: string[]): CareerPro
   });
 }
 
+function normalizedDigits(value: string): string {
+  return value
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/\s+/g, " ");
+}
+
 function validateSuggestion(
   suggestion: AISuggestion,
   graph: CareerProfileGraph,
@@ -50,6 +56,16 @@ function validateSuggestion(
   if (suggestion.evidenceFactIds.some((id) => !allowedIds.has(id)))
     throw new Error("AI suggestion references a fact outside the allowed set");
   if (!suggestion.proposedValue.trim()) throw new Error("AI suggestion cannot be empty");
+  const evidence = normalizedDigits(
+    suggestion.evidenceFactIds
+      .map((id) => graph.facts.find((item) => item.id === id)?.value ?? "")
+      .join(" "),
+  );
+  const unsupportedNumbers = (
+    normalizedDigits(suggestion.proposedValue).match(/\d+/g) ?? []
+  ).filter((number) => !evidence.includes(number));
+  if (unsupportedNumbers.length > 0)
+    throw new Error("AI suggestion contains numbers that are not present in the allowed evidence");
   return {
     factId: fact.id,
     before: fact.value,
@@ -79,6 +95,12 @@ export async function requestEvidenceLockedSuggestion(
   const preview = privacy.previewTransmission(transmission);
   if (!preview.allowed) return { error: { code: "policy_rejected", message: preview.reason } };
   const graph = projectedGraph(request.graph, request.allowedFactIds);
+  const projectedPayloadCharacters = graph.facts
+    .map((fact) => `${fact.fieldPath}: ${fact.value}`)
+    .join("\n").length;
+  if (projectedPayloadCharacters > request.maximumPayloadCharacters) {
+    return { error: { code: "policy_rejected", message: "payload-limit" } };
+  }
   const providerRequest: AIRequest = {
     requestId: `ai-${request.action}`,
     locale: request.requestedLocale,
@@ -93,11 +115,32 @@ export async function requestEvidenceLockedSuggestion(
   };
   const response = await provider.suggest(providerRequest);
   if ("error" in response) return response;
+  if (response.suggestions.length === 0) {
+    return {
+      error: {
+        code: "parse_failed",
+        retryable: false,
+        provider: provider.id,
+        safeMessage: "The AI provider returned no reviewable suggestion.",
+      },
+    };
+  }
   const allowed = new Set(request.allowedFactIds);
-  const diffs = response.suggestions.map((suggestion) =>
-    validateSuggestion(suggestion, graph, allowed),
-  );
-  return { suggestions: response.suggestions, diffs };
+  try {
+    const diffs = response.suggestions.map((suggestion) =>
+      validateSuggestion(suggestion, graph, allowed),
+    );
+    return { suggestions: response.suggestions, diffs };
+  } catch {
+    return {
+      error: {
+        code: "parse_failed",
+        retryable: false,
+        provider: provider.id,
+        safeMessage: "The AI response could not be validated against the approved evidence.",
+      },
+    };
+  }
 }
 
 export function applyApprovedSuggestion(
