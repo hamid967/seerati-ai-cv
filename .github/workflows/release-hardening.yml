@@ -1,0 +1,105 @@
+name: Release Hardening
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-hardening-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VITE_SUPABASE_URL: https://ci-supabase.invalid
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_bundle_guard
+  SUPABASE_URL: https://ci-supabase.invalid
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_bundle_guard
+  BASE_URL: http://127.0.0.1:4173
+
+jobs:
+  browser-hardening:
+    name: Browser hardening (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install hardening tools
+        run: bun add --no-save playwright@1.55.0 @playwright/test@1.55.0 @axe-core/playwright@4.10.2 pixelmatch@6.0.0 pngjs@7.0.0 @lhci/cli@0.15.1
+      - name: Build production artifact
+        run: bun run build
+      - name: Install browser and OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+          bunx playwright install --with-deps ${{ matrix.browser }}
+      - name: Start production preview
+        run: |
+          bunx wrangler dev --config .output/server/wrangler.json --port 4173 > /tmp/seerati-release-hardening.log 2>&1 &
+          for i in {1..45}; do
+            if curl -fsS "$BASE_URL/assistant" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/seerati-release-hardening.log
+          exit 1
+      - name: Run E2E, Network Privacy, axe, keyboard, PDF and print checks
+        env:
+          BROWSER_ONLY: ${{ matrix.browser }}
+        run: bun run test:release-hardening
+      - name: Upload hardening artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-hardening-${{ matrix.browser }}
+          path: |
+            artifacts/release-hardening/
+            tests/release-baselines/
+          if-no-files-found: ignore
+
+  lighthouse:
+    name: Lighthouse public routes
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: browser-hardening
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install Lighthouse CI and Chromium
+        run: |
+          bun add --no-save @lhci/cli@0.15.1
+          bunx playwright install --with-deps chromium
+      - name: Build production artifact
+        run: bun run build
+      - name: Start production preview
+        run: |
+          bunx wrangler dev --config .output/server/wrangler.json --port 4173 > /tmp/seerati-lighthouse.log 2>&1 &
+          for i in {1..45}; do
+            if curl -fsS "$BASE_URL/" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/seerati-lighthouse.log
+          exit 1
+      - name: Run Lighthouse CI
+        run: bun run test:lighthouse
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: artifacts/lighthouse/
+          if-no-files-found: ignore

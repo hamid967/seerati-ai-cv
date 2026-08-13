@@ -1,12 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { ArrowLeft, Palette } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
-import { hasSeenIntro } from "@/lib/intro";
 import { defaultTemplates } from "@/lib/templates";
 import { DESIGN_TEAM, agentPrimaryHref } from "@/lib/team";
 import heroResume from "@/assets/hero-resume.jpg";
@@ -42,12 +40,6 @@ function Landing() {
   const navigate = useNavigate();
   const templateCount = defaultTemplates.length;
   const featuredTemplates = defaultTemplates.filter((t) => t.active !== false).slice(0, 6);
-
-  useEffect(() => {
-    if (!hasSeenIntro()) {
-      void navigate({ to: "/intro", replace: true });
-    }
-  }, [navigate]);
 
   const steps = ar
     ? [
@@ -107,6 +99,8 @@ function Landing() {
                 alt={ar ? "سيرة عربية من سيرتي" : "Arabic resume from Seerati"}
                 width={1440}
                 height={1024}
+                fetchPriority="high"
+                decoding="async"
                 className="mx-auto w-full rounded-2xl border border-white/10 shadow-2xl"
               />
             </div>
@@ -132,7 +126,7 @@ function Landing() {
           <div className="mx-auto max-w-6xl px-4">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="max-w-xl">
-                <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-accent">
+                <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
                   <Palette className="size-3.5" />
                   {ar ? "فريق التصميم" : "Design team"}
                 </p>
@@ -168,7 +162,7 @@ function Landing() {
                     {agent.initials}
                   </span>
                   <h3 className="mt-4 font-bold group-hover:text-primary">{agent.name[lang]}</h3>
-                  <p className="text-xs font-semibold text-emerald-accent">{agent.role[lang]}</p>
+                  <p className="text-xs font-semibold text-emerald-700">{agent.role[lang]}</p>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {agent.blurb[lang]}
                   </p>

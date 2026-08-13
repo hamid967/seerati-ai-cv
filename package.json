@@ -18,6 +18,8 @@
     "test:templates": "node scripts/template-smoke.mjs",
     "test:rezi-additions": "node scripts/rezi-additions-smoke.mjs",
     "test:assistant-capabilities": "node scripts/assistant-capability-smoke.mjs",
+    "test:release-hardening": "node scripts/release-hardening.mjs",
+    "test:lighthouse": "lhci autorun --config=lighthouserc.cjs",
     "check:rtl": "node scripts/validate-rtl.mjs",
     "check:premium-3d": "node scripts/check-premium-3d.mjs",
     "check:client-env": "node scripts/check-client-env.mjs",
