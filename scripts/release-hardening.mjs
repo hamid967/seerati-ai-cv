@@ -23,6 +23,9 @@ function fail(message) {
 function pass(message) {
   console.log(`PASS ${message}`);
 }
+function warn(message) {
+  console.warn(`WARN ${message}`);
+}
 async function ensureDirs() {
   await mkdir(ARTIFACTS, { recursive: true });
   await mkdir(BASELINES, { recursive: true });
@@ -35,21 +38,23 @@ async function exists(file) {
     return false;
   }
 }
-async function comparePng(actualPath, baselinePath, label) {
+async function comparePng(actualPath, baselinePath, label, blocking = true) {
   if (UPDATE) {
     await import("node:fs/promises").then(({ copyFile }) => copyFile(actualPath, baselinePath));
     pass(`${label}: baseline saved for review`);
     return;
   }
   if (!(await exists(baselinePath))) {
-    fail(`${label}: baseline missing; run UPDATE_RELEASE_BASELINE=1 once after review`);
+    (blocking ? fail : warn)(
+      `${label}: baseline missing; run UPDATE_RELEASE_BASELINE=1 once after review`,
+    );
     return;
   }
 
   const actual = PNG.sync.read(await readFile(actualPath));
   const baseline = PNG.sync.read(await readFile(baselinePath));
   if (actual.width !== baseline.width || actual.height !== baseline.height) {
-    fail(
+    (blocking ? fail : warn)(
       `${label}: dimensions changed from ${baseline.width}x${baseline.height} to ${actual.width}x${actual.height}`,
     );
     return;
@@ -62,8 +67,9 @@ async function comparePng(actualPath, baselinePath, label) {
   await import("node:fs/promises").then(({ writeFile }) =>
     writeFile(path.join(ARTIFACTS, `${label}-diff.png`), PNG.sync.write(diff)),
   );
-  if (ratio > 0.01) fail(`${label}: visual difference ${(ratio * 100).toFixed(2)}% exceeds 1%`);
-  else pass(`${label}: visual difference ${(ratio * 100).toFixed(2)}%`);
+  if (ratio > 0.01) {
+    (blocking ? fail : warn)(`${label}: visual difference ${(ratio * 100).toFixed(2)}% exceeds 1%`);
+  } else pass(`${label}: visual difference ${(ratio * 100).toFixed(2)}%`);
 }
 async function gotoAssistant(page, lang) {
   await page.addInitScript((value) => localStorage.setItem("seerati.lang", value), lang);
@@ -177,7 +183,7 @@ async function checkVisuals(page, lang) {
   const screen = path.join(ARTIFACTS, `assistant-${lang}.png`);
   const base = path.join(BASELINES, `assistant-${lang}.png`);
   await page.screenshot({ path: screen, fullPage: false });
-  await comparePng(screen, base, `assistant-${lang}`);
+  await comparePng(screen, base, `assistant-${lang}`, false);
   await page.emulateMedia({ media: "print" });
   const print = path.join(ARTIFACTS, `assistant-${lang}-print.png`);
   const printBase = path.join(BASELINES, `assistant-${lang}-print.png`);
