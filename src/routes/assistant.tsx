@@ -2,7 +2,7 @@ import { lazy, Suspense, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ArrowLeft, ArrowRight, Check, Loader2, Sparkles, Wand2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GuestNotice } from "@/components/guest-notice";
+import { AdaptiveQuestion } from "@/components/noura/adaptive-question";
 import { getTemplate } from "@/lib/template-utils";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
-import type { AiUserError } from "@/lib/ai-service";
 import {
   buildAssistantData,
   createFilledAssistantResume,
@@ -26,8 +26,11 @@ import { defaultTemplates } from "@/lib/templates";
 import type { Resume } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
+  adaptiveQuestionForGoal,
   createInitialJourney,
+  isAdaptiveQuestionComplete,
   journeyPrompt,
+  journeyStageProgress,
   NOURA_GOALS,
   NOURA_PROFILE,
   transitionJourney,
@@ -68,6 +71,11 @@ export const Route = createFileRoute("/assistant")({
 });
 
 type Answers = AssistantAnswers;
+type PendingDraft = {
+  summary: string;
+  bullets: string[];
+  skills: string[];
+};
 const emptyAnswers = emptyAssistantAnswers();
 const goalToCreationMode: Record<NouraGoal, Answers["creationMode"]> = {
   create_resume: "scratch",
@@ -125,12 +133,14 @@ function AssistantPage() {
   const [summary, setSummary] = useState("");
   const [bullets, setBullets] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [pendingDraft, setPendingDraft] = useState<PendingDraft | null>(null);
   const [templateId, setTemplateId] = useState("cloud-flow");
   const [saving, setSaving] = useState(false);
 
   const specialist = agentById(agentId) ?? ASSISTANT_AGENTS[0]!;
   const isNoura = specialist.id === NOURA_PROFILE.id;
   const selectedGoal = NOURA_GOALS.find((item) => item.id === goal);
+  const adaptiveQuestion = adaptiveQuestionForGoal(journey.goal);
   const hasPreviewContent = Boolean(
     answers.fullName || answers.jobTitle || summary || bullets.length || skills.length,
   );
@@ -139,13 +149,15 @@ function AssistantPage() {
   const chooseGoal = (nextGoal: NouraGoal) => {
     dispatchJourney({ type: "choose_goal", goal: nextGoal });
     set({ creationMode: goalToCreationMode[nextGoal] });
-    if (nextGoal === "import_resume") {
-      void navigate({ to: "/import" });
-    } else if (nextGoal === "check_ats" || nextGoal === "review_resume") {
-      void navigate({ to: "/ats" });
-    } else if (nextGoal === "cover_letter") {
-      void navigate({ to: "/cover-letters" });
-    }
+  };
+
+  const openContextTool = (tool: "import" | "ats" | "cover-letter") => {
+    const destinations = {
+      import: "/import",
+      ats: "/ats",
+      "cover-letter": "/cover-letters",
+    } as const;
+    void navigate({ to: destinations[tool] });
   };
 
   const previewData = useMemo(
@@ -170,20 +182,33 @@ function AssistantPage() {
     [answers.jobTitle, ar, templateId, resumeLang, previewData],
   );
 
-  const steps = [
-    { ar: "ابدأ مع نورة", en: "Start with Noura" },
-    { ar: "من أنت", en: "About you" },
-    { ar: "خبرتك", en: "Your experience" },
-    { ar: "صياغة بالذكاء الاصطناعي", en: "AI drafting" },
-    { ar: "اختيار القالب", en: "Pick a template" },
-  ];
+  const currentHeading =
+    step === 0
+      ? ar
+        ? "ابدأ مع نورة"
+        : "Start with Noura"
+      : step === 1 && adaptiveQuestion
+        ? adaptiveQuestion.title[lang]
+        : step === 2
+          ? ar
+            ? "خبرتك وأدلتك"
+            : "Your experience and evidence"
+          : step === 3
+            ? ar
+              ? "مراجعة المسودة"
+              : "Review your draft"
+            : ar
+              ? "اختر قالباً"
+              : "Pick a template";
+  const isFinalStep = step === 4;
+  const progressValue = goal
+    ? step === 1 && adaptiveQuestion
+      ? journeyStageProgress(adaptiveQuestion.stage)
+      : Math.min(96, Math.max(20, ((step + 1) / 5) * 100))
+    : 8;
 
   const canNext =
-    step === 0
-      ? Boolean(goal)
-      : step === 1
-        ? answers.fullName.trim().length > 1 && answers.jobTitle.trim().length > 1
-        : true;
+    step === 1 ? isAdaptiveQuestionComplete(adaptiveQuestion, answers) : step === 0 ? false : true;
 
   const runDrafting = async () => {
     if (!aiConsent) {
@@ -237,17 +262,20 @@ function AssistantPage() {
           ...agentOpt,
         }),
       ]);
-      setSummary(sum.text.trim());
-      setBullets((bl.items ?? []).filter(Boolean).slice(0, 4));
       const manual = answers.skills
         .split(/[,،\n]/)
         .map((s) => s.trim())
         .filter(Boolean);
       const suggested = (sk.items ?? []).map((s) => s.trim()).filter(Boolean);
-      setSkills(Array.from(new Set([...manual, ...suggested])).slice(0, 12));
+      setPendingDraft({
+        summary: sum.text.trim(),
+        bullets: (bl.items ?? []).filter(Boolean).slice(0, 4),
+        skills: Array.from(new Set([...manual, ...suggested])).slice(0, 12),
+      });
       dispatchJourney({ type: "suggestion_ready" });
-      toast.success(ar ? "جهّزت مسودة سيرتك للمراجعة" : "Your draft is ready for review");
+      toast.success(ar ? "الاقتراح جاهز للمراجعة" : "Suggestion ready for review");
     } catch (error) {
+      dispatchJourney({ type: "retry" });
       toast.error(
         error instanceof (await import("@/lib/ai-service")).AiUserError
           ? error.message
@@ -257,7 +285,6 @@ function AssistantPage() {
       );
     } finally {
       setDrafting(false);
-      if (journey.state === "ai_processing") dispatchJourney({ type: "retry" });
     }
   };
 
@@ -286,11 +313,9 @@ function AssistantPage() {
       if (isGuest) {
         toast.message(
           ar
-            ? "سجّل حساباً لحفظ سيرتك والمتابعة في المحرر"
-            : "Sign up to save your resume and continue in the editor",
+            ? "ستبقى السيرة في هذه الجلسة فقط. يمكنك اختيار التسجيل لاحقاً إذا أردت الحفظ."
+            : "Your resume stays in this session only. You can choose to sign up later if you want to save it.",
         );
-        navigate({ to: "/auth", search: { mode: "signup" } });
-        return;
       }
       navigate({ to: "/resumes/$id/edit", params: { id: created.id } });
     } catch {
@@ -338,13 +363,19 @@ function AssistantPage() {
                   : "Local first"}
             </Badge>
             <Badge variant="outline">
-              {ar ? `خطوة ${step + 1} من ${steps.length}` : `Step ${step + 1} of ${steps.length}`}
+              {goal
+                ? ar
+                  ? "رحلة مخصصة"
+                  : "Tailored journey"
+                : ar
+                  ? "ابدأ بهدف"
+                  : "Start with a goal"}
             </Badge>
           </div>
         </div>
 
         <Progress
-          value={goal ? ((step + 1) / steps.length) * 100 : 8}
+          value={progressValue}
           className="mt-5 h-1.5"
           aria-label={ar ? "تقدم إنشاء السيرة" : "Resume creation progress"}
         />
@@ -354,7 +385,7 @@ function AssistantPage() {
         </div>
         <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_.9fr]" id="assistant-builder">
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <h2 className="text-lg font-bold">{ar ? steps[step]!.ar : steps[step]!.en}</h2>
+            <h2 className="text-lg font-bold">{currentHeading}</h2>
             {journey.questionFamily && (
               <div
                 className="mt-3 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-muted-foreground"
@@ -418,112 +449,76 @@ function AssistantPage() {
             )}
 
             {step === 1 && (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>
-                    {ar ? "المتخصص الذي يقود الجلسة" : "Specialist leading this session"}
-                  </Label>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {ASSISTANT_AGENTS.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() => {
-                          setAgentId(a.id);
-                          void navigate({
-                            to: "/assistant",
-                            search: { agent: a.id },
-                            replace: true,
-                          });
-                        }}
-                        className={cn(
-                          "flex min-h-11 items-center gap-2 rounded-xl border p-2.5 text-start transition-colors",
-                          agentId === a.id
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:bg-secondary/60",
-                        )}
-                      >
-                        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                          {a.initials}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-semibold">{a.name[lang]}</span>
-                          <span className="block truncate text-[11px] text-muted-foreground">
-                            {a.role[lang]}
-                          </span>
-                        </span>
-                        {a.track === "engineering" && (
-                          <Badge variant="outline" className="shrink-0 text-[9px]">
-                            {ar ? "هندسة" : "Eng"}
-                          </Badge>
-                        )}
-                      </button>
-                    ))}
+              <div className="mt-4 space-y-4">
+                <AdaptiveQuestion
+                  goal={journey.goal}
+                  lang={lang}
+                  answers={answers}
+                  onChange={set}
+                  onOpenTool={openContextTool}
+                />
+
+                <details className="rounded-xl border border-border bg-secondary/20 px-3 py-2.5">
+                  <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                    {ar ? "إضافة بيانات التواصل اختيارياً" : "Add contact details (optional)"}
+                  </summary>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label htmlFor="fullName">{ar ? "الاسم الكامل" : "Full name"}</Label>
+                      <Input
+                        id="fullName"
+                        value={answers.fullName}
+                        onChange={(event) => set({ fullName: event.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="email">{ar ? "البريد الإلكتروني" : "Email"}</Label>
+                      <Input
+                        id="email"
+                        value={answers.email}
+                        onChange={(event) => set({ email: event.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="phone">{ar ? "رقم الجوال" : "Phone"}</Label>
+                      <Input
+                        id="phone"
+                        value={answers.phone}
+                        onChange={(event) => set({ phone: event.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="city">{ar ? "المدينة" : "City"}</Label>
+                      <Input
+                        id="city"
+                        value={answers.city}
+                        placeholder={ar ? "مدينة تختارها" : "A city you choose"}
+                        onChange={(event) => set({ city: event.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="mb-1 block">{ar ? "لغة السيرة" : "Resume language"}</Label>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={resumeLang === "ar" ? "default" : "outline"}
+                          onClick={() => setResumeLang("ar")}
+                        >
+                          العربية
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={resumeLang === "en" ? "default" : "outline"}
+                          onClick={() => setResumeLang("en")}
+                        >
+                          English
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="fullName">{ar ? "الاسم الكامل" : "Full name"}</Label>
-                  <Input
-                    id="fullName"
-                    value={answers.fullName}
-                    onChange={(e) => set({ fullName: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <Label htmlFor="jobTitle">{ar ? "الوظيفة المستهدفة" : "Target job title"}</Label>
-                  <Input
-                    id="jobTitle"
-                    value={answers.jobTitle}
-                    placeholder={ar ? "مثال: محلل بيانات" : "e.g. Data Analyst"}
-                    onChange={(e) => set({ jobTitle: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="email">{ar ? "البريد الإلكتروني" : "Email"}</Label>
-                  <Input
-                    id="email"
-                    value={answers.email}
-                    onChange={(e) => set({ email: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="phone">{ar ? "رقم الجوال" : "Phone"}</Label>
-                  <Input
-                    id="phone"
-                    value={answers.phone}
-                    onChange={(e) => set({ phone: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="city">{ar ? "المدينة" : "City"}</Label>
-                  <Input
-                    id="city"
-                    value={answers.city}
-                    placeholder={ar ? "الرياض" : "Riyadh"}
-                    onChange={(e) => set({ city: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="mb-1 block">{ar ? "لغة السيرة" : "Resume language"}</Label>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant={resumeLang === "ar" ? "default" : "outline"}
-                      onClick={() => setResumeLang("ar")}
-                    >
-                      العربية
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant={resumeLang === "en" ? "default" : "outline"}
-                      onClick={() => setResumeLang("en")}
-                    >
-                      English
-                    </Button>
-                  </div>
-                </div>
+                </details>
               </div>
             )}
 
@@ -624,6 +619,16 @@ function AssistantPage() {
 
             {step === 3 && (
               <div className="mt-4 space-y-4">
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm">
+                  <p className="font-semibold text-foreground">
+                    {ar ? "معاينة الإرسال قبل الموافقة" : "Transmission preview before consent"}
+                  </p>
+                  <p className="mt-1 text-muted-foreground">
+                    {ar
+                      ? "المحدد: المسمى، سنوات الخبرة، القطاع، والأدلة التي كتبتها. المستبعد: الاسم والبريد والجوال والمدينة."
+                      : "Included: target role, years, industry, and evidence you entered. Excluded: name, email, phone, and city."}
+                  </p>
+                </div>
                 <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-sm dark:border-amber-900 dark:bg-amber-950/20">
                   <Checkbox
                     id="assistant-ai-consent"
@@ -636,52 +641,121 @@ function AssistantPage() {
                   />
                   <label htmlFor="assistant-ai-consent" className="cursor-pointer leading-relaxed">
                     {ar
-                      ? "أوافق على إرسال الحد الأدنى من البيانات اللازمة إلى مزود الذكاء الاصطناعي لصياغة مسودة قابلة للمراجعة. لن تُطبق التغييرات تلقائياً."
-                      : "I consent to sending the minimum necessary data to the AI provider for a reviewable draft. Changes will not be applied automatically."}
+                      ? "أوافق على إرسال الحد الأدنى من البيانات الموضحة أعلاه إلى مزود الذكاء الاصطناعي لصياغة اقتراح قابل للمراجعة. لن تُطبق التغييرات تلقائياً."
+                      : "I consent to sending only the data listed above to the AI provider for a reviewable suggestion. Changes will not be applied automatically."}
                   </label>
                 </div>
-                <Button
-                  type="button"
-                  onClick={runDrafting}
-                  disabled={drafting || !aiConsent}
-                  className="gap-2"
-                >
+                <Button type="button" onClick={runDrafting} disabled={drafting} className="gap-2">
                   {drafting ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
                     <Sparkles className="size-4" />
                   )}
-                  {summary
+                  {pendingDraft
                     ? ar
-                      ? "أعد الصياغة"
-                      : "Redraft"
+                      ? "إعادة إنشاء اقتراح"
+                      : "Generate another suggestion"
                     : ar
-                      ? "اكتب لي المسودة"
-                      : "Draft it for me"}
+                      ? "إنشاء اقتراح للمراجعة"
+                      : "Generate a suggestion for review"}
                 </Button>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="summary">{ar ? "الملخص المهني" : "Professional summary"}</Label>
-                  <Textarea
-                    id="summary"
-                    rows={5}
-                    value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
-                    placeholder={ar ? "سيظهر هنا بعد الصياغة…" : "Appears here after drafting…"}
-                  />
-                </div>
+                {pendingDraft ? (
+                  <section
+                    className="rounded-xl border border-primary/30 bg-primary/5 p-4"
+                    aria-live="polite"
+                    data-testid="noura-suggestion-diff"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-foreground">
+                          {ar ? "اقتراح ينتظر موافقتك" : "Suggestion awaiting your approval"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {ar
+                            ? "لا تزال المسودة الحالية دون تغيير حتى تختار القبول."
+                            : "Your current draft remains unchanged until you choose accept."}
+                        </p>
+                      </div>
+                      <Badge variant="outline">{ar ? "مراجعة مطلوبة" : "Review required"}</Badge>
+                    </div>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-lg border border-border bg-card p-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          {ar ? "قبل" : "Before"}
+                        </p>
+                        <p className="mt-2 whitespace-pre-wrap text-sm text-foreground">
+                          {summary || (ar ? "لا يوجد ملخص محفوظ بعد." : "No saved summary yet.")}
+                        </p>
+                      </div>
+                      <div className="rounded-lg border border-primary/30 bg-card p-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                          {ar ? "الاقتراح" : "Suggestion"}
+                        </p>
+                        <p className="mt-2 whitespace-pre-wrap text-sm text-foreground">
+                          {pendingDraft.summary ||
+                            (ar ? "لا يوجد ملخص مقترح." : "No summary proposed.")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setSummary(pendingDraft.summary);
+                          setBullets(pendingDraft.bullets);
+                          setSkills(pendingDraft.skills);
+                          setPendingDraft(null);
+                          dispatchJourney({ type: "approve_suggestion" });
+                        }}
+                      >
+                        <Check className="me-2 size-4" />
+                        {ar ? "قبول الاقتراح" : "Accept suggestion"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setPendingDraft(null);
+                          dispatchJourney({ type: "reject_suggestion" });
+                        }}
+                      >
+                        {ar ? "رفض والاحتفاظ بالمسودة" : "Reject and keep draft"}
+                      </Button>
+                    </div>
+                  </section>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="summary">
+                      {ar ? "ملخص محلي اختياري" : "Optional local summary"}
+                    </Label>
+                    <Textarea
+                      id="summary"
+                      rows={5}
+                      value={summary}
+                      onChange={(event) => setSummary(event.target.value)}
+                      placeholder={
+                        ar
+                          ? "يمكنك كتابة ملخصك بنفسك دون استخدام الذكاء الاصطناعي."
+                          : "You can write your own summary without using AI."
+                      }
+                    />
+                  </div>
+                )}
 
                 {bullets.length > 0 && (
                   <div className="space-y-2">
-                    <Label>{ar ? "إنجازات مقترحة" : "Suggested achievements"}</Label>
-                    {bullets.map((b, i) => (
+                    <Label>{ar ? "إنجازات مقبولة" : "Accepted achievements"}</Label>
+                    {bullets.map((bullet, index) => (
                       <Textarea
-                        key={i}
+                        key={index}
                         rows={2}
-                        value={b}
-                        onChange={(e) =>
+                        value={bullet}
+                        onChange={(event) =>
                           setBullets((list) =>
-                            list.map((item, idx) => (idx === i ? e.target.value : item)),
+                            list.map((item, itemIndex) =>
+                              itemIndex === index ? event.target.value : item,
+                            ),
                           )
                         }
                       />
@@ -691,16 +765,16 @@ function AssistantPage() {
 
                 {skills.length > 0 && (
                   <div className="space-y-2">
-                    <Label>{ar ? "المهارات" : "Skills"}</Label>
+                    <Label>{ar ? "مهارات مقبولة" : "Accepted skills"}</Label>
                     <div className="flex flex-wrap gap-2">
-                      {skills.map((s) => (
+                      {skills.map((skill) => (
                         <button
-                          key={s}
+                          key={skill}
                           type="button"
-                          onClick={() => setSkills((list) => list.filter((x) => x !== s))}
+                          onClick={() => setSkills((list) => list.filter((item) => item !== skill))}
                           className="rounded-full border border-border bg-secondary px-3 py-1 text-xs hover:border-destructive hover:text-destructive"
                         >
-                          {s} ×
+                          {skill} ×
                         </button>
                       ))}
                     </div>
@@ -751,39 +825,46 @@ function AssistantPage() {
               </div>
             )}
 
-            <div className="mt-6 flex items-center justify-between gap-3">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => dispatchJourney({ type: "back" })}
-                disabled={step === 0}
-                className="gap-2"
-              >
-                {ar ? <ArrowRight className="size-4" /> : <ArrowLeft className="size-4" />}
-                {ar ? "السابق" : "Back"}
-              </Button>
-
-              {step < steps.length - 1 ? (
+            {step === 0 ? (
+              <p className="mt-6 text-sm text-muted-foreground" role="status">
+                {ar
+                  ? "اختر هدفاً واحداً لبدء سؤال مخصص لك."
+                  : "Choose one goal to start a question tailored to you."}
+              </p>
+            ) : (
+              <div className="mt-6 flex items-center justify-between gap-3">
                 <Button
                   type="button"
-                  onClick={() => dispatchJourney({ type: "next" })}
-                  disabled={!canNext}
+                  variant="ghost"
+                  onClick={() => dispatchJourney({ type: "back" })}
                   className="gap-2"
                 >
-                  {ar ? "التالي" : "Next"}
-                  {ar ? <ArrowLeft className="size-4" /> : <ArrowRight className="size-4" />}
+                  {ar ? <ArrowRight className="size-4" /> : <ArrowLeft className="size-4" />}
+                  {ar ? "السابق" : "Back"}
                 </Button>
-              ) : (
-                <Button type="button" onClick={finish} disabled={saving} className="gap-2">
-                  {saving ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Check className="size-4" />
-                  )}
-                  {ar ? "أنشئ سيرتي الآن" : "Create my resume"}
-                </Button>
-              )}
-            </div>
+
+                {!isFinalStep ? (
+                  <Button
+                    type="button"
+                    onClick={() => dispatchJourney({ type: "next" })}
+                    disabled={!canNext}
+                    className="gap-2"
+                  >
+                    {ar ? "التالي" : "Next"}
+                    {ar ? <ArrowLeft className="size-4" /> : <ArrowRight className="size-4" />}
+                  </Button>
+                ) : (
+                  <Button type="button" onClick={finish} disabled={saving} className="gap-2">
+                    {saving ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Check className="size-4" />
+                    )}
+                    {ar ? "أنشئ سيرتي الآن" : "Create my resume"}
+                  </Button>
+                )}
+              </div>
+            )}
           </section>
 
           <aside className="lg:sticky lg:top-6 lg:self-start">
