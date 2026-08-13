@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import { DESIGN_TEAM, agentPrimaryHref } from "@/lib/team";
 import heroResume from "@/assets/hero-resume.webp";
+import { SaudiCityStory } from "@/components/saudi-city-story";
 import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/")({
@@ -147,6 +148,8 @@ function Landing() {
             ))}
           </ol>
         </section>
+
+        <SaudiCityStory arabic={ar} />
 
         <section className="bg-secondary/40 section-y">
           <div className="mx-auto max-w-6xl px-4">
