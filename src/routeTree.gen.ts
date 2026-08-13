@@ -26,6 +26,7 @@ import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ImportRouteImport } from './routes/import'
 import { Route as IntroRouteImport } from './routes/intro'
 import { Route as KeywordScannerRouteImport } from './routes/keyword-scanner'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrivacyCenterRouteImport } from './routes/privacy-center'
@@ -33,6 +34,8 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -42,6 +45,7 @@ import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as ResumesNewRouteImport } from './routes/resumes.new'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ResumesIdComposerRouteImport } from './routes/resumes.$id.composer'
 import { Route as ResumesIdEditRouteImport } from './routes/resumes.$id.edit'
 import { Route as ResumesIdPreviewRouteImport } from './routes/resumes.$id.preview'
@@ -133,6 +137,11 @@ const KeywordScannerRoute = KeywordScannerRouteImport.update({
   path: '/keyword-scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -168,6 +177,18 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -213,6 +234,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ResumesIdComposerRoute = ResumesIdComposerRouteImport.update({
   id: '/resumes/$id/composer',
   path: '/resumes/$id/composer',
@@ -257,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/import': typeof ImportRoute
   '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
+  '/mcp': typeof McpRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
@@ -264,6 +292,8 @@ export interface FileRoutesByFullPath {
   '/team': typeof TeamRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
@@ -273,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
@@ -296,6 +327,7 @@ export interface FileRoutesByTo {
   '/import': typeof ImportRoute
   '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
+  '/mcp': typeof McpRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
@@ -303,6 +335,8 @@ export interface FileRoutesByTo {
   '/team': typeof TeamRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
@@ -312,6 +346,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
@@ -337,6 +372,7 @@ export interface FileRoutesById {
   '/import': typeof ImportRoute
   '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
+  '/mcp': typeof McpRoute
   '/onboarding': typeof OnboardingRoute
   '/privacy': typeof PrivacyRoute
   '/privacy-center': typeof PrivacyCenterRoute
@@ -344,6 +380,8 @@ export interface FileRoutesById {
   '/team': typeof TeamRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/templates': typeof AdminTemplatesRoute
@@ -353,6 +391,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/resumes/$id/composer': typeof ResumesIdComposerRoute
   '/resumes/$id/edit': typeof ResumesIdEditRoute
   '/resumes/$id/preview': typeof ResumesIdPreviewRoute
@@ -379,6 +418,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/intro'
     | '/keyword-scanner'
+    | '/mcp'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
@@ -386,6 +426,8 @@ export interface FileRouteTypes {
     | '/team'
     | '/templates'
     | '/terms'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/audit'
     | '/admin/settings'
     | '/admin/templates'
@@ -395,6 +437,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/jobs/'
     | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
@@ -418,6 +461,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/intro'
     | '/keyword-scanner'
+    | '/mcp'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
@@ -425,6 +469,8 @@ export interface FileRouteTypes {
     | '/team'
     | '/templates'
     | '/terms'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/audit'
     | '/admin/settings'
     | '/admin/templates'
@@ -434,6 +480,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/jobs'
     | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
@@ -458,6 +505,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/intro'
     | '/keyword-scanner'
+    | '/mcp'
     | '/onboarding'
     | '/privacy'
     | '/privacy-center'
@@ -465,6 +513,8 @@ export interface FileRouteTypes {
     | '/team'
     | '/templates'
     | '/terms'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/audit'
     | '/admin/settings'
     | '/admin/templates'
@@ -474,6 +524,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/jobs/'
     | '/.lovable/oauth/consent'
+    | '/.mcp/invoke-tool/$tool'
     | '/resumes/$id/composer'
     | '/resumes/$id/edit'
     | '/resumes/$id/preview'
@@ -499,6 +550,7 @@ export interface RootRouteChildren {
   ImportRoute: typeof ImportRoute
   IntroRoute: typeof IntroRoute
   KeywordScannerRoute: typeof KeywordScannerRoute
+  McpRoute: typeof McpRoute
   OnboardingRoute: typeof OnboardingRoute
   PrivacyRoute: typeof PrivacyRoute
   PrivacyCenterRoute: typeof PrivacyCenterRoute
@@ -506,10 +558,13 @@ export interface RootRouteChildren {
   TeamRoute: typeof TeamRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   JobsIdRoute: typeof JobsIdRoute
   ResumesNewRoute: typeof ResumesNewRoute
   JobsIndexRoute: typeof JobsIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ResumesIdComposerRoute: typeof ResumesIdComposerRoute
   ResumesIdEditRoute: typeof ResumesIdEditRoute
   ResumesIdPreviewRoute: typeof ResumesIdPreviewRoute
@@ -638,6 +693,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KeywordScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -685,6 +747,20 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -748,6 +824,13 @@ declare module '@tanstack/react-router' {
       path: '/.lovable/oauth/consent'
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resumes/$id/composer': {
@@ -824,6 +907,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImportRoute: ImportRoute,
   IntroRoute: IntroRoute,
   KeywordScannerRoute: KeywordScannerRoute,
+  McpRoute: McpRoute,
   OnboardingRoute: OnboardingRoute,
   PrivacyRoute: PrivacyRoute,
   PrivacyCenterRoute: PrivacyCenterRoute,
@@ -831,10 +915,14 @@ const rootRouteChildren: RootRouteChildren = {
   TeamRoute: TeamRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   JobsIdRoute: JobsIdRoute,
   ResumesNewRoute: ResumesNewRoute,
   JobsIndexRoute: JobsIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ResumesIdComposerRoute: ResumesIdComposerRoute,
   ResumesIdEditRoute: ResumesIdEditRoute,
   ResumesIdPreviewRoute: ResumesIdPreviewRoute,
