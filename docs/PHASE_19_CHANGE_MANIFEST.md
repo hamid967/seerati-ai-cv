@@ -32,6 +32,10 @@ Each program is additive under `src/modules/intelligence/*`. Removing the new ex
 
 A deterministic harness now covers 500 synthetic Arabic and English intent cases. The current result is 500/500 correct (100% intent accuracy) with zero network calls and zero personal data. This does not yet cover the complete final evaluation matrix, which remains a later hardening wave.
 
+## Wave 2 checkpoint
+
+Wave 2 adds a bilingual local Coach surface to the resume editor. It exposes Section Coach prompts and Smart Interview STAR practice using the existing `CareerProfileGraph` adapter. Answers remain session-only React state; no audio recording, remote call, automatic resume edit, telemetry, or guest persistence was added. The legacy Evidence-Locked AI adapter now rejects missing consent and oversized evidence payloads before invoking the existing service.
+
 ## Explicit exclusions
 
 This wave does not add a new chatbot, remote AI call, account migration, long-term guest profile, geolocation, automatic template changes, automatic content edits, or hidden analytics. Generative AI, learning/evaluation harnesses, and deeper UI integration are later waves.
