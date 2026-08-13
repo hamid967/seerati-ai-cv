@@ -20,6 +20,7 @@
     "test:assistant-capabilities": "node scripts/assistant-capability-smoke.mjs",
     "test:phase14-guest": "node scripts/phase14-guest-smoke.mjs",
     "test:phase18-foundations": "bun scripts/phase18-foundation-smoke.ts",
+    "test:phase18-document-template": "bun scripts/phase18-document-template-smoke.ts",
     "generate:phase15-fixtures": "node scripts/phase15-generate-eval-dataset.mjs",
     "test:phase15-fixtures": "node scripts/phase15-evaluate-fixtures.mjs",
     "test:release-hardening": "node scripts/release-hardening.mjs",
