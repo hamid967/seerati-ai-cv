@@ -94,6 +94,17 @@ async function gotoAssistant(page, lang) {
   if (!response || response.status() >= 400)
     throw new Error(`assistant returned ${response?.status()}`);
   await page.locator("#assistant-capabilities-title").waitFor({ state: "visible", timeout: 15000 });
+  const cards = page.locator('a[href="/import"]');
+  for (
+    let attempt = 0;
+    attempt < 3 && !(await cards.isVisible().catch(() => false));
+    attempt += 1
+  ) {
+    const explore = page.getByRole("button", { name: /استكشف القدرات|Explore capabilities/ });
+    if (await explore.count()) await explore.first().evaluate((element) => element.click());
+    await page.waitForTimeout(700 * (attempt + 1));
+  }
+  await cards.waitFor({ state: "visible", timeout: 15000 });
   await page.waitForTimeout(600);
 }
 async function checkCapabilities(page, browserName) {

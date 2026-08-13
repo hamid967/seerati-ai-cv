@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { listAllCoverLetters, type CoverLetter } from "@/lib/cover-letters";
 import { useAuthGuard, useStore } from "@/lib/store";
+import { GuestCoverLetter } from "@/components/guest-cover-letter";
 
 export const Route = createFileRoute("/cover-letters")({
   head: () => ({
@@ -26,13 +27,17 @@ export const Route = createFileRoute("/cover-letters")({
 function CoverLettersPage() {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { user, ready } = useStore();
-  useAuthGuard();
+  const { user, ready, isGuest } = useStore();
+  useAuthGuard({ allowGuest: true });
   const [letters, setLetters] = useState<CoverLetter[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!ready || !user) return;
+    if (!ready) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     let active = true;
     void listAllCoverLetters().then((rows) => {
       if (!active) return;
@@ -49,7 +54,7 @@ function CoverLettersPage() {
     [letters],
   );
 
-  if (!ready || !user || loading) {
+  if (!ready || loading) {
     return (
       <div className="mx-auto w-full max-w-5xl space-y-4 px-4 py-10">
         <Skeleton className="h-10 w-64" />
@@ -58,6 +63,8 @@ function CoverLettersPage() {
       </div>
     );
   }
+
+  if (isGuest) return <GuestCoverLetter />;
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-10">

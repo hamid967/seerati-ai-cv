@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
+import { GuestJobMatch } from "@/components/guest-job-match";
 import {
   createJob,
   deleteJob,
@@ -89,10 +90,10 @@ const emptyForm = (): FormState => ({
 function JobsIndex() {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { user, ready } = useStore();
+  const { user, ready, isGuest } = useStore();
   const navigate = useNavigate();
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   const [jobs, setJobs] = useState<JobWorkspace[]>([]);
   const [loading, setLoading] = useState(true);
@@ -180,7 +181,7 @@ function JobsIndex() {
     await updateJob(job.id, { status });
   };
 
-  if (!ready || !user) {
+  if (!ready) {
     return (
       <div className="min-h-screen">
         <div className="mx-auto max-w-6xl space-y-4 px-4 py-12">
@@ -190,6 +191,8 @@ function JobsIndex() {
       </div>
     );
   }
+
+  if (isGuest) return <GuestJobMatch />;
 
   const addDialog = (
     <Dialog

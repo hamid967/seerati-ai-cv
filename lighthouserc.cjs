@@ -9,8 +9,10 @@ module.exports = {
         `${baseUrl}/features`,
         `${baseUrl}/privacy`,
         `${baseUrl}/assistant`,
+        `${baseUrl}/jobs`,
+        `${baseUrl}/cover-letters`,
       ],
-      numberOfRuns: 2,
+      numberOfRuns: 3,
       settings: {
         chromeFlags: "--no-sandbox --disable-dev-shm-usage",
         onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
@@ -18,7 +20,7 @@ module.exports = {
     },
     assert: {
       assertions: {
-        // Performance remains a measured warning gate until a production baseline is reviewed.
+        // Performance remains a measured warning gate until the three-run Phase 14 baseline is reviewed.
         // Accessibility, Best Practices, and SEO remain blocking release gates.
         "categories:performance": ["warn", { minScore: 0.8 }],
         "categories:accessibility": ["error", { minScore: 0.9 }],
