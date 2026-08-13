@@ -18,6 +18,7 @@
     "test:templates": "node scripts/template-smoke.mjs",
     "test:rezi-additions": "node scripts/rezi-additions-smoke.mjs",
     "test:assistant-capabilities": "node scripts/assistant-capability-smoke.mjs",
+    "test:phase14-guest": "node scripts/phase14-guest-smoke.mjs",
     "test:release-hardening": "node scripts/release-hardening.mjs",
     "test:lighthouse": "lhci autorun --config=lighthouserc.cjs",
     "check:rtl": "node scripts/validate-rtl.mjs",

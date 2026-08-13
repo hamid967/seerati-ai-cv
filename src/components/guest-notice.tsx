@@ -12,9 +12,12 @@ import { ANONYMOUS_SESSION_TIMEOUT_MINUTES } from "@/lib/guest-store";
 export function GuestNotice({ className = "" }: { className?: string }) {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { ready, isGuest, clearGuestSession } = useStore();
+  const { isGuest, clearGuestSession } = useStore();
 
-  if (!ready || !isGuest) return null;
+  // A null user is the anonymous default while auth is resolving. Rendering the
+  // disclosure immediately prevents auth bootstrap latency from becoming the
+  // largest contentful paint; it disappears if an authenticated session wins.
+  if (!isGuest) return null;
 
   const clear = () => {
     clearGuestSession();

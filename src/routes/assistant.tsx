@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -9,9 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { AssistantCapabilityHub } from "@/components/assistant-capability-hub";
 import { GuestNotice } from "@/components/guest-notice";
-import { ResumePreview, getTemplate } from "@/components/resume-preview";
+import { getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { aiService, AiUserError } from "@/lib/ai-service";
@@ -27,6 +26,27 @@ import type { Resume } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const ASSISTANT_AGENTS = agentsForSurface("assistant");
+const AssistantCapabilityHub = lazy(() =>
+  import("@/components/assistant-capability-hub").then((m) => ({
+    default: m.AssistantCapabilityHub,
+  })),
+);
+const ResumePreview = lazy(() =>
+  import("@/components/resume-preview").then((m) => ({ default: m.ResumePreview })),
+);
+
+const USER_TYPES = [
+  { value: "student", ar: "طالب", en: "Student" },
+  { value: "graduate", ar: "خريج", en: "Graduate" },
+  { value: "employee", ar: "موظف", en: "Employee" },
+  { value: "job_seeker", ar: "باحث عن عمل", en: "Job seeker" },
+  { value: "executive", ar: "قيادي", en: "Executive" },
+] as const;
+const CREATION_MODES = [
+  { value: "scratch", ar: "إنشاء من الصفر", en: "Start from scratch" },
+  { value: "import", ar: "استيراد سيرة", en: "Import a resume" },
+  { value: "improve", ar: "تحسين سيرة موجودة", en: "Improve an existing resume" },
+] as const;
 
 export const Route = createFileRoute("/assistant")({
   validateSearch: z.object({ agent: z.string().optional() }),
@@ -52,6 +72,44 @@ export const Route = createFileRoute("/assistant")({
 
 type Answers = AssistantAnswers;
 const emptyAnswers = emptyAssistantAnswers();
+
+function DeferredCapabilityHub() {
+  const { lang } = useI18n();
+  const [open, setOpen] = useState(false);
+  if (!open) {
+    return (
+      <section
+        className="rounded-2xl border border-border bg-card p-4"
+        aria-labelledby="assistant-capabilities-title"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              {lang === "ar" ? "مركز مساعد سيرتي" : "Seerati assistant hub"}
+            </p>
+            <p id="assistant-capabilities-title" className="mt-1 text-sm text-muted-foreground">
+              {lang === "ar"
+                ? "استكشف أدوات الاستيراد وATS والتخصيص عند الحاجة."
+                : "Explore import, ATS and tailoring tools when you need them."}
+            </p>
+          </div>
+          <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+            {lang === "ar" ? "استكشف القدرات" : "Explore capabilities"}
+          </Button>
+        </div>
+      </section>
+    );
+  }
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-24 rounded-2xl border border-border bg-card" aria-hidden="true" />
+      }
+    >
+      <AssistantCapabilityHub />
+    </Suspense>
+  );
+}
 
 function AssistantPage() {
   const { lang } = useI18n();
@@ -102,6 +160,7 @@ function AssistantPage() {
   );
 
   const steps = [
+    { ar: "اختر مسارك", en: "Choose your path" },
     { ar: "من أنت", en: "About you" },
     { ar: "خبرتك", en: "Your experience" },
     { ar: "صياغة بالذكاء الاصطناعي", en: "AI drafting" },
@@ -109,7 +168,11 @@ function AssistantPage() {
   ];
 
   const canNext =
-    step === 0 ? answers.fullName.trim().length > 1 && answers.jobTitle.trim().length > 1 : true;
+    step === 0
+      ? Boolean(answers.userType && answers.sector.trim() && answers.creationMode)
+      : step === 1
+        ? answers.fullName.trim().length > 1 && answers.jobTitle.trim().length > 1
+        : true;
 
   const runDrafting = async () => {
     setDrafting(true);
@@ -122,6 +185,9 @@ function AssistantPage() {
           industry: answers.industry,
           achievement: answers.story,
         },
+        userType: answers.userType,
+        sector: answers.sector,
+        creationMode: answers.creationMode,
       };
       const agentOpt = { agentId };
       const [sum, bl, sk] = await Promise.all([
@@ -239,13 +305,80 @@ function AssistantPage() {
         />
         <GuestNotice className="mt-5" />
         <div className="mt-6" id="assistant-capabilities">
-          <AssistantCapabilityHub />
+          <DeferredCapabilityHub />
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_.9fr]" id="assistant-builder">
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <h2 className="text-lg font-bold">{ar ? steps[step]!.ar : steps[step]!.en}</h2>
 
             {step === 0 && (
+              <div className="mt-4 space-y-5">
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-semibold">
+                    {ar ? "ما حالتك المهنية؟" : "What is your current stage?"}
+                  </legend>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {USER_TYPES.map((item) => (
+                      <button
+                        key={item.value}
+                        type="button"
+                        aria-pressed={answers.userType === item.value}
+                        onClick={() => set({ userType: item.value })}
+                        className={cn(
+                          "min-h-11 rounded-xl border p-3 text-start text-sm",
+                          answers.userType === item.value
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:bg-secondary/60",
+                        )}
+                      >
+                        {item[lang]}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+                <div className="space-y-2">
+                  <Label htmlFor="assistant-sector">
+                    {ar ? "ما المجال الذي تستهدفه؟" : "Which field are you targeting?"}
+                  </Label>
+                  <Input
+                    id="assistant-sector"
+                    value={answers.sector}
+                    placeholder={ar ? "مثال: التقنية أو المالية" : "e.g. Technology or finance"}
+                    onChange={(e) => set({ sector: e.target.value })}
+                  />
+                </div>
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-semibold">
+                    {ar ? "كيف تريد أن تبدأ؟" : "How would you like to start?"}
+                  </legend>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {CREATION_MODES.map((item) => (
+                      <button
+                        key={item.value}
+                        type="button"
+                        aria-pressed={answers.creationMode === item.value}
+                        onClick={() => set({ creationMode: item.value })}
+                        className={cn(
+                          "min-h-11 rounded-xl border p-3 text-start text-sm",
+                          answers.creationMode === item.value
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:bg-secondary/60",
+                        )}
+                      >
+                        {item[lang]}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {ar
+                      ? "لن نستورد ملفاً أو نرسل بيانات للذكاء الاصطناعي قبل اختيارك وموافقتك."
+                      : "We will not import a file or send data to AI before your choice and consent."}
+                  </p>
+                </fieldset>
+              </div>
+            )}
+
+            {step === 1 && (
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
                   <Label>
@@ -355,7 +488,7 @@ function AssistantPage() {
               </div>
             )}
 
-            {step === 1 && (
+            {step === 2 && (
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="years">{ar ? "سنوات الخبرة" : "Years of experience"}</Label>
@@ -450,7 +583,7 @@ function AssistantPage() {
               </div>
             )}
 
-            {step === 2 && (
+            {step === 3 && (
               <div className="mt-4 space-y-4">
                 <Button type="button" onClick={runDrafting} disabled={drafting} className="gap-2">
                   {drafting ? (
@@ -516,7 +649,7 @@ function AssistantPage() {
               </div>
             )}
 
-            {step === 3 && (
+            {step === 4 && (
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {defaultTemplates
                   .filter((t) => t.active !== false)

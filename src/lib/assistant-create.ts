@@ -3,6 +3,9 @@ import { analyzeResume, completeness } from "@/lib/ats";
 import { emptyResumeData, type Resume, type ResumeData, type SectionKey } from "@/lib/types";
 
 export type AssistantAnswers = {
+  userType: "student" | "graduate" | "employee" | "job_seeker" | "executive" | "";
+  sector: string;
+  creationMode: "scratch" | "import" | "improve" | "";
   fullName: string;
   jobTitle: string;
   email: string;
@@ -20,6 +23,9 @@ export type AssistantAnswers = {
 };
 
 export const emptyAssistantAnswers = (): AssistantAnswers => ({
+  userType: "",
+  sector: "",
+  creationMode: "",
   fullName: "",
   jobTitle: "",
   email: "",

@@ -1,4 +1,5 @@
 import type { CareerTwin, JobRequirements, MatchAnalysis, MatchGap } from "./career";
+import type { Resume } from "./types";
 
 /**
  * Deterministic, local job-description parsing and matching.
@@ -355,6 +356,83 @@ export function matchTwinToJob(twin: CareerTwin | null, req: JobRequirements): M
   );
 
   return { score, matchedSkills, missingSkills, gaps, limitations };
+}
+
+export function matchResumeToJob(resume: Resume | null, req: JobRequirements): MatchAnalysis {
+  const limitations = [
+    "هذه المقارنة تعتمد على النص الذي أدخلته وسيرتك الحالية فقط، وليست تقييماً من جهة التوظيف.",
+    "غياب كلمة في السيرة لا يعني غياب المهارة؛ قد تحتاج إلى صياغة أوضح فقط.",
+  ];
+  const data = resume?.data;
+  const corpus = norm(
+    [
+      data?.personal.fullName,
+      data?.personal.jobTitle,
+      data?.summary,
+      data?.targetJob,
+      ...(data?.skills ?? []).map((skill) => skill.name),
+      ...(data?.experience ?? []).flatMap((item) => [
+        item.role,
+        item.company,
+        ...(item.bullets ?? []),
+      ]),
+      ...(data?.education ?? []).flatMap((item) => [item.degree, item.school]),
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+  const matchedSkills = req.hardSkills.filter((skill) => corpus.includes(norm(skill)));
+  const missingSkills = req.hardSkills.filter((skill) => !corpus.includes(norm(skill)));
+  const matchedSoft = req.softSkills.filter((skill) => corpus.includes(norm(skill)));
+  const matchedKeywords = req.keywords.filter((keyword) => corpus.includes(norm(keyword)));
+  const bulletsWithNumbers = (data?.experience ?? [])
+    .flatMap((item) => item.bullets ?? [])
+    .filter((bullet) => /\\d/.test(bullet)).length;
+  const gaps: MatchGap[] = missingSkills.slice(0, 8).map((skill) => ({
+    id: uid(),
+    kind: "skill",
+    label: skill,
+    hint: "أضفها فقط إن كنت تملكها فعلاً، ووضّح أين استخدمتها.",
+  }));
+  if (matchedKeywords.length < Math.min(6, req.keywords.length))
+    gaps.push({
+      id: uid(),
+      kind: "wording",
+      label: "مصطلحات الوظيفة غير مستخدمة في ملفك",
+      hint: "استخدم نفس مصطلحات الوصف الوظيفي حيث تنطبق على عملك الحقيقي.",
+    });
+  if (bulletsWithNumbers < 2)
+    gaps.push({
+      id: uid(),
+      kind: "evidence",
+      label: "الإنجازات بحاجة إلى أدلة قابلة للقياس",
+      hint: "أضف رقماً أو نتيجة تعرفها بدقة لكل إنجاز رئيسي.",
+    });
+  for (const missing of req.missing.slice(0, 3))
+    gaps.push({
+      id: uid(),
+      kind: "info",
+      label: missing,
+      hint: "أضف المعلومة يدوياً إن عرفتها من مصدر آخر.",
+    });
+  const skillPart = req.hardSkills.length
+    ? (matchedSkills.length / req.hardSkills.length) * 55
+    : 30;
+  const softPart = req.softSkills.length ? (matchedSoft.length / req.softSkills.length) * 15 : 10;
+  const keywordPart = req.keywords.length
+    ? (matchedKeywords.length / req.keywords.length) * 20
+    : 10;
+  const evidencePart = Math.min(10, bulletsWithNumbers * 3);
+  return {
+    score: Math.max(
+      0,
+      Math.min(100, Math.round(skillPart + softPart + keywordPart + evidencePart)),
+    ),
+    matchedSkills,
+    missingSkills,
+    gaps,
+    limitations,
+  };
 }
 
 export const GAP_LABEL: Record<MatchGap["kind"], { ar: string; en: string }> = {
