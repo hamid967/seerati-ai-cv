@@ -12,6 +12,8 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GuestNotice } from "@/components/guest-notice";
 import { AdaptiveQuestion } from "@/components/noura/adaptive-question";
+import { buildNouraEvidencePlan, requestNouraEvidenceSuggestion } from "@/modules/ai";
+import { createPrivacyRuntime } from "@/modules/privacy";
 import { getTemplate } from "@/lib/template-utils";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
@@ -73,8 +75,8 @@ export const Route = createFileRoute("/assistant")({
 type Answers = AssistantAnswers;
 type PendingDraft = {
   summary: string;
-  bullets: string[];
-  skills: string[];
+  providerId: string;
+  evidenceFactIds: string[];
 };
 const emptyAnswers = emptyAssistantAnswers();
 const goalToCreationMode: Record<NouraGoal, Answers["creationMode"]> = {
@@ -134,6 +136,7 @@ function AssistantPage() {
   const [bullets, setBullets] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [pendingDraft, setPendingDraft] = useState<PendingDraft | null>(null);
+  const evidencePrivacy = useMemo(createPrivacyRuntime, []);
   const [templateId, setTemplateId] = useState("cloud-flow");
   const [saving, setSaving] = useState(false);
 
@@ -163,6 +166,16 @@ function AssistantPage() {
   const previewData = useMemo(
     () => buildAssistantData(answers, resumeLang, summary, bullets, skills),
     [answers, resumeLang, summary, bullets, skills],
+  );
+
+  const evidencePlan = useMemo(
+    () =>
+      buildNouraEvidencePlan({
+        data: previewData,
+        locale: resumeLang,
+        consentAiProcessing: aiConsent,
+      }),
+    [previewData, resumeLang, aiConsent],
   );
 
   const previewResume: Resume = useMemo(
@@ -223,65 +236,36 @@ function AssistantPage() {
     setDrafting(true);
     dispatchJourney({ type: "request_ai" });
     try {
-      const { aiService } = await import("@/lib/ai-service");
-      const ctx = {
-        targetRole: answers.jobTitle,
-        answers: {
-          role: answers.jobTitle,
-          years: answers.years,
-          industry: answers.industry,
-          achievement: answers.story,
-        },
-        userType: answers.userType,
-        sector: answers.sector,
-        creationMode: answers.creationMode,
-      };
-      const agentOpt = { agentId };
-      const [sum, bl, sk] = await Promise.all([
-        aiService.run({
-          task: "summary",
-          lang: resumeLang,
-          input: `${answers.jobTitle} — ${answers.years} ${ar ? "سنوات خبرة" : "years"} — ${answers.industry}. ${answers.story}`,
-          context: ctx,
-          ...agentOpt,
-        }),
-        answers.story
-          ? aiService.run({
-              task: "quantify",
-              lang: resumeLang,
-              input: answers.story,
-              context: { ...ctx, section: "experience" },
-              ...agentOpt,
-            })
-          : Promise.resolve({ text: "", items: [] }),
-        aiService.run({
-          task: "suggest_skills",
-          lang: resumeLang,
-          input: `${answers.jobTitle} ${answers.industry} ${answers.skills}`,
-          context: ctx,
-          ...agentOpt,
-        }),
-      ]);
-      const manual = answers.skills
-        .split(/[,،\n]/)
-        .map((s) => s.trim())
-        .filter(Boolean);
-      const suggested = (sk.items ?? []).map((s) => s.trim()).filter(Boolean);
+      const result = await requestNouraEvidenceSuggestion(evidencePrivacy, evidencePlan);
+      if ("error" in result) {
+        dispatchJourney({ type: "retry" });
+        toast.error(
+          ar
+            ? "لم نتمكن من التحقق من الاقتراح مقابل أدلتك. يمكنك المتابعة بالتحرير المحلي."
+            : "We could not validate the suggestion against your evidence. You can continue editing locally.",
+        );
+        return;
+      }
+      const [suggestion] = result.suggestions;
+      const [diff] = result.diffs;
+      if (!suggestion || !diff) {
+        dispatchJourney({ type: "retry" });
+        toast.error(ar ? "لم يصل اقتراح قابل للمراجعة." : "No reviewable suggestion was returned.");
+        return;
+      }
       setPendingDraft({
-        summary: sum.text.trim(),
-        bullets: (bl.items ?? []).filter(Boolean).slice(0, 4),
-        skills: Array.from(new Set([...manual, ...suggested])).slice(0, 12),
+        summary: diff.after,
+        providerId: evidencePlan.providerId,
+        evidenceFactIds: diff.evidenceFactIds,
       });
       dispatchJourney({ type: "suggestion_ready" });
       toast.success(ar ? "الاقتراح جاهز للمراجعة" : "Suggestion ready for review");
-    } catch (error) {
+    } catch {
       dispatchJourney({ type: "retry" });
       toast.error(
-        error instanceof (await import("@/lib/ai-service")).AiUserError
-          ? error.message
-          : ar
-            ? "تعذّرت الصياغة الآن، جرّب مرة أخرى."
-            : "Drafting failed, please retry.",
+        ar
+          ? "تعذّرت الصياغة الآن، واستمر محرر المسودة محلياً دون تغيير."
+          : "Drafting is unavailable; your local draft remains unchanged.",
       );
     } finally {
       setDrafting(false);
@@ -619,16 +603,57 @@ function AssistantPage() {
 
             {step === 3 && (
               <div className="mt-4 space-y-4">
-                <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm">
-                  <p className="font-semibold text-foreground">
-                    {ar ? "معاينة الإرسال قبل الموافقة" : "Transmission preview before consent"}
-                  </p>
+                <section
+                  className="rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm"
+                  data-testid="noura-evidence-payload-preview"
+                  aria-live="polite"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-semibold text-foreground">
+                      {ar ? "معاينة الإرسال قبل الموافقة" : "Transmission preview before consent"}
+                    </p>
+                    <Badge variant="outline">
+                      {evidencePlan.preview.allowed
+                        ? ar
+                          ? "جاهز بعد الموافقة"
+                          : "Ready after consent"
+                        : ar
+                          ? "لن يُرسل شيء الآن"
+                          : "Nothing is sent now"}
+                    </Badge>
+                  </div>
                   <p className="mt-1 text-muted-foreground">
                     {ar
-                      ? "المحدد: المسمى، سنوات الخبرة، القطاع، والأدلة التي كتبتها. المستبعد: الاسم والبريد والجوال والمدينة."
-                      : "Included: target role, years, industry, and evidence you entered. Excluded: name, email, phone, and city."}
+                      ? `المزوّد: ${evidencePlan.providerId}. يتم إرسال ${evidencePlan.preview.factCount} حقائق موثقة فقط عند موافقتك (${evidencePlan.estimatedPayloadCharacters} حرفاً تقريباً).`
+                      : `Provider: ${evidencePlan.providerId}. Only ${evidencePlan.preview.factCount} evidenced facts are sent after your consent (~${evidencePlan.estimatedPayloadCharacters} characters).`}
                   </p>
-                </div>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold text-foreground">
+                        {ar ? "حقول ستُرسل" : "Fields that may be sent"}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {evidencePlan.includedFieldPaths.length > 0
+                          ? evidencePlan.includedFieldPaths.join(" · ")
+                          : ar
+                            ? "لا توجد حقائق كافية بعد؛ يمكنك الاستمرار بالتحرير المحلي."
+                            : "No sufficient facts yet; you can continue editing locally."}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-foreground">
+                        {ar ? "حقول مستبعدة" : "Excluded fields"}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {evidencePlan.excludedFieldPaths.length > 0
+                          ? evidencePlan.excludedFieldPaths.join(" · ")
+                          : ar
+                            ? "لا توجد حقول إضافية مستبعدة."
+                            : "No additional fields are excluded."}
+                      </p>
+                    </div>
+                  </div>
+                </section>
                 <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-sm dark:border-amber-900 dark:bg-amber-950/20">
                   <Checkbox
                     id="assistant-ai-consent"
@@ -676,6 +701,11 @@ function AssistantPage() {
                             ? "لا تزال المسودة الحالية دون تغيير حتى تختار القبول."
                             : "Your current draft remains unchanged until you choose accept."}
                         </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {ar
+                            ? `المزوّد: ${pendingDraft.providerId} · الدليل: ${pendingDraft.evidenceFactIds.join("، ")}`
+                            : `Provider: ${pendingDraft.providerId} · Evidence: ${pendingDraft.evidenceFactIds.join(", ")}`}
+                        </p>
                       </div>
                       <Badge variant="outline">{ar ? "مراجعة مطلوبة" : "Review required"}</Badge>
                     </div>
@@ -703,8 +733,6 @@ function AssistantPage() {
                         type="button"
                         onClick={() => {
                           setSummary(pendingDraft.summary);
-                          setBullets(pendingDraft.bullets);
-                          setSkills(pendingDraft.skills);
                           setPendingDraft(null);
                           dispatchJourney({ type: "approve_suggestion" });
                         }}
