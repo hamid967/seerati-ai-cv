@@ -1,0 +1,12 @@
+{
+  "region": "ap-southeast-1",
+  "app": {
+    "name": "tanstack-start-ts",
+    "framework": "tanstack-start",
+    "httpPort": 3000,
+    "build": {
+      "command": "bun run build",
+      "outputDirectory": ".output"
+    }
+  }
+}
