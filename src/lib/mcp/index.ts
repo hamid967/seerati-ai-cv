@@ -1,4 +1,4 @@
-import { auth, defineMcp } from "@lovable.dev/mcp-js";
+import { auth, defineMcp, type AnyToolDefinition } from "@lovable.dev/mcp-js";
 import createResumeTool from "./tools/create-resume";
 import getResumeTool from "./tools/get-resume";
 import listResumesTool from "./tools/list-resumes";
