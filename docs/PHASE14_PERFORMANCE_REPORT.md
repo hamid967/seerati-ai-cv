@@ -70,20 +70,20 @@ The final Chromium run reported an **English assistant visual difference of 1.08
 
 ## CI status and links
 
-The branch is ready for the Draft Pull Request. The final CI links must be appended after the pushed commit has completed the six required checks.
+The Draft Pull Request is open as [PR #44](https://github.com/hamid967/seerati-ai-cv/pull/44). The latest successful CI runs are tied to commit `aa9c2e0`.
 
-| Required check | CI run link        | Status                 |
-| -------------- | ------------------ | ---------------------- |
-| Chromium       | Pending final push | Pending                |
-| Firefox        | Pending final push | Pending                |
-| WebKit         | Pending final push | Pending                |
-| Lighthouse     | Pending final push | Pending / warning gate |
-| Quality        | Pending final push | Pending                |
-| Route smoke    | Pending final push | Pending                |
+| Required check | CI run link                                                                                             | Status                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| Chromium       | [Release Hardening run 31670731402](https://github.com/hamid967/seerati-ai-cv/actions/runs/31670731402) | Green                                  |
+| Firefox        | [Release Hardening run 31670731402](https://github.com/hamid967/seerati-ai-cv/actions/runs/31670731402) | Green                                  |
+| WebKit         | [Release Hardening run 31670731402](https://github.com/hamid967/seerati-ai-cv/actions/runs/31670731402) | Green                                  |
+| Lighthouse     | [Release Hardening run 31670731402](https://github.com/hamid967/seerati-ai-cv/actions/runs/31670731402) | Green; LCP/SEO remain warning findings |
+| Quality        | [Seerati CI run 31670729537](https://github.com/hamid967/seerati-ai-cv/actions/runs/31670729537)        | Green                                  |
+| Route smoke    | [Seerati CI run 31670729537](https://github.com/hamid967/seerati-ai-cv/actions/runs/31670729537)        | Green                                  |
 
 ## Release decision
 
-**Recommendation: approve the Draft PR for owner review, but do not merge yet.** The privacy-first guest boundaries, browser matrix, accessibility, PDF, print, and route-level smoke gates are green locally. The only outstanding product-performance requirement is the LCP target: `/assistant` has improved materially but its local three-run median remains **3.386s**, above the required **2.5s**. Lighthouse should remain non-blocking for this PR, with the target tracked as the next performance iteration.
+**Recommendation: approve the Draft PR for owner review, but do not merge yet.** The privacy-first guest boundaries, browser matrix, accessibility, PDF, print, route smoke, quality, and Lighthouse CI checks are green on commit `aa9c2e0`. The only outstanding product-performance requirement is the LCP target: `/assistant` has improved materially but its local three-run median remains **3.386s**, above the required **2.5s**. Lighthouse remains non-blocking for this PR, with the target tracked as the next performance iteration.
 
 No merge is authorized by this report. Merge remains subject to explicit owner approval after reviewing the Draft PR and the final CI results.
 
