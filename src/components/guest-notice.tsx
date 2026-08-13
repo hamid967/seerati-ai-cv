@@ -9,7 +9,13 @@ import { ANONYMOUS_SESSION_TIMEOUT_MINUTES } from "@/lib/guest-store";
  * Privacy status for the anonymous builder. The default session is memory-only;
  * this disclosure makes the data location, AI boundary, and expiry explicit.
  */
-export function GuestNotice({ className = "" }: { className?: string }) {
+export function GuestNotice({
+  className = "",
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const { isGuest, clearGuestSession } = useStore();
@@ -26,17 +32,17 @@ export function GuestNotice({ className = "" }: { className?: string }) {
 
   return (
     <details
-      className={`rounded-xl border border-emerald-200 bg-emerald-50/80 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-100 ${className}`}
+      className={`${compact ? "rounded-lg" : "rounded-xl"} border border-emerald-200 bg-emerald-50/80 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-100 ${className}`}
     >
       <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 px-4 py-3 text-xs leading-relaxed [&::-webkit-details-marker]:hidden">
         <ShieldCheck className="size-4 shrink-0" aria-hidden="true" />
         <span className="min-w-0 flex-1">
           <strong className="block font-semibold">
-            {ar
-              ? "خصوصيتك محفوظة — بيانات هذه السيرة غير محفوظة"
-              : "Your privacy is protected — this CV is not retained"}
+            {ar ? "جلسة خاصة — لا حفظ افتراضي" : "Private session — no default saving"}
           </strong>
-          {ar ? "تُستخدم مؤقتًا داخل جلستك فقط." : "Used temporarily in this session only."}
+          {ar
+            ? "بياناتك في ذاكرة الجلسة فقط. لا قاعدة بيانات ولا localStorage للسيرة."
+            : "Your data stays in session memory. No database or resume localStorage by default."}
         </span>
         <span className="text-[11px] font-medium underline underline-offset-2">
           {ar ? "عرض التفاصيل" : "View details"}
@@ -50,8 +56,8 @@ export function GuestNotice({ className = "" }: { className?: string }) {
             <strong className="block">{ar ? "أين توجد البيانات؟" : "Where is it?"}</strong>
             <span>
               {ar
-                ? "في ذاكرة المتصفح فقط، ولا تُكتب في التخزين الدائم."
-                : "In browser memory only; not in persistent storage."}
+                ? "في ذاكرة الجلسة فقط افتراضياً. الاستعادة في sessionStorage اختيارية وبموافقة منفصلة."
+                : "In session memory by default. Optional sessionStorage recovery requires separate consent."}
             </span>
           </div>
           <div className="rounded-lg bg-white/60 p-3 dark:bg-black/10">
@@ -81,7 +87,7 @@ export function GuestNotice({ className = "" }: { className?: string }) {
           <Button size="sm" variant="ghost" asChild>
             <Link to="/auth" search={{ mode: "signup" }}>
               <Cloud className="size-4" aria-hidden="true" />
-              {ar ? "حساب اختياري للحفظ" : "Optional account to save"}
+              {ar ? "حساب اختياري بعد المراجعة" : "Optional account after review"}
             </Link>
           </Button>
         </div>

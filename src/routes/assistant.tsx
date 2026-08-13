@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
 import { GuestNotice } from "@/components/guest-notice";
 import { getTemplate } from "@/lib/template-utils";
 import { useI18n } from "@/lib/i18n";
@@ -24,6 +25,7 @@ import { agentById, agentsForSurface } from "@/lib/team";
 import { defaultTemplates } from "@/lib/templates";
 import type { Resume } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { NOURA_GOALS, NOURA_PROFILE, type NouraGoal, type NouraState } from "@/modules/noura";
 
 const ASSISTANT_AGENTS = agentsForSurface("assistant");
 const AssistantCapabilityHub = lazy(() =>
@@ -34,19 +36,6 @@ const AssistantCapabilityHub = lazy(() =>
 const ResumePreview = lazy(() =>
   import("@/components/resume-preview").then((m) => ({ default: m.ResumePreview })),
 );
-
-const USER_TYPES = [
-  { value: "student", ar: "طالب", en: "Student" },
-  { value: "graduate", ar: "خريج", en: "Graduate" },
-  { value: "employee", ar: "موظف", en: "Employee" },
-  { value: "job_seeker", ar: "باحث عن عمل", en: "Job seeker" },
-  { value: "executive", ar: "قيادي", en: "Executive" },
-] as const;
-const CREATION_MODES = [
-  { value: "scratch", ar: "إنشاء من الصفر", en: "Start from scratch" },
-  { value: "import", ar: "استيراد سيرة", en: "Import a resume" },
-  { value: "improve", ar: "تحسين سيرة موجودة", en: "Improve an existing resume" },
-] as const;
 
 export const Route = createFileRoute("/assistant")({
   validateSearch: z.object({ agent: z.string().optional() }),
@@ -72,32 +61,24 @@ export const Route = createFileRoute("/assistant")({
 
 type Answers = AssistantAnswers;
 const emptyAnswers = emptyAssistantAnswers();
+const goalToCreationMode: Record<NouraGoal, Answers["creationMode"]> = {
+  create_resume: "scratch",
+  improve_resume: "improve",
+  target_job: "scratch",
+  import_resume: "import",
+  check_ats: "improve",
+  cover_letter: "improve",
+  review_resume: "improve",
+};
 
 function DeferredCapabilityHub() {
   const { lang } = useI18n();
   const [open, setOpen] = useState(false);
   if (!open) {
     return (
-      <section
-        className="rounded-2xl border border-border bg-card p-4"
-        aria-labelledby="assistant-capabilities-title"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              {lang === "ar" ? "مركز مساعد سيرتي" : "Seerati assistant hub"}
-            </p>
-            <p id="assistant-capabilities-title" className="mt-1 text-sm text-muted-foreground">
-              {lang === "ar"
-                ? "استكشف أدوات الاستيراد وATS والتخصيص عند الحاجة."
-                : "Explore import, ATS and tailoring tools when you need them."}
-            </p>
-          </div>
-          <Button type="button" variant="outline" onClick={() => setOpen(true)}>
-            {lang === "ar" ? "استكشف القدرات" : "Explore capabilities"}
-          </Button>
-        </div>
-      </section>
+      <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(true)}>
+        {lang === "ar" ? "الأدوات عند الحاجة" : "Tools when needed"}
+      </Button>
     );
   }
   return (
@@ -123,10 +104,13 @@ function AssistantPage() {
     (agentFromSearch && agentById(agentFromSearch)?.id) || ASSISTANT_AGENTS[0]?.id || "noura";
 
   const [step, setStep] = useState(0);
+  const [goal, setGoal] = useState<NouraGoal | "">("");
+  const [nouraState, setNouraState] = useState<NouraState>("idle");
   const [agentId, setAgentId] = useState(initialAgent);
   const [answers, setAnswers] = useState<Answers>(emptyAnswers);
   const [resumeLang, setResumeLang] = useState<"ar" | "en">(lang);
   const [drafting, setDrafting] = useState(false);
+  const [aiConsent, setAiConsent] = useState(false);
   const [summary, setSummary] = useState("");
   const [bullets, setBullets] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
@@ -134,8 +118,25 @@ function AssistantPage() {
   const [saving, setSaving] = useState(false);
 
   const specialist = agentById(agentId) ?? ASSISTANT_AGENTS[0]!;
+  const isNoura = specialist.id === NOURA_PROFILE.id;
+  const selectedGoal = NOURA_GOALS.find((item) => item.id === goal);
+  const hasPreviewContent = Boolean(
+    answers.fullName || answers.jobTitle || summary || bullets.length || skills.length,
+  );
 
   const set = (patch: Partial<Answers>) => setAnswers((a) => ({ ...a, ...patch }));
+  const chooseGoal = (nextGoal: NouraGoal) => {
+    setGoal(nextGoal);
+    set({ creationMode: goalToCreationMode[nextGoal] });
+    setNouraState("asking");
+    if (nextGoal === "import_resume") {
+      void navigate({ to: "/import" });
+    } else if (nextGoal === "check_ats" || nextGoal === "review_resume") {
+      void navigate({ to: "/ats" });
+    } else if (nextGoal === "cover_letter") {
+      void navigate({ to: "/cover-letters" });
+    }
+  };
 
   const previewData = useMemo(
     () => buildAssistantData(answers, resumeLang, summary, bullets, skills),
@@ -160,7 +161,7 @@ function AssistantPage() {
   );
 
   const steps = [
-    { ar: "اختر مسارك", en: "Choose your path" },
+    { ar: "ابدأ مع نورة", en: "Start with Noura" },
     { ar: "من أنت", en: "About you" },
     { ar: "خبرتك", en: "Your experience" },
     { ar: "صياغة بالذكاء الاصطناعي", en: "AI drafting" },
@@ -169,13 +170,23 @@ function AssistantPage() {
 
   const canNext =
     step === 0
-      ? Boolean(answers.userType && answers.sector.trim() && answers.creationMode)
+      ? Boolean(goal)
       : step === 1
         ? answers.fullName.trim().length > 1 && answers.jobTitle.trim().length > 1
         : true;
 
   const runDrafting = async () => {
+    if (!aiConsent) {
+      setNouraState("consent_required");
+      toast.message(
+        ar
+          ? "اختر الموافقة أولاً. يمكنك متابعة التحرير محلياً دون إرسال البيانات."
+          : "Choose consent first. You can continue editing locally without sending data.",
+      );
+      return;
+    }
     setDrafting(true);
+    setNouraState("ai_processing");
     try {
       const { aiService } = await import("@/lib/ai-service");
       const ctx = {
@@ -224,7 +235,8 @@ function AssistantPage() {
         .filter(Boolean);
       const suggested = (sk.items ?? []).map((s) => s.trim()).filter(Boolean);
       setSkills(Array.from(new Set([...manual, ...suggested])).slice(0, 12));
-      toast.success(ar ? "جهّزت مسودة سيرتك" : "Your draft is ready");
+      setNouraState("suggestion_ready");
+      toast.success(ar ? "جهّزت مسودة سيرتك للمراجعة" : "Your draft is ready for review");
     } catch (error) {
       toast.error(
         error instanceof (await import("@/lib/ai-service")).AiUserError
@@ -235,6 +247,7 @@ function AssistantPage() {
       );
     } finally {
       setDrafting(false);
+      if (nouraState === "ai_processing") setNouraState("error");
     }
   };
 
@@ -280,102 +293,105 @@ function AssistantPage() {
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
-            <Wand2 className="size-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-              {ar ? "مساعد سيرتي" : "Seerati Assistant"}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {ar
-                ? `أسئلة قصيرة مع ${specialist.name.ar}، صياغة بالذكاء الاصطناعي، ثم تختار القالب.`
-                : `A few questions with ${specialist.name.en}, AI drafting, then pick a template.`}
-            </p>
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+          <div className="flex items-start gap-3">
+            <span
+              className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm"
+              aria-hidden="true"
+            >
+              <span className="text-xl font-black">ن</span>
+            </span>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                NOURA · نورة
+              </p>
+              <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+                {isNoura ? NOURA_PROFILE.role[lang] : specialist.name[lang]}
+              </h1>
+              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                {isNoura
+                  ? ar
+                    ? "أهلًا، أنا نورة. سأساعدك تبني سيرة مهنية خطوة بخطوة، ولن أرسل شيئاً للذكاء الاصطناعي دون موافقتك."
+                    : "Hi, I’m Noura. I’ll help you build a professional resume step by step, and I won’t send anything to AI without your consent."
+                  : `${specialist.name[lang]} · ${specialist.role[lang]}`}
+              </p>
+            </div>
           </div>
-          <Badge variant="secondary" className="ms-auto">
-            {ar ? `خطوة ${step + 1} من ${steps.length}` : `Step ${step + 1} of ${steps.length}`}
-          </Badge>
+          <div className="flex items-center gap-2 lg:justify-end">
+            <Badge variant="secondary">
+              {nouraState === "ai_processing"
+                ? ar
+                  ? "AI يعمل"
+                  : "AI processing"
+                : ar
+                  ? "محلي أولاً"
+                  : "Local first"}
+            </Badge>
+            <Badge variant="outline">
+              {ar ? `خطوة ${step + 1} من ${steps.length}` : `Step ${step + 1} of ${steps.length}`}
+            </Badge>
+          </div>
         </div>
 
         <Progress
-          value={((step + 1) / steps.length) * 100}
+          value={goal ? ((step + 1) / steps.length) * 100 : 8}
           className="mt-5 h-1.5"
           aria-label={ar ? "تقدم إنشاء السيرة" : "Resume creation progress"}
         />
-        <GuestNotice className="mt-5" />
-        <div className="mt-6" id="assistant-capabilities">
+        <GuestNotice className="mt-4" compact />
+        <div className="mt-4 flex justify-end" id="assistant-capabilities">
           <DeferredCapabilityHub />
         </div>
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_.9fr]" id="assistant-builder">
+        <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr_.9fr]" id="assistant-builder">
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <h2 className="text-lg font-bold">{ar ? steps[step]!.ar : steps[step]!.en}</h2>
 
             {step === 0 && (
               <div className="mt-4 space-y-5">
-                <fieldset className="space-y-2">
-                  <legend className="text-sm font-semibold">
-                    {ar ? "ما حالتك المهنية؟" : "What is your current stage?"}
-                  </legend>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {USER_TYPES.map((item) => (
-                      <button
-                        key={item.value}
-                        type="button"
-                        aria-pressed={answers.userType === item.value}
-                        onClick={() => set({ userType: item.value })}
-                        className={cn(
-                          "min-h-11 rounded-xl border p-3 text-start text-sm",
-                          answers.userType === item.value
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:bg-secondary/60",
-                        )}
-                      >
-                        {item[lang]}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-                <div className="space-y-2">
-                  <Label htmlFor="assistant-sector">
-                    {ar ? "ما المجال الذي تستهدفه؟" : "Which field are you targeting?"}
-                  </Label>
-                  <Input
-                    id="assistant-sector"
-                    value={answers.sector}
-                    placeholder={ar ? "مثال: التقنية أو المالية" : "e.g. Technology or finance"}
-                    onChange={(e) => set({ sector: e.target.value })}
-                  />
-                </div>
-                <fieldset className="space-y-2">
-                  <legend className="text-sm font-semibold">
-                    {ar ? "كيف تريد أن تبدأ؟" : "How would you like to start?"}
-                  </legend>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {CREATION_MODES.map((item) => (
-                      <button
-                        key={item.value}
-                        type="button"
-                        aria-pressed={answers.creationMode === item.value}
-                        onClick={() => set({ creationMode: item.value })}
-                        className={cn(
-                          "min-h-11 rounded-xl border p-3 text-start text-sm",
-                          answers.creationMode === item.value
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:bg-secondary/60",
-                        )}
-                      >
-                        {item[lang]}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {ar
-                      ? "لن نستورد ملفاً أو نرسل بيانات للذكاء الاصطناعي قبل اختيارك وموافقتك."
-                      : "We will not import a file or send data to AI before your choice and consent."}
+                <div>
+                  <p className="text-xl font-bold text-foreground">
+                    {ar ? "ما الذي تريد إنجازه اليوم؟" : "What do you want to accomplish today?"}
                   </p>
-                </fieldset>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {ar
+                      ? "اختر هدفاً واحداً، وسأعرض السؤال الأنسب فقط."
+                      : "Choose one goal and I’ll show only the next useful question."}
+                  </p>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {NOURA_GOALS.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      aria-pressed={goal === item.id}
+                      onClick={() => chooseGoal(item.id)}
+                      className={cn(
+                        "min-h-14 rounded-xl border p-3 text-start text-sm transition-colors",
+                        goal === item.id
+                          ? "border-primary bg-primary/10 ring-2 ring-primary/20"
+                          : "border-border hover:bg-secondary/60",
+                      )}
+                    >
+                      <span className="block font-semibold">{item[lang]}</span>
+                      {goal === item.id && (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {item[lang === "ar" ? "nextAr" : "nextEn"]}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {selectedGoal && (
+                  <div
+                    className="border-t border-border pt-4 text-sm text-muted-foreground"
+                    aria-live="polite"
+                  >
+                    {ar ? "الخطوة التالية:" : "Next:"}{" "}
+                    <span className="font-semibold text-foreground">
+                      {selectedGoal[lang === "ar" ? "nextAr" : "nextEn"]}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -586,7 +602,24 @@ function AssistantPage() {
 
             {step === 3 && (
               <div className="mt-4 space-y-4">
-                <Button type="button" onClick={runDrafting} disabled={drafting} className="gap-2">
+                <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-3 text-sm dark:border-amber-900 dark:bg-amber-950/20">
+                  <Checkbox
+                    id="assistant-ai-consent"
+                    checked={aiConsent}
+                    onCheckedChange={(value) => setAiConsent(Boolean(value))}
+                  />
+                  <label htmlFor="assistant-ai-consent" className="cursor-pointer leading-relaxed">
+                    {ar
+                      ? "أوافق على إرسال الحد الأدنى من البيانات اللازمة إلى مزود الذكاء الاصطناعي لصياغة مسودة قابلة للمراجعة. لن تُطبق التغييرات تلقائياً."
+                      : "I consent to sending the minimum necessary data to the AI provider for a reviewable draft. Changes will not be applied automatically."}
+                  </label>
+                </div>
+                <Button
+                  type="button"
+                  onClick={runDrafting}
+                  disabled={drafting || !aiConsent}
+                  className="gap-2"
+                >
                   {drafting ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
@@ -735,6 +768,20 @@ function AssistantPage() {
               <Badge variant="outline">{getTemplate(templateId).name[lang]}</Badge>
             </div>
             <div className="relative h-[520px] overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+              {!hasPreviewContent && (
+                <div className="absolute inset-x-4 top-5 z-10 border border-dashed border-primary/40 bg-primary/5 p-4 text-center text-xs text-muted-foreground">
+                  <p className="font-semibold text-foreground">
+                    {ar
+                      ? "مثال توضيحي — ستظهر إجاباتك هنا تدريجياً"
+                      : "Illustrative preview — your answers will appear here progressively"}
+                  </p>
+                  <p className="mt-1">
+                    {ar
+                      ? "لا اسم أو مدينة أو جنسية مفترضة."
+                      : "No assumed name, city, or nationality."}
+                  </p>
+                </div>
+              )}
               <div
                 aria-hidden
                 className="pointer-events-none absolute start-0 top-0 origin-top-left rtl:origin-top-right"
@@ -746,8 +793,8 @@ function AssistantPage() {
             {isGuest && (
               <p className="mt-3 text-xs text-muted-foreground">
                 {ar
-                  ? "تعمل كزائر — سيرتك تُحفظ في هذا المتصفح، وتُنقل لحسابك عند التسجيل."
-                  : "Guest mode — your resume stays in this browser and moves to your account when you sign up."}
+                  ? "المعاينة مبنية على مسودة هذه الجلسة فقط. لا تُنقل إلى حساب إلا بعد اختيارك الصريح للحفظ."
+                  : "This preview is a draft for this session. It is not moved to an account unless you explicitly choose to save it."}
               </p>
             )}
           </aside>

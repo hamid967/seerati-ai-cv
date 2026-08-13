@@ -62,7 +62,6 @@ export function buildAssistantData(
       email: a.email,
       phone: a.phone,
       city: a.city,
-      country: lang === "ar" ? "السعودية" : "Saudi Arabia",
     },
     summary,
     targetJob: a.jobTitle,
