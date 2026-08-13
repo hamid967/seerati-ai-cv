@@ -783,6 +783,7 @@ function AssistantPage() {
                 </div>
               )}
               <div
+                id="print-area"
                 aria-hidden
                 className="pointer-events-none absolute start-0 top-0 origin-top-left rtl:origin-top-right"
                 style={{ width: 794, transform: "scale(0.52)" }}

@@ -36,13 +36,24 @@ for (const lang of ["ar", "en"]) {
   const pdfPath = path.join(ARTIFACTS, `noura-${lang}.pdf`);
   await page.emulateMedia({ media: "print" });
   await page.screenshot({ path: path.join(ARTIFACTS, `noura-${lang}-print.png`), fullPage: true });
+  const printState = await page.locator("#print-area").evaluate((element) => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return {
+      text: element.textContent?.slice(0, 240),
+      visibility: style.visibility,
+      display: style.display,
+      width: rect.width,
+      height: rect.height,
+    };
+  });
+  console.log(`${lang}: print-area state`, printState);
   await page.pdf({ path: pdfPath, format: "A4", printBackground: true, preferCSSPageSize: true });
   const text = execFileSync("pdftotext", [pdfPath, "-"], { encoding: "utf8" });
-  const expected =
-    lang === "ar" ? ["نورة", "وكيلتك المهنية السعودية"] : ["Noura", "Saudi career agent"];
+  const expected = lang === "ar" ? ["اسمك الكامل"] : ["Your name"];
   if (expected.some((term) => text.includes(term)))
-    pass(`${lang}: PDF contains Noura identity text`);
-  else fail(`${lang}: PDF identity text missing`);
+    pass(`${lang}: PDF contains resume preview text`);
+  else fail(`${lang}: PDF resume preview text missing`);
   await page.close();
 }
 await context.close();
