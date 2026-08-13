@@ -2,7 +2,7 @@
 
 **Repository:** `hamid967/seerati-ai-cv`  
 **Branch:** `feat/noura-intelligent-career-experience`  
-**HEAD verified:** `03df1ff6be5170a79feee70d76bc2d2d15ea4306` (`03df1ff`)
+**HEAD verified:** `a2291d381e58e88683bc26f51a8d3b475230be69` (`a2291d3`)
 
 **PR:** [#53](https://github.com/hamid967/seerati-ai-cv/pull/53) — Draft, not merged  
 **Verification date:** 2026-08-13
@@ -11,17 +11,17 @@
 
 The current Noura Foundation route was verified without adding product features. The Arabic and English goal-first entry point shows Noura's identity and professional role, presents one goal question, keeps the capability hub behind the tools button, does not show an assumed country or city, and exposes the current privacy deletion control. The local browser harness passed the Chromium, Firefox, and WebKit desktop/mobile matrix with reduced-motion context, keyboard traversal, no horizontal overflow, no console errors, no resume storage keys, and no guest mutation or Supabase write requests.
 
-The Foundation release gates were rerun after a minimal print-area and guest-smoke alignment fix. Build, QA, Data Deletion/guest parity, PDF/Print, Network Privacy, and the Chromium/Firefox/WebKit desktop/mobile checks now pass locally. The GitHub CI runs associated with the previous `668550c` commit failed; a new CI run is required for `03df1ff`. The branch remains Draft and must not be merged until the new CI checks are reviewed.
+The Foundation release gates were rerun after a minimal print-area, guest-smoke, and release-hardening selector alignment fix. Build, QA, Data Deletion/guest parity, PDF/Print, Network Privacy, local browser checks, and the GitHub Release Hardening workflow now pass. The only failing GitHub check on `a2291d3` is Seerati CI quality's repository-wide Prettier check, which reports seven MCP files present in the merge-result environment but absent from this branch checkout. The branch remains Draft and must not be merged until that repository-level discrepancy is resolved or explicitly accepted by the owner.
 
 ## Commit and CI evidence
 
-| Item                  | Evidence                                                                                  |
-| --------------------- | ----------------------------------------------------------------------------------------- |
-| Verified commit       | `03df1ff6be5170a79feee70d76bc2d2d15ea4306`                                                |
-| PR                    | [#53](https://github.com/hamid967/seerati-ai-cv/pull/53)                                  |
-| Seerati CI run        | [31712419004](https://github.com/hamid967/seerati-ai-cv/actions/runs/31712419004), failed |
-| Release Hardening run | [31712419040](https://github.com/hamid967/seerati-ai-cv/actions/runs/31712419040), failed |
-| PR status             | Open, Draft, not merged                                                                   |
+| Item                  | Evidence                                                                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Verified commit       | `a2291d381e58e88683bc26f51a8d3b475230be69`                                                                                         |
+| PR                    | [#53](https://github.com/hamid967/seerati-ai-cv/pull/53)                                                                           |
+| Seerati CI run        | [31716881095](https://github.com/hamid967/seerati-ai-cv/actions/runs/31716881095), failed at repository-wide Prettier format check |
+| Release Hardening run | [31716881132](https://github.com/hamid967/seerati-ai-cv/actions/runs/31716881132), passed                                          |
+| PR status             | Open, Draft, not merged                                                                                                            |
 
 ## Commands and results
 
@@ -36,6 +36,7 @@ The Foundation release gates were rerun after a minimal print-area and guest-smo
 | `test:noura-foundation`            | Passed                                                     | Noura identity, seven goals, and no assumed country in generated data.                                                                    |
 | Phase 19 intelligence smoke        | Passed                                                     | Existing Phase 19 contract checks passed.                                                                                                 |
 | Phase 19 evaluation                | Passed                                                     | 500/500 synthetic cases; 100% intent accuracy.                                                                                            |
+| `test:release-hardening` locally   | Passed                                                     | Updated Noura selectors, E2E capability navigation, Network Privacy, axe, keyboard, PDF, print, Firefox, and WebKit checks passed.        |
 | Phase 14 guest/data-deletion smoke | Passed                                                     | Updated only the stale assistant selectors to `/assistant?agent=noura` and the current goal-first copy; guest mutation assertions passed. |
 | Network Privacy harness            | Passed                                                     | No non-GET mutation, no Supabase write, no persistence endpoint mutation, no CV/PII markers in request bodies.                            |
 | Data deletion control              | Passed                                                     | Current route exposes `حذف بياناتي الآن` / `Delete my data now`; guest parity smoke passed without persistence writes.                    |
@@ -97,12 +98,12 @@ The anonymous route did not expose resume, CV, draft, or document keys in `local
 
 The verification did not claim full Noura Phase 2 adaptive conversation, journey-specific state machines, achievement interviewing, diff/undo flows, offline recovery, live AI failure recovery, or mobile bottom navigation. Those belong to the separate Phase 2 request and were intentionally excluded from this Foundation-only verification.
 
-The Phase 14 guest smoke and assistant PDF contract were updated with the smallest compatible changes. The PDF fix adds the existing `print-area` contract to the current live resume preview; it does not add a new user-facing feature. The previous GitHub CI failures remain historical evidence for `668550c`; CI must be rerun for `03df1ff`. Full Noura Phase 2 adaptive conversation remains intentionally excluded.
+The Phase 14 guest smoke, assistant PDF contract, and release-hardening selectors were updated with the smallest compatible changes. The PDF fix adds the existing `print-area` contract to the current live resume preview; it does not add a new user-facing feature. GitHub Release Hardening is now green on `a2291d3`. Seerati CI quality remains blocked by the seven MCP Prettier findings described above. Full Noura Phase 2 adaptive conversation remains intentionally excluded.
 
 ## Rollback
 
-The minimal product/test fix is revertible at `03df1ff`; the Foundation implementation before it is `668550c`. Verification harnesses, screenshots, and this report are committed separately for review. No merge is allowed until the new CI run is green and the owner approves.
+The minimal product/test fix is revertible at `03df1ff`; release-hardening alignment is `a2291d3`; the Foundation implementation before it is `668550c`. Verification harnesses, screenshots, and this report are committed separately for review. No merge is allowed until all required CI checks are green and the owner approves.
 
 ## Final decision
 
-**Do not merge PR #53 yet.** Local Build, QA, Network Privacy, Data Deletion parity, PDF/Print, and browser checks pass after `03df1ff`, but GitHub CI must complete successfully for the new commit and the owner must approve the Draft PR.
+**Do not merge PR #53 yet.** Local Build, QA, Network Privacy, Data Deletion parity, PDF/Print, browser checks, and GitHub Release Hardening pass on `a2291d3`; Seerati CI quality still fails at repository-wide formatting, so owner review and a green quality check are required.
