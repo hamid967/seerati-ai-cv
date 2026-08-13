@@ -38,13 +38,11 @@ try {
   await page.getByRole("button", { name: /أنشئ مسودة محلية|Create local draft/ }).click();
   await assertText(/راجع المسودة|Review your draft/);
 
-  await page.goto(`${base}/assistant`, { waitUntil: "networkidle" });
-  await assertText(/اختر مسارك|Choose your path/);
-  await page.getByRole("button", { name: /باحث عن عمل|Job seeker/ }).click();
+  await page.goto(`${base}/assistant?agent=noura`, { waitUntil: "networkidle" });
+  await assertText(/ما الذي تريد إنجازه اليوم؟|What do you want to accomplish today\?/);
   await page
-    .getByLabel(/ما المجال الذي تستهدفه؟|Which field are you targeting\?/)
-    .fill("Technology");
-  await page.getByRole("button", { name: /إنشاء من الصفر|Start from scratch/ }).click();
+    .getByRole("button", { name: /إنشاء سيرة من الصفر|Create a resume from scratch/ })
+    .click();
   await page.getByRole("button", { name: /التالي|Next/ }).click();
   await assertText(/من أنت|About you/);
 

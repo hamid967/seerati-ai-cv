@@ -76,7 +76,7 @@ async function gotoAssistant(page, lang) {
   let response;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     try {
-      response = await page.goto(`${BASE_URL}/assistant`, {
+      response = await page.goto(`${BASE_URL}/assistant?agent=noura`, {
         waitUntil: "domcontentloaded",
         timeout: 30000,
       });
@@ -93,15 +93,19 @@ async function gotoAssistant(page, lang) {
   }
   if (!response || response.status() >= 400)
     throw new Error(`assistant returned ${response?.status()}`);
-  await page.locator("#assistant-capabilities-title").waitFor({ state: "visible", timeout: 15000 });
+  await page.locator("#assistant-builder").waitFor({ state: "visible", timeout: 15000 });
+  await page.waitForTimeout(1200);
+  const explore = page.getByRole("button", { name: /الأدوات عند الحاجة|Tools when needed/ });
+  if (await explore.isVisible().catch(() => false)) await explore.click();
   const cards = page.locator('a[href="/import"]');
   for (
     let attempt = 0;
     attempt < 3 && !(await cards.isVisible().catch(() => false));
     attempt += 1
   ) {
-    const explore = page.getByRole("button", { name: /استكشف القدرات|Explore capabilities/ });
-    if (await explore.count()) await explore.first().evaluate((element) => element.click());
+    const explore = page.getByRole("button", { name: /الأدوات عند الحاجة|Tools when needed/ });
+    if ((await explore.count()) && (await explore.isVisible().catch(() => false)))
+      await explore.first().click();
     await page.waitForTimeout(700 * (attempt + 1));
   }
   await cards.waitFor({ state: "visible", timeout: 15000 });
@@ -213,10 +217,7 @@ async function checkVisuals(page, lang) {
   const pdf = path.join(ARTIFACTS, `assistant-${lang}.pdf`);
   await page.pdf({ path: pdf, format: "A4", printBackground: true, preferCSSPageSize: true });
   const text = execFileSync("pdftotext", [pdf, "-"], { encoding: "utf8" });
-  const expected =
-    lang === "ar"
-      ? ["مساعد سيرتي", "مركز مساعد سيرتي"]
-      : ["Seerati Assistant", "Seerati assistant hub"];
+  const expected = lang === "ar" ? ["اسمك الكامل"] : ["Your name"];
   if (!expected.some((term) => text.includes(term)))
     fail(`PDF ${lang}: expected language text missing`);
   else pass(`PDF ${lang}: generated and contains expected language text`);

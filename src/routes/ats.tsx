@@ -17,6 +17,7 @@ import { demoResume, demoResumeData } from "@/lib/demo-data";
 import { getTemplate } from "@/components/resume-preview";
 import { fromResumeData } from "@/modules/career";
 import { analyzeCareerGraph } from "@/modules/ats";
+import { assessResumeHealth } from "@/modules/intelligence";
 
 export const Route = createFileRoute("/ats")({
   head: () => ({
@@ -58,6 +59,7 @@ function AtsPage() {
     [phase18Input, lang],
   );
   const phase18Report = useMemo(() => analyzeCareerGraph(phase18Graph, jd), [phase18Graph, jd]);
+  const phase19Health = useMemo(() => assessResumeHealth(phase18Input), [phase18Input]);
   const lint = useMemo(() => lintResume(sample), [sample]);
   const snapshot = useMemo(
     () => buildRecruiterSnapshot(sample, { graph: emptyFactGraph(), jobDescription: jd }),
@@ -225,6 +227,38 @@ function AtsPage() {
           {phase18Report.failedRules.length === 0 && (
             <p className="mt-4 text-sm text-emerald-accent">
               {ar ? "اجتازت القواعد الحالية." : "The current rules passed."}
+            </p>
+          )}
+        </section>
+
+        <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="font-bold">{ar ? "صحة السيرة محلياً" : "Local resume health"}</p>
+              <p className="mt-1 text-xs leading-[1.8] text-muted-foreground">
+                {ar
+                  ? "فحص محلي لا يرسل المحتوى إلى AI ولا يغير السيرة."
+                  : "A local check that sends no content to AI and changes nothing."}
+              </p>
+            </div>
+            <p className="text-2xl font-extrabold">{phase19Health.score}/100</p>
+          </div>
+          {phase19Health.topIssues.length > 0 ? (
+            <div className="mt-4 space-y-2 text-sm">
+              {phase19Health.topIssues.map((issue) => (
+                <p key={issue} className="text-muted-foreground">
+                  {issue}
+                </p>
+              ))}
+              <p className="text-xs text-emerald-700">
+                {ar
+                  ? `الخطوة التالية: ${phase19Health.nextAction} — نحو ${phase19Health.estimatedMinutes} دقائق`
+                  : `Next: ${phase19Health.nextAction} — about ${phase19Health.estimatedMinutes} minutes`}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-emerald-700">
+              {ar ? "لا توجد مشكلات محلية أساسية." : "No core local issues found."}
             </p>
           )}
         </section>

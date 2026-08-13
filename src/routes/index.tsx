@@ -9,6 +9,7 @@ import { defaultTemplates } from "@/lib/templates";
 import { DESIGN_TEAM, agentPrimaryHref } from "@/lib/team";
 import heroResume from "@/assets/hero-resume.webp";
 import { SaudiCityStory } from "@/components/saudi-city-story";
+import { SmartStartPanel } from "@/components/smart-start-panel";
 import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/")({
@@ -133,6 +134,8 @@ function Landing() {
             </div>
           </div>
         </section>
+
+        <SmartStartPanel arabic={ar} />
 
         <section className="section-y mx-auto max-w-6xl px-4">
           <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">
