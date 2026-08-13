@@ -2,7 +2,7 @@
 
 **Branch:** `feat/phase-15-saudi-validation`  
 **Base:** `origin/main` at `19bfffa7fe43dbf1f70ad550ef59021f7716fb0d`  
-**Current implementation commit:** to be filled after final commit  
+**Current implementation commit:** `28d93e2`  
 **Status:** Draft PR candidate; do not merge without owner approval.
 
 ## Executive result
