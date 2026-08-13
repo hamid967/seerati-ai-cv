@@ -19,6 +19,8 @@
     "test:rezi-additions": "node scripts/rezi-additions-smoke.mjs",
     "test:assistant-capabilities": "node scripts/assistant-capability-smoke.mjs",
     "test:phase14-guest": "node scripts/phase14-guest-smoke.mjs",
+    "generate:phase15-fixtures": "node scripts/phase15-generate-eval-dataset.mjs",
+    "test:phase15-fixtures": "node scripts/phase15-evaluate-fixtures.mjs",
     "test:release-hardening": "node scripts/release-hardening.mjs",
     "test:lighthouse": "lhci autorun --config=lighthouserc.cjs",
     "check:rtl": "node scripts/validate-rtl.mjs",

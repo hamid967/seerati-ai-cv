@@ -10,10 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { GuestNotice } from "@/components/guest-notice";
-import { getTemplate } from "@/components/resume-preview";
+import { getTemplate } from "@/lib/template-utils";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
-import { aiService, AiUserError } from "@/lib/ai-service";
+import type { AiUserError } from "@/lib/ai-service";
 import {
   buildAssistantData,
   createFilledAssistantResume,
@@ -177,6 +177,7 @@ function AssistantPage() {
   const runDrafting = async () => {
     setDrafting(true);
     try {
+      const { aiService } = await import("@/lib/ai-service");
       const ctx = {
         targetRole: answers.jobTitle,
         answers: {
@@ -226,7 +227,7 @@ function AssistantPage() {
       toast.success(ar ? "جهّزت مسودة سيرتك" : "Your draft is ready");
     } catch (error) {
       toast.error(
-        error instanceof AiUserError
+        error instanceof (await import("@/lib/ai-service")).AiUserError
           ? error.message
           : ar
             ? "تعذّرت الصياغة الآن، جرّب مرة أخرى."
