@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 import { DESIGN_TEAM, agentPrimaryHref } from "@/lib/team";
-import heroResume from "@/assets/hero-resume.jpg";
+import heroResume from "@/assets/hero-resume.webp";
 import type { CSSProperties } from "react";
 
 export const Route = createFileRoute("/")({
@@ -29,7 +29,10 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: "https://hrhbs.com/og-image.png" },
       { name: "twitter:image", content: "https://hrhbs.com/og-image.png" },
     ],
-    links: [{ rel: "canonical", href: "https://hrhbs.com/" }],
+    links: [
+      { rel: "canonical", href: "https://hrhbs.com/" },
+      { rel: "preload", as: "image", href: heroResume, type: "image/webp", fetchPriority: "high" },
+    ],
   }),
   component: Landing,
 });
@@ -100,6 +103,7 @@ function Landing() {
                 width={1440}
                 height={1024}
                 fetchPriority="high"
+                loading="eager"
                 decoding="async"
                 className="mx-auto w-full rounded-2xl border border-white/10 shadow-2xl"
               />

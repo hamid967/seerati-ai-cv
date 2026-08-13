@@ -75,12 +75,17 @@ async function gotoAssistant(page, lang) {
   await page.addInitScript((value) => localStorage.setItem("seerati.lang", value), lang);
   let response;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    response = await page.goto(`${BASE_URL}/assistant`, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
-    if (page.url().includes("/assistant")) break;
-    await page.waitForTimeout(attempt * 300);
+    try {
+      response = await page.goto(`${BASE_URL}/assistant`, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+      if (page.url().includes("/assistant")) break;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!/NS_BINDING_ABORTED|frame was detached/i.test(message) || attempt === 3) throw error;
+    }
+    await page.waitForTimeout(attempt * 500);
   }
   if (!response || response.status() >= 400)
     throw new Error(`assistant returned ${response?.status()}`);
