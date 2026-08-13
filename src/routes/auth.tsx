@@ -21,7 +21,18 @@ import { useI18n, useT } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-const searchSchema = z.object({ mode: z.enum(["signin", "signup", "reset"]).optional() });
+const searchSchema = z.object({
+  mode: z.enum(["signin", "signup", "reset"]).optional(),
+  /** Same-origin relative path to return to after authentication (e.g. OAuth consent). */
+  next: z.string().optional(),
+});
+
+/** Only same-origin relative paths are allowed as a post-auth redirect target. */
+function safeNext(value?: string): string | undefined {
+  if (!value) return undefined;
+  return /^\/(?!\/)/.test(value) ? value : undefined;
+}
+
 
 type AuthMode = "signin" | "signup" | "reset";
 type AuthErrors = Partial<Record<"email" | "password" | "confirm" | "name" | "terms", string>>;
@@ -57,9 +68,10 @@ function AuthPage() {
   const t = useT();
   const { lang, toggle } = useI18n();
   const ar = lang === "ar";
-  const { mode: modeFromSearch } = Route.useSearch();
+  const { mode: modeFromSearch, next: nextFromSearch } = Route.useSearch();
   const navigate = useNavigate();
   const { signIn, signUp, resetPassword } = useStore();
+  const returnTo = safeNext(nextFromSearch);
 
   const [tab, setTab] = useState<AuthMode>(modeFromSearch ?? "signin");
   const [email, setEmail] = useState("");
@@ -78,8 +90,13 @@ function AuthPage() {
   const setMode = (next: AuthMode) => {
     setTab(next);
     setErrors({});
-    void navigate({ to: "/auth", search: { mode: next }, replace: true });
+    void navigate({
+      to: "/auth",
+      search: { mode: next, ...(returnTo ? { next: returnTo } : {}) },
+      replace: true,
+    });
   };
+
 
   const strength = useMemo(() => passwordScore(password), [password]);
   const strengthLabel =
@@ -134,6 +151,10 @@ function AuthPage() {
           return;
         }
         toast.success(t("auth_ok_created"));
+        if (returnTo) {
+          window.location.href = returnTo;
+          return;
+        }
         navigate({ to: "/onboarding" });
         return;
       }
@@ -143,6 +164,10 @@ function AuthPage() {
         return;
       }
       toast.success(t("auth_ok_welcome"));
+      if (returnTo) {
+        window.location.href = returnTo;
+        return;
+      }
       navigate({
         to: res.role === "admin" ? "/admin" : res.onboarded ? "/dashboard" : "/onboarding",
       });

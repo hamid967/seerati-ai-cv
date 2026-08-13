@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ywqufkamftsacnzxvjsr.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "seerati-ai",
+      "version": "0.1.0",
+      "title": "Seerati AI"
+    },
+    "tools": [
+      {
+        "name": "list_resumes",
+        "title": "List resumes",
+        "description": "List the signed-in user's resumes with title, language, template and scores.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_resume",
+        "title": "Get resume",
+        "description": "Read the full content of one of the signed-in user's resumes by id.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Resume id returned by list_resumes."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_resume",
+        "title": "Create resume",
+        "description": "Create a new resume draft for the signed-in user (max 3 per account). Optionally set the headline details and summary.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Resume title, e.g. 'Data Analyst CV'."
+            },
+            "language": {
+              "type": "string",
+              "enum": [
+                "ar",
+                "en"
+              ],
+              "default": "ar",
+              "description": "Resume language."
+            },
+            "templateId": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Template id, e.g. 'cloud-flow'."
+            },
+            "fullName": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "jobTitle": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "summary": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
