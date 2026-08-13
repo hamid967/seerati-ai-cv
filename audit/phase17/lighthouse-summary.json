@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-08-13T08:56:41.453Z",
+  "rows": [
+    {
+      "route": "/",
+      "runs": 4,
+      "medianLcpMs": 4194,
+      "medianCls": 0,
+      "medianPerformance": 78,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 100
+    },
+    {
+      "route": "/assistant",
+      "runs": 3,
+      "medianLcpMs": 4241,
+      "medianCls": 0,
+      "medianPerformance": 77,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 100
+    },
+    {
+      "route": "/cover-letters",
+      "runs": 3,
+      "medianLcpMs": 3923,
+      "medianCls": 0.009,
+      "medianPerformance": 82,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 63
+    },
+    {
+      "route": "/features",
+      "runs": 3,
+      "medianLcpMs": 3920,
+      "medianCls": 0,
+      "medianPerformance": 81,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 100
+    },
+    {
+      "route": "/jobs",
+      "runs": 3,
+      "medianLcpMs": 4216,
+      "medianCls": 0.036,
+      "medianPerformance": 77,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 63
+    },
+    {
+      "route": "/privacy",
+      "runs": 3,
+      "medianLcpMs": 3902,
+      "medianCls": 0,
+      "medianPerformance": 81,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 100
+    },
+    {
+      "route": "/templates",
+      "runs": 3,
+      "medianLcpMs": 4031,
+      "medianCls": 0,
+      "medianPerformance": 79,
+      "medianAccessibility": 100,
+      "medianBestPractices": 100,
+      "medianSeo": 100
+    }
+  ]
+}

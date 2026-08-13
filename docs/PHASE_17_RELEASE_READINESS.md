@@ -2,19 +2,19 @@
 
 ## Current decision
 
-**Status: Development/Staging only.** The implemented Phase 17 slice includes a semantic Design System 3.0 layer, a homepage Saudi Future Professional value story, and an abstract Saudi city story. It does not yet certify a complete site-wide redesign, a full 24-template visual catalog, a public beta, or production readiness.
+**Status: Development/Staging only.** The implemented Phase 17 slice now includes the semantic Design System 3.0 layer, homepage Saudi Future Professional value story, abstract Saudi city story, optional/skippable intro, bilingual accessible Mega Menu, and template-gallery search/filter discovery. The QA and Release Hardening gates are green, but the current Lighthouse calibration remains above the requested LCP budget, so this does not certify production readiness.
 
 ## Evidence already available
 
-Formatting, TypeScript, production build, client Supabase environment guard, and diff checks pass after the current slice. The code adds no new persistence, analytics payload, AI/ATS behavior, or external asset dependency. The repository already contains 24 active default templates, documented in `PREMIUM_TEMPLATE_CATALOG.md`.
+Formatting, TypeScript, production build, official QA, guest memory-only smoke, Network Privacy, axe, keyboard navigation, Chromium/Firefox/WebKit, PDF/Print, and three-run Lighthouse calibration have evidence under `audit/phase17/`. The code adds no new persistence, analytics payload, AI/ATS behavior, or external asset dependency. The repository contains 24 active default templates, documented in `PREMIUM_TEMPLATE_CATALOG.md`, and the new city story remains CSS-only.
 
 ## Gates still required
 
-The final branch must pass the full QA route suite, Network Privacy, guest memory-only smoke, data deletion validation, Chromium/Firefox/WebKit, mobile and slow-network checks, reduced motion, keyboard and screen-reader review, 200% zoom, PDF/Print, visual regression, three-run Lighthouse on production preview, and a human originality/cultural review. User-study results remain pending.
+The final branch still requires data deletion browser evidence, mobile and slow-network checks, reduced motion, screen-reader review, 200% zoom, a broader visual-regression review, and human originality/cultural review. The completed evidence covers the full QA route suite, Network Privacy, guest memory-only smoke, Chromium/Firefox/WebKit, axe, keyboard, PDF/Print, and three-run Lighthouse on production preview. User-study results remain pending.
 
 ## Blocking findings unless evidence changes
 
-The `/assistant` LCP target remains a known performance gap until a new three-run production measurement proves otherwise. AI output quality, ATS precision/recall/F1, complete deletion browser evidence, full red-team execution, and Saudi user-study results must not be represented as complete without evidence. Missing asset licenses, critical privacy findings, PDF/Arabic failures, route failures, or browser regressions block release.
+The LCP target remains a measured performance gap: the latest three-run production-like preview reports a median of 4.241s on `/assistant`, with homepage and template routes also above 4s. Performance scores range from 77–82 on the measured routes, while CLS remains at or below 0.036 and accessibility/best-practices scores are 100. AI output quality, ATS precision/recall/F1, complete deletion browser evidence, full red-team execution, and Saudi user-study results must not be represented as complete without evidence. Missing asset licenses, critical privacy findings, PDF/Arabic failures, route failures, or browser regressions block release.
 
 ## Delivery and rollback
 

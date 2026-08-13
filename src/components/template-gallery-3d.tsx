@@ -1,8 +1,9 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, Eye, GitCompareArrows, Sparkles, X } from "lucide-react";
+import { Check, Eye, GitCompareArrows, Search, Sparkles, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { demoResume } from "@/lib/demo-data";
 import { useI18n } from "@/lib/i18n";
@@ -90,6 +91,7 @@ export function TemplateGallery3D() {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
   const [previewLanguage, setPreviewLanguage] = useState<"ar" | "en">(lang);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -101,11 +103,19 @@ export function TemplateGallery3D() {
     () =>
       defaultTemplates.filter((template) => {
         if (!template.active) return false;
-        if (filter === "all") return true;
-        if (filter === "ats") return template.atsFriendly;
-        return template.category === filter;
+        if (
+          filter !== "all" &&
+          (filter === "ats" ? !template.atsFriendly : template.category !== filter)
+        )
+          return false;
+        const normalizedQuery = query.trim().toLocaleLowerCase();
+        if (!normalizedQuery) return true;
+        return [template.name[lang], template.description[lang], template.category]
+          .join(" ")
+          .toLocaleLowerCase()
+          .includes(normalizedQuery);
       }),
-    [filter],
+    [filter, lang, query],
   );
 
   useEffect(() => {
@@ -117,6 +127,14 @@ export function TemplateGallery3D() {
   const compared = compareIds
     .map((id) => defaultTemplates.find((template) => template.id === id))
     .filter((template): template is TemplateDef => Boolean(template));
+
+  const filterCount = (id: Filter) =>
+    defaultTemplates.filter((template) => {
+      if (!template.active) return false;
+      if (id === "all") return true;
+      if (id === "ats") return template.atsFriendly;
+      return template.category === id;
+    }).length;
 
   const filterLabel = (id: Filter) => {
     if (id === "all") return ar ? "الكل" : "All";
@@ -180,17 +198,29 @@ export function TemplateGallery3D() {
         aria-label={ar ? "معرض القوالب" : "Template gallery"}
       >
         <div className="seerati-gallery-toolbar">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
             {FILTERS.map((id) => (
               <Button
                 key={id}
                 size="sm"
                 variant={filter === id ? "default" : "outline"}
                 onClick={() => setFilter(id)}
+                aria-pressed={filter === id}
               >
-                {filterLabel(id)}
+                {filterLabel(id)}{" "}
+                <span className="ms-1 text-[10px] opacity-70">{filterCount(id)}</span>
               </Button>
             ))}
+          </div>
+          <div className="relative w-full sm:max-w-xs">
+            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={ar ? "ابحث عن قالب أو أسلوب" : "Search a template or style"}
+              aria-label={ar ? "البحث في القوالب" : "Search templates"}
+              className="ps-9"
+            />
           </div>
           <div className="flex items-center gap-2">
             <span className="hidden text-xs text-muted-foreground sm:inline">
@@ -300,6 +330,13 @@ export function TemplateGallery3D() {
             );
           })}
         </div>
+        {list.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+            {ar
+              ? "لم نجد قالباً يطابق بحثك. جرّب كلمة أخرى أو امسح البحث."
+              : "No templates match that search. Try another term or clear the search."}
+          </div>
+        )}
         {list.length > visibleList.length && (
           <div className="mt-6 flex justify-center">
             <Button type="button" variant="outline" onClick={() => setPreviewLimit(list.length)}>
