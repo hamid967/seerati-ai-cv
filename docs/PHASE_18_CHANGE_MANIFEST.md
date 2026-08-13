@@ -60,3 +60,9 @@ These slices are domain contracts and deterministic engines. They do not yet cla
 ## Current known gaps
 
 The current branch still needs route-level integration, full import/export regression wiring, live migration inventory, provider adapter integration with existing AI services, bundle measurement after lazy loading, production-domain verification, full security tooling, and a final Draft PR review. These gaps are release gates, not hidden assumptions.
+
+## Integration update
+
+The public `/ats` route now consumes the Phase 18 `CareerProfileGraph` adapter and renders the Explainable ATS layer alongside the existing legacy report. The legacy report remains intentionally visible during migration for comparison.
+
+The authenticated Job Workspace still uses the legacy `CareerTwin` and job-match/asset persistence path. The new Job Match, Application Workspace, Cover Letter, Interview, and Portfolio engines are tested domain foundations but are not yet the live route path. This is an explicit integration gap and must not be reported as fully shipped.
