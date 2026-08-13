@@ -28,6 +28,10 @@ The first wave must have strict Zod contracts, deterministic fixtures, Arabic/En
 
 Each program is additive under `src/modules/intelligence/*`. Removing the new exports and UI wiring restores the Phase 18 behavior. No database migration is allowed in this wave.
 
+## Evaluation checkpoint
+
+A deterministic harness now covers 500 synthetic Arabic and English intent cases. The current result is 500/500 correct (100% intent accuracy) with zero network calls and zero personal data. This does not yet cover the complete final evaluation matrix, which remains a later hardening wave.
+
 ## Explicit exclusions
 
 This wave does not add a new chatbot, remote AI call, account migration, long-term guest profile, geolocation, automatic template changes, automatic content edits, or hidden analytics. Generative AI, learning/evaluation harnesses, and deeper UI integration are later waves.

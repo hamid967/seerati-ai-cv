@@ -31,6 +31,10 @@ Homepage now exposes Smart Start. `/ats` now displays Local Resume Health beside
 - No AI call or network request is made by the first-wave engines.
 - No database migration, localStorage write, URL state, analytics payload, or guest persistence was added.
 
+## Evaluation checkpoint
+
+The deterministic intent harness now runs 500 synthetic Arabic and English cases with 500/500 correct routing, 100% intent accuracy, zero network calls, and no personal data. This is limited to supported explicit intent fixtures and is not the final Phase 19 evaluation matrix.
+
 ## Known limits
 
 Generative AI wiring, Smart Career Interview live integration, authenticated preference storage, full command palette UI, evaluation harness, 500-case dataset, worker offloading, and final Lighthouse calibration are later waves. The first wave deliberately does not claim the Phase 19 final acceptance thresholds are complete.

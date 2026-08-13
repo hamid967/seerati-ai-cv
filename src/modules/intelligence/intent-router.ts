@@ -29,7 +29,7 @@ const RULES: IntentRule[] = [
   {
     intent: "improve_resume",
     ar: ["حسن سيرتي", "تحسين السيرة", "طور السيرة", "عدّل سيرتي"],
-    en: ["improve resume", "fix my cv", "optimize resume", "polish my resume", "my resume"],
+    en: ["improve resume", "fix my cv", "optimize resume", "polish my resume", "حسن my resume"],
     requiredContext: ["resume"],
     next: "open_resume_health",
     fallback: "offer local resume health checks first",

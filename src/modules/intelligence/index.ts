@@ -11,3 +11,4 @@ export * from "./smart-rewrite";
 export * from "./template-recommendation";
 export * from "./layout-intelligence";
 export * from "./commands-search-recovery";
+export * from "./evaluation";
