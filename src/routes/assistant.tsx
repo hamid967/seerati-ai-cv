@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { AssistantCapabilityHub } from "@/components/assistant-capability-hub";
 import { GuestNotice } from "@/components/guest-notice";
 import { ResumePreview, getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
@@ -233,8 +234,10 @@ function AssistantPage() {
 
         <Progress value={((step + 1) / steps.length) * 100} className="mt-5 h-1.5" />
         <GuestNotice className="mt-5" />
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="mt-6" id="assistant-capabilities">
+          <AssistantCapabilityHub />
+        </div>
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_.9fr]" id="assistant-builder">
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <h2 className="text-lg font-bold">{ar ? steps[step]!.ar : steps[step]!.en}</h2>
 
