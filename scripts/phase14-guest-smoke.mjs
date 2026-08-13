@@ -43,7 +43,6 @@ try {
   await page
     .getByRole("button", { name: /إنشاء سيرة من الصفر|Create a resume from scratch/ })
     .click();
-  await page.getByRole("button", { name: /التالي|Next/ }).click();
   await assertText(/من أنت|About you/);
 
   if (forbidden.length)
