@@ -46,6 +46,7 @@ try {
   });
   await page.waitForTimeout(1000);
   await createGoal.click({ force: true });
+  await createGoal.press("Enter");
   await page.waitForFunction(() => document.querySelector('button[aria-pressed="true"]') !== null);
   await page.waitForFunction(() =>
     [...document.querySelectorAll("button")].some(
