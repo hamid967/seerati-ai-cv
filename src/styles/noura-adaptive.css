@@ -1,0 +1,112 @@
+@layer components {
+  .noura-adaptive-question {
+    display: grid;
+    gap: 1rem;
+    border: 1px solid color-mix(in oklch, var(--primary) 18%, var(--border));
+    border-radius: var(--radius-xl);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--primary) 6%, var(--card)),
+      var(--card) 58%
+    );
+    padding: 1rem;
+  }
+
+  .noura-adaptive-question__lead h3 {
+    margin-top: 0.25rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .noura-adaptive-question__lead p,
+  .noura-adaptive-question__tool p,
+  .noura-adaptive-question__boundary {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  .noura-adaptive-question__eyebrow {
+    display: inline-flex;
+    border-radius: 999px;
+    background: color-mix(in oklch, var(--primary) 10%, transparent);
+    color: var(--primary);
+    padding: 0.2rem 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .noura-adaptive-question__choices {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .noura-adaptive-question__choices legend {
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .noura-stage-choice {
+    display: flex;
+    min-height: 3.25rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    padding: 0.75rem;
+    text-align: start;
+  }
+
+  .noura-stage-choice:hover {
+    border-color: color-mix(in oklch, var(--primary) 42%, var(--border));
+    background: color-mix(in oklch, var(--primary) 4%, var(--card));
+  }
+
+  .noura-stage-choice[aria-pressed="true"] {
+    border-color: var(--primary);
+    background: color-mix(in oklch, var(--primary) 10%, var(--card));
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 16%, transparent);
+  }
+
+  .noura-stage-choice:focus-visible,
+  .noura-adaptive-question button:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .noura-adaptive-question__tool {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid color-mix(in oklch, var(--primary) 12%, var(--border));
+    padding-top: 1rem;
+  }
+
+  .noura-adaptive-question__tool p {
+    margin-top: 0.15rem;
+  }
+
+  .noura-adaptive-question__boundary {
+    border-inline-start: 2px solid var(--emerald-accent);
+    padding-inline-start: 0.75rem;
+  }
+
+  @media (max-width: 40rem) {
+    .noura-adaptive-question__tool {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .noura-stage-choice {
+      transition: none;
+    }
+  }
+}
