@@ -1,7 +1,7 @@
 # Phase 15 — Saudi Validation, Security Red-Team and Controlled Beta
 
 **Branch:** `feat/phase-15-saudi-validation`  
-**Base:** `origin/main` at `19bfffa7fe43dbf1f70ad550ef59021f7716fb0d`  
+**Base:** `origin/main` at `0c6dfe3ee5f828b6e9f13249a82cebb848370c45`
 **Current implementation commit:** `d3f10a6`
 **Status:** Draft PR candidate; do not merge without owner approval.
 
@@ -49,4 +49,4 @@ The AI harness currently validates fixture structure and reproducibility, not mo
 
 ## Rollback
 
-Rollback is the prior merged Phase 14 commit `19bfffa`. No force push, history rewrite, or merge is authorized by this report.
+Rollback for this incremental delta is `0c6dfe3`, the current merged Phase 15 base. PR #45 was merged externally at that base before the later theme, intro, duplicate-key, benchmark, and Lighthouse-report commits were pushed. No force push, history rewrite, or additional merge is authorized by this report.
