@@ -254,6 +254,11 @@ export const aiService = {
       );
     }
 
+    if (!(await hasSession())) {
+      aiService.lastProvider = localProvider.id;
+      return localProvider.run(req);
+    }
+
     try {
       const result = await gatewayProvider.run(req);
       aiService.lastProvider = gatewayProvider.id;
