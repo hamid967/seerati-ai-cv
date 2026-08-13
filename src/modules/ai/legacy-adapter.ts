@@ -3,6 +3,7 @@ import { aiService } from "@/lib/ai-service";
 import type { PrivacyRuntime } from "@/modules/privacy";
 import type { CareerProfileGraph } from "@/modules/career";
 import type { AIAction, AIProvider, AIRequest } from "@/modules/providers";
+import { providerError } from "@/modules/providers";
 import { requestEvidenceLockedSuggestion, type EvidenceLockedRequest } from "./evidence";
 
 const actionToLegacyTask: Partial<Record<AIAction, AiTask>> = {
@@ -23,6 +24,8 @@ function factsInput(graph: CareerProfileGraph): string {
 export const legacyAIProvider: AIProvider = {
   id: "legacy-ai-service-phase18-adapter",
   async suggest(request: AIRequest) {
+    if (!request.consentAiProcessing)
+      return providerError("consent_required", this.id, "Explicit AI consent is required.");
     const task = actionToLegacyTask[request.action];
     if (!task)
       return {
@@ -34,10 +37,17 @@ export const legacyAIProvider: AIProvider = {
         },
       };
     try {
+      const input = factsInput(request.graph);
+      if (input.length > 100_000)
+        return providerError(
+          "invalid_request",
+          this.id,
+          "The evidence payload is larger than the allowed limit.",
+        );
       const response = await aiService.run({
         task,
         lang: request.locale,
-        input: factsInput(request.graph),
+        input,
         ...(request.targetRole ? { context: { targetRole: request.targetRole } } : {}),
       });
       const evidenceFactId = request.allowedFactIds[0];
@@ -64,14 +74,12 @@ export const legacyAIProvider: AIProvider = {
         ],
       };
     } catch {
-      return {
-        error: {
-          code: "unavailable",
-          retryable: true,
-          provider: "legacy-ai-service-phase18-adapter",
-          safeMessage: "The AI provider is unavailable. Try again later.",
-        },
-      };
+      return providerError(
+        "unavailable",
+        this.id,
+        "The AI provider is unavailable. Try again later.",
+        true,
+      );
     }
   },
 };
