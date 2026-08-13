@@ -57,6 +57,7 @@ import {
 } from "@/lib/resume-versions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 import { BilingualSyncCard } from "@/components/bilingual-sync-card";
+import { IntelligenceCoachPanel } from "@/components/intelligence-coach-panel";
 
 export const Route = createFileRoute("/resumes/$id/edit")({
   head: () => ({
@@ -459,6 +460,9 @@ function EditResume() {
                     <TabsTrigger value="ats" className="flex-1">
                       ATS
                     </TabsTrigger>
+                    <TabsTrigger value="coach" className="flex-1">
+                      {ar ? "مدرب" : "Coach"}
+                    </TabsTrigger>
                   </TabsList>
                   <TabsContent
                     value="preview"
@@ -496,6 +500,14 @@ function EditResume() {
                           });
                         })
                       }
+                    />
+                  </TabsContent>
+                  <TabsContent value="coach" className="mt-2 min-h-0 flex-1">
+                    <IntelligenceCoachPanel
+                      data={draft.data}
+                      language={lang}
+                      section={step}
+                      jobDescription={jobDescription}
                     />
                   </TabsContent>
                   <TabsContent
