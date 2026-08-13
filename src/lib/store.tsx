@@ -169,6 +169,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [user, guestResumes.length]);
 
   useEffect(() => {
+    // Guests use the explicit one-resume limit and must not call Supabase for
+    // account settings. This keeps the free anonymous path quiet and private.
+    if (!user) return;
     void supabase
       .from("app_settings")
       .select("max_resumes")
@@ -177,7 +180,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .then(({ data }) => {
         if (data?.max_resumes) setMaxResumes(data.max_resumes);
       });
-  }, []);
+  }, [user]);
 
   const loadProfile = useCallback(async (userId: string, email: string) => {
     const [{ data: profile }, { data: roles }] = await Promise.all([

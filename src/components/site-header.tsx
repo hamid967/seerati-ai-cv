@@ -82,7 +82,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={toggle} aria-label={t("language")}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggle}
+            aria-label={`${t("language")}: ${lang === "ar" ? "EN" : "ع"}`}
+          >
             <Globe className="size-4" />
             {lang === "ar" ? "EN" : "ع"}
           </Button>

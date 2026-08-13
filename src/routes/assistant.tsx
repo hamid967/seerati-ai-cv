@@ -232,7 +232,11 @@ function AssistantPage() {
           </Badge>
         </div>
 
-        <Progress value={((step + 1) / steps.length) * 100} className="mt-5 h-1.5" />
+        <Progress
+          value={((step + 1) / steps.length) * 100}
+          className="mt-5 h-1.5"
+          aria-label={ar ? "تقدم إنشاء السيرة" : "Resume creation progress"}
+        />
         <GuestNotice className="mt-5" />
         <div className="mt-6" id="assistant-capabilities">
           <AssistantCapabilityHub />
