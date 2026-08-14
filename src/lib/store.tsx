@@ -24,6 +24,7 @@ import {
 import {
   clearGuestResumeSession,
   readGuestResumeSession,
+  synchronizeGuestResumeSession,
   upsertGuestResumeSession,
   type GuestResumeSession,
 } from "./guest-session";
@@ -136,7 +137,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     guestRef.current = next;
     setGuestResumes(next);
     writeGuestResumes(next);
-    setGuestSession(next[0] ? upsertGuestResumeSession(next[0]) : null);
+    setGuestSession(synchronizeGuestResumeSession(next[0] ?? null));
   }, []);
 
   const setResumesState = useCallback((update: Resume[] | ((prev: Resume[]) => Resume[])) => {

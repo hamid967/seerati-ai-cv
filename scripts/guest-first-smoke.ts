@@ -2,6 +2,7 @@ import {
   clearGuestResumeSession,
   createGuestResumeSession,
   readGuestResumeSession,
+  synchronizeGuestResumeSession,
   upsertGuestResumeSession,
 } from "../src/lib/guest-session";
 import { draftToGuestResumeData, type ImportDraft } from "../src/lib/import-map";
@@ -38,6 +39,11 @@ assert(
   "guest session must reference the local resume only",
 );
 assert(synced.currentJourney === "import", "guest journey state must remain local");
+const clearedAfterFinalResumeDeletion = synchronizeGuestResumeSession(null);
+assert(
+  clearedAfterFinalResumeDeletion === null && readGuestResumeSession() === null,
+  "final-resume deletion must clear metadata and the retained resume reference",
+);
 clearGuestResumeSession();
 assert(
   readGuestResumeSession() === null,
