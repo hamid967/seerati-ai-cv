@@ -1,6 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Expand, FileText, Gauge, Minus, Plus, Sparkles } from "lucide-react";
+import {
+  Columns2,
+  Expand,
+  FileText,
+  Gauge,
+  Globe2,
+  ImagePlus,
+  Minus,
+  Plus,
+  Rows3,
+  ScanText,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { ProfessionalResumePreview } from "@/components/professional-resume-preview";
 import { ResumeAutoDesignPanel } from "@/components/resume-auto-design-panel";
@@ -16,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
+import { getPrimaryTemplateSignals, type TemplateSignalId } from "@/lib/template-signals";
 import { defaultTemplates } from "@/lib/templates";
 import { adviseResumeStudio } from "@/lib/resume-studio";
 import {
@@ -40,6 +54,16 @@ const nextFrame = () =>
   new Promise<void>((resolve) =>
     requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
   );
+
+const TEMPLATE_SIGNAL_ICONS: Record<TemplateSignalId, LucideIcon> = {
+  ats: ScanText,
+  global: Globe2,
+  document: FileText,
+  visual: Columns2,
+  photo: ImagePlus,
+  compact: Rows3,
+  spacious: Expand,
+};
 
 function ResumeStudioUltra() {
   const { id } = Route.useParams();
@@ -421,13 +445,40 @@ function ResumeStudioUltra() {
                 return (
                   <button
                     key={templateId}
+                    type="button"
                     onClick={() => void applyTemplate(templateId)}
+                    aria-pressed={resume.templateId === templateId}
                     className={`w-full rounded-xl border p-3 text-start transition hover:border-emerald-accent ${resume.templateId === templateId ? "border-emerald-accent bg-emerald-accent/5" : "border-border"}`}
                   >
-                    <span className="font-semibold">{tpl.name[lang]}</span>
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="font-semibold">{tpl.name[lang]}</span>
+                      {resume.templateId === templateId ? (
+                        <Badge variant="secondary" className="shrink-0 text-[10px]">
+                          {ar ? "القالب الحالي" : "Current"}
+                        </Badge>
+                      ) : null}
+                    </span>
                     <p className="mt-1 text-[11px] text-muted-foreground">
                       {tpl.description[lang]}
                     </p>
+                    <span
+                      className="mt-2 flex flex-wrap gap-1"
+                      aria-label={ar ? "خصائص القالب المقترح" : "Recommended template properties"}
+                    >
+                      {getPrimaryTemplateSignals(tpl, 3).map((signal) => {
+                        const Icon = TEMPLATE_SIGNAL_ICONS[signal.id];
+                        return (
+                          <span
+                            key={signal.id}
+                            className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-1 text-[10px] text-muted-foreground"
+                            title={signal.detail[lang]}
+                          >
+                            <Icon className="size-3 text-emerald-accent" aria-hidden="true" />
+                            {signal.label[lang]}
+                          </span>
+                        );
+                      })}
+                    </span>
                   </button>
                 );
               })}
