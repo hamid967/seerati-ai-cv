@@ -2,6 +2,10 @@
  * Shared AI contract types. Kept in its own module so the server-only prompt
  * builder and the client-side service can both use them without a cycle.
  */
+import type {
+  SyntheticExperienceLevel,
+  SyntheticSpecialtyId,
+} from "@/modules/synthetic-resume/types";
 import type { ResumeData } from "./types";
 
 export type AiTask =
@@ -16,7 +20,9 @@ export type AiTask =
   | "ats_keywords"
   | "translate"
   | "chat"
-  | "copilot";
+  | "copilot"
+  /** Internal, consented synthetic-resume adaptation only. */
+  | "adapt_sample";
 
 export type AiRequest = {
   task: AiTask;
@@ -35,6 +41,26 @@ export type AiRequest = {
 };
 
 export type AiResponse = { text: string; items?: string[] };
+
+/**
+ * The only data that can cross the optional synthetic-adaptation AI boundary.
+ * `consent` is literal true so callers cannot invoke the endpoint accidentally.
+ */
+export type SyntheticAdaptationRequest = {
+  consent: true;
+  specialtyId: SyntheticSpecialtyId;
+  experienceLevel: SyntheticExperienceLevel;
+  language: "ar" | "en";
+};
+
+/** All returned text remains synthetic sample content and must be user-reviewed. */
+export type SyntheticAdaptationContent = {
+  summary: string;
+  responsibilities: [string, string, string];
+  skills: [string, string, string, string];
+  project: string;
+  certificate: string;
+};
 
 /** Tasks whose useful output is a list; these are validated as structured items. */
 export const ITEM_TASKS: AiTask[] = [

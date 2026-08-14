@@ -8,13 +8,13 @@ The generator assigns metadata to every material sample field. The metadata is s
 type SampleField = {
   value: string;
   status: "sample" | "user-confirmed";
-  source: "synthetic-template" | "user";
+  source: "synthetic-template" | "synthetic-ai" | "user";
   requiresUserReview: boolean;
   exportApproved: boolean;
 };
 ```
 
-A newly generated field always has `status: "sample"`, `source: "synthetic-template"`, `requiresUserReview: true`, and `exportApproved: false`. It must never be promoted automatically because the editor opened, the visitor signed in, a route changed, an ATS screen rendered, or a template changed.
+A newly generated deterministic field has `status: "sample"`, `source: "synthetic-template"`, `requiresUserReview: true`, and `exportApproved: false`. Optional AI-adapted wording has the same state except for `source: "synthetic-ai"`. Neither source may be promoted automatically because the editor opened, the visitor signed in, a route changed, an ATS screen rendered, a template changed, or an AI request succeeded.
 
 ## Guided review sequence
 
@@ -32,7 +32,7 @@ The system reads the current editor value before changing metadata. If the curre
 
 ## Manual, not automatic
 
-The initial implementation deliberately does not infer truth from typing. The visitor must first replace a core field and then explicitly confirm it. The feature does not send the replacement to Noura AI, ATS matching, a job tracker, a cover-letter generator, analytics, or a database as part of confirmation.
+The implementation deliberately does not infer truth from typing or from AI generation. The visitor must first replace a core field and then explicitly confirm it. AI-adapted text is only a fictional alternative to deterministic wording; it is not evidence of identity, skills, experience, education, or qualification. The feature does not send the replacement to Noura AI, ATS matching, a job tracker, a cover-letter generator, analytics, or a database as part of confirmation.
 
 ## Deletion and expiry
 

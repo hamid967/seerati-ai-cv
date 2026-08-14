@@ -10,18 +10,51 @@ export type SampleFieldStatus = "sample" | "user-confirmed";
 export type SampleField = {
   value: string;
   status: SampleFieldStatus;
-  source: "synthetic-template" | "user";
+  source: "synthetic-template" | "synthetic-ai" | "user";
   requiresUserReview: boolean;
   exportApproved: boolean;
 };
 
-export type SyntheticSpecialtyId =
-  | "software-development"
-  | "accounting"
-  | "civil-engineering"
-  | "human-resources"
-  | "nursing"
-  | "sales";
+export const SYNTHETIC_SPECIALTY_IDS = [
+  "software-development",
+  "accounting",
+  "civil-engineering",
+  "human-resources",
+  "nursing",
+  "sales",
+  "software-engineering",
+  "data-analysis",
+  "cybersecurity",
+  "it-support",
+  "network-engineering",
+  "cloud-devops",
+  "mobile-development",
+  "ui-ux-design",
+  "quality-assurance",
+  "project-management",
+  "mechanical-engineering",
+  "electrical-engineering",
+  "architecture",
+  "supply-chain",
+  "operations-management",
+  "procurement",
+  "financial-analysis",
+  "banking",
+  "internal-audit",
+  "investment-analysis",
+  "recruitment",
+  "payroll",
+  "organizational-development",
+  "digital-marketing",
+  "account-management",
+  "business-development",
+  "customer-service",
+  "ecommerce",
+  "pharmacy",
+  "laboratory-science",
+] as const;
+
+export type SyntheticSpecialtyId = (typeof SYNTHETIC_SPECIALTY_IDS)[number];
 
 export type SyntheticExperienceLevel =
   | "student"

@@ -17,12 +17,19 @@ async function runArabicMobileJourney() {
   });
   const page = await context.newPage();
   const violations = [];
+  const adaptationRequests = [];
   const marker = "اسمك الكامل";
   page.on("request", (request) => {
     const body = request.postData() ?? "";
     const url = request.url();
     if (body.includes(marker) || url.includes(encodeURIComponent(marker))) {
       violations.push(`sample content reached ${request.method()} ${new URL(url).origin}`);
+    }
+    if (
+      /synthetic-adaptation\.functions|adapt_sample/i.test(url) ||
+      body.includes("adapt_sample")
+    ) {
+      adaptationRequests.push(`${request.method()} ${new URL(url).pathname}`);
     }
     if (
       ["POST", "PUT", "PATCH", "DELETE"].includes(request.method()) &&
@@ -46,6 +53,22 @@ async function runArabicMobileJourney() {
   await page.getByRole("button", { name: "التالي" }).click();
   await page.getByRole("button", { name: "التقديم على وظيفة" }).click();
   await page.getByRole("button", { name: "التالي" }).click();
+  await page.getByTestId("synthetic-ai-consent").waitFor();
+  const adaptButton = page.getByTestId("synthetic-ai-adapt");
+  assert(
+    await adaptButton.isDisabled(),
+    "AI adaptation must stay disabled before explicit consent",
+  );
+  await page.getByTestId("synthetic-ai-consent").getByRole("checkbox").check();
+  await adaptButton.click();
+  await page
+    .getByTestId("synthetic-ai-status")
+    .getByText(/جلسة ضيف: لم نرسل أي طلب AI/)
+    .waitFor();
+  assert(
+    adaptationRequests.length === 0,
+    `guest AI adaptation must not send an endpoint request: ${adaptationRequests.join(", ")}`,
+  );
   await page.getByRole("button", { name: "قارن" }).nth(0).click();
   await page.getByRole("button", { name: "قارن" }).nth(0).click();
   await page.getByRole("button", { name: "اختر وابدأ التعديل" }).first().click();
@@ -126,6 +149,11 @@ async function runEnglishAndroidCheck() {
   await page.getByRole("button", { name: "Job application" }).click();
   await page.getByRole("button", { name: "Next" }).click();
   await page.getByText("Choose the closest look").waitFor();
+  await page.getByTestId("synthetic-ai-consent").waitFor();
+  assert(
+    await page.getByTestId("synthetic-ai-adapt").isDisabled(),
+    "English AI adaptation must require explicit consent",
+  );
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > window.innerWidth,
   );
@@ -137,7 +165,7 @@ try {
   await runArabicMobileJourney();
   await runEnglishAndroidCheck();
   console.log(
-    "Synthetic resume browser smoke passed: Noura flow, mobile, RTL/LTR, keyboard, sample export guard, ATS boundary, and privacy.",
+    "Synthetic resume browser smoke passed: Noura flow, mobile, RTL/LTR, explicit AI consent, guest no-network fallback, sample export guard, ATS boundary, and privacy.",
   );
 } finally {
   await browser.close();

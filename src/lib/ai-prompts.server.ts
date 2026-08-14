@@ -5,7 +5,14 @@
  * are split at build time, so sibling runtime helpers must live in an imported
  * module.
  */
-import { ITEM_TASKS, type AiRequest, type AiResponse, type AiTask } from "./ai-types";
+import {
+  ITEM_TASKS,
+  type AiRequest,
+  type AiResponse,
+  type AiTask,
+  type SyntheticAdaptationContent,
+  type SyntheticAdaptationRequest,
+} from "./ai-types";
 import { agentById } from "./team";
 
 /** Model chosen for short, latency-sensitive resume editing tasks. */
@@ -97,6 +104,10 @@ const TASK_INSTRUCTION: Record<AiTask, { ar: string; en: string }> = {
       "Never assume unstated information, never invent numbers, and never exceed 3 lines.",
     ].join(" "),
   },
+  adapt_sample: {
+    ar: "مهمة داخلية لتكييف محتوى سيرة تجريبية فقط؛ استخدم دالة التكييف المخصصة ولا تستقبل نص سيرة أو بيانات شخصية.",
+    en: "Internal synthetic-sample adaptation task; use the dedicated adaptation function and never accept resume text or personal data.",
+  },
 };
 
 export function buildPrompt(req: AiRequest): { system: string; prompt: string } {
@@ -146,6 +157,78 @@ const cleanItem = (s: string) =>
  * list of strings: JSON is preferred, line splitting is the tolerant fallback.
  * Throws when nothing usable can be recovered so the caller can fall back.
  */
+const SYNTHETIC_ADAPTATION_FORBIDDEN =
+  /(?:https?:\/\/|www\.|@|linkedin|\b(?:company|university|hospital)\b|شركة|جامعة|مستشفى|[0-9٠-٩])/i;
+
+function adaptationText(value: unknown, field: string, maxLength: number) {
+  if (typeof value !== "string") throw new Error(`invalid_adaptation_${field}`);
+  const text = value.replace(/\s+/g, " ").trim();
+  if (!text || text.length > maxLength || SYNTHETIC_ADAPTATION_FORBIDDEN.test(text)) {
+    throw new Error(`unsafe_adaptation_${field}`);
+  }
+  return text;
+}
+
+/**
+ * Builds a restricted prompt from product selections only. The payload contains
+ * no resume content, contact details, employer, education, location, or free text.
+ */
+export function buildSyntheticAdaptationPrompt(req: SyntheticAdaptationRequest): {
+  system: string;
+  prompt: string;
+} {
+  const ar = req.language === "ar";
+  const rules = ar
+    ? [
+        "أنشئ محتوى تجريبياً خيالياً لسيرة ذاتية، وليس حقائق عن شخص حقيقي.",
+        "لا تذكر أسماء أشخاص أو شركات أو جامعات أو مدن أو جهات أو شهادات مهنية حقيقية.",
+        "لا تكتب أرقاماً أو نسباً أو تواريخ أو روابط أو بريد إلكتروني أو هاتف.",
+        "لا تجعل المحتوى قابلاً للاستخدام كادعاء وظيفي دون تحرير المستخدم والتحقق منه.",
+      ].join(" ")
+    : [
+        "Create fictional resume sample content, never facts about a real person.",
+        "Do not name people, employers, universities, cities, organisations, or real professional credentials.",
+        "Do not include numbers, percentages, dates, links, email addresses, or phone numbers.",
+        "Do not make the content usable as an employment claim without user editing and verification.",
+      ].join(" ");
+  const format = ar
+    ? 'أعد JSON فقط بهذا الشكل: {"summary":"...","responsibilities":["...","...","..."],"skills":["...","...","...","..."],"project":"...","certificate":"..."}.'
+    : 'Return JSON only in this exact shape: {"summary":"...","responsibilities":["...","...","..."],"skills":["...","...","...","..."],"project":"...","certificate":"..."}.';
+  return {
+    system: `${rules}\n${format}`,
+    prompt: ar
+      ? `التخصص: ${req.specialtyId}\nالمستوى: ${req.experienceLevel}\nاللغة: العربية\nأنشئ صياغة مختلفة عن القالب الحتمي مع بقاء كل المحتوى تجريبياً.`
+      : `Specialty: ${req.specialtyId}\nLevel: ${req.experienceLevel}\nLanguage: English\nCreate wording distinct from the deterministic template while keeping all content fictional.`,
+  };
+}
+
+/** Strict shape and safety gate for the optional adaptation response. */
+export function validateSyntheticAdaptationOutput(raw: string): SyntheticAdaptationContent {
+  const parsed = extractJson(raw);
+  if (!parsed || typeof parsed !== "object") throw new Error("invalid_adaptation_json");
+  const object = parsed as Record<string, unknown>;
+  const responsibilities = object["responsibilities"];
+  const skills = object["skills"];
+  if (!Array.isArray(responsibilities) || responsibilities.length !== 3) {
+    throw new Error("invalid_adaptation_responsibilities");
+  }
+  if (!Array.isArray(skills) || skills.length !== 4) throw new Error("invalid_adaptation_skills");
+  return {
+    summary: adaptationText(object["summary"], "summary", 600),
+    responsibilities: responsibilities.map((item) =>
+      adaptationText(item, "responsibility", 280),
+    ) as [string, string, string],
+    skills: skills.map((item) => adaptationText(item, "skill", 80)) as [
+      string,
+      string,
+      string,
+      string,
+    ],
+    project: adaptationText(object["project"], "project", 220),
+    certificate: adaptationText(object["certificate"], "certificate", 220),
+  };
+}
+
 export function validateAiOutput(task: AiTask, raw: string): AiResponse {
   const text = raw.trim();
   if (!text) throw new Error("empty_model_output");

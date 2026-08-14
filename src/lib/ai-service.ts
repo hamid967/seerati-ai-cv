@@ -30,6 +30,7 @@ export const AI_TASK_LABELS: Record<AiTask, { ar: string; en: string }> = {
   translate: { ar: "ترجمة", en: "Translate" },
   chat: { ar: "محادثة", en: "Chat" },
   copilot: { ar: "مساعد المحادثة", en: "Copilot" },
+  adapt_sample: { ar: "تكييف عينة تجريبية", en: "Adapt sample resume" },
 };
 
 /* ------------------------------- rate limit ------------------------------- */

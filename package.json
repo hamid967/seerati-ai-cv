@@ -43,6 +43,7 @@
     "test:guest-recovery-browser": "node scripts/guest-recovery-browser-smoke.mjs",
     "test:guest-transfer": "bun scripts/guest-transfer-smoke.ts",
     "test:synthetic-resume": "bun scripts/synthetic-resume-smoke.ts",
+    "test:synthetic-adaptation": "bun scripts/synthetic-adaptation-contract-smoke.ts",
     "test:synthetic-resume-browser": "node scripts/synthetic-resume-browser-smoke.mjs",
     "test:phase18-ats": "bun scripts/phase18-ats-smoke.ts",
     "test:phase18-job-match": "bun scripts/phase18-job-match-smoke.ts",
@@ -56,7 +57,7 @@
     "check:rtl": "node scripts/validate-rtl.mjs",
     "check:premium-3d": "node scripts/check-premium-3d.mjs",
     "check:client-env": "node scripts/check-client-env.mjs",
-    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run test:rezi-additions && npm run test:assistant-capabilities && npm run test:noura-adaptive && npm run test:phase20-journey && npm run test:phase20-evidence && npm run test:guest-first && npm run test:guest-recovery && npm run test:guest-transfer && npm run test:synthetic-resume && npm run check:rtl && npm run check:premium-3d && QA_ALLOW_MISSING_DIST=1 npm run check:client-env"
+    "qa": "npm run qa:routes && npm run qa:ai && npm run check:routes-shell && npm run test:ai-contract && npm run test:resume-diff && npm run test:templates && npm run test:rezi-additions && npm run test:assistant-capabilities && npm run test:noura-adaptive && npm run test:phase20-journey && npm run test:phase20-evidence && npm run test:guest-first && npm run test:guest-recovery && npm run test:guest-transfer && npm run test:synthetic-resume && npm run test:synthetic-adaptation && npm run check:rtl && npm run check:premium-3d && QA_ALLOW_MISSING_DIST=1 npm run check:client-env"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.27",
