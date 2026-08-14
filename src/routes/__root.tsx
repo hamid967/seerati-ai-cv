@@ -153,6 +153,7 @@ const APP_PREFIXES = [
   "/admin",
   "/import",
   "/privacy-center",
+  "/application-center",
   "/cover-letters",
   "/keyword-scanner",
 ];
