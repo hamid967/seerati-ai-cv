@@ -14,12 +14,24 @@ import { ProfessionalResumePreview } from "@/components/professional-resume-prev
 import { getTemplate } from "@/components/resume-preview";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SyntheticSampleNotice } from "@/components/synthetic-resume/synthetic-sample-notice";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useI18n } from "@/lib/i18n";
 import { useAuthGuard, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeResume, toPlainText } from "@/lib/ats";
 import { exportResumePdf } from "@/lib/pdf";
 import { normalizeResumeDesign, PAGE_SIZES } from "@/lib/resume-layout";
+import { hasUnapprovedSampleData } from "@/modules/synthetic-resume";
 
 export const Route = createFileRoute("/resumes/$id/preview")({
   head: () => ({
@@ -45,6 +57,7 @@ function PreviewResume() {
   const { ready, user, getResume } = useStore();
   const resume = getResume(id);
   const [exportingImagePdf, setExportingImagePdf] = useState(false);
+  const [sampleExportWarningOpen, setSampleExportWarningOpen] = useState(false);
   const stamped = useRef<string | null>(null);
 
   useAuthGuard({ allowGuest: true });
@@ -73,6 +86,9 @@ function PreviewResume() {
 
   const tpl = getTemplate(resume.templateId);
   const score = analyzeResume(resume, tpl).score;
+  const sampleNeedsReview = Boolean(
+    resume.syntheticSample && hasUnapprovedSampleData(resume.syntheticSample),
+  );
   const design = normalizeResumeDesign(resume.data.design);
   const page = PAGE_SIZES[design.pageSize];
 
@@ -88,6 +104,10 @@ function PreviewResume() {
   })();
 
   const printPdf = () => {
+    if (sampleNeedsReview) {
+      setSampleExportWarningOpen(true);
+      return;
+    }
     const previous = document.title;
     const style = document.createElement("style");
     style.id = "seerati-dynamic-page-size";
@@ -102,6 +122,10 @@ function PreviewResume() {
   };
 
   const downloadImagePdf = async () => {
+    if (sampleNeedsReview) {
+      setSampleExportWarningOpen(true);
+      return;
+    }
     const el = document.getElementById("print-area");
     if (!el) {
       toast.error(ar ? "تعذّر العثور على السيرة الذاتية" : "Could not find the resume content");
@@ -119,6 +143,10 @@ function PreviewResume() {
   };
 
   const copyTxt = async () => {
+    if (sampleNeedsReview) {
+      setSampleExportWarningOpen(true);
+      return;
+    }
     try {
       await navigator.clipboard.writeText(toPlainText(resume));
       toast.success(ar ? "تم نسخ النسخة النصية" : "Plain text copied");
@@ -127,15 +155,30 @@ function PreviewResume() {
     }
   };
 
-  const downloadTxt = () => {
-    const blob = new Blob([toPlainText(resume)], { type: "text/plain;charset=utf-8" });
+  const downloadTxt = (labelledSample = false) => {
+    const prefix = labelledSample
+      ? ar
+        ? "نموذج تجريبي — لا تستخدم هذه المعلومات للتقديم قبل استبدالها ببياناتك الحقيقية.\n\n"
+        : "SAMPLE ONLY — Do not use this information for an application before replacing it with your verified details.\n\n"
+      : "";
+    const blob = new Blob([`${prefix}${toPlainText(resume)}`], {
+      type: "text/plain;charset=utf-8",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${fileBase}.txt`;
+    a.download = labelledSample ? "sample-resume-not-for-application.txt" : `${fileBase}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(ar ? "تم تنزيل النسخة النصية" : "Plain text downloaded");
+    toast.success(
+      labelledSample
+        ? ar
+          ? "تم تنزيل نسخة النموذج التجريبي المعنونة"
+          : "Labelled sample copy downloaded"
+        : ar
+          ? "تم تنزيل النسخة النصية"
+          : "Plain text downloaded",
+    );
   };
 
   return (
@@ -172,7 +215,10 @@ function PreviewResume() {
               {ar ? "مؤلف الصفحات" : "Page composer"}
             </Link>
           </Button>
-          <Button variant="outline" onClick={downloadTxt}>
+          <Button
+            variant="outline"
+            onClick={() => (sampleNeedsReview ? setSampleExportWarningOpen(true) : downloadTxt())}
+          >
             <Download className="size-4" />
             {ar ? "نسخة نصية ATS" : "ATS plain text"}
           </Button>
@@ -195,11 +241,45 @@ function PreviewResume() {
         </div>
       </div>
 
+      {resume.syntheticSample ? (
+        <div className="mx-auto max-w-6xl px-4 pb-4">
+          <SyntheticSampleNotice resume={resume} compact onUpdate={() => undefined} />
+        </div>
+      ) : null}
+
       <p className="mx-auto max-w-6xl px-4 pb-4 text-xs text-muted-foreground">
         {ar
           ? `حجم الورق الفعلي: ${page.label} (${page.widthMm} × ${page.heightMm} مم). استخدم PDF النصي أو النسخة النصية للتقديم الإلكتروني. PDF البصري مبني كصورة للمشاركة أو الأرشفة وقد لا يُقرأ جيداً في أنظمة الفرز.`
           : `Actual paper size: ${page.label} (${page.widthMm} × ${page.heightMm} mm). Use the text PDF or plain-text copy for online applications. The visual PDF is image-based for sharing or archiving and may not parse reliably in screening systems.`}
       </p>
+
+      <AlertDialog open={sampleExportWarningOpen} onOpenChange={setSampleExportWarningOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {ar
+                ? "ما زالت السيرة تحتوي على بيانات تجريبية"
+                : "This resume still contains sample data"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {ar
+                ? "قد يؤدي استخدامها إلى تقديم معلومات غير صحيحة. راجع الحقول التجريبية واستبدلها ببياناتك المؤكدة قبل PDF أو النسخة النصية النهائية."
+                : "Using it could present inaccurate information. Review and replace sample fields with verified details before a final PDF or plain-text export."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{ar ? "إلغاء" : "Cancel"}</AlertDialogCancel>
+            <Button type="button" variant="outline" onClick={() => downloadTxt(true)}>
+              {ar ? "تنزيل نموذج تجريبي معنّون" : "Download labelled sample"}
+            </Button>
+            <AlertDialogAction asChild>
+              <Link to="/resumes/$id/edit" params={{ id: resume.id }}>
+                {ar ? "العودة واستبدال البيانات" : "Return and replace data"}
+              </Link>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="mx-auto max-w-6xl overflow-auto px-4 pb-16">
         <div id="print-area" className="mx-auto w-max">

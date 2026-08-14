@@ -24,6 +24,7 @@ import {
 import { AiAssistant } from "@/components/ai-assistant";
 import { FieldAi } from "@/components/field-ai";
 import { GuestNotice } from "@/components/guest-notice";
+import { SyntheticSampleNotice } from "@/components/synthetic-resume/synthetic-sample-notice";
 import { BulletWriterPanel } from "@/components/bullet-writer-panel";
 
 import { SortableList, SortableItem, reorderArray } from "@/components/sortable";
@@ -217,6 +218,14 @@ function EditResume() {
       });
     },
     [scheduleSave],
+  );
+
+  const updateSyntheticSample = useCallback(
+    async (samplePatch: Partial<Resume>) => {
+      setDraft((previous) => (previous ? { ...previous, ...samplePatch } : previous));
+      await updateResume(id, samplePatch);
+    },
+    [id, updateResume],
   );
 
   const undo = useCallback(() => {
@@ -557,8 +566,9 @@ function EditResume() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1500px] px-4 pt-4">
+      <div className="mx-auto max-w-[1500px] space-y-3 px-4 pt-4">
         <GuestNotice />
+        <SyntheticSampleNotice resume={draft} onUpdate={updateSyntheticSample} />
       </div>
 
       <main className="mx-auto grid w-full max-w-[1760px] gap-6 px-4 py-6 lg:grid-cols-[176px_minmax(0,1fr)_minmax(0,1fr)] xl:gap-8">

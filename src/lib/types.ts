@@ -128,6 +128,31 @@ export type ResumeData = {
 
 export type ResumeStatus = "draft" | "complete";
 
+/** Metadata for a fictional sample field; it is never rendered as resume content. */
+export type SampleFieldMetadata = {
+  value: string;
+  status: "sample" | "user-confirmed";
+  source: "synthetic-template" | "user";
+  requiresUserReview: boolean;
+  exportApproved: boolean;
+};
+
+/**
+ * Ephemeral sample-resume metadata. The guest flow keeps this in memory by
+ * default; it must not be written to a persistent account record.
+ */
+export type SyntheticResumeMetadata = {
+  version: "synthetic-v1";
+  specialtyId: string;
+  experienceLevel: string;
+  goal: string;
+  language: "ar" | "en";
+  selectedTemplateId: string;
+  fieldMap: Record<string, SampleFieldMetadata>;
+  coreFieldPaths: string[];
+  generatedAt: string;
+};
+
 export type Resume = {
   id: string;
   ownerId: string;
@@ -141,6 +166,8 @@ export type Resume = {
   lastViewedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  /** Present only for a locally generated fictional sample resume. */
+  syntheticSample?: SyntheticResumeMetadata;
 };
 
 export type Profile = {

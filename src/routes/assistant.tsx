@@ -49,6 +49,11 @@ const AssistantCapabilityHub = lazy(() =>
 const ResumePreview = lazy(() =>
   import("@/components/resume-preview").then((m) => ({ default: m.ResumePreview })),
 );
+const SyntheticSampleFlow = lazy(() =>
+  import("@/components/noura/synthetic-sample-flow").then((m) => ({
+    default: m.SyntheticSampleFlow,
+  })),
+);
 
 export const Route = createFileRoute("/assistant")({
   validateSearch: z.object({ agent: z.string().optional() }),
@@ -139,6 +144,7 @@ function AssistantPage() {
   const evidencePrivacy = useMemo(createPrivacyRuntime, []);
   const [templateId, setTemplateId] = useState("cloud-flow");
   const [saving, setSaving] = useState(false);
+  const [sampleMode, setSampleMode] = useState(false);
 
   const specialist = agentById(agentId) ?? ASSISTANT_AGENTS[0]!;
   const isNoura = specialist.id === NOURA_PROFILE.id;
@@ -309,6 +315,49 @@ function AssistantPage() {
     }
   };
 
+  if (sampleMode) {
+    return (
+      <div className="min-h-screen bg-background">
+        <main className="mx-auto max-w-6xl px-4 py-8">
+          <div className="flex items-start gap-3">
+            <span
+              className="grid size-12 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm"
+              aria-hidden="true"
+            >
+              <span className="text-xl font-black">ن</span>
+            </span>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                NOURA · نورة
+              </p>
+              <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">
+                {ar ? "نموذج سيرة حسب التخصص" : "Sample CV by profession"}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {ar
+                  ? "بيانات تجريبية محلية فقط، قابلة للتحرير والمراجعة."
+                  : "Local fictional data only, ready for editing and review."}
+              </p>
+            </div>
+          </div>
+          <GuestNotice className="mt-5" compact />
+          <Suspense
+            fallback={
+              <div
+                className="mt-5 min-h-96 rounded-2xl border border-border bg-card"
+                aria-busy="true"
+              />
+            }
+          >
+            <div className="mt-5">
+              <SyntheticSampleFlow onClose={() => setSampleMode(false)} />
+            </div>
+          </Suspense>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl px-4 py-8">
@@ -418,6 +467,21 @@ function AssistantPage() {
                     </button>
                   ))}
                 </div>
+                <button
+                  type="button"
+                  data-testid="synthetic-sample-resume-goal"
+                  onClick={() => setSampleMode(true)}
+                  className="min-h-14 rounded-xl border border-dashed border-primary/50 bg-primary/5 p-3 text-start text-sm transition-colors hover:bg-primary/10"
+                >
+                  <span className="block font-semibold">
+                    {ar ? "إنشاء نموذج جاهز حسب التخصص" : "Create a sample CV for my profession"}
+                  </span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    {ar
+                      ? "بيانات وهمية قابلة للاستبدال، بلا تسجيل"
+                      : "Fictional data to replace, no sign-up"}
+                  </span>
+                </button>
                 {selectedGoal && (
                   <div
                     className="border-t border-border pt-4 text-sm text-muted-foreground"
