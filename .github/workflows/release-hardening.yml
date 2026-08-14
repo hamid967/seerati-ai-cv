@@ -70,6 +70,9 @@ jobs:
       - name: Run complete guest visitor workflow parity smoke
         if: matrix.browser == 'chromium'
         run: bun run test:guest-visitor-parity
+      - name: Run intelligent template guide smoke
+        if: matrix.browser == 'chromium'
+        run: bun run test:template-intelligence
       - name: Run consented guest recovery privacy smoke
         if: matrix.browser == 'chromium'
         run: bun run test:guest-recovery-browser

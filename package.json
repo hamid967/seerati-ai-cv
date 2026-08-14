@@ -38,6 +38,7 @@
     "test:guest-first": "bun scripts/guest-first-smoke.ts",
     "test:guest-first-browser": "node scripts/guest-first-browser-smoke.mjs",
     "test:guest-visitor-parity": "node scripts/guest-visitor-parity-smoke.mjs",
+    "test:template-intelligence": "node scripts/template-intelligence-smoke.mjs",
     "test:guest-recovery": "bun scripts/guest-recovery-smoke.ts",
     "test:guest-recovery-browser": "node scripts/guest-recovery-browser-smoke.mjs",
     "test:guest-transfer": "bun scripts/guest-transfer-smoke.ts",

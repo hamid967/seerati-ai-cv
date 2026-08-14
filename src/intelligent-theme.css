@@ -1,0 +1,145 @@
+.seerati-intelligence-page {
+  background:
+    radial-gradient(
+      75% 44% at 50% -8%,
+      color-mix(in oklab, var(--emerald-accent) 15%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--background) 94%, var(--brand-soft)),
+      var(--background) 42rem
+    );
+}
+
+.seerati-intelligence-guide {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 1.5rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--emerald-accent) 28%, var(--border));
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--card) 92%, var(--brand-soft)), var(--card)),
+    var(--card);
+  box-shadow: var(--shadow-editorial);
+  padding: 1.25rem;
+}
+
+.seerati-intelligence-guide::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--border) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--border) 40%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
+  opacity: 0.38;
+}
+
+.seerati-intelligence-guide__signal {
+  position: absolute;
+  inset-inline-end: -4rem;
+  inset-block-start: -5rem;
+  z-index: -1;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--emerald-accent) 28%, transparent),
+    transparent 68%
+  );
+}
+
+.seerati-intelligence-guide__intro {
+  min-width: 0;
+}
+
+.seerati-intelligence-guide__controls,
+.seerati-intelligence-guide__results {
+  border: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--card) 86%, transparent);
+  padding: 1rem;
+}
+
+.seerati-intelligence-guide__choice {
+  display: flex;
+  min-height: 5.25rem;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--background) 55%, transparent);
+  color: var(--foreground);
+  padding: 0.75rem;
+  text-align: start;
+}
+
+.seerati-intelligence-guide__choice:hover {
+  border-color: color-mix(in oklab, var(--emerald-accent) 55%, var(--border));
+  background: color-mix(in oklab, var(--brand-soft) 64%, var(--card));
+}
+
+.seerati-intelligence-guide__choice.is-active {
+  border-color: color-mix(in oklab, var(--emerald-accent) 72%, var(--border));
+  background: color-mix(in oklab, var(--brand-soft) 78%, var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--emerald-accent) 18%, transparent);
+}
+
+.seerati-intelligence-guide__result {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--background) 62%, transparent);
+  padding: 0.625rem;
+}
+
+.seerati-intelligence-guide__empty {
+  display: flex;
+  min-height: 8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border: 1px dashed color-mix(in oklab, var(--border) 84%, transparent);
+  border-radius: 0.875rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.seerati-template-card--recommended {
+  border-color: color-mix(in oklab, var(--emerald-accent) 72%, var(--border));
+  box-shadow: 0 18px 44px -30px color-mix(in oklab, var(--emerald-accent) 58%, transparent);
+}
+
+@media (min-width: 900px) {
+  .seerati-intelligence-guide {
+    grid-template-columns: minmax(0, 0.9fr) minmax(21rem, 1.1fr) minmax(18rem, 0.85fr);
+    align-items: stretch;
+    padding: 1.5rem;
+  }
+
+  .seerati-intelligence-guide__intro {
+    align-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seerati-intelligence-guide__choice {
+    transition: none;
+  }
+}
+
+@media print {
+  .seerati-intelligence-guide {
+    display: none !important;
+  }
+}

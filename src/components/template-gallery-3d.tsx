@@ -87,7 +87,11 @@ function FullTemplatePreview({
   );
 }
 
-export function TemplateGallery3D() {
+export function TemplateGallery3D({
+  recommendedTemplateIds = [],
+}: {
+  recommendedTemplateIds?: string[];
+}) {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const [filter, setFilter] = useState<Filter>("all");
@@ -99,24 +103,32 @@ export function TemplateGallery3D() {
   const [previewLimit, setPreviewLimit] = useState(INITIAL_PREVIEW_COUNT);
 
   const sample = useMemo(() => demoResume("template-gallery-preview"), []);
-  const list = useMemo(
-    () =>
-      defaultTemplates.filter((template) => {
-        if (!template.active) return false;
-        if (
-          filter !== "all" &&
-          (filter === "ats" ? !template.atsFriendly : template.category !== filter)
-        )
-          return false;
-        const normalizedQuery = query.trim().toLocaleLowerCase();
-        if (!normalizedQuery) return true;
-        return [template.name[lang], template.description[lang], template.category]
-          .join(" ")
-          .toLocaleLowerCase()
-          .includes(normalizedQuery);
-      }),
-    [filter, lang, query],
-  );
+  const list = useMemo(() => {
+    const filtered = defaultTemplates.filter((template) => {
+      if (!template.active) return false;
+      if (
+        filter !== "all" &&
+        (filter === "ats" ? !template.atsFriendly : template.category !== filter)
+      )
+        return false;
+      const normalizedQuery = query.trim().toLocaleLowerCase();
+      if (!normalizedQuery) return true;
+      return [template.name[lang], template.description[lang], template.category]
+        .join(" ")
+        .toLocaleLowerCase()
+        .includes(normalizedQuery);
+    });
+
+    if (!recommendedTemplateIds.length) return filtered;
+    return [...filtered].sort((a, b) => {
+      const aRank = recommendedTemplateIds.indexOf(a.id);
+      const bRank = recommendedTemplateIds.indexOf(b.id);
+      if (aRank === -1 && bRank === -1) return 0;
+      if (aRank === -1) return 1;
+      if (bRank === -1) return -1;
+      return aRank - bRank;
+    });
+  }, [filter, lang, query, recommendedTemplateIds]);
 
   useEffect(() => {
     setPreviewLimit(INITIAL_PREVIEW_COUNT);
@@ -248,10 +260,12 @@ export function TemplateGallery3D() {
         <div className="seerati-gallery-grid">
           {visibleList.map((template, index) => {
             const isCompared = compareIds.includes(template.id);
+            const isRecommended = recommendedTemplateIds.includes(template.id);
             return (
               <article
                 key={template.id}
-                className="seerati-template-card"
+                className={`seerati-template-card ${isRecommended ? "seerati-template-card--recommended" : ""}`}
+                data-recommended={isRecommended || undefined}
                 style={{ "--gallery-index": index } as React.CSSProperties}
                 onPointerMove={tilt}
                 onPointerLeave={resetTilt}
@@ -277,6 +291,11 @@ export function TemplateGallery3D() {
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-1.5">
+                    {isRecommended && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        {ar ? "توصية محلية" : "Local pick"}
+                      </Badge>
+                    )}
                     {template.atsFriendly ? (
                       <Badge variant="secondary" className="text-[10px]">
                         ATS
