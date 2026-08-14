@@ -70,6 +70,7 @@ jobs:
           bun run qa:ai
           bun run check:routes-shell
           bun run test:ai-contract
+          bun run test:ai-request-validation
           bun run test:resume-diff
           bun run test:templates
           bun run check:rtl
