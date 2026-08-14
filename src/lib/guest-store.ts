@@ -13,6 +13,11 @@ const RECOVERY_KEY = "seerati.session-recovery";
 
 let memoryResumes: Resume[] = [];
 
+type RecoveryPayload = {
+  expiresAt: string;
+  resumes: Resume[];
+};
+
 function normalize(list: Resume[]): Resume[] {
   return list.slice(0, GUEST_RESUME_LIMIT).map((resume) => ({
     ...resume,
@@ -42,14 +47,22 @@ export function hasSessionRecoveryConsent(): boolean {
 
 export function setSessionRecoveryConsent(enabled: boolean) {
   if (typeof window === "undefined") return;
-  if (enabled) window.sessionStorage.setItem(CONSENT_KEY, "true");
-  else window.sessionStorage.removeItem(CONSENT_KEY);
+  if (enabled) {
+    window.sessionStorage.setItem(CONSENT_KEY, "true");
+    return;
+  }
+  // Revocation must remove both the permission and the retained document data.
+  clearConsentedSessionRecovery();
 }
 
 export function saveConsentedSessionRecovery(list: Resume[]) {
   if (typeof window === "undefined" || !hasSessionRecoveryConsent()) return;
   try {
-    window.sessionStorage.setItem(RECOVERY_KEY, JSON.stringify(normalize(list)));
+    const payload: RecoveryPayload = {
+      expiresAt: new Date(Date.now() + ANONYMOUS_SESSION_TIMEOUT_MS).toISOString(),
+      resumes: normalize(list),
+    };
+    window.sessionStorage.setItem(RECOVERY_KEY, JSON.stringify(payload));
   } catch {
     // Private browsing and quota restrictions must not interrupt editing.
   }
@@ -60,9 +73,15 @@ export function readConsentedSessionRecovery(): Resume[] {
   try {
     const raw = window.sessionStorage.getItem(RECOVERY_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as Resume[];
-    return Array.isArray(parsed) ? normalize(parsed) : [];
+    const parsed = JSON.parse(raw) as Partial<RecoveryPayload>;
+    const expired = !parsed.expiresAt || Date.parse(parsed.expiresAt) <= Date.now();
+    if (expired || !Array.isArray(parsed.resumes)) {
+      clearConsentedSessionRecovery();
+      return [];
+    }
+    return normalize(parsed.resumes);
   } catch {
+    clearConsentedSessionRecovery();
     return [];
   }
 }
