@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Globe2, ScanText, ShieldCheck, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +73,49 @@ function TemplatesPage() {
               <span className="rounded-full border border-border bg-card/80 px-3 py-1.5">
                 AR / EN · RTL / LTR
               </span>
+            </div>
+            <div className="mt-7 grid gap-3 sm:grid-cols-3" data-testid="template-global-signals">
+              <div className="flex items-start gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 backdrop-blur-sm">
+                <Globe2 className="mt-0.5 size-5 shrink-0 text-emerald-accent" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-bold">{ar ? "جاهز للاتجاهين" : "Direction-ready"}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {ar
+                      ? "إشارات القالب توضّح دعم العربية RTL والإنجليزية LTR."
+                      : "Template signals clarify Arabic RTL and English LTR support."}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 backdrop-blur-sm">
+                <ScanText
+                  className="mt-0.5 size-5 shrink-0 text-emerald-accent"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="text-sm font-bold">{ar ? "خصائص مفهومة" : "Explainable fit"}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {ar
+                      ? "الأيقونات تعرض بنية القالب وكثافته وملاءمة القراءة دون وعود بنتائج."
+                      : "Icons show structure, density, and reading fit without outcome promises."}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-2xl border border-border/70 bg-card/70 p-4 backdrop-blur-sm">
+                <ShieldCheck
+                  className="mt-0.5 size-5 shrink-0 text-emerald-accent"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="text-sm font-bold">
+                    {ar ? "اختيار محلي خاص" : "Private local choice"}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {ar
+                      ? "إرشاد القوالب يعمل محلياً ولا يطلب محتوى سيرتك أو يخزّن اختيارك."
+                      : "Template guidance runs locally and never requests or stores resume content."}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

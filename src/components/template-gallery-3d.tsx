@@ -1,12 +1,28 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type PointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, Eye, GitCompareArrows, Search, Sparkles, X } from "lucide-react";
+import {
+  Check,
+  Columns2,
+  Eye,
+  Expand,
+  FileText,
+  GitCompareArrows,
+  Globe2,
+  ImagePlus,
+  Rows3,
+  ScanText,
+  Search,
+  Sparkles,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { demoResume } from "@/lib/demo-data";
 import { useI18n } from "@/lib/i18n";
+import { getPrimaryTemplateSignals, type TemplateSignalId } from "@/lib/template-signals";
 import { defaultTemplates } from "@/lib/templates";
 import type { TemplateCategory, TemplateDef } from "@/lib/types";
 import "../template-gallery-3d.css";
@@ -84,6 +100,47 @@ function FullTemplatePreview({
     >
       <LazyResumeThumb resume={resume} template={template} />
     </Suspense>
+  );
+}
+
+const TEMPLATE_SIGNAL_ICONS: Record<TemplateSignalId, LucideIcon> = {
+  ats: ScanText,
+  global: Globe2,
+  document: FileText,
+  visual: Columns2,
+  photo: ImagePlus,
+  compact: Rows3,
+  spacious: Expand,
+};
+
+function TemplateSignalBadges({
+  template,
+  lang,
+  limit = 3,
+}: {
+  template: TemplateDef;
+  lang: "ar" | "en";
+  limit?: number;
+}) {
+  return (
+    <div
+      className="mt-3 flex flex-wrap gap-1.5"
+      aria-label={lang === "ar" ? "خصائص القالب" : "Template properties"}
+    >
+      {getPrimaryTemplateSignals(template, limit).map((signal) => {
+        const Icon = TEMPLATE_SIGNAL_ICONS[signal.id];
+        return (
+          <span
+            key={signal.id}
+            className="inline-flex items-center gap-1 rounded-full border border-border bg-background/70 px-2 py-1 text-[10px] font-medium text-muted-foreground"
+            title={signal.detail[lang]}
+          >
+            <Icon className="size-3 shrink-0 text-emerald-accent" aria-hidden="true" />
+            {signal.label[lang]}
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
@@ -290,30 +347,13 @@ export function TemplateGallery3D({
                     </Badge>
                   </div>
 
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {isRecommended && (
-                      <Badge variant="secondary" className="text-[10px]">
-                        {ar ? "توصية محلية" : "Local pick"}
-                      </Badge>
-                    )}
-                    {template.atsFriendly ? (
-                      <Badge variant="secondary" className="text-[10px]">
-                        ATS
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-[10px]">
-                        {ar ? "إبداعي بصري" : "Visual-first"}
-                      </Badge>
-                    )}
-                    {template.supportsRTL && (
-                      <Badge variant="outline" className="text-[10px]">
-                        RTL
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="text-[10px]">
-                      A4
+                  {isRecommended && (
+                    <Badge variant="secondary" className="mt-3 w-fit text-[10px]">
+                      <Sparkles className="size-3" aria-hidden="true" />
+                      {ar ? "توصية محلية" : "Local pick"}
                     </Badge>
-                  </div>
+                  )}
+                  <TemplateSignalBadges template={template} lang={lang} />
 
                   <div className="mt-4 grid grid-cols-[1fr_auto_auto] gap-2">
                     <Button size="sm" asChild>
@@ -422,10 +462,8 @@ export function TemplateGallery3D({
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Badge variant="secondary">{selected.category}</Badge>
-                  {selected.atsFriendly && <Badge variant="outline">ATS</Badge>}
-                  {selected.supportsRTL && <Badge variant="outline">RTL</Badge>}
-                  <Badge variant="outline">A4</Badge>
                 </div>
+                <TemplateSignalBadges template={selected} lang={lang} limit={4} />
                 <div className="mt-auto pt-8">
                   <Button size="lg" className="w-full" asChild>
                     <Link to="/resumes/new" search={{ template: selected.id }}>
