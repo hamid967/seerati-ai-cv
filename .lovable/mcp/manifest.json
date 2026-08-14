@@ -5,7 +5,9 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://ywqufkamftsacnzxvjsr.supabase.co/auth/v1",
-    "accepted_audiences": ["authenticated"]
+    "accepted_audiences": [
+      "authenticated"
+    ]
   },
   "mcp": {
     "server": {
@@ -48,7 +50,9 @@
               "description": "Resume id returned by list_resumes."
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
@@ -74,7 +78,10 @@
             },
             "language": {
               "type": "string",
-              "enum": ["ar", "en"],
+              "enum": [
+                "ar",
+                "en"
+              ],
               "default": "ar",
               "description": "Resume language."
             },
@@ -96,7 +103,9 @@
               "maxLength": 2000
             }
           },
-          "required": ["title"],
+          "required": [
+            "title"
+          ],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
