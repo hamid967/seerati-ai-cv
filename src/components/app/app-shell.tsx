@@ -3,8 +3,10 @@ import { AppChromeContext, type AppChrome } from "./app-chrome";
 import { AppSidebar } from "./app-sidebar";
 import { AppTopbar } from "./app-topbar";
 import { CommandPalette } from "./command-palette";
+import { GuestMobileBottomNav } from "./guest-mobile-bottom-nav";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 import { ProductAnalyticsBridge } from "./product-analytics-bridge";
+import { useStore } from "@/lib/store";
 
 const STORAGE_KEY = "seerati.sidebar.collapsed";
 
@@ -39,6 +41,7 @@ export function AppShell({
 }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isGuest } = useStore();
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
@@ -118,7 +121,7 @@ export function AppShell({
             <div className={bare ? "h-full w-full" : widthClass}>{children}</div>
           </main>
         </div>
-        {!focus && <MobileBottomNav />}
+        {!focus && (isGuest ? <GuestMobileBottomNav /> : <MobileBottomNav />)}
         <CommandPalette />
       </div>
     </AppChromeContext.Provider>

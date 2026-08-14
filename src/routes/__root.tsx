@@ -12,9 +12,10 @@ import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { I18nProvider } from "@/lib/i18n";
-import { StoreProvider } from "@/lib/store";
+import { StoreProvider, useStore } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
 import { AppShell } from "@/components/app/app-shell";
+import { GuestMobileBottomNav } from "@/components/app/guest-mobile-bottom-nav";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { getPublicRuntimeConfig } from "@/lib/public-runtime-config.functions";
 import { setSupabaseRuntimeConfig } from "@/integrations/supabase/client";
@@ -158,12 +159,27 @@ const APP_PREFIXES = [
 ];
 /** Editor-style routes: chrome shrinks into focus mode. */
 const FOCUS_PATTERN = /^\/resumes\/[^/]+\/(edit|preview)$/;
+const GUEST_MOBILE_PUBLIC_PREFIXES = ["/assistant", "/ats", "/templates"];
 
 function AppFrame() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isGuest } = useStore();
   const isApp = APP_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const hasGuestMobileNav =
+    isGuest &&
+    GUEST_MOBILE_PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-  if (!isApp) return <Outlet />;
+  if (!isApp) {
+    if (!hasGuestMobileNav) return <Outlet />;
+    return (
+      <>
+        <div className="pb-24 md:pb-0">
+          <Outlet />
+        </div>
+        <GuestMobileBottomNav />
+      </>
+    );
+  }
 
   return (
     <AppShell bare width="full" focus={FOCUS_PATTERN.test(pathname)}>
