@@ -37,6 +37,7 @@
     "test:phase20-evidence": "bun scripts/phase20-evidence-smoke.ts",
     "test:guest-first": "bun scripts/guest-first-smoke.ts",
     "test:guest-first-browser": "node scripts/guest-first-browser-smoke.mjs",
+    "test:guest-visitor-parity": "node scripts/guest-visitor-parity-smoke.mjs",
     "test:phase18-ats": "bun scripts/phase18-ats-smoke.ts",
     "test:phase18-job-match": "bun scripts/phase18-job-match-smoke.ts",
     "test:phase18-versioning": "bun scripts/phase18-versioning-smoke.ts",
