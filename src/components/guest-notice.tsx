@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Cloud, Info, ShieldCheck, Trash2 } from "lucide-react";
+import { Cloud, Download, FileText, Info, ShieldCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { ANONYMOUS_SESSION_TIMEOUT_MINUTES } from "@/lib/guest-store";
+import { buildGuestExport, buildGuestPlainText, downloadLocalFile } from "@/lib/guest-transfer";
 
 /**
  * Privacy status for the anonymous builder. The default session is memory-only;
@@ -18,7 +19,7 @@ export function GuestNotice({
 }) {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { isGuest, clearGuestSession, sessionRecoveryEnabled, setGuestSessionRecovery } =
+  const { isGuest, resumes, clearGuestSession, sessionRecoveryEnabled, setGuestSessionRecovery } =
     useStore();
 
   // A null user is the anonymous default while auth is resolving. Rendering the
@@ -29,6 +30,23 @@ export function GuestNotice({
   const clear = () => {
     clearGuestSession();
     window.dispatchEvent(new CustomEvent("seerati:guest-data-deleted"));
+  };
+
+  const exportJson = () => {
+    const document = buildGuestExport(resumes);
+    downloadLocalFile(
+      JSON.stringify(document, null, 2),
+      "seerati-guest-session-export.json",
+      "application/json",
+    );
+  };
+
+  const exportPlainText = () => {
+    downloadLocalFile(
+      buildGuestPlainText(resumes),
+      "seerati-guest-ats.txt",
+      "text/plain;charset=utf-8",
+    );
   };
 
   return (
@@ -96,14 +114,36 @@ export function GuestNotice({
                 ? "حفظ هذه الجلسة في علامة التبويب"
                 : "Remember this tab"}
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={exportJson}
+            type="button"
+            disabled={!resumes.length}
+          >
+            <Download className="size-4" aria-hidden="true" />
+            {ar ? "تصدير JSON محلياً" : "Export JSON locally"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={exportPlainText}
+            type="button"
+            disabled={!resumes.length}
+          >
+            <FileText className="size-4" aria-hidden="true" />
+            {ar ? "تصدير نص ATS" : "Export ATS text"}
+          </Button>
           <Button size="sm" variant="outline" onClick={clear} type="button">
             <Trash2 className="size-4" aria-hidden="true" />
             {ar ? "حذف بياناتي الآن" : "Delete my data now"}
           </Button>
           <Button size="sm" variant="ghost" asChild>
-            <Link to="/auth" search={{ mode: "signup" }}>
+            <Link to="/auth" search={{ mode: "signup", next: "/account" }}>
               <Cloud className="size-4" aria-hidden="true" />
-              {ar ? "حساب اختياري بعد المراجعة" : "Optional account after review"}
+              {ar
+                ? "حساب اختياري لنسخ يدوي بعد المراجعة"
+                : "Optional account for reviewed manual copy"}
             </Link>
           </Button>
         </div>

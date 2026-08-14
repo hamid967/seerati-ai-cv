@@ -26,6 +26,7 @@ import {
   setSessionRecoveryConsent,
   writeGuestResumes,
 } from "./guest-store";
+import { buildGuestMigrationPreview, type GuestMigrationPreview } from "./guest-transfer";
 import {
   clearGuestResumeSession,
   readGuestResumeSession,
@@ -76,6 +77,21 @@ type Ctx = {
   sessionRecoveryEnabled: boolean;
   /** Enable or revoke optional sessionStorage recovery for the current guest tab. */
   setGuestSessionRecovery: (enabled: boolean) => void;
+  /** Exact local resumes that could be copied after an account holder reviews them. */
+  guestMigrationPreview: GuestMigrationPreview;
+  /**
+   * Copies current in-memory guest resumes only after a user-triggered confirmation.
+   * Local guest data is retained unless deletion is explicitly requested after every
+   * selected resume has copied successfully.
+   */
+  migrateGuestResumes: (options: {
+    confirmed: boolean;
+    deleteLocalAfterMigration?: boolean;
+  }) => Promise<{
+    migrated: number;
+    skipped: number;
+    error?: string;
+  }>;
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -360,11 +376,77 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setSessionRecoveryEnabled(enabled);
   }, []);
 
+  const migrateGuestResumes = useCallback<Ctx["migrateGuestResumes"]>(
+    async ({ confirmed, deleteLocalAfterMigration = false }) => {
+      if (!confirmed) {
+        return {
+          migrated: 0,
+          skipped: guestRef.current.length,
+          error: "confirmation_required",
+        };
+      }
+      if (!user) {
+        return { migrated: 0, skipped: guestRef.current.length, error: "not_authenticated" };
+      }
+
+      const preview = buildGuestMigrationPreview(
+        guestRef.current,
+        resumesRef.current.length,
+        maxResumes,
+      );
+      if (!preview.transferable.length) {
+        return {
+          migrated: 0,
+          skipped: preview.blocked.length,
+          error: preview.reason === "account_limit" ? "account_limit" : "no_guest_data",
+        };
+      }
+
+      await ensureSession();
+      const inserted: Resume[] = [];
+      for (const guestResume of preview.transferable) {
+        const { data, error } = await supabase
+          .from("resumes")
+          .insert({
+            user_id: user.id,
+            title: guestResume.title,
+            template_id: guestResume.templateId,
+            language: guestResume.language,
+            data: guestResume.data as never,
+            status: guestResume.status,
+            completion_score: guestResume.completionScore,
+            ats_score: guestResume.atsScore,
+          })
+          .select("*")
+          .single();
+        if (error || !data) {
+          if (inserted.length) setResumesState((rows) => [...inserted, ...rows]);
+          return {
+            migrated: inserted.length,
+            skipped: preview.requested - inserted.length,
+            error: error?.message ?? "migration_failed",
+          };
+        }
+        inserted.push(toResume(data as ResumeRow));
+      }
+
+      setResumesState((rows) => [...inserted, ...rows]);
+      if (deleteLocalAfterMigration && inserted.length === preview.requested) clearGuestSession();
+      return { migrated: inserted.length, skipped: preview.requested - inserted.length };
+    },
+    [clearGuestSession, maxResumes, setResumesState, user],
+  );
+
   const value = useMemo<Ctx>(() => {
     const isGuest = !user;
     const list = isGuest ? guestResumes : resumes;
     const effectiveMax = isGuest ? GUEST_RESUME_LIMIT : maxResumes;
     const atLimit = list.length >= effectiveMax;
+    const guestMigrationPreview = buildGuestMigrationPreview(
+      guestResumes,
+      resumes.length,
+      maxResumes,
+    );
     return {
       ready,
       user,
@@ -377,6 +459,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       guestSession,
       sessionRecoveryEnabled,
       setGuestSessionRecovery,
+      guestMigrationPreview,
+      migrateGuestResumes,
 
       signIn,
       signUp,
@@ -529,6 +613,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     guestSession,
     sessionRecoveryEnabled,
     setGuestSessionRecovery,
+    migrateGuestResumes,
   ]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
