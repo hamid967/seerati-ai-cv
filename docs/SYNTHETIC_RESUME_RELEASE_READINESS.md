@@ -4,24 +4,24 @@
 
 The Synthetic Specialty Resume Generator is eligible for review only when its privacy, fictional-content, export-safety, optional-AI, and existing guest-path checks are green. It must remain a Draft Pull Request until the owner reviews the final diff and explicitly approves any merge.
 
-| Gate | Required status | Current implementation evidence |
-| --- | --- | --- |
-| No-registration entry | Noura option works for a visitor | Implemented and browser-tested. |
-| Default memory-only behavior | No sample CV content in persistent browser storage or Supabase | Implemented and browser-tested. |
-| No automatic account migration | Transient sample is excluded from guest migration | Implemented in Store separation. |
-| Deterministic catalog | 36 reviewed bilingual specialties generate a safe local sample | Taxonomy and all-specialty deterministic smoke. |
-| Synthetic content safety | No real personal, employer, university, client, credential, or achievement claims | Deterministic library, AI prompt/validator, and contract smoke. |
-| Explicit AI consent | Checkbox is unchecked and adaptation control is disabled before consent | Browser-tested in Arabic and English. |
-| Guest AI boundary | A no-session visitor sends no adaptation request and receives a local fallback | Browser-tested network assertion. |
-| AI request minimisation | Endpoint accepts only `consent`, specialty ID, level, and language | Strict Zod schema and server-function contract. |
-| AI output validation | Malformed or unsafe output never reaches a sample | Exact JSON-shape and anti-fabrication contract smoke. |
-| AI provenance and review | Applied output stays `sample`, `synthetic-ai`, unapproved | Deterministic adaptation metadata smoke. |
-| Field review | Placeholder cannot be confirmed unchanged | Existing editor and browser coverage. |
-| Export safety | Final PDF/text/clipboard actions are gated while samples remain | Existing browser-tested export guard; source-neutral metadata. |
-| ATS boundary | No final content score for unresolved samples | Existing browser-tested ATS boundary. |
-| Accessibility | Keyboard, RTL/LTR, reduced motion, mobile overflow, consent control | Browser-tested on Arabic iPhone and English Android viewports. |
-| Quality | Format, lint, TypeScript, build, QA | Final validation required before PR delivery. |
-| CI | Quality, route smoke, browser matrix, Lighthouse | Pending Draft PR run. |
+| Gate                           | Required status                                                                   | Current implementation evidence                                 |
+| ------------------------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| No-registration entry          | Noura option works for a visitor                                                  | Implemented and browser-tested.                                 |
+| Default memory-only behavior   | No sample CV content in persistent browser storage or Supabase                    | Implemented and browser-tested.                                 |
+| No automatic account migration | Transient sample is excluded from guest migration                                 | Implemented in Store separation.                                |
+| Deterministic catalog          | 36 reviewed bilingual specialties generate a safe local sample                    | Taxonomy and all-specialty deterministic smoke.                 |
+| Synthetic content safety       | No real personal, employer, university, client, credential, or achievement claims | Deterministic library, AI prompt/validator, and contract smoke. |
+| Explicit AI consent            | Checkbox is unchecked and adaptation control is disabled before consent           | Browser-tested in Arabic and English.                           |
+| Guest AI boundary              | A no-session visitor sends no adaptation request and receives a local fallback    | Browser-tested network assertion.                               |
+| AI request minimisation        | Endpoint accepts only `consent`, specialty ID, level, and language                | Strict Zod schema and server-function contract.                 |
+| AI output validation           | Malformed or unsafe output never reaches a sample                                 | Exact JSON-shape and anti-fabrication contract smoke.           |
+| AI provenance and review       | Applied output stays `sample`, `synthetic-ai`, unapproved                         | Deterministic adaptation metadata smoke.                        |
+| Field review                   | Placeholder cannot be confirmed unchanged                                         | Existing editor and browser coverage.                           |
+| Export safety                  | Final PDF/text/clipboard actions are gated while samples remain                   | Existing browser-tested export guard; source-neutral metadata.  |
+| ATS boundary                   | No final content score for unresolved samples                                     | Existing browser-tested ATS boundary.                           |
+| Accessibility                  | Keyboard, RTL/LTR, reduced motion, mobile overflow, consent control               | Browser-tested on Arabic iPhone and English Android viewports.  |
+| Quality                        | Format, lint, TypeScript, build, QA                                               | Final validation required before PR delivery.                   |
+| CI                             | Quality, route smoke, browser matrix, Lighthouse                                  | Pending Draft PR run.                                           |
 
 ## Privacy review
 

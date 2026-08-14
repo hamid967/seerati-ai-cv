@@ -4,17 +4,17 @@
 
 This document records evidence collected on `feat/synthetic-ai-specialty-expansion` before its Draft Pull Request. It distinguishes executed local checks from checks that must run again in GitHub Actions after the branch is pushed.
 
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Expanded deterministic generator smoke | Passed | `bun scripts/synthetic-resume-smoke.ts`; checks all 36 specialties in Arabic and English across student, graduate, mid, and manager levels. |
-| Adaptation contract smoke | Passed | `bun scripts/synthetic-adaptation-contract-smoke.ts`; checks restricted prompt inputs, accepted JSON shape, and rejection of employer-like output. |
-| TypeScript strict compilation | Passed | `bun x tsc --noEmit`. |
-| Production build | Passed | `npm run build` with the project-required Node `v24.14.0`, including the client-environment guard. |
-| Synthetic Chromium browser smoke | Passed | `BASE_URL=http://127.0.0.1:4175 node scripts/synthetic-resume-browser-smoke.mjs` against a local TanStack development server. |
-| ESLint | Pending final validation | To run after documentation and final formatting updates. |
-| Repository QA | Pending final validation | Includes the new `test:synthetic-adaptation` command. |
-| Existing guest recovery and visitor-parity browser smokes | Pending final validation | Final quality phase. |
-| Release Hardening matrix | Pending Draft PR run | Chromium, Firefox, WebKit, and Lighthouse workflow. |
+| Check                                                     | Result                   | Evidence                                                                                                                                           |
+| --------------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Expanded deterministic generator smoke                    | Passed                   | `bun scripts/synthetic-resume-smoke.ts`; checks all 36 specialties in Arabic and English across student, graduate, mid, and manager levels.        |
+| Adaptation contract smoke                                 | Passed                   | `bun scripts/synthetic-adaptation-contract-smoke.ts`; checks restricted prompt inputs, accepted JSON shape, and rejection of employer-like output. |
+| TypeScript strict compilation                             | Passed                   | `bun x tsc --noEmit`.                                                                                                                              |
+| Production build                                          | Passed                   | `npm run build` with the project-required Node `v24.14.0`, including the client-environment guard.                                                 |
+| Synthetic Chromium browser smoke                          | Passed                   | `BASE_URL=http://127.0.0.1:4175 node scripts/synthetic-resume-browser-smoke.mjs` against a local TanStack development server.                      |
+| ESLint                                                    | Pending final validation | To run after documentation and final formatting updates.                                                                                           |
+| Repository QA                                             | Pending final validation | Includes the new `test:synthetic-adaptation` command.                                                                                              |
+| Existing guest recovery and visitor-parity browser smokes | Pending final validation | Final quality phase.                                                                                                                               |
+| Release Hardening matrix                                  | Pending Draft PR run     | Chromium, Firefox, WebKit, and Lighthouse workflow.                                                                                                |
 
 > The shell's default Node was `v22.13.0`, which does not satisfy this repository's `>=24 <25` engine and failed before the application build started. The executed build used installed Node `v24.14.0`; this is an environment-selection note, not an application defect.
 

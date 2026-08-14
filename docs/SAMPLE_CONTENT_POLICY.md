@@ -10,32 +10,32 @@ This policy applies equally to the reviewed deterministic library and to the opt
 
 The reviewed local library may include a generic role title, neutral professional summary, example responsibilities, high-level skill categories, project structures, education placeholders, certification placeholders, and non-functional contact/link placeholders. Copy must remain understandable in Arabic and English without inventing numerical performance claims.
 
-| Safe category | Example pattern |
-| --- | --- |
-| Identity | `اسمك الكامل` / `Your Full Name` |
-| Contact | `example@email.com`, `05XXXXXXXX`, `linkedin.com/in/your-name` |
-| Employer | `اسم الشركة السابقة` / `Previous Company Name` |
-| Education | `اسم الجامعة` / `University Name` |
-| Responsibility | “Reviewed sample entries and organised supporting documents.” |
-| Project | “Sample project: internal request-tracking dashboard.” |
-| Training | “Sample software-development training certificate.” |
+| Safe category      | Example pattern                                                                                                                          |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity           | `اسمك الكامل` / `Your Full Name`                                                                                                         |
+| Contact            | `example@email.com`, `05XXXXXXXX`, `linkedin.com/in/your-name`                                                                           |
+| Employer           | `اسم الشركة السابقة` / `Previous Company Name`                                                                                           |
+| Education          | `اسم الجامعة` / `University Name`                                                                                                        |
+| Responsibility     | “Reviewed sample entries and organised supporting documents.”                                                                            |
+| Project            | “Sample project: internal request-tracking dashboard.”                                                                                   |
+| Training           | “Sample software-development training certificate.”                                                                                      |
 | AI-adapted wording | Fictional alternative summary, three responsibilities, four skills, project, and training placeholder with no identity or outcome claim. |
 
 ## Optional AI adaptation boundary
 
 The optional adaptation feature is a separate, consented wording route. It does **not** receive a user's resume, custom-specialty note, contact details, job description, education, location, employer, or any other free text. A valid request contains exactly specialty ID, experience level, language, and `consent: true`.
 
-| Control | Required behavior |
-| --- | --- |
-| Consent | The checkbox is unchecked by default and the control is disabled until the visitor actively checks it. The button press, not the checkbox alone, triggers a request. |
-| Guest path | No adaptation endpoint call is made without an authenticated session. The visitor keeps the deterministic local sample and sees a fallback disclosure. |
-| Server boundary | The endpoint rejects missing consent and extra properties, applies the established user rate limit, and never accepts CV content. |
-| Prompt | The server describes only the selected product options and prohibits names, organisations, cities, credentials, numbers, dates, links, email, and phone details. |
-| Output shape | Exactly one summary, three responsibilities, four skills, one project, and one certificate are required as JSON. |
-| Output validation | Empty, oversized, malformed, link-like, digit-containing, or employer/university/hospital-like output is rejected. No failed model text reaches the sample. |
-| Provenance | Applied wording has `status: sample`, `source: synthetic-ai`, `requiresUserReview: true`, and `exportApproved: false`. |
-| Fallback | Provider, quota, transport, parse, and safety failures retain the deterministic local profile. |
-| Logging | Usage is recorded only as task/provider/status/token count for an authenticated user; prompts and generated content are not written to usage records. |
+| Control           | Required behavior                                                                                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Consent           | The checkbox is unchecked by default and the control is disabled until the visitor actively checks it. The button press, not the checkbox alone, triggers a request. |
+| Guest path        | No adaptation endpoint call is made without an authenticated session. The visitor keeps the deterministic local sample and sees a fallback disclosure.               |
+| Server boundary   | The endpoint rejects missing consent and extra properties, applies the established user rate limit, and never accepts CV content.                                    |
+| Prompt            | The server describes only the selected product options and prohibits names, organisations, cities, credentials, numbers, dates, links, email, and phone details.     |
+| Output shape      | Exactly one summary, three responsibilities, four skills, one project, and one certificate are required as JSON.                                                     |
+| Output validation | Empty, oversized, malformed, link-like, digit-containing, or employer/university/hospital-like output is rejected. No failed model text reaches the sample.          |
+| Provenance        | Applied wording has `status: sample`, `source: synthetic-ai`, `requiresUserReview: true`, and `exportApproved: false`.                                               |
+| Fallback          | Provider, quota, transport, parse, and safety failures retain the deterministic local profile.                                                                       |
+| Logging           | Usage is recorded only as task/provider/status/token count for an authenticated user; prompts and generated content are not written to usage records.                |
 
 > An AI-adapted field is still sample material. It is never automatically confirmed, cannot be exported as a final application document, and remains subject to the existing edit-and-confirm process.
 
