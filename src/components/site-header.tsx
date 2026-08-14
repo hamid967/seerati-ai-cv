@@ -97,12 +97,13 @@ export function SiteHeader() {
                   </p>
                   <Link
                     role="menuitem"
-                    to="/resumes/new"
+                    to="/assistant"
+                    search={{ agent: "noura" }}
                     onClick={() => setExploreOpen(false)}
                     className="group block rounded-xl p-3 hover:bg-secondary"
                   >
                     <span className="flex items-center justify-between text-sm font-semibold">
-                      {ar ? "ابدأ سيرة" : "Start a resume"}
+                      {ar ? "ابدأ سيرتك مجانًا" : "Start your resume free"}
                       <ArrowUpRight className="size-4 opacity-60 group-hover:opacity-100" />
                     </span>
                     <span className="mt-1 block text-xs text-muted-foreground">
@@ -284,8 +285,8 @@ export function SiteHeader() {
                   <Link to="/auth">{t("nav_login")}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link to="/auth" search={{ mode: "signup" }}>
-                    {t("nav_start")}
+                  <Link to="/assistant" search={{ agent: "noura" }}>
+                    {ar ? "ابدأ سيرتك مجانًا" : "Start free"}
                   </Link>
                 </Button>
               </div>
@@ -313,11 +314,12 @@ export function SiteHeader() {
                     </a>
                   ))}
                 <Link
-                  to="/resumes/new"
+                  to="/assistant"
+                  search={{ agent: "noura" }}
                   onClick={() => setOpen(false)}
                   className="rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
                 >
-                  {ar ? "ابدأ سيرة" : "Start a resume"}
+                  {ar ? "ابدأ سيرتك مجانًا" : "Start your resume free"}
                 </Link>
                 {links.map((l) => (
                   <Link
@@ -368,12 +370,12 @@ export function SiteHeader() {
                         {t("nav_login")}
                       </Link>
                       <Link
-                        to="/auth"
-                        search={{ mode: "signup" }}
+                        to="/assistant"
+                        search={{ agent: "noura" }}
                         onClick={() => setOpen(false)}
                         className="rounded-md px-3 py-2.5 text-sm font-semibold text-primary hover:bg-secondary"
                       >
-                        {t("nav_start")}
+                        {ar ? "ابدأ سيرتك مجانًا" : "Start free"}
                       </Link>
                     </>
                   )
