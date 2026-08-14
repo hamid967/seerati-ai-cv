@@ -18,7 +18,8 @@ export function GuestNotice({
 }) {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { isGuest, clearGuestSession } = useStore();
+  const { isGuest, clearGuestSession, sessionRecoveryEnabled, setGuestSessionRecovery } =
+    useStore();
 
   // A null user is the anonymous default while auth is resolving. Rendering the
   // disclosure immediately prevents auth bootstrap latency from becoming the
@@ -80,6 +81,21 @@ export function GuestNotice({
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant={sessionRecoveryEnabled ? "secondary" : "outline"}
+            type="button"
+            aria-pressed={sessionRecoveryEnabled}
+            onClick={() => setGuestSessionRecovery(!sessionRecoveryEnabled)}
+          >
+            {sessionRecoveryEnabled
+              ? ar
+                ? "إيقاف استعادة هذه الجلسة"
+                : "Stop remembering this tab"
+              : ar
+                ? "حفظ هذه الجلسة في علامة التبويب"
+                : "Remember this tab"}
+          </Button>
           <Button size="sm" variant="outline" onClick={clear} type="button">
             <Trash2 className="size-4" aria-hidden="true" />
             {ar ? "حذف بياناتي الآن" : "Delete my data now"}

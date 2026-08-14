@@ -70,6 +70,9 @@ jobs:
       - name: Run complete guest visitor workflow parity smoke
         if: matrix.browser == 'chromium'
         run: bun run test:guest-visitor-parity
+      - name: Run consented guest recovery privacy smoke
+        if: matrix.browser == 'chromium'
+        run: bun run test:guest-recovery-browser
       - name: Upload hardening artifacts
         if: always()
         uses: actions/upload-artifact@v4

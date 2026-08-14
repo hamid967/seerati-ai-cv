@@ -14,11 +14,16 @@ import { emptyResumeData, RESUME_LIMIT, type Profile, type Resume, type ResumeDa
 import { demoResumeData } from "./demo-data";
 import {
   ANONYMOUS_SESSION_TIMEOUT_MS,
+  clearConsentedSessionRecovery,
   clearGuestResumes,
   GUEST_RESUME_LIMIT,
+  hasSessionRecoveryConsent,
   isGuestResumeId,
   makeGuestResume,
+  readConsentedSessionRecovery,
   readGuestResumes,
+  saveConsentedSessionRecovery,
+  setSessionRecoveryConsent,
   writeGuestResumes,
 } from "./guest-store";
 import {
@@ -67,6 +72,10 @@ type Ctx = {
   clearGuestSession: () => void;
   /** In-memory metadata for the current anonymous editing session. */
   guestSession: GuestResumeSession | null;
+  /** True only after the visitor explicitly opts into this-tab recovery. */
+  sessionRecoveryEnabled: boolean;
+  /** Enable or revoke optional sessionStorage recovery for the current guest tab. */
+  setGuestSessionRecovery: (enabled: boolean) => void;
 };
 
 const StoreContext = createContext<Ctx | null>(null);
@@ -122,6 +131,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [guestResumes, setGuestResumes] = useState<Resume[]>([]);
   const [guestSession, setGuestSession] = useState<GuestResumeSession | null>(null);
+  const [sessionRecoveryEnabled, setSessionRecoveryEnabled] = useState(false);
   const [loadingResumes, setLoadingResumes] = useState(false);
   const [maxResumes, setMaxResumes] = useState(RESUME_LIMIT);
 
@@ -137,6 +147,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     guestRef.current = next;
     setGuestResumes(next);
     writeGuestResumes(next);
+    if (next[0] && hasSessionRecoveryConsent()) saveConsentedSessionRecovery(next);
+    if (!next[0]) {
+      // Explicit document deletion revokes recovery consent and removes the
+      // corresponding sessionStorage payload as well as in-memory state.
+      clearConsentedSessionRecovery();
+      setSessionRecoveryEnabled(false);
+    }
     setGuestSession(synchronizeGuestResumeSession(next[0] ?? null));
   }, []);
 
@@ -147,10 +164,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const stored = readGuestResumes();
+    const recovered = hasSessionRecoveryConsent() ? readConsentedSessionRecovery() : [];
+    const stored = recovered.length ? recovered : readGuestResumes();
+    if (recovered.length) writeGuestResumes(recovered);
     guestRef.current = stored;
     setGuestResumes(stored);
     setGuestSession(stored[0] ? upsertGuestResumeSession(stored[0]) : readGuestResumeSession());
+    setSessionRecoveryEnabled(hasSessionRecoveryConsent());
   }, []);
 
   useEffect(() => {
@@ -166,6 +186,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       20 * 60 * 1000,
     );
     const reset = () => {
+      if (hasSessionRecoveryConsent()) saveConsentedSessionRecovery(guestRef.current);
       window.clearTimeout(timeout);
       timeout = window.setTimeout(() => {
         clearGuestResumes();
@@ -329,6 +350,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     guestRef.current = [];
     setGuestResumes([]);
     setGuestSession(null);
+    setSessionRecoveryEnabled(false);
+  }, []);
+
+  const setGuestSessionRecovery = useCallback((enabled: boolean) => {
+    setSessionRecoveryConsent(enabled);
+    if (enabled) saveConsentedSessionRecovery(guestRef.current);
+    else clearConsentedSessionRecovery();
+    setSessionRecoveryEnabled(enabled);
   }, []);
 
   const value = useMemo<Ctx>(() => {
@@ -346,6 +375,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       isGuest,
       clearGuestSession,
       guestSession,
+      sessionRecoveryEnabled,
+      setGuestSessionRecovery,
 
       signIn,
       signUp,
@@ -496,6 +527,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     signUp,
     clearGuestSession,
     guestSession,
+    sessionRecoveryEnabled,
+    setGuestSessionRecovery,
   ]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
