@@ -54,6 +54,7 @@ import { RecruiterSnapshotCard } from "@/components/recruiter-snapshot";
 import { NextBestActions } from "@/components/next-best-actions";
 import { ResumeVariantSwitcher } from "@/components/resume-variant-switcher";
 import { InterviewEvidenceAnswer } from "@/components/interview-evidence-answer";
+import { GuestJobWorkspace } from "@/components/guest-job-workspace";
 import { ApplicationReadinessPanel } from "@/components/application-readiness-panel";
 import { TailoringStudioPanel } from "@/components/tailoring-studio-panel";
 import {
@@ -119,10 +120,10 @@ function JobWorkspacePage() {
   const { id } = useParams({ from: "/jobs/$id" });
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { user, ready, createResume, atLimit, resumes, updateResume } = useStore();
+  const { user, ready, isGuest, createResume, atLimit, resumes, updateResume } = useStore();
   const navigate = useNavigate();
 
-  useAuthGuard();
+  useAuthGuard({ allowGuest: true });
 
   const [job, setJob] = useState<JobWorkspace | null | undefined>(undefined);
   const [twin, setTwin] = useState<CareerTwin | null>(null);
@@ -159,7 +160,7 @@ function JobWorkspacePage() {
   }, [twin, form.jobDescription, lang]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || isGuest) return;
     let active = true;
     void (async () => {
       const [loadedJob, loadedTwin, loadedGraph] = await Promise.all([
@@ -198,10 +199,10 @@ function JobWorkspacePage() {
     return () => {
       active = false;
     };
-  }, [id, user, reload]);
+  }, [id, user, isGuest, reload]);
 
   useEffect(() => {
-    if (!baseResume) return;
+    if (!baseResume || isGuest) return;
     let active = true;
     void listResumeVersions(baseResume.id).then((v) => {
       if (active) setVersions(v);
@@ -209,7 +210,7 @@ function JobWorkspacePage() {
     return () => {
       active = false;
     };
-  }, [baseResume?.id, reload]);
+  }, [baseResume?.id, isGuest, reload]);
 
   const persist = useCallback(
     (patch: Partial<JobWorkspace>) => {
@@ -432,6 +433,8 @@ function JobWorkspacePage() {
       setBranching(false);
     }
   };
+
+  if (ready && isGuest) return <GuestJobWorkspace />;
 
   if (!ready || !user || job === undefined) {
     return (

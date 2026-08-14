@@ -29,36 +29,53 @@ async function expectRecoveryStorage(expected) {
   }, expected);
 }
 
+async function openGuestNotice() {
+  const notice = page.locator("details").filter({
+    hasText: /حفظ هذه الجلسة|Remember this tab|حذف بياناتي الآن|Delete my data now/i,
+  });
+  await notice.first().waitFor({ state: "attached", timeout: 5_000 });
+  await notice.first().evaluate((element) => {
+    element.open = true;
+  });
+}
+
+async function clickConsentControl(name) {
+  let lastError;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const control = page.getByRole("button", { name });
+    try {
+      await control.waitFor({ state: "visible", timeout: 2_000 });
+      await control.click({ force: true, timeout: 2_000 });
+      return;
+    } catch (error) {
+      lastError = error;
+      await page.waitForTimeout(150);
+    }
+  }
+  throw lastError;
+}
+
 try {
   await page.goto(`${baseUrl}/resumes/new`, { waitUntil: "networkidle" });
   await page.locator("#title").fill("Synthetic recovery resume");
   await page.getByRole("button", { name: /إنشاء وفتح المحرر|Create and open editor/i }).click();
   await page.waitForURL(/\/resumes\/guest-[^/]+\/edit/);
 
-  await page.locator("details > summary").first().click();
-  const remember = page.getByRole("button", {
-    name: /حفظ هذه الجلسة في علامة التبويب|Remember this tab/i,
-  });
-  await remember.waitFor();
-  await remember.click({ force: true, timeout: 5_000 });
+  await openGuestNotice();
+  await clickConsentControl(/حفظ هذه الجلسة في علامة التبويب|Remember this tab/i);
   await expectRecoveryStorage(true);
 
   await page.reload({ waitUntil: "networkidle" });
-  await page.locator("details > summary").first().click();
-  const stopRemembering = page.getByRole("button", {
-    name: /إيقاف استعادة هذه الجلسة|Stop remembering this tab/i,
-  });
-  await stopRemembering.waitFor();
+  await openGuestNotice();
+  await page
+    .getByRole("button", { name: /إيقاف استعادة هذه الجلسة|Stop remembering this tab/i })
+    .waitFor();
   assert(!page.url().includes("/auth"), "consented recovery must restore without auth");
 
-  await stopRemembering.click({ force: true, timeout: 5_000 });
+  await clickConsentControl(/إيقاف استعادة هذه الجلسة|Stop remembering this tab/i);
   await expectRecoveryStorage(false);
 
-  const rememberAgain = page.getByRole("button", {
-    name: /حفظ هذه الجلسة في علامة التبويب|Remember this tab/i,
-  });
-  await rememberAgain.waitFor();
-  await rememberAgain.click({ force: true, timeout: 5_000 });
+  await clickConsentControl(/حفظ هذه الجلسة في علامة التبويب|Remember this tab/i);
   await expectRecoveryStorage(true);
   await page.getByRole("button", { name: /حذف بياناتي الآن|Delete my data now/i }).click();
   await expectRecoveryStorage(false);
