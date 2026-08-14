@@ -6,6 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createServerFn } from "@tanstack/react-start";
 
 import { parseAiRequest } from "./ai-validate";
+import { logServerFailure } from "./safe-server-log";
 
 export const runAiTask = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -32,7 +33,7 @@ export const runAiTask = createServerFn({ method: "POST" })
 
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) {
-      console.error("[ai] LOVABLE_API_KEY is not configured");
+      logServerFailure("ai.gateway_configuration", new Error("ConfigurationError"));
       return { ok: false as const, code: "provider_unavailable" };
     }
 
@@ -53,9 +54,10 @@ export const runAiTask = createServerFn({ method: "POST" })
         provider: "gateway" as const,
       };
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("[ai] gateway task failed", data.task, message);
+      // Gateway errors can include prompt fragments or provider diagnostics. Keep them
+      // out of server logs and client responses; callers only need a stable retry code.
+      logServerFailure("ai.gateway_task", error);
       await recordUsage(supabase, userId, data.task, "gateway", "error", null);
-      return { ok: false as const, code: "provider_error", message };
+      return { ok: false as const, code: "provider_error" };
     }
   });

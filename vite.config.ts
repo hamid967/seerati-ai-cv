@@ -4,8 +4,44 @@
 //     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+import { readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
+import { format, resolveConfig } from "prettier";
+
+const MCP_GENERATED_ROUTE_FILES = [
+  "src/routes/mcp.ts",
+  "src/routes/[.mcp]/list-tools.ts",
+  "src/routes/[.mcp]/invoke-tool/$tool.ts",
+  "src/routes/[.well-known]/oauth-protected-resource.ts",
+] as const;
+
+function formatGeneratedMcpRoutes() {
+  let projectRoot = process.cwd();
+
+  const applyPrettier = async () => {
+    await Promise.all(
+      MCP_GENERATED_ROUTE_FILES.map(async (relativePath) => {
+        const file = resolve(projectRoot, relativePath);
+        const source = await readFile(file, "utf8");
+        const options = (await resolveConfig(file)) ?? {};
+        const formatted = await format(source, { ...options, filepath: file });
+        if (formatted !== source) await writeFile(file, formatted, "utf8");
+      }),
+    );
+  };
+
+  return {
+    name: "seerati:format-generated-mcp-routes",
+    enforce: "post" as const,
+    configResolved: async (config: { root: string }) => {
+      projectRoot = config.root;
+      await applyPrettier();
+    },
+    buildStart: applyPrettier,
+  };
+}
 
 /**
  * Public backend connection values. These are publishable (safe in the client
@@ -30,7 +66,7 @@ function resolvePublicEnv(key: keyof typeof PUBLIC_ENV_FALLBACKS): string {
 
 export default defineConfig({
   vite: {
-    plugins: [mcpPlugin()],
+    plugins: [mcpPlugin(), formatGeneratedMcpRoutes()],
     // Vite's `define` replacement is applied directly to the browser bundle.
     // Keeping these publishable values here prevents hydration from depending
     // on whether a particular build runner exported VITE_* variables.

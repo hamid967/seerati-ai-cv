@@ -94,20 +94,21 @@ async function gotoAssistant(page, lang) {
   if (!response || response.status() >= 400)
     throw new Error(`assistant returned ${response?.status()}`);
   await page.locator("#assistant-builder").waitFor({ state: "visible", timeout: 15000 });
-  await page.waitForTimeout(1200);
+  await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
   const explore = page.getByRole("button", { name: /الأدوات عند الحاجة|Tools when needed/ });
-  if (await explore.isVisible().catch(() => false)) await explore.click();
+  const hubTitle = page.locator("#assistant-capabilities-title");
   const cards = page.locator('a[href="/import"]');
   for (
     let attempt = 0;
-    attempt < 3 && !(await cards.isVisible().catch(() => false));
+    attempt < 4 && !(await hubTitle.isVisible().catch(() => false));
     attempt += 1
   ) {
-    const explore = page.getByRole("button", { name: /الأدوات عند الحاجة|Tools when needed/ });
-    if ((await explore.count()) && (await explore.isVisible().catch(() => false)))
+    if ((await explore.count()) && (await explore.isVisible().catch(() => false))) {
       await explore.first().click();
-    await page.waitForTimeout(700 * (attempt + 1));
+    }
+    await page.waitForTimeout(750 * (attempt + 1));
   }
+  await hubTitle.waitFor({ state: "visible", timeout: 15000 });
   await cards.waitFor({ state: "visible", timeout: 15000 });
   await page.waitForTimeout(600);
 }

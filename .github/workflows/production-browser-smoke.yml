@@ -21,13 +21,11 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.14
-      - name: Install Playwright
-        run: |
-          bun add --no-save playwright@1.55.0
-          bunx playwright install --with-deps chromium
+      - name: Install Playwright browser
+        run: bunx playwright install --with-deps chromium
       - name: Test live production hydration after runtime bootstrap
         env:
-          BASE_URL: https://seerati-ai-cv.lovable.app
+          BASE_URL: https://hrhbs.com
         run: |
           node <<'NODE'
           const { chromium } = require('playwright');

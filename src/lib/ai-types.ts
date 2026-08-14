@@ -6,7 +6,6 @@ import type {
   SyntheticExperienceLevel,
   SyntheticSpecialtyId,
 } from "@/modules/synthetic-resume/types";
-import type { ResumeData } from "./types";
 
 export type AiTask =
   | "summary"
@@ -24,20 +23,25 @@ export type AiTask =
   /** Internal, consented synthetic-resume adaptation only. */
   | "adapt_sample";
 
+export type AiContext = {
+  /** The only resume-derived title the generic prompt builder consumes. */
+  personal?: { jobTitle?: string };
+  targetRole?: string;
+  jobDescription?: string;
+  section?: string;
+  answers?: Record<string, string>;
+  /** Protected-term policy block (see bilingual-intelligence.ts). */
+  protectedTerms?: string;
+};
+
 export type AiRequest = {
   task: AiTask;
   lang: "ar" | "en";
   input: string;
   /** Optional virtual specialist — prepends TEAM systemRole on the server. */
   agentId?: string;
-  context?: Partial<ResumeData> & {
-    targetRole?: string;
-    jobDescription?: string;
-    section?: string;
-    answers?: Record<string, string>;
-    /** Protected-term policy block (see bilingual-intelligence.ts). */
-    protectedTerms?: string;
-  };
+  /** Bounded, allowlisted context only; never a full ResumeData object. */
+  context?: AiContext;
 };
 
 export type AiResponse = { text: string; items?: string[] };
