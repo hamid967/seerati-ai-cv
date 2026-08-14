@@ -34,7 +34,7 @@ The template experience derives signals only from existing static `TemplateDef` 
 | Optional photo              | `design.supportsPhoto`       | Space is available when a photo is appropriate for the application context.                             |
 | Compact or generous spacing | `design.spacing`             | The layout density is disclosed before selection.                                                       |
 
-The public `/templates` page introduces three bilingual global principles with accessible icons: direction readiness, explainable fit, and local private choice. The editor's template switcher uses the same signals, keeping selection language consistent across discovery and editing.
+The public `/templates` page introduces three bilingual global principles with accessible icons: direction readiness, explainable fit, and local private choice. The editor's template switcher uses the same signals, keeping selection language consistent across discovery and editing. The resume studio's **Design advisor** now presents those signals on each local recommendation before the visitor presses its explicit apply button; the selected card is announced through `aria-pressed` and carries a visible current-template label.
 
 ## Privacy and accessibility boundaries
 
