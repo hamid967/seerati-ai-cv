@@ -53,14 +53,15 @@ async function expectGuestStorageEmpty() {
   );
 }
 
+const guestNotice = page.getByTestId("guest-notice");
+
 async function openGuestNotice() {
-  const notice = page.locator("details").filter({
-    hasText: /تصدير JSON محلياً|Export JSON locally|حذف بياناتي الآن|Delete my data now/i,
-  });
-  await notice.first().waitFor({ state: "attached" });
-  await notice.first().evaluate((element) => {
-    element.open = true;
-  });
+  await guestNotice.waitFor({ state: "visible", timeout: 10_000 });
+  const expanded = await guestNotice.evaluate((element) => element.open);
+  if (!expanded) await guestNotice.locator("summary").click();
+  await guestNotice
+    .getByRole("button", { name: /تصدير JSON محلياً|Export JSON locally/i })
+    .waitFor({ state: "visible", timeout: 10_000 });
 }
 
 async function readDownload(download) {
@@ -102,17 +103,17 @@ try {
   assert(!page.url().includes("/auth"), "guest editor must not redirect to auth");
 
   await openGuestNotice();
-  await page
+  await guestNotice
     .getByRole("link", {
       name: /حساب اختياري لنسخ يدوي بعد المراجعة|Optional account for reviewed manual copy/i,
     })
-    .waitFor();
+    .waitFor({ state: "visible", timeout: 10_000 });
 
   const [jsonDownload] = await Promise.all([
     page.waitForEvent("download"),
-    page
+    guestNotice
       .getByRole("button", { name: /تصدير JSON محلياً|Export JSON locally/i })
-      .click({ force: true }),
+      .click({ timeout: 5_000 }),
   ]);
   assert(
     jsonDownload.suggestedFilename() === "seerati-guest-session-export.json",
@@ -128,7 +129,9 @@ try {
   await openGuestNotice();
   const [textDownload] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: /تصدير نص ATS|Export ATS text/i }).click({ force: true }),
+    guestNotice
+      .getByRole("button", { name: /تصدير نص ATS|Export ATS text/i })
+      .click({ timeout: 5_000 }),
   ]);
   assert(
     textDownload.suggestedFilename() === "seerati-guest-ats.txt",
@@ -200,9 +203,10 @@ Professional summary: Synthetic visitor parity fixture.
 
   await expectGuestStorageEmpty();
   await navigateWithinApp(`/resumes/${resumeId}/edit`);
-  await page.locator("details > summary").first().waitFor();
-  await page.locator("details > summary").first().click();
-  await page.getByRole("button", { name: /حذف بياناتي الآن|Delete my data now/i }).click();
+  await openGuestNotice();
+  await guestNotice
+    .getByRole("button", { name: /حذف بياناتي الآن|Delete my data now/i })
+    .click({ timeout: 5_000 });
   await navigateWithinApp("/ats");
   await page.getByText(/مثال على سيرة تجريبية|Example: demo resume/i).waitFor();
 
