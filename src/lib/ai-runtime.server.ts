@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateText } from "ai";
 
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { logServerFailure } from "./safe-server-log";
 import {
   AI_MODEL,
   buildPrompt,
@@ -53,7 +54,7 @@ async function countUsage(supabase: SupabaseClient, userId: string, sinceIso: st
   // Quotas are a server-side abuse boundary. If the counter cannot be read,
   // fail safely instead of silently treating the user as having zero usage.
   if (error) {
-    console.error("[ai] usage counter unavailable", error.message);
+    logServerFailure("ai.usage_counter", error);
     throw new AiRateLimitError("unavailable");
   }
 
@@ -82,7 +83,7 @@ export async function recordUsage(
   const { error } = await supabase
     .from("ai_usage")
     .insert({ user_id: userId, task: `${task}.${provider}.${status}`, tokens });
-  if (error) console.error("[ai] usage log failed", error.message);
+  if (error) logServerFailure("ai.usage_log", error);
 }
 
 /** Calls the gateway once, with a hard timeout, and validates the output shape. */

@@ -64,6 +64,15 @@ async function runLocale({ lang, viewport, label }) {
       `${label}: no horizontal overflow`,
     );
 
+    const globalSignals = page.getByTestId("template-global-signals");
+    assert(await globalSignals.isVisible(), `${label}: global template signals are visible`);
+    assert(
+      await globalSignals
+        .getByText(lang === "ar" ? /اختيار محلي خاص/ : /Private local choice/)
+        .isVisible(),
+      `${label}: global template signals disclose the local privacy boundary`,
+    );
+
     const goal = guide.getByRole("button", {
       name: lang === "ar" ? /مسار قيادي/ : /Leadership path/,
     });
@@ -132,5 +141,5 @@ if (failures.length) {
 }
 
 console.log(
-  "Template intelligence smoke passed: local recommendations, mobile accessibility, and privacy boundaries.",
+  "Template intelligence smoke passed: global template signals, local recommendations, mobile accessibility, and privacy boundaries.",
 );

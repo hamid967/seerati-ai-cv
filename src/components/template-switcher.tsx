@@ -1,5 +1,17 @@
 import { useMemo, useState } from "react";
-import { Check, LayoutTemplate, Sparkles } from "lucide-react";
+import {
+  Check,
+  Columns2,
+  Expand,
+  FileText,
+  Globe2,
+  ImagePlus,
+  LayoutTemplate,
+  Rows3,
+  ScanText,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { ResumeThumb, getTemplate } from "@/components/resume-preview";
 import { useI18n } from "@/lib/i18n";
+import { getPrimaryTemplateSignals, type TemplateSignalId } from "@/lib/template-signals";
 import { defaultTemplates } from "@/lib/templates";
 import type { Resume, TemplateDef } from "@/lib/types";
 
@@ -23,6 +36,16 @@ const CATEGORIES: { id: string; ar: string; en: string }[] = [
   { id: "minimal", ar: "مبسّط", en: "Minimal" },
   { id: "creative", ar: "إبداعي", en: "Creative" },
 ];
+
+const TEMPLATE_SIGNAL_ICONS: Record<TemplateSignalId, LucideIcon> = {
+  ats: ScanText,
+  global: Globe2,
+  document: FileText,
+  visual: Columns2,
+  photo: ImagePlus,
+  compact: Rows3,
+  spacious: Expand,
+};
 
 /**
  * Live template switcher for the resume editor: each card renders the user's
@@ -109,13 +132,33 @@ export function TemplateSwitcher({
                   )}
                 </div>
 
-                <div className="mt-2 flex items-center justify-between gap-2 px-1 pb-1">
-                  <span className="truncate text-sm font-semibold">{t.name[lang]}</span>
-                  {t.atsFriendly && (
-                    <Badge variant="secondary" className="shrink-0 text-[10px]">
-                      ATS
-                    </Badge>
-                  )}
+                <div className="mt-2 px-1 pb-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-semibold">{t.name[lang]}</span>
+                    {t.atsFriendly && (
+                      <Badge variant="secondary" className="shrink-0 text-[10px]">
+                        ATS
+                      </Badge>
+                    )}
+                  </div>
+                  <div
+                    className="mt-1.5 flex flex-wrap gap-1"
+                    aria-label={ar ? "خصائص القالب" : "Template properties"}
+                  >
+                    {getPrimaryTemplateSignals(t, 3).map((signal) => {
+                      const Icon = TEMPLATE_SIGNAL_ICONS[signal.id];
+                      return (
+                        <span
+                          key={signal.id}
+                          className="inline-flex items-center rounded-md bg-muted px-1.5 py-1 text-muted-foreground"
+                          title={signal.detail[lang]}
+                        >
+                          <Icon className="size-3" aria-hidden="true" />
+                          <span className="sr-only">{signal.label[lang]}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
               </button>
             );
