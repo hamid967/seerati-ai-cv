@@ -61,6 +61,10 @@ jobs:
         env:
           BROWSER_ONLY: ${{ matrix.browser }}
         run: bun run test:release-hardening
+      - name: Run guest mobile accessibility smoke
+        env:
+          BROWSER_ONLY: ${{ matrix.browser }}
+        run: bun run test:guest-mobile-accessibility
       - name: Run Phase 14 guest parity and privacy smoke
         if: matrix.browser == 'chromium'
         run: bun run test:phase14-guest
