@@ -2,7 +2,7 @@
 
 ## Safety objective
 
-A resume containing unresolved fictional information must not be exported in a form that appears final or applicant-authored. The export gate is evaluated from `syntheticSample.fieldMap`: if any field has `exportApproved: false`, the resume remains a sample.
+A resume containing unresolved fictional information must not be exported in a form that appears final or applicant-authored. The export gate is evaluated from `syntheticSample.fieldMap`: if any field has `exportApproved: false`, the resume remains a sample. This rule is source-neutral: deterministic fields (`synthetic-template`) and optional AI-adapted fields (`synthetic-ai`) are both unresolved samples until the visitor changes and explicitly confirms them.
 
 ## Guarded actions
 
@@ -23,7 +23,7 @@ The permitted pre-review download uses the filename `sample-resume-not-for-appli
 
 ## Final export condition
 
-The initial slice does not provide a bypass. Final PDF, print, copy, and unlabelled ATS-text actions become available only when all tracked sample fields are explicitly confirmed after their underlying content changed. Existing free, registration-optional export behavior applies after this condition is met.
+The initial slice does not provide a bypass. Final PDF, print, copy, and unlabelled ATS-text actions become available only when all tracked sample fields are explicitly confirmed after their underlying content changed. Optional AI adaptation does not alter this condition: its summary, responsibilities, skills, project, and certificate are initially tagged `status: sample`, `source: synthetic-ai`, and `exportApproved: false`. Existing free, registration-optional export behavior applies after the condition is met.
 
 ## ATS and job-matching boundary
 
@@ -31,4 +31,4 @@ When an unresolved sample is active, the ATS route suppresses final content scor
 
 ## Regression coverage
 
-The browser smoke creates a synthetic resume, attempts Text PDF export, verifies that the warning appears, and downloads the labelled sample file. It also navigates to ATS and verifies the synthetic-content boundary. The test fails if synthetic marker content reaches an outbound request, if a cloud persistence mutation occurs, or if a persistence key related to the sample is present by default.
+The browser smoke creates a synthetic resume, attempts Text PDF export, verifies that the warning appears, and downloads the labelled sample file. It also navigates to ATS and verifies the synthetic-content boundary. The deterministic smoke verifies that applying accepted AI adaptation sets `contentMode: ai-adapted`, leaves fields in sample status, records `synthetic-ai` source, and keeps export approval false. The browser smoke additionally verifies that the AI control is disabled until consent and that a guest fallback issues no adaptation request. Tests fail if synthetic marker content reaches an outbound request, if a cloud persistence mutation occurs, or if a persistence key related to the sample is present by default.

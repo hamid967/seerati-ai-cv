@@ -1,5 +1,6 @@
 import {
   SYNTHETIC_SPECIALTY_TAXONOMY,
+  applySyntheticAdaptation,
   createSyntheticCareerProfile,
   hasUnapprovedSampleData,
   searchSyntheticSpecialties,
@@ -15,8 +16,8 @@ function assert(condition: unknown, message: string): asserts condition {
 const levels: SyntheticExperienceLevel[] = ["student", "graduate", "mid", "manager"];
 
 assert(
-  SYNTHETIC_SPECIALTY_TAXONOMY.length === 6,
-  "initial taxonomy must contain exactly six scoped specialties",
+  SYNTHETIC_SPECIALTY_TAXONOMY.length === 36,
+  "expanded taxonomy must contain the six initial specialties plus thirty reviewed additions",
 );
 assert(
   searchSyntheticSpecialties("محاسب").some((specialty) => specialty.id === "accounting"),
@@ -27,6 +28,14 @@ assert(
     (specialty) => specialty.id === "software-development",
   ),
   "English specialty search must find software development",
+);
+assert(
+  searchSyntheticSpecialties("صيدلي").some((specialty) => specialty.id === "pharmacy"),
+  "Arabic expanded specialty search must find pharmacy",
+);
+assert(
+  searchSyntheticSpecialties("cybersecurity").some((specialty) => specialty.id === "cybersecurity"),
+  "English expanded specialty search must find cybersecurity",
 );
 
 for (const specialty of SYNTHETIC_SPECIALTY_TAXONOMY) {
@@ -89,6 +98,35 @@ assert(
   hasUnapprovedSampleData(confirmed),
   "one confirmed field must not silently approve the remaining sample data",
 );
+
+const adapted = applySyntheticAdaptation(profile, {
+  summary: "Fictional adapted sample summary requiring user review.",
+  responsibilities: [
+    "Organised fictional workflow notes for review.",
+    "Prepared fictional sample materials for iteration.",
+    "Collaborated with a fictional team on a sample handover.",
+  ],
+  skills: ["Sample planning", "Sample documentation", "Sample communication", "Sample review"],
+  project: "Sample project: fictional workflow guide",
+  certificate: "Sample fictional training certificate",
+});
+assert(
+  adapted.metadata.contentMode === "ai-adapted",
+  "adapted sample must retain AI mode metadata",
+);
+assert(
+  adapted.metadata.fieldMap["summary"]?.source === "synthetic-ai",
+  "adapted summary must be tagged with its synthetic AI source",
+);
+assert(
+  adapted.metadata.fieldMap["summary"]?.status === "sample",
+  "adapted summary must remain a sample rather than a confirmed fact",
+);
+assert(
+  !adapted.metadata.fieldMap["summary"]?.exportApproved,
+  "adapted summary must remain blocked from final export",
+);
+assert(hasUnapprovedSampleData(adapted.metadata), "adapted sample must remain export-blocked");
 
 const serialized = JSON.stringify(profile);
 assert(

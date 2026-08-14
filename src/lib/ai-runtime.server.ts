@@ -5,14 +5,30 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateText } from "ai";
 
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
-import { AI_MODEL, buildPrompt, validateAiOutput } from "./ai-prompts.server";
-import type { AiRequest, AiResponse } from "./ai-types";
+import {
+  AI_MODEL,
+  buildPrompt,
+  buildSyntheticAdaptationPrompt,
+  validateAiOutput,
+  validateSyntheticAdaptationOutput,
+} from "./ai-prompts.server";
+import type {
+  AiRequest,
+  AiResponse,
+  SyntheticAdaptationContent,
+  SyntheticAdaptationRequest,
+} from "./ai-types";
 
 /** Per-user quota enforced server-side (client-side throttling is not enough). */
 export const RATE_LIMIT_PER_MINUTE = 20;
 export const RATE_LIMIT_PER_DAY = 300;
 
 export type AiRunResult = AiResponse & { provider: "gateway"; runId?: string };
+export type SyntheticAdaptationRunResult = SyntheticAdaptationContent & {
+  provider: "gateway";
+  runId?: string;
+  tokens: number | null;
+};
 
 export class AiRateLimitError extends Error {
   constructor(public scope: "minute" | "day" | "unavailable") {
@@ -70,6 +86,35 @@ export async function recordUsage(
 }
 
 /** Calls the gateway once, with a hard timeout, and validates the output shape. */
+/**
+ * Calls the AI gateway for a consented synthetic adaptation. Its prompt is built
+ * solely from specialty, experience level, and language; no CV or personal text
+ * is accepted by this function.
+ */
+export async function runSyntheticGatewayAdaptation(
+  req: SyntheticAdaptationRequest,
+  apiKey: string,
+): Promise<SyntheticAdaptationRunResult> {
+  const gateway = createLovableAiGatewayProvider(apiKey);
+  const { system, prompt } = buildSyntheticAdaptationPrompt(req);
+  const result = await generateText({
+    model: gateway(AI_MODEL),
+    system,
+    prompt,
+    temperature: 0.3,
+    maxRetries: 1,
+    abortSignal: AbortSignal.timeout(45_000),
+  });
+  const content = validateSyntheticAdaptationOutput(result.text ?? "");
+  const runId = gateway.getRunId();
+  return {
+    ...content,
+    provider: "gateway",
+    ...(runId ? { runId } : {}),
+    tokens: result.usage?.totalTokens ?? null,
+  };
+}
+
 export async function runGatewayTask(req: AiRequest, apiKey: string): Promise<AiRunResult> {
   const gateway = createLovableAiGatewayProvider(apiKey);
   const { system, prompt } = buildPrompt(req);

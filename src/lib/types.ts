@@ -132,7 +132,7 @@ export type ResumeStatus = "draft" | "complete";
 export type SampleFieldMetadata = {
   value: string;
   status: "sample" | "user-confirmed";
-  source: "synthetic-template" | "user";
+  source: "synthetic-template" | "synthetic-ai" | "user";
   requiresUserReview: boolean;
   exportApproved: boolean;
 };
@@ -151,6 +151,8 @@ export type SyntheticResumeMetadata = {
   fieldMap: Record<string, SampleFieldMetadata>;
   coreFieldPaths: string[];
   generatedAt: string;
+  /** The adapted mode remains fictional and must never bypass sample review. */
+  contentMode?: "deterministic" | "ai-adapted";
 };
 
 export type Resume = {

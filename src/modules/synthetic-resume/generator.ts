@@ -1,4 +1,5 @@
 import { emptyResumeData, type ResumeData, type SectionKey } from "@/lib/types";
+import type { SyntheticAdaptationContent } from "@/lib/ai-types";
 import { defaultTemplates } from "@/lib/templates";
 import { specialtyById } from "./taxonomy";
 import type {
@@ -7,6 +8,7 @@ import type {
   SyntheticGeneratorInput,
   SyntheticReadiness,
   SyntheticResumeMetadata,
+  SyntheticSpecialty,
   SyntheticSpecialtyId,
   SyntheticTemplateOption,
 } from "./types";
@@ -27,230 +29,313 @@ type RoleDefinition = {
  * Reviewed, fictional role copy. This library intentionally contains no real
  * employers, universities, clients, credentials, people, or performance data.
  */
-export const SyntheticCareerTemplateLibrary: Record<SyntheticSpecialtyId, RoleDefinition> = {
-  "software-development": {
-    title: { ar: "مطور برمجيات", en: "Software Developer" },
-    degree: { ar: "بكالوريوس في علوم الحاسب", en: "Bachelor's degree in Computer Science" },
-    summary: {
-      ar: "نموذج تجريبي لمطور برمجيات يركز على بناء حلول قابلة للصيانة والتعاون مع فرق المنتج والجودة.",
-      en: "Sample profile for a software developer focused on maintainable solutions and collaboration with product and quality teams.",
+export const SyntheticCareerTemplateLibrary: Partial<Record<SyntheticSpecialtyId, RoleDefinition>> =
+  {
+    "software-development": {
+      title: { ar: "مطور برمجيات", en: "Software Developer" },
+      degree: { ar: "بكالوريوس في علوم الحاسب", en: "Bachelor's degree in Computer Science" },
+      summary: {
+        ar: "نموذج تجريبي لمطور برمجيات يركز على بناء حلول قابلة للصيانة والتعاون مع فرق المنتج والجودة.",
+        en: "Sample profile for a software developer focused on maintainable solutions and collaboration with product and quality teams.",
+      },
+      responsibilities: [
+        {
+          ar: "طوّرت مكونات تطبيق قابلة لإعادة الاستخدام ضمن فريق تجريبي.",
+          en: "Built reusable application components within a fictional team.",
+        },
+        {
+          ar: "راجعت المتطلبات وكتبت ملاحظات واضحة للاختبار والتحسين.",
+          en: "Reviewed requirements and wrote clear notes for testing and iteration.",
+        },
+        {
+          ar: "تعاونت مع التصميم والجودة لتحسين رحلة المستخدم.",
+          en: "Collaborated with design and quality to improve the user journey.",
+        },
+      ],
+      skills: [
+        { ar: "برمجة", en: "Programming" },
+        { ar: "تصميم واجهات برمجية", en: "API design" },
+        { ar: "اختبار البرمجيات", en: "Software testing" },
+        { ar: "Git", en: "Git" },
+      ],
+      project: {
+        ar: "مشروع تجريبي: لوحة متابعة طلبات داخلية",
+        en: "Sample project: internal request-tracking dashboard",
+      },
+      certificate: {
+        ar: "شهادة تدريب تجريبية في تطوير البرمجيات",
+        en: "Sample software-development training certificate",
+      },
     },
-    responsibilities: [
-      {
-        ar: "طوّرت مكونات تطبيق قابلة لإعادة الاستخدام ضمن فريق تجريبي.",
-        en: "Built reusable application components within a fictional team.",
+    accounting: {
+      title: { ar: "محاسب", en: "Accountant" },
+      degree: { ar: "بكالوريوس في المحاسبة", en: "Bachelor's degree in Accounting" },
+      summary: {
+        ar: "نموذج تجريبي لمحاسب يركز على تنظيم السجلات ومراجعة المستندات ودعم التقارير الدورية.",
+        en: "Sample profile for an accountant focused on organised records, document review, and periodic reporting support.",
       },
-      {
-        ar: "راجعت المتطلبات وكتبت ملاحظات واضحة للاختبار والتحسين.",
-        en: "Reviewed requirements and wrote clear notes for testing and iteration.",
+      responsibilities: [
+        {
+          ar: "راجعت قيوداً تجريبية ونظمت المستندات المساندة.",
+          en: "Reviewed sample entries and organised supporting documents.",
+        },
+        {
+          ar: "أعددت مسودات تقارير دورية للمراجعة الداخلية.",
+          en: "Prepared draft periodic reports for internal review.",
+        },
+        {
+          ar: "نسقت مع أصحاب العلاقة لتوضيح بيانات الفواتير التجريبية.",
+          en: "Coordinated with stakeholders to clarify sample invoice data.",
+        },
+      ],
+      skills: [
+        { ar: "إعداد التقارير", en: "Reporting" },
+        { ar: "Excel", en: "Excel" },
+        { ar: "المطابقات", en: "Reconciliations" },
+        { ar: "الانتباه للتفاصيل", en: "Attention to detail" },
+      ],
+      project: {
+        ar: "مشروع تجريبي: ملف متابعة للمصروفات",
+        en: "Sample project: expense-tracking workbook",
       },
-      {
-        ar: "تعاونت مع التصميم والجودة لتحسين رحلة المستخدم.",
-        en: "Collaborated with design and quality to improve the user journey.",
+      certificate: {
+        ar: "شهادة تدريب تجريبية في أساسيات المحاسبة",
+        en: "Sample accounting fundamentals training certificate",
       },
+    },
+    "civil-engineering": {
+      title: { ar: "مهندس مدني", en: "Civil Engineer" },
+      degree: { ar: "بكالوريوس في الهندسة المدنية", en: "Bachelor's degree in Civil Engineering" },
+      summary: {
+        ar: "نموذج تجريبي لمهندس مدني يركز على التنسيق الموقعي ومراجعة المخططات ودعم جودة التنفيذ.",
+        en: "Sample profile for a civil engineer focused on site coordination, drawing review, and execution-quality support.",
+      },
+      responsibilities: [
+        {
+          ar: "راجعت مخططات تجريبية وسجلت ملاحظات التنسيق.",
+          en: "Reviewed sample drawings and recorded coordination notes.",
+        },
+        {
+          ar: "دعمت متابعة أنشطة موقع افتراضي وفق إجراءات السلامة.",
+          en: "Supported fictional site activity follow-up using safety procedures.",
+        },
+        {
+          ar: "نسقت تحديثات العمل بين الفرق الفنية والموردين التجريبيين.",
+          en: "Coordinated work updates across technical teams and fictional suppliers.",
+        },
+      ],
+      skills: [
+        { ar: "قراءة المخططات", en: "Drawing review" },
+        { ar: "تنسيق الموقع", en: "Site coordination" },
+        { ar: "إدارة الجودة", en: "Quality management" },
+        { ar: "السلامة", en: "Safety" },
+      ],
+      project: {
+        ar: "مشروع تجريبي: متابعة حزمة أعمال مدنية",
+        en: "Sample project: civil works package follow-up",
+      },
+      certificate: {
+        ar: "شهادة تدريب تجريبية في سلامة مواقع العمل",
+        en: "Sample site-safety training certificate",
+      },
+    },
+    "human-resources": {
+      title: { ar: "أخصائي موارد بشرية", en: "Human Resources Specialist" },
+      degree: {
+        ar: "بكالوريوس في إدارة الأعمال",
+        en: "Bachelor's degree in Business Administration",
+      },
+      summary: {
+        ar: "نموذج تجريبي لأخصائي موارد بشرية يركز على تنظيم عمليات الموظفين ودعم التوظيف والتواصل الداخلي.",
+        en: "Sample profile for an HR specialist focused on employee-process organisation, recruitment support, and internal communication.",
+      },
+      responsibilities: [
+        {
+          ar: "نظمت ملفات موظفين تجريبية وفق قائمة تحقق واضحة.",
+          en: "Organised fictional employee files using a clear checklist.",
+        },
+        {
+          ar: "دعمت تنسيق مقابلات تدريبية ورسائل تواصل داخلية.",
+          en: "Supported practice interview coordination and internal communications.",
+        },
+        {
+          ar: "أعددت مسودة مواد تعريفية لعملية انضمام تجريبية.",
+          en: "Prepared draft onboarding materials for a fictional process.",
+        },
+      ],
+      skills: [
+        { ar: "التوظيف", en: "Recruitment" },
+        { ar: "علاقات الموظفين", en: "Employee relations" },
+        { ar: "تنسيق العمليات", en: "Operations coordination" },
+        { ar: "التواصل", en: "Communication" },
+      ],
+      project: {
+        ar: "مشروع تجريبي: قائمة متابعة للانضمام الوظيفي",
+        en: "Sample project: employee onboarding checklist",
+      },
+      certificate: {
+        ar: "شهادة تدريب تجريبية في أساسيات الموارد البشرية",
+        en: "Sample HR fundamentals training certificate",
+      },
+    },
+    nursing: {
+      title: { ar: "ممرض/ممرضة", en: "Registered Nurse" },
+      degree: { ar: "بكالوريوس في التمريض", en: "Bachelor's degree in Nursing" },
+      summary: {
+        ar: "نموذج تجريبي للتمريض يركز على الرعاية الآمنة والتواصل المهني والالتزام بإجراءات القسم.",
+        en: "Sample profile for nursing focused on safe care, professional communication, and adherence to unit procedures.",
+      },
+      responsibilities: [
+        {
+          ar: "دعمت سيناريوهات رعاية تجريبية تحت إشراف تدريبي.",
+          en: "Supported fictional care scenarios under training supervision.",
+        },
+        {
+          ar: "وثقت ملاحظات تدريبية وفق نموذج محاكاة واضح.",
+          en: "Documented training notes using a clear simulation template.",
+        },
+        {
+          ar: "تعاونت مع فريق محاكاة لتنسيق انتقالات الرعاية.",
+          en: "Collaborated with a simulation team to coordinate care handovers.",
+        },
+      ],
+      skills: [
+        { ar: "رعاية المرضى", en: "Patient care" },
+        { ar: "التوثيق", en: "Documentation" },
+        { ar: "مكافحة العدوى", en: "Infection control" },
+        { ar: "التواصل السريري", en: "Clinical communication" },
+      ],
+      project: {
+        ar: "مشروع تجريبي: دليل تسليم المناوبة",
+        en: "Sample project: shift handover guide",
+      },
+      certificate: {
+        ar: "شهادة تدريب تجريبية في السلامة السريرية",
+        en: "Sample clinical-safety training certificate",
+      },
+    },
+    sales: {
+      title: { ar: "أخصائي مبيعات", en: "Sales Specialist" },
+      degree: {
+        ar: "بكالوريوس في إدارة الأعمال",
+        en: "Bachelor's degree in Business Administration",
+      },
+      summary: {
+        ar: "نموذج تجريبي لأخصائي مبيعات يركز على فهم احتياجات العملاء وتنظيم الفرص والتواصل التجاري الواضح.",
+        en: "Sample profile for a sales specialist focused on understanding customer needs, organising opportunities, and clear commercial communication.",
+      },
+      responsibilities: [
+        {
+          ar: "نظمت فرصاً تجريبية في قائمة متابعة للمبيعات.",
+          en: "Organised fictional opportunities in a sales follow-up list.",
+        },
+        {
+          ar: "أعددت رسائل تواصل تجريبية وفق احتياجات عميل افتراضي.",
+          en: "Prepared practice outreach messages for fictional customer needs.",
+        },
+        {
+          ar: "راجعت مراحل البيع مع فريق تدريبي وحددت الخطوة التالية.",
+          en: "Reviewed sales stages with a training team and identified next steps.",
+        },
+      ],
+      skills: [
+        { ar: "إدارة الحسابات", en: "Account management" },
+        { ar: "التواصل التجاري", en: "Commercial communication" },
+        { ar: "إدارة الفرص", en: "Opportunity management" },
+        { ar: "العروض", en: "Presentations" },
+      ],
+      project: {
+        ar: "مشروع تجريبي: مسار فرص لمنتج افتراضي",
+        en: "Sample project: opportunity pipeline for a fictional product",
+      },
+      certificate: {
+        ar: "شهادة تدريب تجريبية في أساسيات المبيعات",
+        en: "Sample sales fundamentals training certificate",
+      },
+    },
+  };
+
+function expandedSpecialtyRole(specialty: SyntheticSpecialty): RoleDefinition {
+  const groupSkills: Record<string, Localized[]> = {
+    Technology: [
+      { ar: "حل المشكلات", en: "Problem solving" },
+      { ar: "توثيق العمل", en: "Work documentation" },
+      { ar: "التعاون التقني", en: "Technical collaboration" },
+      { ar: "إدارة الأولويات", en: "Prioritisation" },
     ],
-    skills: [
-      { ar: "برمجة", en: "Programming" },
-      { ar: "تصميم واجهات برمجية", en: "API design" },
-      { ar: "اختبار البرمجيات", en: "Software testing" },
-      { ar: "Git", en: "Git" },
-    ],
-    project: {
-      ar: "مشروع تجريبي: لوحة متابعة طلبات داخلية",
-      en: "Sample project: internal request-tracking dashboard",
-    },
-    certificate: {
-      ar: "شهادة تدريب تجريبية في تطوير البرمجيات",
-      en: "Sample software-development training certificate",
-    },
-  },
-  accounting: {
-    title: { ar: "محاسب", en: "Accountant" },
-    degree: { ar: "بكالوريوس في المحاسبة", en: "Bachelor's degree in Accounting" },
-    summary: {
-      ar: "نموذج تجريبي لمحاسب يركز على تنظيم السجلات ومراجعة المستندات ودعم التقارير الدورية.",
-      en: "Sample profile for an accountant focused on organised records, document review, and periodic reporting support.",
-    },
-    responsibilities: [
-      {
-        ar: "راجعت قيوداً تجريبية ونظمت المستندات المساندة.",
-        en: "Reviewed sample entries and organised supporting documents.",
-      },
-      {
-        ar: "أعددت مسودات تقارير دورية للمراجعة الداخلية.",
-        en: "Prepared draft periodic reports for internal review.",
-      },
-      {
-        ar: "نسقت مع أصحاب العلاقة لتوضيح بيانات الفواتير التجريبية.",
-        en: "Coordinated with stakeholders to clarify sample invoice data.",
-      },
-    ],
-    skills: [
-      { ar: "إعداد التقارير", en: "Reporting" },
-      { ar: "Excel", en: "Excel" },
-      { ar: "المطابقات", en: "Reconciliations" },
-      { ar: "الانتباه للتفاصيل", en: "Attention to detail" },
-    ],
-    project: {
-      ar: "مشروع تجريبي: ملف متابعة للمصروفات",
-      en: "Sample project: expense-tracking workbook",
-    },
-    certificate: {
-      ar: "شهادة تدريب تجريبية في أساسيات المحاسبة",
-      en: "Sample accounting fundamentals training certificate",
-    },
-  },
-  "civil-engineering": {
-    title: { ar: "مهندس مدني", en: "Civil Engineer" },
-    degree: { ar: "بكالوريوس في الهندسة المدنية", en: "Bachelor's degree in Civil Engineering" },
-    summary: {
-      ar: "نموذج تجريبي لمهندس مدني يركز على التنسيق الموقعي ومراجعة المخططات ودعم جودة التنفيذ.",
-      en: "Sample profile for a civil engineer focused on site coordination, drawing review, and execution-quality support.",
-    },
-    responsibilities: [
-      {
-        ar: "راجعت مخططات تجريبية وسجلت ملاحظات التنسيق.",
-        en: "Reviewed sample drawings and recorded coordination notes.",
-      },
-      {
-        ar: "دعمت متابعة أنشطة موقع افتراضي وفق إجراءات السلامة.",
-        en: "Supported fictional site activity follow-up using safety procedures.",
-      },
-      {
-        ar: "نسقت تحديثات العمل بين الفرق الفنية والموردين التجريبيين.",
-        en: "Coordinated work updates across technical teams and fictional suppliers.",
-      },
-    ],
-    skills: [
-      { ar: "قراءة المخططات", en: "Drawing review" },
-      { ar: "تنسيق الموقع", en: "Site coordination" },
+    Engineering: [
+      { ar: "قراءة المتطلبات", en: "Requirements review" },
+      { ar: "التنسيق الفني", en: "Technical coordination" },
       { ar: "إدارة الجودة", en: "Quality management" },
-      { ar: "السلامة", en: "Safety" },
+      { ar: "السلامة", en: "Safety awareness" },
     ],
-    project: {
-      ar: "مشروع تجريبي: متابعة حزمة أعمال مدنية",
-      en: "Sample project: civil works package follow-up",
-    },
-    certificate: {
-      ar: "شهادة تدريب تجريبية في سلامة مواقع العمل",
-      en: "Sample site-safety training certificate",
-    },
-  },
-  "human-resources": {
-    title: { ar: "أخصائي موارد بشرية", en: "Human Resources Specialist" },
-    degree: {
-      ar: "بكالوريوس في إدارة الأعمال",
-      en: "Bachelor's degree in Business Administration",
-    },
-    summary: {
-      ar: "نموذج تجريبي لأخصائي موارد بشرية يركز على تنظيم عمليات الموظفين ودعم التوظيف والتواصل الداخلي.",
-      en: "Sample profile for an HR specialist focused on employee-process organisation, recruitment support, and internal communication.",
-    },
-    responsibilities: [
-      {
-        ar: "نظمت ملفات موظفين تجريبية وفق قائمة تحقق واضحة.",
-        en: "Organised fictional employee files using a clear checklist.",
-      },
-      {
-        ar: "دعمت تنسيق مقابلات تدريبية ورسائل تواصل داخلية.",
-        en: "Supported practice interview coordination and internal communications.",
-      },
-      {
-        ar: "أعددت مسودة مواد تعريفية لعملية انضمام تجريبية.",
-        en: "Prepared draft onboarding materials for a fictional process.",
-      },
+    Finance: [
+      { ar: "إعداد التقارير", en: "Reporting" },
+      { ar: "تحليل المعلومات", en: "Information analysis" },
+      { ar: "الانتباه للتفاصيل", en: "Attention to detail" },
+      { ar: "Excel", en: "Excel" },
     ],
-    skills: [
-      { ar: "التوظيف", en: "Recruitment" },
-      { ar: "علاقات الموظفين", en: "Employee relations" },
-      { ar: "تنسيق العمليات", en: "Operations coordination" },
-      { ar: "التواصل", en: "Communication" },
+    "Human resources": [
+      { ar: "التواصل المهني", en: "Professional communication" },
+      { ar: "تنسيق العمليات", en: "Process coordination" },
+      { ar: "تنظيم السجلات", en: "Record organisation" },
+      { ar: "إدارة الأولويات", en: "Prioritisation" },
     ],
-    project: {
-      ar: "مشروع تجريبي: قائمة متابعة للانضمام الوظيفي",
-      en: "Sample project: employee onboarding checklist",
-    },
-    certificate: {
-      ar: "شهادة تدريب تجريبية في أساسيات الموارد البشرية",
-      en: "Sample HR fundamentals training certificate",
-    },
-  },
-  nursing: {
-    title: { ar: "ممرض/ممرضة", en: "Registered Nurse" },
-    degree: { ar: "بكالوريوس في التمريض", en: "Bachelor's degree in Nursing" },
-    summary: {
-      ar: "نموذج تجريبي للتمريض يركز على الرعاية الآمنة والتواصل المهني والالتزام بإجراءات القسم.",
-      en: "Sample profile for nursing focused on safe care, professional communication, and adherence to unit procedures.",
-    },
-    responsibilities: [
-      {
-        ar: "دعمت سيناريوهات رعاية تجريبية تحت إشراف تدريبي.",
-        en: "Supported fictional care scenarios under training supervision.",
-      },
-      {
-        ar: "وثقت ملاحظات تدريبية وفق نموذج محاكاة واضح.",
-        en: "Documented training notes using a clear simulation template.",
-      },
-      {
-        ar: "تعاونت مع فريق محاكاة لتنسيق انتقالات الرعاية.",
-        en: "Collaborated with a simulation team to coordinate care handovers.",
-      },
+    "Sales & marketing": [
+      { ar: "التواصل مع العملاء", en: "Client communication" },
+      { ar: "تنظيم الفرص", en: "Opportunity organisation" },
+      { ar: "إعداد العروض", en: "Presentation preparation" },
+      { ar: "التعاون", en: "Collaboration" },
     ],
-    skills: [
-      { ar: "رعاية المرضى", en: "Patient care" },
+    Health: [
       { ar: "التوثيق", en: "Documentation" },
-      { ar: "مكافحة العدوى", en: "Infection control" },
-      { ar: "التواصل السريري", en: "Clinical communication" },
+      { ar: "الالتزام بالإجراءات", en: "Procedure adherence" },
+      { ar: "التواصل المهني", en: "Professional communication" },
+      { ar: "العمل الجماعي", en: "Teamwork" },
     ],
-    project: {
-      ar: "مشروع تجريبي: دليل تسليم المناوبة",
-      en: "Sample project: shift handover guide",
-    },
-    certificate: {
-      ar: "شهادة تدريب تجريبية في السلامة السريرية",
-      en: "Sample clinical-safety training certificate",
-    },
-  },
-  sales: {
-    title: { ar: "أخصائي مبيعات", en: "Sales Specialist" },
+    "Management & operations": [
+      { ar: "تنسيق العمليات", en: "Operations coordination" },
+      { ar: "تحسين الإجراءات", en: "Process improvement" },
+      { ar: "إعداد التقارير", en: "Reporting" },
+      { ar: "إدارة أصحاب المصلحة", en: "Stakeholder coordination" },
+    ],
+  };
+  const skills = groupSkills[specialty.group.en] ?? groupSkills["Management & operations"]!;
+  return {
+    title: specialty.name,
     degree: {
-      ar: "بكالوريوس في إدارة الأعمال",
-      en: "Bachelor's degree in Business Administration",
+      ar: `مؤهل مناسب في ${specialty.name.ar}`,
+      en: `Relevant qualification in ${specialty.name.en}`,
     },
     summary: {
-      ar: "نموذج تجريبي لأخصائي مبيعات يركز على فهم احتياجات العملاء وتنظيم الفرص والتواصل التجاري الواضح.",
-      en: "Sample profile for a sales specialist focused on understanding customer needs, organising opportunities, and clear commercial communication.",
+      ar: `نموذج تجريبي في ${specialty.name.ar} يوضح طريقة تنظيم الخبرات والمهارات دون ادعاء أي معلومات حقيقية.`,
+      en: `Sample ${specialty.name.en} profile showing how to organise experience and skills without asserting any real information.`,
     },
     responsibilities: [
       {
-        ar: "نظمت فرصاً تجريبية في قائمة متابعة للمبيعات.",
-        en: "Organised fictional opportunities in a sales follow-up list.",
+        ar: `نظمت مهاماً تجريبية مرتبطة بمجال ${specialty.name.ar} وفق خطوات عمل واضحة.`,
+        en: `Organised fictional ${specialty.name.en} tasks using clear working steps.`,
       },
       {
-        ar: "أعددت رسائل تواصل تجريبية وفق احتياجات عميل افتراضي.",
-        en: "Prepared practice outreach messages for fictional customer needs.",
+        ar: "راجعت مدخلات نموذجية ووثقت ملاحظات للمراجعة والتحسين.",
+        en: "Reviewed sample inputs and documented notes for review and improvement.",
       },
       {
-        ar: "راجعت مراحل البيع مع فريق تدريبي وحددت الخطوة التالية.",
-        en: "Reviewed sales stages with a training team and identified next steps.",
+        ar: "تعاونت مع فريق افتراضي لتنسيق تحديثات العمل.",
+        en: "Collaborated with a fictional team to coordinate work updates.",
       },
     ],
-    skills: [
-      { ar: "إدارة الحسابات", en: "Account management" },
-      { ar: "التواصل التجاري", en: "Commercial communication" },
-      { ar: "إدارة الفرص", en: "Opportunity management" },
-      { ar: "العروض", en: "Presentations" },
-    ],
+    skills,
     project: {
-      ar: "مشروع تجريبي: مسار فرص لمنتج افتراضي",
-      en: "Sample project: opportunity pipeline for a fictional product",
+      ar: `مشروع تجريبي: سير عمل في ${specialty.name.ar}`,
+      en: `Sample project: ${specialty.name.en} workflow`,
     },
     certificate: {
-      ar: "شهادة تدريب تجريبية في أساسيات المبيعات",
-      en: "Sample sales fundamentals training certificate",
+      ar: `شهادة تدريب تجريبية في ${specialty.name.ar}`,
+      en: `Sample ${specialty.name.en} training certificate`,
     },
-  },
-};
+  };
+}
 
 const sampleField = (value: string): SampleField => ({
   value,
@@ -372,9 +457,10 @@ function baseFieldMap(data: ResumeData) {
 export function createSyntheticCareerProfile(
   input: SyntheticGeneratorInput,
 ): SyntheticCareerProfile {
-  const role = SyntheticCareerTemplateLibrary[input.specialtyId];
   const specialty = specialtyById(input.specialtyId);
-  if (!role || !specialty) throw new Error("Unsupported synthetic specialty");
+  if (!specialty) throw new Error("Unsupported synthetic specialty");
+  const role =
+    SyntheticCareerTemplateLibrary[input.specialtyId] ?? expandedSpecialtyRole(specialty);
 
   const lang = input.language;
   const text = (value: Localized) => value[lang];
@@ -465,6 +551,57 @@ export function createSyntheticCareerProfile(
   };
 
   return { resumeData, metadata, templates: templateOptions(input) };
+}
+
+/**
+ * Applies optional AI wording to a deterministic profile without changing the
+ * resume's memory-only lifecycle. Every changed field is still a fictional
+ * sample field and is explicitly blocked from final export until user review.
+ */
+export function applySyntheticAdaptation(
+  profile: SyntheticCareerProfile,
+  adaptation: SyntheticAdaptationContent,
+): SyntheticCareerProfile {
+  const resumeData = {
+    ...profile.resumeData,
+    summary: adaptation.summary,
+    experience: profile.resumeData.experience.map((item, index) =>
+      index === 0 ? { ...item, bullets: [...adaptation.responsibilities] } : item,
+    ),
+    skills: profile.resumeData.skills.map((item, index) => ({
+      ...item,
+      name: adaptation.skills[index] ?? item.name,
+    })),
+    projects: profile.resumeData.projects.map((item, index) =>
+      index === 0 ? { ...item, title: adaptation.project } : item,
+    ),
+    certificates: profile.resumeData.certificates.map((item, index) =>
+      index === 0 ? { ...item, title: adaptation.certificate } : item,
+    ),
+  };
+  const fieldMap = { ...profile.metadata.fieldMap };
+  const markSample = (path: string, value: string) => {
+    fieldMap[path] = {
+      value,
+      status: "sample",
+      source: "synthetic-ai",
+      requiresUserReview: true,
+      exportApproved: false,
+    };
+  };
+  markSample("summary", adaptation.summary);
+  adaptation.responsibilities.forEach((value, index) =>
+    markSample(`experience.0.bullets.${index}`, value),
+  );
+  adaptation.skills.forEach((value, index) => markSample(`skills.${index}.name`, value));
+  markSample("projects.0.title", adaptation.project);
+  markSample("certificates.0.title", adaptation.certificate);
+
+  return {
+    ...profile,
+    resumeData,
+    metadata: { ...profile.metadata, fieldMap, contentMode: "ai-adapted" },
+  };
 }
 
 export function updateSyntheticFieldMetadata(

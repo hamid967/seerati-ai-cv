@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -16,11 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useI18n } from "@/lib/i18n";
+import { adaptSyntheticSample } from "@/lib/synthetic-adaptation-service";
 import { useStore } from "@/lib/store";
 import {
+  applySyntheticAdaptation,
   createSyntheticCareerProfile,
   searchSyntheticSpecialties,
   type SyntheticCareerGoal,
+  type SyntheticCareerProfile,
   type SyntheticExperienceLevel,
   type SyntheticSpecialtyId,
 } from "@/modules/synthetic-resume";
@@ -65,6 +68,12 @@ export function SyntheticSampleFlow({ onClose }: Props) {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [customSpecialty, setCustomSpecialty] = useState("");
+  const [aiConsent, setAiConsent] = useState(false);
+  const [adaptedProfile, setAdaptedProfile] = useState<SyntheticCareerProfile | null>(null);
+  const [sampleMode, setSampleMode] = useState<"deterministic" | "ai-adapted">("deterministic");
+  const [adaptationState, setAdaptationState] = useState<
+    "idle" | "loading" | "adapted" | "guest" | "unavailable"
+  >("idle");
 
   const specialties = useMemo(() => searchSyntheticSpecialties(query), [query]);
   const profile = useMemo(
@@ -79,21 +88,50 @@ export function SyntheticSampleFlow({ onClose }: Props) {
         : null,
     [specialtyId, level, sampleLanguage, goal],
   );
-  const activeTemplate = profile?.templates.find((option) => option.template.id === previewId);
+  useEffect(() => {
+    setAdaptedProfile(null);
+    setSampleMode("deterministic");
+    setAiConsent(false);
+    setAdaptationState("idle");
+  }, [specialtyId, level, sampleLanguage, goal]);
+
+  const selectedProfile = sampleMode === "ai-adapted" && adaptedProfile ? adaptedProfile : profile;
+  const activeTemplate = selectedProfile?.templates.find(
+    (option) => option.template.id === previewId,
+  );
   const canContinue = step === 0 ? Boolean(specialtyId) : true;
 
+  const requestAdaptation = async () => {
+    if (!profile || !specialtyId || !aiConsent) return;
+    setAdaptationState("loading");
+    const result = await adaptSyntheticSample({
+      consent: true,
+      specialtyId,
+      experienceLevel: level,
+      language: sampleLanguage,
+    });
+    if (result.kind === "adapted") {
+      setAdaptedProfile(applySyntheticAdaptation(profile, result.content));
+      setSampleMode("ai-adapted");
+      setAdaptationState("adapted");
+      return;
+    }
+    setSampleMode("deterministic");
+    setAdaptationState(result.reason === "guest" ? "guest" : "unavailable");
+  };
+
   const createSample = (templateId: string) => {
-    if (!profile) return;
-    const template = profile.templates.find((option) => option.template.id === templateId);
+    if (!selectedProfile) return;
+    const template = selectedProfile.templates.find((option) => option.template.id === templateId);
     if (!template) return;
     const title =
-      profile.resumeData.personal.jobTitle || (ar ? "نموذج سيرة تجريبي" : "Sample resume");
+      selectedProfile.resumeData.personal.jobTitle || (ar ? "نموذج سيرة تجريبي" : "Sample resume");
     const resume = createTransientSampleResume({
       title,
       templateId,
       language: sampleLanguage,
-      data: profile.resumeData,
-      syntheticSample: { ...profile.metadata, selectedTemplateId: templateId },
+      data: selectedProfile.resumeData,
+      syntheticSample: { ...selectedProfile.metadata, selectedTemplateId: templateId },
     });
     void navigate({ to: "/resumes/$id/edit", params: { id: resume.id } });
   };
@@ -196,8 +234,8 @@ export function SyntheticSampleFlow({ onClose }: Props) {
             <p className="font-semibold">{ar ? "لم أجد تخصصي" : "I cannot find my specialty"}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {ar
-                ? "المكتبة الأولية تغطي ستة تخصصات فقط. يمكنك كتابة تخصصك هنا للرجوع إليه، ثم اختيار الأقرب لإنشاء نموذج عام قابل للتحرير. لا يُرسل النص أو يُحفظ."
-                : "The initial library covers six professions. You may note your specialty here, then choose the closest option for an editable general sample. This text is neither sent nor stored."}
+                ? "تغطي المكتبة ٣٦ تخصصاً تجريبياً مراجعاً. يمكنك كتابة تخصصك هنا للرجوع إليه، ثم اختيار الأقرب لإنشاء نموذج عام قابل للتحرير. لا يُرسل النص أو يُحفظ."
+                : "The library covers thirty-six reviewed sample professions. You may note your specialty here, then choose the closest option for an editable general sample. This text is neither sent nor stored."}
             </p>
             <Input
               className="mt-3"
@@ -275,6 +313,101 @@ export function SyntheticSampleFlow({ onClose }: Props) {
             </p>
             <Badge variant="outline">{ar ? "4 قوالب" : "4 templates"}</Badge>
           </div>
+          <section
+            className="rounded-xl border border-border bg-secondary/20 p-4"
+            aria-labelledby="synthetic-ai-consent-title"
+            data-testid="synthetic-ai-consent"
+          >
+            <div className="flex items-start gap-3">
+              <input
+                id="synthetic-ai-consent-checkbox"
+                type="checkbox"
+                checked={aiConsent}
+                onChange={(event) => setAiConsent(event.target.checked)}
+                className="mt-1 size-4 accent-primary"
+                aria-describedby="synthetic-ai-consent-details"
+              />
+              <div>
+                <Label id="synthetic-ai-consent-title" htmlFor="synthetic-ai-consent-checkbox">
+                  {ar
+                    ? "أوافق على طلب صياغة تجريبية اختيارية بالذكاء الاصطناعي"
+                    : "I agree to request optional AI sample wording"}
+                </Label>
+                <p
+                  id="synthetic-ai-consent-details"
+                  className="mt-2 max-w-4xl text-xs text-muted-foreground"
+                >
+                  {ar
+                    ? "عند الضغط على الزر فقط، قد تُرسل معرفات التخصص ومستوى الخبرة ولغة النموذج إلى مزود AI عبر خادم سيرتي. لا تُرسل بيانات شخصية أو نص السيرة أو التخصص المكتوب يدوياً. في جلسة الضيف لا يُجرى أي طلب ويب ويبقى النموذج المحلي الحتمي. أي خرج يبقى خيالياً بعلامة «عينة»، ويتطلب مراجعتك ويظل محظوراً من التصدير النهائي."
+                    : "Only after you press the button, the specialty ID, experience level, and sample language may be sent to an AI provider through Seerati's server. No personal data, resume text, or typed custom specialty is sent. In a guest session no web request is made and the deterministic local sample remains in use. Any output stays fictional, marked as a sample, requires your review, and remains blocked from final export."}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={!aiConsent || adaptationState === "loading"}
+                onClick={() => void requestAdaptation()}
+                data-testid="synthetic-ai-adapt"
+              >
+                <Sparkles className="size-4" />
+                {adaptationState === "loading"
+                  ? ar
+                    ? "جارٍ إعداد صياغة تجريبية…"
+                    : "Preparing sample wording…"
+                  : ar
+                    ? "استخدم صياغة AI اختيارية"
+                    : "Use optional AI wording"}
+              </Button>
+              {adaptedProfile ? (
+                <div
+                  role="group"
+                  aria-label={ar ? "مصدر محتوى العينة" : "Sample content source"}
+                  className="flex flex-wrap gap-2"
+                >
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={sampleMode === "deterministic" ? "secondary" : "ghost"}
+                    aria-pressed={sampleMode === "deterministic"}
+                    onClick={() => setSampleMode("deterministic")}
+                  >
+                    {ar ? "القالب المحلي" : "Local base"}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={sampleMode === "ai-adapted" ? "secondary" : "ghost"}
+                    aria-pressed={sampleMode === "ai-adapted"}
+                    onClick={() => setSampleMode("ai-adapted")}
+                  >
+                    {ar ? "عينة مكيّفة بالذكاء الاصطناعي" : "AI-adapted sample"}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+            <p
+              className="mt-3 text-xs text-muted-foreground"
+              aria-live="polite"
+              data-testid="synthetic-ai-status"
+            >
+              {adaptationState === "adapted"
+                ? ar
+                  ? "تم إعداد صياغة خيالية مكيّفة. ما زالت كل الحقول عيّنات تحتاج مراجعتك ولا يمكن تصديرها نهائياً."
+                  : "Fictional adapted wording is ready. Every field is still a sample requiring your review and cannot be finally exported."
+                : adaptationState === "guest"
+                  ? ar
+                    ? "جلسة ضيف: لم نرسل أي طلب AI. تم الاحتفاظ بالقالب المحلي الحتمي."
+                    : "Guest session: no AI request was sent. The deterministic local base has been kept."
+                  : adaptationState === "unavailable"
+                    ? ar
+                      ? "صياغة AI غير متاحة الآن. تم الاحتفاظ بالقالب المحلي الحتمي."
+                      : "AI wording is unavailable right now. The deterministic local base has been kept."
+                    : null}
+            </p>
+          </section>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {profile.templates.map((option) => {
               const selectedForCompare = compareIds.includes(option.template.id);
