@@ -70,6 +70,16 @@ export function upsertGuestResumeSession(
   return session;
 }
 
+/**
+ * Keep metadata aligned with the current local guest resume. Passing null is
+ * the final-resume deletion path and clears the module-held resume reference.
+ */
+export function synchronizeGuestResumeSession(resume: Resume | null): GuestResumeSession | null {
+  if (resume) return upsertGuestResumeSession(resume);
+  clearGuestResumeSession();
+  return null;
+}
+
 export function clearGuestResumeSession() {
   session = null;
 }
