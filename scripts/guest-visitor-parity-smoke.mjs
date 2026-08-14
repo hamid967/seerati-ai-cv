@@ -53,6 +53,23 @@ async function expectGuestStorageEmpty() {
   );
 }
 
+async function openGuestNotice() {
+  const notice = page.locator("details").filter({
+    hasText: /تصدير JSON محلياً|Export JSON locally|حذف بياناتي الآن|Delete my data now/i,
+  });
+  await notice.first().waitFor({ state: "attached" });
+  await notice.first().evaluate((element) => {
+    element.open = true;
+  });
+}
+
+async function readDownload(download) {
+  const stream = await download.createReadStream();
+  let output = "";
+  for await (const chunk of stream) output += chunk.toString();
+  return output;
+}
+
 try {
   page.on("request", recordRequest);
 
@@ -76,6 +93,45 @@ try {
   const resumeId = editorUrl.pathname.split("/")[2];
   assert(resumeId?.startsWith("guest-"), "visitor resume must use the local guest identifier");
   assert(!page.url().includes("/auth"), "guest editor must not redirect to auth");
+
+  await openGuestNotice();
+  await page
+    .getByRole("link", {
+      name: /حساب اختياري لنسخ يدوي بعد المراجعة|Optional account for reviewed manual copy/i,
+    })
+    .waitFor();
+
+  const [jsonDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page
+      .getByRole("button", { name: /تصدير JSON محلياً|Export JSON locally/i })
+      .click({ force: true }),
+  ]);
+  assert(
+    jsonDownload.suggestedFilename() === "seerati-guest-session-export.json",
+    "guest JSON export must use the documented local filename",
+  );
+  const jsonExport = await readDownload(jsonDownload);
+  assert(
+    jsonExport.includes(`${marker} resume`),
+    "guest JSON export must include the current local resume",
+  );
+  assert(!jsonExport.includes(resumeId), "guest JSON export must omit the local guest identifier");
+
+  await openGuestNotice();
+  const [textDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /تصدير نص ATS|Export ATS text/i }).click({ force: true }),
+  ]);
+  assert(
+    textDownload.suggestedFilename() === "seerati-guest-ats.txt",
+    "guest text export must use the documented local filename",
+  );
+  const textExport = await readDownload(textDownload);
+  assert(
+    textExport.includes(`${marker} resume`),
+    "guest ATS export must include the current local resume",
+  );
 
   await navigateWithinApp(`/resumes/${resumeId}/preview`);
   await page.getByRole("heading", { name: `${marker} resume` }).waitFor();
@@ -145,7 +201,7 @@ Professional summary: Synthetic visitor parity fixture.
 
   assert(!violations.length, `visitor parity network/privacy violations: ${violations.join("; ")}`);
   console.log(
-    "Guest visitor parity passed: Noura, templates, local resume, preview/print, ATS, detailed job workspace, import, jobs, cover letters, deletion, storage, and network boundaries.",
+    "Guest visitor parity passed: Noura, templates, local resume, JSON/ATS export, preview/print, ATS, detailed job workspace, import, jobs, cover letters, deletion, storage, and network boundaries.",
   );
 } finally {
   await browser.close();
