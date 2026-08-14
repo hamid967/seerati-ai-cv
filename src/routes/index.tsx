@@ -263,8 +263,8 @@ function Landing() {
             </h2>
             <p className="mx-auto mt-3 max-w-md text-sm text-ink-foreground/75">
               {ar
-                ? "أنشئ سيرتك، ثم سجّل لحفظها ومزامنتها."
-                : "Create your resume, then sign up to save and sync."}
+                ? "أنشئ سيرتك الآن — الحساب اختياري، وحفظها في حسابك قرارك أنت."
+                : "Create your resume now — an account is optional, and saving it is your choice."}
             </p>
             <Button
               size="lg"

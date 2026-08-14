@@ -150,7 +150,7 @@ function AuthPage() {
         }
         toast.success(t("auth_ok_created"));
         if (returnTo) {
-          window.location.href = returnTo;
+          navigate({ href: returnTo });
           return;
         }
         navigate({ to: "/onboarding" });
@@ -163,7 +163,7 @@ function AuthPage() {
       }
       toast.success(t("auth_ok_welcome"));
       if (returnTo) {
-        window.location.href = returnTo;
+        navigate({ href: returnTo });
         return;
       }
       navigate({
@@ -475,8 +475,8 @@ function AuthPage() {
             <div className="mt-6 rounded-xl border border-border bg-secondary/50 p-4 text-center">
               <p className="text-xs leading-relaxed text-muted-foreground">
                 {ar
-                  ? "اختر قالباً وابنِ مسودة سيرتك أولاً، ثم أنشئ حساباً لحفظها ومزامنتها."
-                  : "Pick a template and build a draft first, then create an account to save and sync it."}
+                  ? "يمكنك بناء مسودة سيرتك بدون حساب. بعد تسجيل الدخول يبقى العمل في هذه الجلسة، ويمكنك حفظه في حسابك من صفحة الحساب بموافقة صريحة."
+                  : "You can build a draft without an account. After signing in your session work stays available, and you can save it to your account from the account page with an explicit confirmation."}
               </p>
               <Button variant="outline" size="sm" className="mt-3" asChild>
                 <Link to="/templates">{ar ? "استعرض القوالب" : "Browse templates"}</Link>
