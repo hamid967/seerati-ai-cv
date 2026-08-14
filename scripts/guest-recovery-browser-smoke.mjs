@@ -29,30 +29,23 @@ async function expectRecoveryStorage(expected) {
   }, expected);
 }
 
+const guestNotice = page.getByTestId("guest-notice");
+
 async function openGuestNotice() {
-  const notice = page.locator("details").filter({
-    hasText: /حفظ هذه الجلسة|Remember this tab|حذف بياناتي الآن|Delete my data now/i,
-  });
-  await notice.first().waitFor({ state: "attached", timeout: 5_000 });
-  await notice.first().evaluate((element) => {
-    element.open = true;
-  });
+  await guestNotice.waitFor({ state: "visible", timeout: 10_000 });
+  const expanded = await guestNotice.evaluate((element) => element.open);
+  if (!expanded) await guestNotice.locator("summary").click();
+  await guestNotice
+    .getByRole("button", {
+      name: /حفظ هذه الجلسة|Remember this tab|إيقاف استعادة هذه الجلسة|Stop remembering this tab/i,
+    })
+    .waitFor({ state: "visible", timeout: 10_000 });
 }
 
 async function clickConsentControl(name) {
-  let lastError;
-  for (let attempt = 0; attempt < 4; attempt += 1) {
-    const control = page.getByRole("button", { name });
-    try {
-      await control.waitFor({ state: "visible", timeout: 2_000 });
-      await control.click({ force: true, timeout: 2_000 });
-      return;
-    } catch (error) {
-      lastError = error;
-      await page.waitForTimeout(150);
-    }
-  }
-  throw lastError;
+  const control = guestNotice.getByRole("button", { name });
+  await control.waitFor({ state: "visible", timeout: 10_000 });
+  await control.click({ timeout: 5_000 });
 }
 
 try {
@@ -67,9 +60,9 @@ try {
 
   await page.reload({ waitUntil: "networkidle" });
   await openGuestNotice();
-  await page
+  await guestNotice
     .getByRole("button", { name: /إيقاف استعادة هذه الجلسة|Stop remembering this tab/i })
-    .waitFor();
+    .waitFor({ state: "visible", timeout: 10_000 });
   assert(!page.url().includes("/auth"), "consented recovery must restore without auth");
 
   await clickConsentControl(/إيقاف استعادة هذه الجلسة|Stop remembering this tab/i);
@@ -77,7 +70,9 @@ try {
 
   await clickConsentControl(/حفظ هذه الجلسة في علامة التبويب|Remember this tab/i);
   await expectRecoveryStorage(true);
-  await page.getByRole("button", { name: /حذف بياناتي الآن|Delete my data now/i }).click();
+  await guestNotice
+    .getByRole("button", { name: /حذف بياناتي الآن|Delete my data now/i })
+    .click({ timeout: 5_000 });
   await expectRecoveryStorage(false);
   assert(!violations.length, `recovery must not create cloud mutations: ${violations.join(", ")}`);
 
