@@ -84,6 +84,13 @@ try {
       name: /اختر القالب كما لو كنت تمسكه بيدك|Choose a template as if it were in your hands/i,
     })
     .waitFor();
+  await page.getByTestId("template-intelligence-guide").waitFor({ state: "visible" });
+  await page.getByRole("button", { name: /اعرض توصيات محلية|Show local recommendations/i }).click();
+  await page.locator('[data-recommended="true"]').first().waitFor({ state: "visible" });
+  assert(
+    (await page.locator('[data-recommended="true"]').count()) <= 3,
+    "local template guide must surface no more than three focused recommendations",
+  );
 
   await page.goto(`${baseUrl}/resumes/new`, { waitUntil: "networkidle" });
   await page.locator("#title").fill(`${marker} resume`);

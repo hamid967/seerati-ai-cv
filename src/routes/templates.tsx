@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Badge } from "@/components/ui/badge";
 import { TemplateGallery3D } from "@/components/template-gallery-3d";
+import { TemplateIntelligenceGuide } from "@/components/template-intelligence-guide";
 import { useI18n } from "@/lib/i18n";
 import { defaultTemplates } from "@/lib/templates";
 
@@ -38,9 +40,10 @@ function TemplatesPage() {
   const ar = lang === "ar";
   const activeTemplates = defaultTemplates.filter((template) => template.active);
   const atsTemplates = activeTemplates.filter((template) => template.atsFriendly).length;
+  const [recommendedTemplateIds, setRecommendedTemplateIds] = useState<string[]>([]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="seerati-intelligence-page flex min-h-screen flex-col bg-background">
       <SiteHeader />
       <main className="flex-1">
         <section className="relative overflow-hidden border-b border-border/70 px-4 py-14 md:py-20">
@@ -74,8 +77,11 @@ function TemplatesPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-          <TemplateGallery3D />
+        <section className="mx-auto max-w-6xl space-y-8 px-4 py-10 md:space-y-10 md:py-14">
+          <TemplateIntelligenceGuide onRecommendationsChange={setRecommendedTemplateIds} />
+          <div id="template-gallery">
+            <TemplateGallery3D recommendedTemplateIds={recommendedTemplateIds} />
+          </div>
         </section>
       </main>
       <SiteFooter />
