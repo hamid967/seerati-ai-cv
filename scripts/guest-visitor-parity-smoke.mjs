@@ -112,6 +112,19 @@ Professional summary: Synthetic visitor parity fixture.
   await page.getByRole("button", { name: /حلّل محلياً|Analyze locally/i }).click();
   await page.getByText(/ملخص المطابقة|Match summary/i).waitFor();
 
+  await navigateWithinApp("/jobs/guest-local-workspace");
+  await page.getByRole("heading", { name: /مساحة وظيفة محلية|Local job workspace/i }).waitFor();
+  assert(!page.url().includes("/auth"), "guest job workspace must not redirect to auth");
+  await page.getByRole("textbox", { name: /المسمى الوظيفي|Job title/i }).fill("Product Analyst");
+  await page.getByRole("textbox", { name: /الشركة|Company/i }).fill("Evidence Co");
+  await page
+    .getByRole("textbox", { name: /الوصف الوظيفي|Job description/i })
+    .fill(
+      `${marker}: Senior Product Analyst role requiring SQL, analytics, stakeholder communication, and research.`,
+    );
+  await page.getByRole("button", { name: /حلّل محلياً|Analyse locally/i }).click();
+  await page.getByText(/ملخص المطابقة|Match summary/i).waitFor();
+
   await navigateWithinApp("/cover-letters");
   await page.getByText(/اكتب خطاب تقديم|Write a cover letter/i).waitFor();
   await page.getByRole("textbox", { name: /المسمى الوظيفي|Job title/i }).fill("Product Analyst");
@@ -132,7 +145,7 @@ Professional summary: Synthetic visitor parity fixture.
 
   assert(!violations.length, `visitor parity network/privacy violations: ${violations.join("; ")}`);
   console.log(
-    "Guest visitor parity passed: Noura, templates, local resume, preview/print, ATS, import, jobs, cover letters, deletion, storage, and network boundaries.",
+    "Guest visitor parity passed: Noura, templates, local resume, preview/print, ATS, detailed job workspace, import, jobs, cover letters, deletion, storage, and network boundaries.",
   );
 } finally {
   await browser.close();
