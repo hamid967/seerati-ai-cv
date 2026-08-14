@@ -61,6 +61,14 @@ type Ctx = {
     seed?: boolean;
     jobTitle?: string;
   }) => Promise<Resume | null>;
+  /** Creates a same-tab fictional sample without database or browser persistence. */
+  createTransientSampleResume: (input: {
+    title: string;
+    templateId: string;
+    language: "ar" | "en";
+    data: ResumeData;
+    syntheticSample: NonNullable<Resume["syntheticSample"]>;
+  }) => Resume;
   updateResume: (id: string, patch: Partial<Resume>) => Promise<void>;
   duplicateResume: (id: string) => Promise<Resume | null>;
   deleteResume: (id: string) => Promise<void>;
@@ -146,6 +154,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Profile | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [guestResumes, setGuestResumes] = useState<Resume[]>([]);
+  // Sample resumes are intentionally same-tab only, even for an authenticated user.
+  const [transientSampleResumes, setTransientSampleResumes] = useState<Resume[]>([]);
   const [guestSession, setGuestSession] = useState<GuestResumeSession | null>(null);
   const [sessionRecoveryEnabled, setSessionRecoveryEnabled] = useState(false);
   const [loadingResumes, setLoadingResumes] = useState(false);
@@ -157,6 +167,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
    */
   const guestRef = useRef<Resume[]>([]);
   const resumesRef = useRef<Resume[]>([]);
+  const transientSampleRef = useRef<Resume[]>([]);
 
   const persistGuest = useCallback((update: Resume[] | ((prev: Resume[]) => Resume[])) => {
     const next = typeof update === "function" ? update(guestRef.current) : update;
@@ -178,6 +189,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     resumesRef.current = next;
     setResumes(next);
   }, []);
+
+  const persistTransientSample = useCallback(
+    (update: Resume[] | ((prev: Resume[]) => Resume[])) => {
+      const next = typeof update === "function" ? update(transientSampleRef.current) : update;
+      transientSampleRef.current = next;
+      setTransientSampleResumes(next);
+    },
+    [],
+  );
 
   useEffect(() => {
     const recovered = hasSessionRecoveryConsent() ? readConsentedSessionRecovery() : [];
@@ -364,7 +384,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     clearGuestResumes();
     clearGuestResumeSession();
     guestRef.current = [];
+    transientSampleRef.current = [];
     setGuestResumes([]);
+    setTransientSampleResumes([]);
     setGuestSession(null);
     setSessionRecoveryEnabled(false);
   }, []);
@@ -439,9 +461,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Ctx>(() => {
     const isGuest = !user;
-    const list = isGuest ? guestResumes : resumes;
+    const persistentList = isGuest ? guestResumes : resumes;
+    const list = [...transientSampleResumes, ...persistentList];
     const effectiveMax = isGuest ? GUEST_RESUME_LIMIT : maxResumes;
-    const atLimit = list.length >= effectiveMax;
+    // Same-tab sample resumes never consume a signed-in account limit.
+    const atLimit = isGuest ? list.length >= effectiveMax : persistentList.length >= effectiveMax;
     const guestMigrationPreview = buildGuestMigrationPreview(
       guestResumes,
       resumes.length,
@@ -472,6 +496,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       signOut: async () => {
         await supabase.auth.signOut();
+        transientSampleRef.current = [];
+        setTransientSampleResumes([]);
         setUser(null);
         setResumesState([]);
       },
@@ -526,7 +552,38 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setResumesState((rows) => [resume, ...rows]);
         return resume;
       },
+      createTransientSampleResume: ({ title, templateId, language, data, syntheticSample }) => {
+        const now = new Date().toISOString();
+        const sample: Resume = {
+          id: `sample-${Math.random().toString(36).slice(2, 10)}`,
+          ownerId: "synthetic-session",
+          title,
+          templateId,
+          language,
+          data,
+          status: "draft",
+          completionScore: 0,
+          atsScore: 0,
+          lastViewedAt: null,
+          createdAt: now,
+          updatedAt: now,
+          syntheticSample,
+        };
+        // Replace rather than accumulate: this path is a focused, same-tab sample session.
+        persistTransientSample([sample]);
+        return sample;
+      },
       updateResume: async (id, patch) => {
+        if (id.startsWith("sample-")) {
+          persistTransientSample((prev) =>
+            prev.map((resume) =>
+              resume.id === id
+                ? { ...resume, ...patch, updatedAt: new Date().toISOString() }
+                : resume,
+            ),
+          );
+          return;
+        }
         if (isGuest || isGuestResumeId(id)) {
           persistGuest((prev) =>
             prev.map((r) =>
@@ -560,6 +617,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       duplicateResume: async (id) => {
         const src = list.find((r) => r.id === id);
         if (!src || atLimit) return null;
+        if (id.startsWith("sample-")) {
+          const now = new Date().toISOString();
+          const copy = {
+            ...src,
+            id: `sample-${Math.random().toString(36).slice(2, 10)}`,
+            title: `${src.title} — ${src.language === "ar" ? "نسخة تجريبية" : "sample copy"}`,
+            createdAt: now,
+            updatedAt: now,
+          };
+          persistTransientSample((prev) => [copy, ...prev]);
+          return copy;
+        }
         if (isGuest) {
           const copy = makeGuestResume({
             title: `${src.title} — نسخة`,
@@ -588,6 +657,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return copy;
       },
       deleteResume: async (id) => {
+        if (id.startsWith("sample-")) {
+          persistTransientSample((prev) => prev.filter((resume) => resume.id !== id));
+          return;
+        }
         if (isGuest || isGuestResumeId(id)) {
           persistGuest((prev) => prev.filter((r) => r.id !== id));
           return;
@@ -604,7 +677,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     user,
     resumes,
     guestResumes,
+    transientSampleResumes,
     persistGuest,
+    persistTransientSample,
     loadingResumes,
     maxResumes,
     signIn,

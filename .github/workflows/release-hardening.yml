@@ -73,6 +73,9 @@ jobs:
       - name: Run intelligent template guide smoke
         if: matrix.browser == 'chromium'
         run: bun run test:template-intelligence
+      - name: Run synthetic specialty resume privacy and export-safety smoke
+        if: matrix.browser == 'chromium'
+        run: bun run test:synthetic-resume-browser
       - name: Run consented guest recovery privacy smoke
         if: matrix.browser == 'chromium'
         run: bun run test:guest-recovery-browser

@@ -19,6 +19,7 @@ import { getTemplate } from "@/components/resume-preview";
 import { fromResumeData } from "@/modules/career";
 import { analyzeCareerGraph } from "@/modules/ats";
 import { assessResumeHealth } from "@/modules/intelligence";
+import { hasUnapprovedSampleData } from "@/modules/synthetic-resume";
 
 export const Route = createFileRoute("/ats")({
   head: () => ({
@@ -50,9 +51,13 @@ function AtsPage() {
   const ar = lang === "ar";
   const [jd, setJd] = useState("");
   const { resumes, isGuest } = useStore();
-  const guestResume = isGuest ? resumes[0] : undefined;
-  const sample = useMemo(() => guestResume ?? demoResume("demo"), [guestResume]);
-  const phase18Input = useMemo(() => guestResume?.data ?? demoResumeData(), [guestResume]);
+  const activeResume =
+    resumes.find((resume) => resume.syntheticSample) ?? (isGuest ? resumes[0] : undefined);
+  const syntheticNeedsReview = Boolean(
+    activeResume?.syntheticSample && hasUnapprovedSampleData(activeResume.syntheticSample),
+  );
+  const sample = useMemo(() => activeResume ?? demoResume("demo"), [activeResume]);
+  const phase18Input = useMemo(() => activeResume?.data ?? demoResumeData(), [activeResume]);
   const report = useMemo(
     () => analyzeResume(sample, getTemplate(sample.templateId), jd),
     [sample, jd],
@@ -85,34 +90,53 @@ function AtsPage() {
         <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="flex items-center justify-between">
             <p className="font-bold">
-              {guestResume
+              {syntheticNeedsReview
                 ? ar
-                  ? "فحص سيرتك في هذه الجلسة"
-                  : "Checking your resume in this session"
-                : ar
-                  ? "مثال على سيرة تجريبية"
-                  : "Example: demo resume"}
+                  ? "توافق بنية القالب التجريبي"
+                  : "Sample template structure compatibility"
+                : activeResume
+                  ? ar
+                    ? "فحص سيرتك في هذه الجلسة"
+                    : "Checking your resume in this session"
+                  : ar
+                    ? "مثال على سيرة تجريبية"
+                    : "Example: demo resume"}
             </p>
-            <p className="text-2xl font-extrabold text-emerald-accent">{report.score}/100</p>
+            <p className="text-2xl font-extrabold text-emerald-accent">
+              {syntheticNeedsReview ? "—" : `${report.score}/100`}
+            </p>
           </div>
-          <Progress value={report.score} className="mt-4" />
+          {syntheticNeedsReview ? (
+            <p
+              className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm leading-relaxed text-amber-950 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-100"
+              data-testid="synthetic-ats-boundary"
+            >
+              {ar
+                ? "التقييم الحالي يشرح ملاءمة القالب والبنية فقط. لا توجد درجة محتوى نهائية أو مطابقة وظيفية مؤكدة حتى تستبدل البيانات التجريبية وتراجعها."
+                : "This view explains template and structure fit only. There is no final content score or verified job match until sample data is replaced and reviewed."}
+            </p>
+          ) : (
+            <Progress value={report.score} className="mt-4" />
+          )}
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {report.categories.map((c) => (
-              <div key={c.id} className="rounded-xl border border-border p-4">
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-sm font-semibold">{c.label[lang]}</p>
-                  <span className="text-xs font-bold text-muted-foreground">
-                    {c.earned}/{c.max}
-                  </span>
+          {!syntheticNeedsReview ? (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {report.categories.map((c) => (
+                <div key={c.id} className="rounded-xl border border-border p-4">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-sm font-semibold">{c.label[lang]}</p>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {c.earned}/{c.max}
+                    </span>
+                  </div>
+                  <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
+                  {c.tips[0] && (
+                    <p className="mt-2 text-xs text-muted-foreground">{c.tips[0][lang]}</p>
+                  )}
                 </div>
-                <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
-                {c.tips[0] && (
-                  <p className="mt-2 text-xs text-muted-foreground">{c.tips[0][lang]}</p>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : null}
 
           <div className="mt-8 space-y-2">
             <Label htmlFor="jd">
@@ -121,7 +145,7 @@ function AtsPage() {
                 : "Try a job description to measure keyword coverage"}
             </Label>
             <Textarea id="jd" rows={5} value={jd} onChange={(e) => setJd(e.target.value)} />
-            {report.keywords && (
+            {!syntheticNeedsReview && report.keywords && (
               <div className="pt-2">
                 <p className="text-sm font-semibold">
                   {ar ? "التطابق" : "Match"}: {report.keywords.coverage}% (
@@ -151,56 +175,61 @@ function AtsPage() {
                   : "A hard, rule-based check — no AI involved, and the same resume always yields the same result."}
               </p>
             </div>
-            <p className="text-2xl font-extrabold">{lint.score}/100</p>
-          </div>
-          <Progress value={lint.score} className="mt-4" />
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {lint.categories.map((c) => (
-              <div key={c.category} className="rounded-xl border border-border p-4">
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-sm font-semibold">
-                    {ar ? LINT_CATEGORY_LABEL[c.category].ar : LINT_CATEGORY_LABEL[c.category].en}
-                  </p>
-                  <span className="text-xs font-bold text-muted-foreground">
-                    {c.earned}/{c.max}
-                  </span>
-                </div>
-                <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
-              </div>
-            ))}
-          </div>
-
-          {lint.findings.length ? (
-            <ul className="mt-5 space-y-2 border-t border-border pt-4">
-              {lint.findings.slice(0, 10).map((f) => (
-                <li
-                  key={`${f.rule}-${f.where ?? ""}`}
-                  className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]"
-                >
-                  <Badge
-                    variant={f.severity === "error" ? "destructive" : "outline"}
-                    className="mt-0.5 text-[10.5px]"
-                  >
-                    {ar
-                      ? f.severity === "error"
-                        ? "حرج"
-                        : f.severity === "warning"
-                          ? "تحذير"
-                          : "ملاحظة"
-                      : f.severity}
-                  </Badge>
-                  <span className="flex-1">{explainFinding(f, ar ? "ar" : "en")}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-5 border-t border-border pt-4 text-sm text-emerald-accent">
-              {ar
-                ? "لا توجد ملاحظات — بنية السيرة سليمة."
-                : "No findings — the structure looks clean."}
+            <p className="text-2xl font-extrabold">
+              {syntheticNeedsReview ? "—" : `${lint.score}/100`}
             </p>
-          )}
+          </div>
+          {!syntheticNeedsReview ? <Progress value={lint.score} className="mt-4" /> : null}
+
+          {!syntheticNeedsReview ? (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {lint.categories.map((c) => (
+                <div key={c.category} className="rounded-xl border border-border p-4">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-sm font-semibold">
+                      {ar ? LINT_CATEGORY_LABEL[c.category].ar : LINT_CATEGORY_LABEL[c.category].en}
+                    </p>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {c.earned}/{c.max}
+                    </span>
+                  </div>
+                  <Progress value={(c.earned / c.max) * 100} className="mt-2 h-1.5" />
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {!syntheticNeedsReview &&
+            (lint.findings.length ? (
+              <ul className="mt-5 space-y-2 border-t border-border pt-4">
+                {lint.findings.slice(0, 10).map((f) => (
+                  <li
+                    key={`${f.rule}-${f.where ?? ""}`}
+                    className="flex flex-wrap items-start gap-2 text-sm leading-[1.9]"
+                  >
+                    <Badge
+                      variant={f.severity === "error" ? "destructive" : "outline"}
+                      className="mt-0.5 text-[10.5px]"
+                    >
+                      {ar
+                        ? f.severity === "error"
+                          ? "حرج"
+                          : f.severity === "warning"
+                            ? "تحذير"
+                            : "ملاحظة"
+                        : f.severity}
+                    </Badge>
+                    <span className="flex-1">{explainFinding(f, ar ? "ar" : "en")}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-5 border-t border-border pt-4 text-sm text-emerald-accent">
+                {ar
+                  ? "لا توجد ملاحظات — بنية السيرة سليمة."
+                  : "No findings — the structure looks clean."}
+              </p>
+            ))}
         </section>
 
         <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-soft">
@@ -280,7 +309,7 @@ function AtsPage() {
 
         <Button size="lg" className="mt-8" asChild>
           <Link to="/assistant" search={{ agent: "noura" }}>
-            {guestResume
+            {activeResume
               ? ar
                 ? "العودة إلى نورة"
                 : "Return to Noura"
