@@ -20,11 +20,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CareerEvidenceRouteImport } from './routes/career-evidence'
 import { Route as CareerGuidesRouteImport } from './routes/career-guides'
 import { Route as CareerPassportRouteImport } from './routes/career-passport'
+import { Route as CareerRoadmapRouteImport } from './routes/career-roadmap'
 import { Route as CareerTwinRouteImport } from './routes/career-twin'
 import { Route as CoverLettersRouteImport } from './routes/cover-letters'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ImportRouteImport } from './routes/import'
+import { Route as InterviewsRouteImport } from './routes/interviews'
 import { Route as IntroRouteImport } from './routes/intro'
 import { Route as KeywordScannerRouteImport } from './routes/keyword-scanner'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -108,6 +110,11 @@ const CareerPassportRoute = CareerPassportRouteImport.update({
   path: '/career-passport',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CareerRoadmapRoute = CareerRoadmapRouteImport.update({
+  id: '/career-roadmap',
+  path: '/career-roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CareerTwinRoute = CareerTwinRouteImport.update({
   id: '/career-twin',
   path: '/career-twin',
@@ -131,6 +138,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
 const ImportRoute = ImportRouteImport.update({
   id: '/import',
   path: '/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewsRoute = InterviewsRouteImport.update({
+  id: '/interviews',
+  path: '/interviews',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntroRoute = IntroRouteImport.update({
@@ -284,11 +296,13 @@ export interface FileRoutesByFullPath {
   '/career-evidence': typeof CareerEvidenceRoute
   '/career-guides': typeof CareerGuidesRoute
   '/career-passport': typeof CareerPassportRoute
+  '/career-roadmap': typeof CareerRoadmapRoute
   '/career-twin': typeof CareerTwinRoute
   '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/interviews': typeof InterviewsRoute
   '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
   '/mcp': typeof McpRoute
@@ -328,11 +342,13 @@ export interface FileRoutesByTo {
   '/career-evidence': typeof CareerEvidenceRoute
   '/career-guides': typeof CareerGuidesRoute
   '/career-passport': typeof CareerPassportRoute
+  '/career-roadmap': typeof CareerRoadmapRoute
   '/career-twin': typeof CareerTwinRoute
   '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/interviews': typeof InterviewsRoute
   '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
   '/mcp': typeof McpRoute
@@ -374,11 +390,13 @@ export interface FileRoutesById {
   '/career-evidence': typeof CareerEvidenceRoute
   '/career-guides': typeof CareerGuidesRoute
   '/career-passport': typeof CareerPassportRoute
+  '/career-roadmap': typeof CareerRoadmapRoute
   '/career-twin': typeof CareerTwinRoute
   '/cover-letters': typeof CoverLettersRoute
   '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/import': typeof ImportRoute
+  '/interviews': typeof InterviewsRoute
   '/intro': typeof IntroRoute
   '/keyword-scanner': typeof KeywordScannerRoute
   '/mcp': typeof McpRoute
@@ -421,11 +439,13 @@ export interface FileRouteTypes {
     | '/career-evidence'
     | '/career-guides'
     | '/career-passport'
+    | '/career-roadmap'
     | '/career-twin'
     | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/interviews'
     | '/intro'
     | '/keyword-scanner'
     | '/mcp'
@@ -465,11 +485,13 @@ export interface FileRouteTypes {
     | '/career-evidence'
     | '/career-guides'
     | '/career-passport'
+    | '/career-roadmap'
     | '/career-twin'
     | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/interviews'
     | '/intro'
     | '/keyword-scanner'
     | '/mcp'
@@ -510,11 +532,13 @@ export interface FileRouteTypes {
     | '/career-evidence'
     | '/career-guides'
     | '/career-passport'
+    | '/career-roadmap'
     | '/career-twin'
     | '/cover-letters'
     | '/dashboard'
     | '/features'
     | '/import'
+    | '/interviews'
     | '/intro'
     | '/keyword-scanner'
     | '/mcp'
@@ -556,11 +580,13 @@ export interface RootRouteChildren {
   CareerEvidenceRoute: typeof CareerEvidenceRoute
   CareerGuidesRoute: typeof CareerGuidesRoute
   CareerPassportRoute: typeof CareerPassportRoute
+  CareerRoadmapRoute: typeof CareerRoadmapRoute
   CareerTwinRoute: typeof CareerTwinRoute
   CoverLettersRoute: typeof CoverLettersRoute
   DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   ImportRoute: typeof ImportRoute
+  InterviewsRoute: typeof InterviewsRoute
   IntroRoute: typeof IntroRoute
   KeywordScannerRoute: typeof KeywordScannerRoute
   McpRoute: typeof McpRoute
@@ -664,6 +690,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareerPassportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/career-roadmap': {
+      id: '/career-roadmap'
+      path: '/career-roadmap'
+      fullPath: '/career-roadmap'
+      preLoaderRoute: typeof CareerRoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/career-twin': {
       id: '/career-twin'
       path: '/career-twin'
@@ -697,6 +730,13 @@ declare module '@tanstack/react-router' {
       path: '/import'
       fullPath: '/import'
       preLoaderRoute: typeof ImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interviews': {
+      id: '/interviews'
+      path: '/interviews'
+      fullPath: '/interviews'
+      preLoaderRoute: typeof InterviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/intro': {
@@ -921,11 +961,13 @@ const rootRouteChildren: RootRouteChildren = {
   CareerEvidenceRoute: CareerEvidenceRoute,
   CareerGuidesRoute: CareerGuidesRoute,
   CareerPassportRoute: CareerPassportRoute,
+  CareerRoadmapRoute: CareerRoadmapRoute,
   CareerTwinRoute: CareerTwinRoute,
   CoverLettersRoute: CoverLettersRoute,
   DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   ImportRoute: ImportRoute,
+  InterviewsRoute: InterviewsRoute,
   IntroRoute: IntroRoute,
   KeywordScannerRoute: KeywordScannerRoute,
   McpRoute: McpRoute,
