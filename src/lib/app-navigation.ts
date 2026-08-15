@@ -1,5 +1,6 @@
 import {
   Briefcase,
+  Compass,
   Upload,
   FileCheck2,
   FileText,
@@ -28,6 +29,7 @@ export type AppNavId =
   | "career-twin"
   | "career-passport"
   | "career-evidence"
+  | "career-roadmap"
   | "import"
   | "resumes"
   | "jobs"
@@ -107,6 +109,15 @@ export const APP_NAV: AppNavItem[] = [
     group: "main",
   },
   {
+    id: "career-roadmap",
+    label: { ar: "خارطة المسار", en: "Career roadmap" },
+    hint: { ar: "خطة محلية قابلة للمراجعة", en: "A reviewable local plan" },
+    icon: Compass,
+    to: "/career-roadmap",
+    enabled: true,
+    group: "main",
+  },
+  {
     id: "import",
     label: { ar: "استيراد", en: "Import" },
     hint: { ar: "من LinkedIn وملفاتك", en: "From LinkedIn and your files" },
@@ -165,10 +176,10 @@ export const APP_NAV: AppNavItem[] = [
   {
     id: "interviews",
     label: { ar: "المقابلات", en: "Interviews" },
-    hint: { ar: "قريباً", en: "Coming soon" },
+    hint: { ar: "تدريب نصي محلي بأسلوب STAR", en: "Local text-only STAR practice" },
     icon: Mic,
     to: "/interviews",
-    enabled: false,
+    enabled: true,
     group: "main",
   },
   {
