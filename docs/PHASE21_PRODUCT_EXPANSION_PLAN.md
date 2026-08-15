@@ -6,11 +6,11 @@ This plan expands Seerati AI CV through independent, reviewable waves. It preser
 
 > **Status convention:** Items labelled **implemented in Wave 1** are code in the `feat/phase21-application-tools` branch. All other items are proposed scope until their own branch, tests, and Draft PR exist.
 
-| Wave | Scope | Guest boundary | Delivery |
-|---|---|---|---|
-| 1 | Application Center, application readiness checklist, discovery links to matching, ATS, cover letters, and job workspaces | Checklist state is React memory only; no job or resume content is collected by the center | `feat/phase21-application-tools` |
-| 2 | Interview practice and career-development guidance | Text-only, local-first practice; no voice capture by default | Separate Draft PR |
-| 3 | Specialized resume sections and application-tracking improvements | Guest drafts remain memory-only; account persistence stays opt-in and owner-scoped | Separate Draft PR |
+| Wave | Scope                                                                                                                    | Guest boundary                                                                            | Delivery                         |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | -------------------------------- |
+| 1    | Application Center, application readiness checklist, discovery links to matching, ATS, cover letters, and job workspaces | Checklist state is React memory only; no job or resume content is collected by the center | `feat/phase21-application-tools` |
+| 2    | Interview practice and career-development guidance                                                                       | Text-only, local-first practice; no voice capture by default                              | Separate Draft PR                |
+| 3    | Specialized resume sections and application-tracking improvements                                                        | Guest drafts remain memory-only; account persistence stays opt-in and owner-scoped        | Separate Draft PR                |
 
 ## Wave 1: Application Center — Implemented
 
@@ -22,22 +22,22 @@ The local readiness checklist includes five review steps: setting a job target, 
 
 The next branch should activate a dedicated `/interviews` route based on the existing evidence-grounded interview engine. It should add a text-only STAR practice surface, make missing evidence visible, and avoid recording audio or sending a prompt before explicit consent. A separate career-guidance section should offer role goals, skill-gap reflection, and curated next-step plans without presenting them as employment predictions.
 
-| Proposed section | Intended user value | Guardrail |
-|---|---|---|
-| Interview practice | Structured STAR rehearsal by role and job description | No audio capture; no employer-outcome claim |
-| Evidence answer builder | Turn verified facts into reviewable answer outlines | Mark missing facts; never invent achievements |
-| Career direction plan | Choose a goal and map skill or portfolio next steps | Local or account-scoped state only; no background profiling |
+| Proposed section        | Intended user value                                   | Guardrail                                                   |
+| ----------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| Interview practice      | Structured STAR rehearsal by role and job description | No audio capture; no employer-outcome claim                 |
+| Evidence answer builder | Turn verified facts into reviewable answer outlines   | Mark missing facts; never invent achievements               |
+| Career direction plan   | Choose a goal and map skill or portfolio next steps   | Local or account-scoped state only; no background profiling |
 
 ## Wave 3: Specialized Sections and Job Tracking — Proposed
 
 The final planned branch should extend structured resume support for projects, publications, licences, portfolios, volunteering, and references. It should also improve the existing job workspace with a clearer application timeline, follow-up reminders that are user-initiated, and exportable account-owned data. It must not create guest cloud records or silently migrate guest content into an account.
 
-| Proposed section | Intended data model | Privacy rule |
-|---|---|---|
-| Projects and portfolios | Title, summary, evidence link, optional outcome | User-entered content stays in memory for guests |
-| Publications and licences | Credential metadata and optional verification URL | Never infer or fabricate a credential |
-| Volunteering and references | Structured optional resume sections | Do not expose contact details in public telemetry or logs |
-| Job follow-up timeline | Status, date, owner-entered note | Guest timeline remains local; account persistence is explicit |
+| Proposed section            | Intended data model                               | Privacy rule                                                  |
+| --------------------------- | ------------------------------------------------- | ------------------------------------------------------------- |
+| Projects and portfolios     | Title, summary, evidence link, optional outcome   | User-entered content stays in memory for guests               |
+| Publications and licences   | Credential metadata and optional verification URL | Never infer or fabricate a credential                         |
+| Volunteering and references | Structured optional resume sections               | Do not expose contact details in public telemetry or logs     |
+| Job follow-up timeline      | Status, date, owner-entered note                  | Guest timeline remains local; account persistence is explicit |
 
 ## Acceptance Gates
 
