@@ -1,6 +1,7 @@
 import {
   Briefcase,
   Upload,
+  FileCheck2,
   FileText,
   IdCard,
   Languages,
@@ -30,6 +31,7 @@ export type AppNavId =
   | "import"
   | "resumes"
   | "jobs"
+  | "application-center"
   | "cover-letters"
   | "keyword-scanner"
   | "interviews"
@@ -131,6 +133,15 @@ export const APP_NAV: AppNavItem[] = [
     to: "/jobs",
     enabled: true,
     mobile: true,
+    group: "main",
+  },
+  {
+    id: "application-center",
+    label: { ar: "مركز التقديم", en: "Application center" },
+    hint: { ar: "جهّز حزمة تقديمك خطوة بخطوة", en: "Prepare your application pack step by step" },
+    icon: FileCheck2,
+    to: "/application-center",
+    enabled: true,
     group: "main",
   },
   {

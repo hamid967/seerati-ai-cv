@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ApplicationCenterRouteImport } from './routes/application-center'
 import { Route as ArabicIntelligenceRouteImport } from './routes/arabic-intelligence'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AtsRouteImport } from './routes/ats'
@@ -65,6 +66,11 @@ const AccountRoute = AccountRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplicationCenterRoute = ApplicationCenterRouteImport.update({
+  id: '/application-center',
+  path: '/application-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArabicIntelligenceRoute = ArabicIntelligenceRouteImport.update({
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/application-center': typeof ApplicationCenterRoute
   '/arabic-intelligence': typeof ArabicIntelligenceRoute
   '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
@@ -313,6 +320,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/application-center': typeof ApplicationCenterRoute
   '/arabic-intelligence': typeof ArabicIntelligenceRoute
   '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
@@ -358,6 +366,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/application-center': typeof ApplicationCenterRoute
   '/arabic-intelligence': typeof ArabicIntelligenceRoute
   '/assistant': typeof AssistantRoute
   '/ats': typeof AtsRoute
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/application-center'
     | '/arabic-intelligence'
     | '/assistant'
     | '/ats'
@@ -447,6 +457,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/application-center'
     | '/arabic-intelligence'
     | '/assistant'
     | '/ats'
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/application-center'
     | '/arabic-intelligence'
     | '/assistant'
     | '/ats'
@@ -536,6 +548,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ApplicationCenterRoute: typeof ApplicationCenterRoute
   ArabicIntelligenceRoute: typeof ArabicIntelligenceRoute
   AssistantRoute: typeof AssistantRoute
   AtsRoute: typeof AtsRoute
@@ -593,6 +606,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/application-center': {
+      id: '/application-center'
+      path: '/application-center'
+      fullPath: '/application-center'
+      preLoaderRoute: typeof ApplicationCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/arabic-intelligence': {
@@ -893,6 +913,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
+  ApplicationCenterRoute: ApplicationCenterRoute,
   ArabicIntelligenceRoute: ArabicIntelligenceRoute,
   AssistantRoute: AssistantRoute,
   AtsRoute: AtsRoute,
